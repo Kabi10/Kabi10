@@ -132,22 +132,57 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 
 <div align="center">
 
-[![Portfolio](https://img.shields.io/badge/Portfolio-kabilan.io-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://kabilan.io)
-[![Email](https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:contact@kabilan.io)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/xkabix)
-[![ResearchGate](https://img.shields.io/badge/ResearchGate-Publications-green?style=for-the-badge&logo=researchgate&logoColor=white)](https://www.researchgate.net/profile/Kabilan-Tharmaratnam-2)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Kabi10)
+### 🌐 **Professional Network**
+
+<div align="center">
+
+[![Portfolio](https://img.shields.io/badge/🌐_Portfolio-kabilan.io-4285F4?style=for-the-badge&logoColor=white)](https://kabilan.io)
+[![Email](https://img.shields.io/badge/📧_Email-Contact-EA4335?style=for-the-badge&logoColor=white)](mailto:contact@kabilan.io)
+[![LinkedIn](https://img.shields.io/badge/💼_LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/xkabix)
+[![ResearchGate](https://img.shields.io/badge/🔬_ResearchGate-Publications-00CCBB?style=for-the-badge&logo=researchgate&logoColor=white)](https://www.researchgate.net/profile/Kabilan-Tharmaratnam-2)
+[![GitHub](https://img.shields.io/badge/💻_GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Kabi10)
+
+</div>
+
+### 📊 **Professional Metrics**
+
+<div align="center">
+
+![Research Impact](https://img.shields.io/badge/Research_Reads-89+-00CCBB?style=for-the-badge&logo=researchgate&logoColor=white)
+![Community Impact](https://img.shields.io/badge/Community_Upvotes-165+-FF4500?style=for-the-badge&logo=reddit&logoColor=white)
+![Publications](https://img.shields.io/badge/Publications-2_Papers-4285F4?style=for-the-badge&logo=google-scholar&logoColor=white)
+![Team Leadership](https://img.shields.io/badge/Team_Leadership-5+_Members-34A853?style=for-the-badge&logo=microsoft-teams&logoColor=white)
+
+</div>
 
 </div>
 
 ---
 
-<div align="center">
-  
+### 🚀 **Ready to Collaborate?**
+
+**I'm actively seeking opportunities in:**
+- 💼 **Full-Stack Development** roles with AI integration
+- 🎓 **MSc Programs** in Computer Science or AI
+- 🔬 **Research Collaborations** in AI ethics and mental health
+- 👥 **Technical Leadership** positions in innovative companies
+
+**Let's build something amazing together!**
+
+[![Hire Me](https://img.shields.io/badge/💼_Available_for_Hire-Yes-success?style=for-the-badge)](mailto:contact@kabilan.io)
+[![Collaborate](https://img.shields.io/badge/🤝_Open_to_Collaborate-Yes-blue?style=for-the-badge)](https://linkedin.com/in/xkabix)
+[![Research](https://img.shields.io/badge/🔬_Research_Partnerships-Welcome-purple?style=for-the-badge)](https://www.researchgate.net/profile/Kabilan-Tharmaratnam-2)
+
+---
+
 **💡 "Code is poetry written in logic, and every bug is just a plot twist waiting to be resolved."**
 
 *Thanks for visiting my profile! Feel free to explore my repositories and don't hesitate to reach out for collaborations or opportunities.*
 
+⭐ **If you find my work valuable, please consider starring my repositories and connecting with me!**
+
 ![Profile Views](https://komarev.com/ghpvc/?username=Kabi10&color=blueviolet&style=flat-square&label=Profile+Views)
+
+<sub>**Last Updated:** January 2025 | **Professional GitHub Profile Optimization Complete**</sub>
 
 </div>
