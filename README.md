@@ -108,6 +108,8 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 
 - 📚 **Published Researcher**: 2 research publications on AI ethics and mental health (2024)
 - 🎓 **Academic Excellence**: Bachelor of Science degree with focus on Computer Science and AI
+- 👥 **Community Leader**: 165+ upvotes on technical posts, active contributor to developer communities
+- 🛠️ **Open Source Impact**: Created popular Cursor AI rules repository with community adoption
 - 🚀 **Zero-Cost Architecture**: Designed and implemented cost-effective solutions saving thousands annually
 - 🔒 **Security Expert**: Implemented enterprise-grade security monitoring and threat detection
 - 📈 **Performance Optimization**: Achieved 90%+ lighthouse scores with advanced optimization techniques
@@ -118,6 +120,7 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 ## 📈 Current Focus
 
 - 🔬 **Research**: AI ethics, mental health applications, and responsible AI development
+- 👥 **Community**: Active contributor to developer communities with 165+ upvote technical posts
 - 🎓 **Academic Growth**: Pursuing advanced computer science concepts and research methodologies
 - 💼 **Career**: Seeking opportunities in innovative tech companies, research institutions, and MSc programs
 - 🌍 **Impact**: Building solutions that create positive change in mental health and technology ethics
