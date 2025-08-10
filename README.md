@@ -8,11 +8,13 @@
 
 ## 🚀 About Me
 
-I'm a passionate **Full-Stack Developer** with expertise in modern web technologies, specializing in building scalable, user-centric applications. Currently focused on creating innovative solutions that solve real-world problems through clean, efficient code.
+I'm a passionate **Full-Stack Developer** and **AI Researcher** with expertise in modern web technologies, specializing in building scalable, user-centric applications. With a Bachelor of Science degree and published research in AI ethics and mental health, I bridge the gap between cutting-edge technology and real-world impact through clean, efficient code.
 
 - 🔭 **Currently Working On**: [RateMyEmployer](https://github.com/Kabi10/ratemyemployer) - A comprehensive employer review platform with AI-powered insights
+- 🎓 **Research Focus**: AI ethics, mental health applications, and responsible AI development
+- 📚 **Publications**: Research papers on "AI in Mental Health, Ethics, and Manipulation" (2024)
 - 🌱 **Learning**: Advanced system design, AI integration, and enterprise-scale architecture
-- 💼 **Open To**: Full-time opportunities, freelance projects, and collaborative ventures
+- 💼 **Open To**: Full-time opportunities, research collaborations, and innovative projects
 - 🎯 **Goal**: Contributing to impactful projects that make a difference in people's lives
 - 📍 **Location**: Available for remote work globally
 - 🌐 **Portfolio**: [kabilan.io](https://kabilan.io)
@@ -104,18 +106,22 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 
 ## 🏆 Achievements & Highlights
 
+- 📚 **Published Researcher**: 2 research publications on AI ethics and mental health (2024)
+- 🎓 **Academic Excellence**: Bachelor of Science degree with focus on Computer Science and AI
 - 🚀 **Zero-Cost Architecture**: Designed and implemented cost-effective solutions saving thousands annually
 - 🔒 **Security Expert**: Implemented enterprise-grade security monitoring and threat detection
 - 📈 **Performance Optimization**: Achieved 90%+ lighthouse scores with advanced optimization techniques
 - 🤖 **AI Integration**: Successfully integrated AI-powered features for enhanced user experiences
 - 🌐 **Modern Web Development**: Expertise in latest web technologies and best practices
+- 🔬 **Research Impact**: 89+ reads on ResearchGate demonstrating academic engagement
 
 ## 📈 Current Focus
 
-- 🔬 **Research**: Exploring advanced AI integration patterns and system architecture
-- 🎓 **Learning**: Pursuing advanced computer science concepts and modern development practices
-- 💼 **Career**: Seeking opportunities in innovative tech companies and research institutions
-- 🌍 **Impact**: Building solutions that create positive change in the tech industry
+- 🔬 **Research**: AI ethics, mental health applications, and responsible AI development
+- 🎓 **Academic Growth**: Pursuing advanced computer science concepts and research methodologies
+- 💼 **Career**: Seeking opportunities in innovative tech companies, research institutions, and MSc programs
+- 🌍 **Impact**: Building solutions that create positive change in mental health and technology ethics
+- 📖 **Publications**: Continuing research in AI applications for social good
 
 ## 📫 Let's Connect!
 
@@ -123,7 +129,8 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 
 [![Portfolio](https://img.shields.io/badge/Portfolio-kabilan.io-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://kabilan.io)
 [![Email](https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:contact@kabilan.io)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/kabi-tharma)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/xkabix)
+[![ResearchGate](https://img.shields.io/badge/ResearchGate-Publications-green?style=for-the-badge&logo=researchgate&logoColor=white)](https://www.researchgate.net/profile/Kabilan-Tharmaratnam-2)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Kabi10)
 
 </div>
