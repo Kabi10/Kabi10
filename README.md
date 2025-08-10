@@ -102,6 +102,8 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 
 ![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=Kabi10&theme=tokyonight&hide_border=true)
 
+![Activity Graph](https://github-readme-activity-graph.vercel.app/graph?username=Kabi10&theme=tokyo-night&bg_color=1a1b27&color=70a5fd&line=70a5fd&point=ffffff&area=true&hide_border=true)
+
 </div>
 
 ## 🏆 Achievements & Highlights
