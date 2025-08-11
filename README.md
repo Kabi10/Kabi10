@@ -8,7 +8,7 @@
 
 ## 🚀 About Me
 
-I'm a passionate **Full-Stack Developer** and **AI Researcher** with expertise in modern web technologies, specializing in building scalable, user-centric applications. With a Bachelor of Science degree and published research in AI ethics and mental health, I bridge the gap between cutting-edge technology and real-world impact through clean, efficient code.
+I'm a passionate **Full-Stack Developer**, **AI Researcher**, and **Computational Biologist** with expertise in modern web technologies, specializing in building scalable, user-centric applications. With a Bachelor of Science degree and published research in AI ethics and mental health, I bridge the gap between cutting-edge technology and real-world impact through clean, efficient code and competitive data science achievements.
 
 - 🔭 **Currently Working On**: [RateMyEmployer](https://github.com/Kabi10/ratemyemployer) - A comprehensive employer review platform with AI-powered insights
 - 🎓 **Research Focus**: AI ethics, mental health applications, and responsible AI development
@@ -35,6 +35,13 @@ I'm a passionate **Full-Stack Developer** and **AI Researcher** with expertise i
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+
+### **Data Science & Bioinformatics**
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
+![Kaggle](https://img.shields.io/badge/Kaggle-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white)
+![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 
 ### **Tools & Technologies**
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
@@ -85,6 +92,21 @@ An advanced AI-powered chatbot built with Next.js, demonstrating modern AI integ
 
 ---
 
+### 🧬 [Stanford RNA Structure Prediction](https://github.com/Kabi10/stanford-rna-structure-prediction)
+**Kaggle Competition Solution - Computational Biology**
+
+Advanced RNA structure prediction using transformer-based deep learning models. Achieved competitive performance in bioinformatics challenge with 500+ participants, demonstrating expertise in AI applications to computational biology.
+
+**Key Achievements:**
+- 🏆 Competitive ranking in Stanford RNA folding competition
+- 🧬 Applied AI/ML to complex biological sequence data
+- 🔬 Demonstrated interdisciplinary research capabilities
+- 📊 Processed large-scale genomic datasets
+
+**Tech Stack:** `Python` `PyTorch` `Transformers` `Bioinformatics` `Scientific Computing`
+
+---
+
 ### 🔧 [Development Tools](https://github.com/Kabi10/Cursor)
 **Productivity Enhancement Tools**
 
@@ -109,6 +131,8 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 ## 🏆 Achievements & Highlights
 
 - 📚 **Published Researcher**: 2 research publications on AI ethics and mental health (2024)
+- 🏆 **Kaggle Competitor**: Competitive performance in Stanford RNA structure prediction challenge (500+ participants)
+- 🧬 **Bioinformatics Expert**: Applied deep learning to complex biological sequence analysis
 - 🎓 **Academic Excellence**: Bachelor of Science degree with focus on Computer Science and AI
 - 👥 **Community Leader**: 165+ upvotes on technical posts, active contributor to developer communities
 - 🛠️ **Open Source Impact**: Created popular Cursor AI rules repository with community adoption
@@ -117,6 +141,7 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 - 📈 **Performance Optimization**: Achieved 90%+ lighthouse scores with advanced optimization techniques
 - 🤖 **AI Integration**: Successfully integrated AI-powered features for enhanced user experiences
 - 🌐 **Modern Web Development**: Expertise in latest web technologies and best practices
+- 📊 **Data Science**: Processed large-scale genomic datasets with transformer architectures
 - 🔬 **Research Impact**: 89+ reads on ResearchGate demonstrating academic engagement
 
 ## 📈 Current Focus
@@ -140,6 +165,7 @@ A collection of helpful development tools, prompts, and configurations to enhanc
 [![Email](https://img.shields.io/badge/📧_Email-Contact-EA4335?style=for-the-badge&logoColor=white)](mailto:contact@kabilan.io)
 [![LinkedIn](https://img.shields.io/badge/💼_LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/xkabix)
 [![ResearchGate](https://img.shields.io/badge/🔬_ResearchGate-Publications-00CCBB?style=for-the-badge&logo=researchgate&logoColor=white)](https://www.researchgate.net/profile/Kabilan-Tharmaratnam-2)
+[![Kaggle](https://img.shields.io/badge/🏆_Kaggle-Competitions-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white)](https://kaggle.com/kabitharma)
 [![GitHub](https://img.shields.io/badge/💻_GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Kabi10)
 
 </div>
