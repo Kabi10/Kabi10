@@ -8,6 +8,8 @@ on:
 jobs:
   health-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,7 +29,7 @@ jobs:
           use-quiet-mode: 'yes'
           
       - name: Check for security vulnerabilities
-        uses: github/super-linter@v4
+        uses: github/super-linter@v6
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
