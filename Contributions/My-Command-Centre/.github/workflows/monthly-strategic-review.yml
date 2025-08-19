@@ -1,0 +1,177 @@
+name: Monthly Strategic Review
+
+on:
+  schedule:
+    # Run on the 1st of every month at 9 AM UTC
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+    inputs:
+      review_month:
+        description: 'Month to review (YYYY-MM format)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+jobs:
+  strategic-review:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r scripts/requirements.txt
+
+    - name: Configure GitHub CLI
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+    - name: Generate monthly portfolio analysis
+      run: |
+        python scripts/monthly_portfolio_analyzer.py \
+          --config config/command-centre.yml \
+          --output analytics/monthly-analysis.json \
+          --review-month "${{ github.event.inputs.review_month || '' }}"
+
+    - name: Analyze contribution patterns
+      run: |
+        python scripts/monthly_contribution_analyzer.py \
+          --config config/command-centre.yml \
+          --output analytics/monthly-contributions.json \
+          --review-month "${{ github.event.inputs.review_month || '' }}"
+
+    - name: Generate strategic insights
+      run: |
+        python scripts/strategic_insights_generator.py \
+          --portfolio-analysis analytics/monthly-analysis.json \
+          --contribution-analysis analytics/monthly-contributions.json \
+          --config config/command-centre.yml \
+          --output strategy/monthly-insights/$(date +%Y-%m)-strategic-insights.md
+
+    - name: Update project timelines
+      run: |
+        python scripts/timeline_updater.py \
+          --config config/command-centre.yml \
+          --strategy-dir strategy/project-timelines/ \
+          --update-type monthly
+
+    - name: Review contribution methodology
+      run: |
+        python scripts/methodology_reviewer.py \
+          --config config/command-centre.yml \
+          --methodology-dir strategy/contribution-methodology/ \
+          --output strategy/methodology-reviews/$(date +%Y-%m)-methodology-review.md
+
+    - name: Generate professional development assessment
+      run: |
+        python scripts/professional_development_assessor.py \
+          --config config/command-centre.yml \
+          --output strategy/professional-development/$(date +%Y-%m)-monthly-assessment.md
+
+    - name: Create strategic review issue
+      run: |
+        python scripts/strategic_review_issue_creator.py \
+          --config config/command-centre.yml \
+          --insights strategy/monthly-insights/$(date +%Y-%m)-strategic-insights.md \
+          --github-token ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update repository curation plan
+      run: |
+        python scripts/repository_curator.py \
+          --config config/command-centre.yml \
+          --portfolio-analysis analytics/monthly-analysis.json \
+          --output strategy/repository-curation/$(date +%Y-%m)-curation-plan.md
+
+    - name: Generate monthly dashboard
+      run: |
+        node dashboard/generate-monthly.js \
+          --config config/command-centre.yml \
+          --portfolio-analysis analytics/monthly-analysis.json \
+          --contribution-analysis analytics/monthly-contributions.json \
+          --output dashboard/monthly/
+
+    - name: Commit strategic review
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add strategy/ analytics/ dashboard/monthly/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "📋 Monthly strategic review - $(date -u +%Y-%m)"
+          git push
+        fi
+
+    - name: Log strategic review
+      run: |
+        python scripts/audit_logger.py \
+          --workflow-name "monthly-strategic-review" \
+          --run-id ${{ github.run_id }} \
+          --status "completed" \
+          --config config/command-centre.yml
+
+  quarterly-assessment:
+    runs-on: ubuntu-latest
+    needs: strategic-review
+    # Only run on months 3, 6, 9, 12 (quarterly)
+    if: contains(fromJson('["03", "06", "09", "12"]'), format('{0:02d}', fromJson(github.event.schedule || '{"month": 0}').month))
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r scripts/requirements.txt
+
+    - name: Generate quarterly strategic assessment
+      run: |
+        python scripts/quarterly_strategic_assessor.py \
+          --config config/command-centre.yml \
+          --output strategy/quarterly-assessments/$(date +%Y-Q%q)-assessment.md
+
+    - name: Update long-term strategic plans
+      run: |
+        python scripts/long_term_planner.py \
+          --config config/command-centre.yml \
+          --assessment strategy/quarterly-assessments/$(date +%Y-Q%q)-assessment.md \
+          --output strategy/long-term-plans/
+
+    - name: Create quarterly review issue
+      run: |
+        python scripts/quarterly_review_issue_creator.py \
+          --config config/command-centre.yml \
+          --assessment strategy/quarterly-assessments/$(date +%Y-Q%q)-assessment.md \
+          --github-token ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Commit quarterly assessment
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add strategy/
+        if git diff --staged --quiet; then
+          echo "No quarterly changes to commit"
+        else
+          git commit -m "📈 Quarterly strategic assessment - $(date -u +%Y-Q%q)"
+          git push
+        fi

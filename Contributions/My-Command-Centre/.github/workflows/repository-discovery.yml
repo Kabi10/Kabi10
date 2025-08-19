@@ -1,0 +1,265 @@
+name: Repository Discovery & Analytics
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      force_full_scan:
+        description: 'Force full repository scan'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+jobs:
+  discover-repositories:
+    runs-on: ubuntu-latest
+    outputs:
+      repositories: ${{ steps.discovery.outputs.repositories }}
+      total_count: ${{ steps.discovery.outputs.total_count }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        pip install -r scripts/requirements.txt
+        npm install --prefix scripts/
+
+    - name: Configure GitHub CLI
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+    - name: Discover repositories
+      id: discovery
+      run: |
+        python scripts/repository_discovery.py \
+          --config config/command-centre.yml \
+          --output analytics/repositories.json \
+          --force-scan ${{ github.event.inputs.force_full_scan || 'false' }}
+
+    - name: Generate repository analytics
+      run: |
+        python scripts/analytics_generator.py \
+          --input analytics/repositories.json \
+          --config config/command-centre.yml \
+          --output-dir analytics/
+
+    - name: Update repository health scores
+      run: |
+        python scripts/health_scoring.py \
+          --input analytics/repositories.json \
+          --config config/command-centre.yml \
+          --output analytics/health_scores.json
+
+    - name: Generate portfolio report
+      run: |
+        python scripts/portfolio_reporter.py \
+          --repositories analytics/repositories.json \
+          --health-scores analytics/health_scores.json \
+          --config config/command-centre.yml \
+          --output analytics/portfolio_report.md
+
+    - name: Check for maintenance alerts
+      run: |
+        python scripts/maintenance_checker.py \
+          --repositories analytics/repositories.json \
+          --health-scores analytics/health_scores.json \
+          --config config/command-centre.yml
+
+    - name: Commit and push analytics
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add analytics/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "📊 Update repository analytics - $(date -u +%Y-%m-%d)"
+          git push
+        fi
+
+  analyze-contributions:
+    runs-on: ubuntu-latest
+    needs: discover-repositories
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r scripts/requirements.txt
+
+    - name: Analyze contribution patterns
+      run: |
+        python scripts/contribution_analyzer.py \
+          --repositories analytics/repositories.json \
+          --config config/command-centre.yml \
+          --output analytics/contribution_patterns.json
+
+    - name: Generate contribution insights
+      run: |
+        python scripts/contribution_insights.py \
+          --patterns analytics/contribution_patterns.json \
+          --config config/command-centre.yml \
+          --output analytics/contribution_insights.md
+
+    - name: Update strategic planning
+      run: |
+        python scripts/strategy_updater.py \
+          --insights analytics/contribution_insights.md \
+          --config config/command-centre.yml \
+          --strategy-dir strategy/
+
+    - name: Commit contribution analysis
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add analytics/ strategy/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "🎯 Update contribution analysis - $(date -u +%Y-%m-%d)"
+          git push
+        fi
+
+  update-dashboard:
+    runs-on: ubuntu-latest
+    needs: [discover-repositories, analyze-contributions]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dashboard dependencies
+      run: npm install --prefix dashboard/
+
+    - name: Generate dashboard
+      run: |
+        node dashboard/generate.js \
+          --repositories analytics/repositories.json \
+          --health-scores analytics/health_scores.json \
+          --contributions analytics/contribution_patterns.json \
+          --config config/command-centre.yml
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Build dashboard site
+      run: |
+        cd dashboard
+        npm run build
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: dashboard/dist
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  create-alerts:
+    runs-on: ubuntu-latest
+    needs: [discover-repositories, analyze-contributions]
+    if: always()
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r scripts/requirements.txt
+
+    - name: Generate alerts
+      run: |
+        python scripts/alert_generator.py \
+          --repositories analytics/repositories.json \
+          --health-scores analytics/health_scores.json \
+          --config config/command-centre.yml
+
+    - name: Create GitHub issues for alerts
+      run: |
+        python scripts/issue_creator.py \
+          --alerts analytics/alerts.json \
+          --config config/command-centre.yml \
+          --github-token ${{ secrets.GITHUB_TOKEN }}
+
+  audit-log:
+    runs-on: ubuntu-latest
+    needs: [discover-repositories, analyze-contributions, update-dashboard, create-alerts]
+    if: always()
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Log workflow execution
+      run: |
+        python scripts/audit_logger.py \
+          --workflow-name "repository-discovery" \
+          --run-id ${{ github.run_id }} \
+          --status "${{ job.status }}" \
+          --repositories-count "${{ needs.discover-repositories.outputs.total_count }}" \
+          --config config/command-centre.yml
+
+    - name: Commit audit logs
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add analytics/audit/
+        if git diff --staged --quiet; then
+          echo "No audit changes to commit"
+        else
+          git commit -m "📋 Update audit logs - $(date -u +%Y-%m-%d)"
+          git push
+        fi

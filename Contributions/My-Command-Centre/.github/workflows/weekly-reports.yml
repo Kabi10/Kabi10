@@ -1,0 +1,148 @@
+name: Weekly Portfolio Reports
+
+on:
+  schedule:
+    # Run every Sunday at 8 AM UTC
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+    inputs:
+      force_regenerate:
+        description: 'Force regenerate all reports'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+jobs:
+  generate-weekly-reports:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        pip install -r scripts/requirements.txt
+        npm install --prefix scripts/
+        npm install --prefix dashboard/
+
+    - name: Configure GitHub CLI
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+    - name: Generate weekly analytics summary
+      run: |
+        python scripts/weekly_reporter.py \
+          --config config/command-centre.yml \
+          --output analytics/weekly-summary.md \
+          --force-regenerate ${{ github.event.inputs.force_regenerate || 'false' }}
+
+    - name: Generate contribution insights
+      run: |
+        python scripts/contribution_insights.py \
+          --config config/command-centre.yml \
+          --output analytics/weekly-contribution-insights.md \
+          --period weekly
+
+    - name: Generate health trends report
+      run: |
+        python scripts/health_trends_reporter.py \
+          --config config/command-centre.yml \
+          --output analytics/weekly-health-trends.md \
+          --period weekly
+
+    - name: Update strategic planning documents
+      run: |
+        python scripts/strategy_updater.py \
+          --config config/command-centre.yml \
+          --strategy-dir strategy/ \
+          --update-type weekly
+
+    - name: Generate weekly dashboard
+      run: |
+        node dashboard/generate-weekly.js \
+          --config config/command-centre.yml \
+          --output dashboard/weekly/
+
+    - name: Create weekly summary issue
+      run: |
+        python scripts/weekly_issue_creator.py \
+          --config config/command-centre.yml \
+          --summary analytics/weekly-summary.md \
+          --github-token ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Commit weekly reports
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add analytics/ strategy/ dashboard/weekly/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "📊 Weekly portfolio reports - $(date -u +%Y-%m-%d)"
+          git push
+        fi
+
+    - name: Log weekly report generation
+      run: |
+        python scripts/audit_logger.py \
+          --workflow-name "weekly-reports" \
+          --run-id ${{ github.run_id }} \
+          --status "completed" \
+          --config config/command-centre.yml
+
+  cleanup-old-reports:
+    runs-on: ubuntu-latest
+    needs: generate-weekly-reports
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install -r scripts/requirements.txt
+
+    - name: Cleanup old reports
+      run: |
+        python scripts/report_cleanup.py \
+          --config config/command-centre.yml \
+          --analytics-dir analytics/ \
+          --retention-weeks 12
+
+    - name: Commit cleanup changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add analytics/
+        if git diff --staged --quiet; then
+          echo "No cleanup changes to commit"
+        else
+          git commit -m "🧹 Cleanup old weekly reports - $(date -u +%Y-%m-%d)"
+          git push
+        fi
