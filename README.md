@@ -66,11 +66,6 @@ A comprehensive platform for rating and reviewing employers with advanced featur
 
 **Tech Stack:** `Next.js 14` `TypeScript` `Supabase` `Tailwind CSS` `Vercel`
 
-**Highlights:**
-- Eliminated $600-4,200+ annual operational costs
-- 90%+ test coverage with comprehensive testing suite
-- Real-time updates using Supabase subscriptions
-- Modern UI with glassmorphism effects and accessibility compliance
 
 ---
 
