@@ -1,0 +1,166 @@
+<resources>
+    <string name="app_name">SL Agrimarket</string>
+    
+    <!-- App Title -->
+    <string name="app_title_tamil">යාපනය ගොවි වෙළඳපොළ</string>
+    <string name="app_title_english">Jaffna Farmers Marketplace</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">මුල් පිටුව</string>
+    <string name="nav_listings">ලැයිස්තු</string>
+    <string name="nav_profile">පැතිකඩ</string>
+    <string name="nav_transactions">ගනුදෙනු</string>
+    <string name="nav_search">සෙවීම</string>
+    
+    <!-- Common Actions -->
+    <string name="action_back">ආපසු</string>
+    <string name="action_logout">ඉවත් වන්න</string>
+    <string name="action_view_all">සියල්ල බලන්න</string>
+    <string name="action_browse">පිරික්සන්න</string>
+    <string name="action_sell">විකුණන්න</string>
+    <string name="action_add">එකතු කරන්න</string>
+    
+    <!-- Home Screen -->
+    <string name="home_welcome">ආයුබෝවන් %1$s!</string>
+    <string name="home_farmer_subtitle">ඔබේ නැවුම් නිෂ්පාදන විකිණීමට සූදානම් වන්න</string>
+    <string name="home_buyer_subtitle">ප්‍රාදේශීය ගොවීන්ගේ නැවුම් නිෂ්පාදන සොයා ගන්න</string>
+    <string name="home_quick_actions">ඉක්මන් ක්‍රියා</string>
+    <string name="home_popular_crops">ජනප්‍රිය බෝග</string>
+    <string name="home_recent_listings">මෑත ලැයිස්තු</string>
+    <string name="home_market_prices">වෙළඳපොළ මිල</string>
+    <string name="home_no_listings">ලැයිස්තු නොමැත</string>
+    
+    <!-- Profile Screen -->
+    <string name="profile_title">පැතිකඩ</string>
+    <string name="profile_verified">✓ සත්‍යාපිත</string>
+    <string name="profile_verification_pending">⚠ සත්‍යාපනය අපේක්ෂාවේ</string>
+    <string name="profile_loading">පරිශීලක තොරතුරු පූරණය වෙමින්…</string>
+    <string name="profile_farmer">ගොවියා</string>
+    <string name="profile_buyer">ගැනුම්කරු</string>
+    <string name="profile_quality_rating">ගුණත්වය</string>
+    <string name="profile_communication_rating">සන්නිවේදනය</string>
+    <string name="profile_location">යාපනය දිස්ත්‍රික්කය</string>
+    <string name="profile_followers">අනුගාමිකයින්</string>
+    <string name="profile_completed_orders">සම්පූර්ණ කළ ඇණවුම්</string>
+    <string name="profile_active_listings">සක්‍රිය ලැයිස්තු</string>
+    <string name="profile_view_details">විස්තර බලන්න</string>
+    
+    <!-- Market Prices -->
+    <string name="market_prices_title">වෙළඳපොළ මිල</string>
+    <string name="market_price_per_kg">LKR %1$.2f කිලෝ ග්‍රාමයකට</string>
+    <string name="market_location_jaffna">යාපනය මධ්‍යම වෙළඳපොළ</string>
+    <string name="market_location_chavakachcheri">චාවකච්චේරි වෙළඳපොළ</string>
+    <string name="market_trend_up">↗️</string>
+    <string name="market_trend_down">↘️</string>
+    <string name="market_trend_stable">➡️</string>
+    
+    <!-- Crops -->
+    <string name="crop_red_onion">රතු ළූණු</string>
+    <string name="crop_chili">මිරිස්</string>
+    <string name="crop_tomato">තක්කාලි</string>
+    <string name="crop_brinjal">වම්බටු</string>
+    <string name="crop_okra">බණ්ඩක්කා</string>
+    <string name="crop_coconut">පොල්</string>
+    <string name="crop_mango">අඹ</string>
+    <string name="crop_banana">කෙසෙල්</string>
+    <string name="crop_rice">සහල්</string>
+    <string name="crop_potato">අල</string>
+    
+    <!-- Language -->
+    <string name="language_english">ඉංග්‍රීසි</string>
+    <string name="language_tamil">දෙමළ</string>
+    <string name="language_sinhala">සිංහල</string>
+    <string name="language_code_en">EN</string>
+    <string name="language_code_ta">TA</string>
+    <string name="language_code_si">SI</string>
+
+    <!-- Listing Creation -->
+    <string name="create_listing_title">ලැයිස්තුව සාදන්න</string>
+    <string name="create_listing_crop_type">බෝග වර්ගය *</string>
+    <string name="create_listing_quantity">ප්‍රමාණය *</string>
+    <string name="create_listing_unit">ඒකකය *</string>
+    <string name="create_listing_price">ඒකකයකට මිල *</string>
+    <string name="create_listing_quality">ගුණත්වය ශ්‍රේණිය *</string>
+    <string name="create_listing_harvest_date">අස්වනු නෙලීමේ දිනය *</string>
+    <string name="create_listing_location">ස්ථානය *</string>
+    <string name="create_listing_submit">ලැයිස්තුව සාදන්න</string>
+    <string name="create_listing_success">ලැයිස්තුව සාර්ථකව සාදන ලදී!</string>
+    <string name="create_listing_error">ලැයිස්තුව සෑදීමට අසමත් විය</string>
+
+    <!-- Quality Grades -->
+    <string name="quality_grade_a">ශ්‍රේණිය A</string>
+    <string name="quality_grade_b">ශ්‍රේණිය B</string>
+    <string name="quality_grade_c">ශ්‍රේණිය C</string>
+
+    <!-- Validation Errors -->
+    <string name="error_required_field">මෙම ක්ෂේත්‍රය අවශ්‍යයි</string>
+    <string name="error_invalid_number">කරුණාකර වලංගු අංකයක් ඇතුළත් කරන්න</string>
+    <string name="error_quantity_range">ප්‍රමාණය 0 සහ 100,000 අතර විය යුතුය</string>
+    <string name="error_price_range">මිල 0 සහ 1,000,000 අතර විය යුතුය</string>
+    <string name="error_future_date">දිනය අනාගතයේ විය නොහැක</string>
+
+    <!-- Profile Settings -->
+    <string name="settings_title">සැකසුම් &amp; මනාපයන්</string>
+    <string name="settings_language">භාෂාව</string>
+    <string name="settings_language_subtitle">English/தமிழ்/සිංහල</string>
+    <string name="settings_notifications">දැනුම්දීම්</string>
+    <string name="settings_notifications_subtitle">දැනුම්දීම් මනාපයන් කළමනාකරණය කරන්න</string>
+    <string name="settings_help">උදව් &amp; සහාය</string>
+    <string name="settings_help_subtitle">උදව් ලබා ගන්න සහ සහාය අමතන්න</string>
+    <string name="settings_about">පිළිබඳව</string>
+    <string name="settings_about_subtitle">යෙදුම් අනුවාදය සහ තොරතුරු</string>
+
+    <!-- Logout Confirmation -->
+    <string name="logout_confirm_title">ඉවත් වීම තහවුරු කරන්න</string>
+    <string name="logout_confirm_message">ඔබට නිශ්චිතව ඉවත් වීමට අවශ්‍යද?</string>
+    <string name="logout_confirm_button">ඉවත් වන්න</string>
+    <string name="logout_cancel_button">අවලංගු කරන්න</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_home">මුල් පිටුව</string>
+    <string name="bottom_nav_browse">බ්‍රවුස් කරන්න</string>
+    <string name="bottom_nav_orders">ඇණවුම්</string>
+    <string name="bottom_nav_profile">පැතිකඩ</string>
+
+    <!-- Quick Actions -->
+    <string name="quick_action_browse">බ්‍රවුස් කරන්න</string>
+    <string name="quick_action_browse_subtitle">සියලුම ලැයිස්තු බලන්න</string>
+    <string name="quick_action_analytics">විශ්ලේෂණ</string>
+    <string name="quick_action_analytics_subtitle">තීක්ෂ්ණ බව බලන්න</string>
+    <string name="quick_action_transactions">ගනුදෙනු</string>
+    <string name="quick_action_transactions_subtitle">ඇණවුම් බලන්න</string>
+    <string name="quick_action_sell">දැන් විකුණන්න</string>
+    <string name="quick_action_sell_subtitle">ලැයිස්තුව සාදන්න</string>
+
+    <!-- Statistics -->
+    <string name="stat_todays_orders">අද ඇණවුම්</string>
+    <string name="stat_todays_revenue">අද ආදායම</string>
+    <string name="stat_revenue_format">LKR %1$,.2f</string>
+
+    <!-- Sync -->
+    <string name="sync_in_progress">දත්ත සමමුහුර්ත කරමින්…</string>
+    <string name="sync_success">සමමුහුර්තකරණය සාර්ථකව සම්පූර්ණ විය</string>
+    <string name="sync_failed">සමමුහුර්තකරණය අසාර්ථක විය</string>
+    <string name="sync_pending_ops">%1$d අපේක්ෂිත මෙහෙයුම්</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_data">දත්ත නොමැත</string>
+    <string name="empty_no_listings">ලැයිස්තු හමු නොවීය</string>
+    <string name="empty_no_transactions">තවමත් ගනුදෙනු නැත</string>
+    <string name="empty_no_activities">මෑත ක්‍රියාකාරකම් නැත</string>
+
+    <!-- Loading States -->
+    <string name="loading">පූරණය වෙමින්…</string>
+    <string name="loading_data">දත්ත පූරණය වෙමින්…</string>
+    <string name="loading_listings">ලැයිස්තු පූරණය වෙමින්…</string>
+
+    <!-- Date Picker -->
+    <string name="date_picker_ok">හරි</string>
+    <string name="date_picker_cancel">අවලංගු කරන්න</string>
+    <string name="date_picker_select">දිනය තෝරන්න</string>
+
+    <!-- Units -->
+    <string name="unit_kg">කිලෝ</string>
+    <string name="unit_ton">ටොන්</string>
+    <string name="unit_units">ඒකක</string>
+</resources>
