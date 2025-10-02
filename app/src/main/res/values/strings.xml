@@ -1,0 +1,166 @@
+<resources>
+    <string name="app_name">SL Agrimarket</string>
+
+    <!-- App Title -->
+    <string name="app_title_tamil">Jaffna Farmers Marketplace</string>
+    <string name="app_title_english">Jaffna Farmers Marketplace</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_listings">Listings</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_search">Search</string>
+
+    <!-- Common Actions -->
+    <string name="action_back">Back</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_view_all">View All</string>
+    <string name="action_browse">Browse</string>
+    <string name="action_sell">Sell</string>
+    <string name="action_add">Add</string>
+
+    <!-- Home Screen -->
+    <string name="home_welcome">Welcome %1$s!</string>
+    <string name="home_farmer_subtitle">Ready to sell your fresh produce</string>
+    <string name="home_buyer_subtitle">Discover fresh produce from local farmers</string>
+    <string name="home_quick_actions">Quick Actions</string>
+    <string name="home_popular_crops">Popular Crops</string>
+    <string name="home_recent_listings">Recent Listings</string>
+    <string name="home_market_prices">Market Prices</string>
+    <string name="home_no_listings">No listings available</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_verified">✓ Verified</string>
+    <string name="profile_verification_pending">⚠ Verification Pending</string>
+    <string name="profile_loading">Loading user information…</string>
+    <string name="profile_farmer">Farmer</string>
+    <string name="profile_buyer">Buyer</string>
+    <string name="profile_quality_rating">Quality Rating</string>
+    <string name="profile_communication_rating">Communication Rating</string>
+    <string name="profile_location">Jaffna District</string>
+    <string name="profile_followers">Followers</string>
+    <string name="profile_completed_orders">Completed Orders</string>
+    <string name="profile_active_listings">Active Listings</string>
+    <string name="profile_view_details">View Details</string>
+
+    <!-- Market Prices -->
+    <string name="market_prices_title">Market Prices</string>
+    <string name="market_price_per_kg">LKR %1$.2f per kg</string>
+    <string name="market_location_jaffna">Jaffna Central Market</string>
+    <string name="market_location_chavakachcheri">Chavakachcheri Market</string>
+    <string name="market_trend_up">↗️</string>
+    <string name="market_trend_down">↘️</string>
+    <string name="market_trend_stable">➡️</string>
+
+    <!-- Crops (Bilingual format will be handled in code) -->
+    <string name="crop_red_onion">Red Onion</string>
+    <string name="crop_chili">Chili</string>
+    <string name="crop_tomato">Tomato</string>
+    <string name="crop_brinjal">Brinjal</string>
+    <string name="crop_okra">Okra</string>
+    <string name="crop_coconut">Coconut</string>
+    <string name="crop_mango">Mango</string>
+    <string name="crop_banana">Banana</string>
+    <string name="crop_rice">Rice</string>
+    <string name="crop_potato">Potato</string>
+
+    <!-- Language -->
+    <string name="language_english">English</string>
+    <string name="language_tamil">Tamil</string>
+    <string name="language_sinhala">Sinhala</string>
+    <string name="language_code_en">EN</string>
+    <string name="language_code_ta">TA</string>
+    <string name="language_code_si">SI</string>
+
+    <!-- Listing Creation -->
+    <string name="create_listing_title">Create Listing</string>
+    <string name="create_listing_crop_type">Crop Type *</string>
+    <string name="create_listing_quantity">Quantity *</string>
+    <string name="create_listing_unit">Unit *</string>
+    <string name="create_listing_price">Price per Unit *</string>
+    <string name="create_listing_quality">Quality Grade *</string>
+    <string name="create_listing_harvest_date">Harvest Date *</string>
+    <string name="create_listing_location">Location *</string>
+    <string name="create_listing_submit">Create Listing</string>
+    <string name="create_listing_success">Listing created successfully!</string>
+    <string name="create_listing_error">Failed to create listing</string>
+
+    <!-- Quality Grades -->
+    <string name="quality_grade_a">Grade A</string>
+    <string name="quality_grade_b">Grade B</string>
+    <string name="quality_grade_c">Grade C</string>
+
+    <!-- Validation Errors -->
+    <string name="error_required_field">This field is required</string>
+    <string name="error_invalid_number">Please enter a valid number</string>
+    <string name="error_quantity_range">Quantity must be between 0 and 100,000</string>
+    <string name="error_price_range">Price must be between 0 and 1,000,000</string>
+    <string name="error_future_date">Date cannot be in the future</string>
+
+    <!-- Profile Settings -->
+    <string name="settings_title">Settings &amp; Preferences</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_subtitle">English/தமிழ்/සිංහල</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_subtitle">Manage notification preferences</string>
+    <string name="settings_help">Help &amp; Support</string>
+    <string name="settings_help_subtitle">Get help and contact support</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_subtitle">App version and information</string>
+
+    <!-- Logout Confirmation -->
+    <string name="logout_confirm_title">Confirm Logout</string>
+    <string name="logout_confirm_message">Are you sure you want to logout?</string>
+    <string name="logout_confirm_button">Logout</string>
+    <string name="logout_cancel_button">Cancel</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_browse">Browse</string>
+    <string name="bottom_nav_orders">Orders</string>
+    <string name="bottom_nav_profile">Profile</string>
+
+    <!-- Quick Actions -->
+    <string name="quick_action_browse">Browse</string>
+    <string name="quick_action_browse_subtitle">View all listings</string>
+    <string name="quick_action_analytics">Analytics</string>
+    <string name="quick_action_analytics_subtitle">View insights</string>
+    <string name="quick_action_transactions">Transactions</string>
+    <string name="quick_action_transactions_subtitle">View orders</string>
+    <string name="quick_action_sell">Sell Now</string>
+    <string name="quick_action_sell_subtitle">Create listing</string>
+
+    <!-- Statistics -->
+    <string name="stat_todays_orders">Today\'s Orders</string>
+    <string name="stat_todays_revenue">Today\'s Revenue</string>
+    <string name="stat_revenue_format">LKR %1$,.2f</string>
+
+    <!-- Sync -->
+    <string name="sync_in_progress">Syncing data…</string>
+    <string name="sync_success">Sync completed successfully</string>
+    <string name="sync_failed">Sync failed</string>
+    <string name="sync_pending_ops">%1$d pending operations</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_data">No data available</string>
+    <string name="empty_no_listings">No listings found</string>
+    <string name="empty_no_transactions">No transactions yet</string>
+    <string name="empty_no_activities">No recent activities</string>
+
+    <!-- Loading States -->
+    <string name="loading">Loading…</string>
+    <string name="loading_data">Loading data…</string>
+    <string name="loading_listings">Loading listings…</string>
+
+    <!-- Date Picker -->
+    <string name="date_picker_ok">OK</string>
+    <string name="date_picker_cancel">Cancel</string>
+    <string name="date_picker_select">Select Date</string>
+
+    <!-- Units -->
+    <string name="unit_kg">Kg</string>
+    <string name="unit_ton">Ton</string>
+    <string name="unit_units">Units</string>
+</resources>

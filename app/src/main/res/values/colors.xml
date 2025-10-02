@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Legacy colors (keeping for compatibility) -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary Green Palette (WCAG AA Compliant) -->
+    <color name="green_50">#f0fdf4</color>
+    <color name="green_100">#dcfce7</color>
+    <color name="green_200">#bbf7d0</color>
+    <color name="green_300">#86efac</color>
+    <color name="green_400">#4ade80</color>
+    <color name="green_500">#22c55e</color>
+    <color name="green_600">#16a34a</color>
+    <color name="green_700">#15803d</color>
+    <color name="green_800">#166534</color>
+    <color name="green_900">#14532d</color>
+
+    <!-- Secondary Blue Palette (WCAG AA Compliant) -->
+    <color name="blue_50">#eff6ff</color>
+    <color name="blue_100">#dbeafe</color>
+    <color name="blue_200">#bfdbfe</color>
+    <color name="blue_300">#93c5fd</color>
+    <color name="blue_400">#60a5fa</color>
+    <color name="blue_500">#3b82f6</color>
+    <color name="blue_600">#2563eb</color>
+    <color name="blue_700">#1d4ed8</color>
+    <color name="blue_800">#1e40af</color>
+    <color name="blue_900">#1e3a8a</color>
+
+    <!-- Semantic Colors (WCAG AA Compliant) -->
+    <!-- Success -->
+    <color name="success_50">#f0fdf4</color>
+    <color name="success_100">#dcfce7</color>
+    <color name="success_500">#22c55e</color>
+    <color name="success_600">#16a34a</color>
+    <color name="success_700">#15803d</color>
+
+    <!-- Warning -->
+    <color name="warning_50">#fffbeb</color>
+    <color name="warning_100">#fef3c7</color>
+    <color name="warning_400">#fbbf24</color>
+    <color name="warning_500">#f59e0b</color>
+    <color name="warning_600">#d97706</color>
+    <color name="warning_700">#b45309</color>
+
+    <!-- Error -->
+    <color name="error_50">#fef2f2</color>
+    <color name="error_100">#fecaca</color>
+    <color name="error_400">#f87171</color>
+    <color name="error_500">#ef4444</color>
+    <color name="error_600">#dc2626</color>
+    <color name="error_700">#b91c1c</color>
+
+    <!-- Neutral Grays (WCAG AA Compliant) -->
+    <color name="gray_50">#f9fafb</color>
+    <color name="gray_100">#f3f4f6</color>
+    <color name="gray_200">#e5e7eb</color>
+    <color name="gray_300">#d1d5db</color>
+    <color name="gray_400">#9ca3af</color>
+    <color name="gray_500">#6b7280</color>
+    <color name="gray_600">#4b5563</color>
+    <color name="gray_700">#374151</color>
+    <color name="gray_800">#1f2937</color>
+    <color name="gray_900">#111827</color>
+
+    <!-- Surface Elevation Colors for Dark Theme -->
+    <color name="surface_elevation_1">#1f2937</color>
+    <color name="surface_elevation_2">#374151</color>
+    <color name="surface_elevation_3">#4b5563</color>
+    <color name="surface_elevation_4">#6b7280</color>
+    <color name="surface_elevation_5">#9ca3af</color>
+
+    <!-- Background Colors -->
+    <color name="background_light">#FFFBFE</color>
+    <color name="background_dark">#111827</color>
+    <color name="surface_light">#FFFBFE</color>
+    <color name="surface_dark">#1f2937</color>
+</resources>
