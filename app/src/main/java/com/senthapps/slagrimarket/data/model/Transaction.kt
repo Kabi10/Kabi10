@@ -481,22 +481,25 @@ fun Transaction.getSummary(language: String = "en"): String {
 
 class TransactionConverters {
     @TypeConverter
-    fun fromTransactionStatus(value: TransactionStatus): String = value.name
+    fun fromTransactionStatus(value: TransactionStatus?): String? = value?.name
 
     @TypeConverter
-    fun toTransactionStatus(value: String): TransactionStatus = TransactionStatus.valueOf(value)
+    fun toTransactionStatus(value: String?): TransactionStatus? =
+        value?.let { TransactionStatus.valueOf(it) }
 
     @TypeConverter
-    fun fromPaymentMethod(value: PaymentMethod): String = value.name
+    fun fromPaymentMethod(value: PaymentMethod?): String? = value?.name
 
     @TypeConverter
-    fun toPaymentMethod(value: String): PaymentMethod = PaymentMethod.valueOf(value)
+    fun toPaymentMethod(value: String?): PaymentMethod? =
+        value?.let { PaymentMethod.valueOf(it) }
 
     @TypeConverter
-    fun fromPaymentStatus(value: PaymentStatus): String = value.name
+    fun fromPaymentStatus(value: PaymentStatus?): String? = value?.name
 
     @TypeConverter
-    fun toPaymentStatus(value: String): PaymentStatus = PaymentStatus.valueOf(value)
+    fun toPaymentStatus(value: String?): PaymentStatus? =
+        value?.let { PaymentStatus.valueOf(it) }
 }
 
 // Common pickup locations in Jaffna with trilingual support

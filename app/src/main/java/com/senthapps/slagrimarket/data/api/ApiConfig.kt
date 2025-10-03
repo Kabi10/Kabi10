@@ -10,7 +10,7 @@ object ApiConfig {
     // BASE URLS
     // ============================================================================
 
-    const val PRODUCTION_BASE_URL = "https://agrimarket-96pmevhf5-kabilantharmaratnam-kpucas-projects.vercel.app/api/"
+    const val PRODUCTION_BASE_URL = "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/"
     const val STAGING_BASE_URL = "https://agrimarket-staging.vercel.app/api/"
     const val DEVELOPMENT_BASE_URL = "http://localhost:3000/api/"
     
@@ -29,53 +29,53 @@ object ApiConfig {
         const val AUTH_SEND_OTP = "auth/send-otp.js"
         const val AUTH_VERIFY_OTP = "auth/verify-otp-simple.js"
         const val AUTH_REFRESH_TOKEN = "auth/refresh-token.js"
-        
+
         // User endpoints
-        const val USERS_PROFILE = "$API_VERSION_V1/users/profile"
-        const val USERS_UPDATE_PROFILE = "$API_VERSION_V1/users/profile"
-        
+        const val USERS_PROFILE = "users/profile"
+        const val USERS_UPDATE_PROFILE = "users/profile"
+
         // Listing endpoints
-        const val LISTINGS = "$API_VERSION_V1/listings"
-        const val LISTINGS_BY_ID = "$API_VERSION_V1/listings/{id}"
-        const val LISTINGS_BY_FARMER = "$API_VERSION_V1/listings/farmer/{farmerId}"
-        const val LISTINGS_TRENDING = "$API_VERSION_V1/listings/trending"
-        const val LISTINGS_SEARCH = "$API_VERSION_V1/listings/search"
-        const val LISTINGS_VIEW = "$API_VERSION_V1/listings/{id}/view"
-        const val LISTINGS_INQUIRY = "$API_VERSION_V1/listings/{id}/inquiry"
-        const val LISTINGS_IMAGES = "$API_VERSION_V1/listings/{id}/images"
-        const val LISTINGS_IMAGES_CONFIRM = "$API_VERSION_V1/listings/{id}/images/confirm"
-        
+        const val LISTINGS = "listings"
+        const val LISTINGS_BY_ID = "listings/{id}"
+        const val LISTINGS_BY_FARMER = "listings/farmer/{farmerId}"
+        const val LISTINGS_TRENDING = "listings/trending"
+        const val LISTINGS_SEARCH = "listings/search"
+        const val LISTINGS_VIEW = "listings/{id}/view"
+        const val LISTINGS_INQUIRY = "listings/{id}/inquiry"
+        const val LISTINGS_IMAGES = "listings/{id}/images"
+        const val LISTINGS_IMAGES_CONFIRM = "listings/{id}/images/confirm"
+
         // Market price endpoints
-        const val MARKET_PRICES = "$API_VERSION_V1/market-prices"
-        const val MARKET_PRICES_BY_ID = "$API_VERSION_V1/market-prices/{id}"
-        const val MARKET_PRICES_TRENDING = "$API_VERSION_V1/market-prices/trending"
-        const val MARKET_PRICES_STATISTICS = "$API_VERSION_V1/market-prices/statistics"
-        const val MARKET_PRICES_HISTORY = "$API_VERSION_V1/market-prices/history"
-        const val MARKET_PRICES_SEARCH = "$API_VERSION_V1/market-prices/search"
-        const val MARKET_PRICES_BY_LOCATION = "$API_VERSION_V1/market-prices/by-location"
-        const val MARKET_PRICES_LATEST = "$API_VERSION_V1/market-prices/latest"
-        
+        const val MARKET_PRICES = "market-prices"
+        const val MARKET_PRICES_BY_ID = "market-prices/{id}"
+        const val MARKET_PRICES_TRENDING = "market-prices/trending"
+        const val MARKET_PRICES_STATISTICS = "market-prices/statistics"
+        const val MARKET_PRICES_HISTORY = "market-prices/history"
+        const val MARKET_PRICES_SEARCH = "market-prices/search"
+        const val MARKET_PRICES_BY_LOCATION = "market-prices/by-location"
+        const val MARKET_PRICES_LATEST = "market-prices/latest"
+
         // Transaction endpoints
-        const val TRANSACTIONS = "$API_VERSION_V1/transactions"
-        const val TRANSACTIONS_BY_ID = "$API_VERSION_V1/transactions/{id}"
-        const val TRANSACTIONS_UPDATE_STATUS = "$API_VERSION_V1/transactions/{id}"
-        
+        const val TRANSACTIONS = "transactions"
+        const val TRANSACTIONS_BY_ID = "transactions/{id}"
+        const val TRANSACTIONS_UPDATE_STATUS = "transactions/{id}"
+
         // Activity endpoints
-        const val ACTIVITIES = "$API_VERSION_V1/activities"
-        const val ACTIVITIES_BY_ID = "$API_VERSION_V1/activities/{id}"
-        const val ACTIVITIES_UNREAD_COUNT = "$API_VERSION_V1/activities/unread-count"
-        const val ACTIVITIES_ACTIONABLE_COUNT = "$API_VERSION_V1/activities/actionable-count"
-        const val ACTIVITIES_SUMMARY = "$API_VERSION_V1/activities/summary"
-        const val ACTIVITIES_RECENT = "$API_VERSION_V1/activities/recent"
-        const val ACTIVITIES_MARK_READ = "$API_VERSION_V1/activities/{id}/read"
-        const val ACTIVITIES_MARK_ALL_READ = "$API_VERSION_V1/activities/mark-all-read"
-        const val ACTIVITIES_DISMISS = "$API_VERSION_V1/activities/{id}/dismiss"
-        const val ACTIVITIES_ARCHIVE = "$API_VERSION_V1/activities/{id}/archive"
-        
+        const val ACTIVITIES = "activities"
+        const val ACTIVITIES_BY_ID = "activities/{id}"
+        const val ACTIVITIES_UNREAD_COUNT = "activities/unread-count"
+        const val ACTIVITIES_ACTIONABLE_COUNT = "activities/actionable-count"
+        const val ACTIVITIES_SUMMARY = "activities/summary"
+        const val ACTIVITIES_RECENT = "activities/recent"
+        const val ACTIVITIES_MARK_READ = "activities/{id}/read"
+        const val ACTIVITIES_MARK_ALL_READ = "activities/mark-all-read"
+        const val ACTIVITIES_DISMISS = "activities/{id}/dismiss"
+        const val ACTIVITIES_ARCHIVE = "activities/{id}/archive"
+
         // Sync endpoints
-        const val SYNC_OPERATIONS = "$API_VERSION_V1/sync/operations"
-        const val SYNC_STATUS = "$API_VERSION_V1/sync/status"
-        
+        const val SYNC_OPERATIONS = "sync/operations"
+        const val SYNC_STATUS = "sync/status"
+
         // Health check endpoints
         const val HEALTH = "health"
         const val HEALTH_DETAILED = "health/detailed"

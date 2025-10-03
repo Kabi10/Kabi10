@@ -16,7 +16,7 @@ interface ListingApiService {
     /**
      * Get listings with comprehensive filtering options
      */
-    @GET("v1/listings")
+    @GET("listings")
     suspend fun getListings(
         @Query("market") market: String? = null,
         @Query("cropType") cropType: String? = null,

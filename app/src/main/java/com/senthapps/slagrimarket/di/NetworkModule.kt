@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://agrimarket-96pmevhf5-kabilantharmaratnam-kpucas-projects.vercel.app/api/" // Serverless API URL
+    private const val BASE_URL = "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/" // Serverless API URL
     
     @Provides
     @Singleton

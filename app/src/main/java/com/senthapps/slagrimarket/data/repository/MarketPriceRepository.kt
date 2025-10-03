@@ -264,11 +264,25 @@ class MarketPriceRepository @Inject constructor(
         val lastUpdateTime = marketPriceDao.getLastUpdateTime()
         if (lastUpdateTime == null) return true
 
-        val lastUpdated = Instant.parse(lastUpdateTime)
-        val now = Instant.now()
-        val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+        return try {
+            // Try to parse the timestamp - handle both ISO format and SQLite datetime format
+            val lastUpdated = try {
+                Instant.parse(lastUpdateTime)
+            } catch (e: Exception) {
+                // If ISO parsing fails, try SQLite datetime format: "2025-10-02 19:36:33"
+                // Convert to ISO format by replacing space with 'T' and adding 'Z'
+                val isoFormat = lastUpdateTime.replace(" ", "T") + "Z"
+                Instant.parse(isoFormat)
+            }
 
-        return minutesSinceUpdate >= 5 // Refresh if older than 5 minutes
+            val now = Instant.now()
+            val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+
+            minutesSinceUpdate >= 5 // Refresh if older than 5 minutes
+        } catch (e: Exception) {
+            // If parsing fails, assume we need to refresh
+            true
+        }
     }
     
     /**
