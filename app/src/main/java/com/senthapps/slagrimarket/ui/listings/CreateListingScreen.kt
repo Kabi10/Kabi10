@@ -449,9 +449,6 @@ fun CreateListingScreen(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
-                            if (viewModel.isFormValid()) {
-                                viewModel.createListing()
-                            }
                         }
                     ),
                     modifier = Modifier.fillMaxWidth()
@@ -467,6 +464,15 @@ fun CreateListingScreen(
                     )
                 }
             }
+
+            // Image picker
+            com.senthapps.slagrimarket.ui.common.ImagePicker(
+                images = uiState.images,
+                onImagesSelected = viewModel::updateImages,
+                onImageRemoved = viewModel::removeImage,
+                maxImages = 5,
+                currentLanguage = currentLanguage
+            )
             
             // Error message
             uiState.error?.let { error ->

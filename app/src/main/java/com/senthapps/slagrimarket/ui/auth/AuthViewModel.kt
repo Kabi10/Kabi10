@@ -2,8 +2,12 @@ package com.senthapps.slagrimarket.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.senthapps.slagrimarket.data.model.User
 import com.senthapps.slagrimarket.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -13,14 +17,95 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    // MVP: Simplified ViewModel without OTP functionality
+    private val _uiState = MutableStateFlow(AuthUiState())
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
     val isLoggedIn = authRepository.isLoggedIn
     val currentUser = authRepository.currentUser
+
+    fun sendOtp(phoneNumber: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null,
+                otpSent = false
+            )
+
+            authRepository.sendOtp(phoneNumber).fold(
+                onSuccess = { otpId ->
+                    Timber.d("OTP sent successfully. OTP ID: $otpId")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        otpSent = true,
+                        otpId = otpId,
+                        phoneNumber = phoneNumber
+                    )
+                },
+                onFailure = { error ->
+                    Timber.e(error, "Failed to send OTP")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to send OTP. Please try again."
+                    )
+                }
+            )
+        }
+    }
+
+    fun verifyOtp(phoneNumber: String, otp: String, otpId: String?) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null
+            )
+
+            authRepository.verifyOtp(phoneNumber, otp, otpId).fold(
+                onSuccess = { user ->
+                    Timber.d("OTP verified successfully. User: ${user.name}")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        isAuthenticated = true,
+                        user = user
+                    )
+                },
+                onFailure = { error ->
+                    Timber.e(error, "Failed to verify OTP")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Invalid OTP. Please try again."
+                    )
+                }
+            )
+        }
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun resetOtpState() {
+        _uiState.value = _uiState.value.copy(
+            otpSent = false,
+            otpId = null,
+            error = null
+        )
+    }
 
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+            _uiState.value = AuthUiState()
             Timber.d("User logged out")
         }
     }
 }
+
+data class AuthUiState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val otpSent: Boolean = false,
+    val otpId: String? = null,
+    val phoneNumber: String? = null,
+    val isAuthenticated: Boolean = false,
+    val user: User? = null
+)

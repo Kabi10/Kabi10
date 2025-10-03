@@ -460,6 +460,86 @@ router.put('/:id', createListingValidation, async (req, res) => {
 });
 
 /**
+ * POST /api/v1/listings/:id/images
+ * Upload images for a listing
+ */
+router.post('/:id/images', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { images } = req.body; // Array of base64 or URLs
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid listing ID'
+      });
+    }
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No images provided'
+      });
+    }
+
+    if (images.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum 5 images allowed'
+      });
+    }
+
+    // Check if listing exists and belongs to user
+    const existingListing = await db.query(
+      'SELECT farmer_id, images FROM listings WHERE id = $1',
+      [id]
+    );
+
+    if (existingListing.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Listing not found'
+      });
+    }
+
+    if (existingListing.rows[0].farmer_id !== req.user.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only upload images to your own listings'
+      });
+    }
+
+    // For now, just store the URLs directly
+    // In production, you would upload to Supabase Storage here
+    const currentImages = existingListing.rows[0].images || [];
+    const updatedImages = [...currentImages, ...images].slice(0, 5);
+
+    await db.query(
+      'UPDATE listings SET images = $1, updated_at = NOW() WHERE id = $2',
+      [updatedImages, id]
+    );
+
+    logger.info('Images uploaded to listing', { 
+      listingId: id, 
+      imageCount: images.length 
+    });
+
+    res.json({
+      success: true,
+      data: {
+        images: updatedImages
+      }
+    });
+  } catch (error) {
+    logger.error('Upload images error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload images'
+    });
+  }
+});
+
+/**
  * DELETE /api/v1/listings/:id
  * Delete (deactivate) listing
  */

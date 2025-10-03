@@ -163,4 +163,39 @@
     <string name="unit_kg">Kg</string>
     <string name="unit_ton">Ton</string>
     <string name="unit_units">Units</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Search crops, locations…</string>
+    <string name="search_filters">Filters</string>
+    <string name="search_clear_all">Clear All</string>
+    <string name="search_crop_types">Crop Types</string>
+    <string name="search_locations">Locations</string>
+    <string name="search_results_count">%1$d results found</string>
+    <string name="search_no_results">No results found</string>
+    <string name="search_no_results_subtitle">Try searching for different keywords or check your spelling</string>
+    <string name="search_popular">Popular Searches</string>
+
+    <!-- Transactions Screen -->
+    <string name="transactions_title">Transactions</string>
+    <string name="transactions_filter_status">Filter by Status</string>
+    <string name="transactions_all">All</string>
+    <string name="transactions_pending">Pending</string>
+    <string name="transactions_confirmed">Confirmed</string>
+    <string name="transactions_in_progress">In Progress</string>
+    <string name="transactions_completed">Completed</string>
+    <string name="transactions_cancelled">Cancelled</string>
+    <string name="transactions_id">Transaction #%1$s</string>
+    <string name="transactions_quantity">Quantity</string>
+    <string name="transactions_total_amount">Total Amount</string>
+    <string name="transactions_pickup">Pickup: %1$s</string>
+    <string name="transactions_date">Date: %1$s</string>
+    <string name="transactions_contact">Contact</string>
+    <string name="transactions_units">%1$s units</string>
+
+    <!-- Listings Screen -->
+    <string name="listings_title">Listings</string>
+    <string name="listings_quantity_label">Quantity: %1$s %2$s</string>
+    <string name="listings_grade">Grade %1$s</string>
+    <string name="listings_per_unit">per %1$s</string>
+    <string name="listings_coming_soon">New listings will be available soon</string>
 </resources>

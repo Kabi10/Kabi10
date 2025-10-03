@@ -178,32 +178,41 @@ class ListingRepository @Inject constructor(
     }
 
     /**
-     * Get listing by ID - offline-first
+     * Get listing by ID - offline-first with Flow
      */
-    suspend fun getListingById(listingId: String): Resource<Listing> {
-        return try {
+    fun getListingById(listingId: String): Flow<Resource<Listing>> = flow {
+        emit(Resource.Loading())
+
+        try {
             // Try local first
             val localListing = listingDao.getListingById(listingId)
             if (localListing != null) {
-                Resource.Success(localListing)
-            } else {
-                // Try network
+                emit(Resource.Success(localListing))
+            }
+
+            // Try to refresh from network
+            try {
                 val response = listingApiService.getListingById(listingId)
                 if (response.isSuccessful) {
                     val networkListing = response.body()
                     if (networkListing != null) {
                         listingDao.insertListing(networkListing)
-                        Resource.Success(networkListing)
-                    } else {
-                        Resource.Error("Listing not found", null)
+                        emit(Resource.Success(networkListing))
+                    } else if (localListing == null) {
+                        emit(Resource.Error("Listing not found", null))
                     }
-                } else {
-                    Resource.Error("Failed to load listing", null)
+                } else if (localListing == null) {
+                    emit(Resource.Error("Failed to load listing", null))
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to refresh listing from network")
+                if (localListing == null) {
+                    emit(Resource.Error("Failed to load listing", e))
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting listing by ID")
-            Resource.Error("Failed to load listing", e)
+            emit(Resource.Error("Failed to load listing", e))
         }
     }
     
@@ -215,7 +224,8 @@ class ListingRepository @Inject constructor(
         quality: String,
         harvestDate: String,
         location: String,
-        farmerId: String
+        farmerId: String,
+        imageUrls: List<String> = emptyList()
     ): Result<Listing> {
         return try {
             // Parse quality string to enum
@@ -236,7 +246,7 @@ class ListingRepository @Inject constructor(
                 quality = qualityGrade,
                 harvestDate = harvestDate,
                 location = location,
-                images = emptyList(),
+                images = imageUrls,
                 isActive = true,
                 createdAt = Instant.now().toString(),
                 updatedAt = Instant.now().toString()
@@ -497,6 +507,52 @@ class ListingRepository @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Error incrementing inquiry count")
             Resource.Error("Failed to update inquiry count", e)
+        }
+    }
+
+    /**
+     * Upload images for a listing
+     * Converts URIs to base64 and uploads to server
+     */
+    suspend fun uploadImages(
+        listingId: String,
+        imageUris: List<android.net.Uri>,
+        context: android.content.Context
+    ): Result<List<String>> {
+        return try {
+            if (imageUris.isEmpty()) {
+                return Result.success(emptyList())
+            }
+
+            // Convert URIs to base64 strings
+            val base64Images = imageUris.mapNotNull { uri ->
+                try {
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val bytes = inputStream?.readBytes()
+                    inputStream?.close()
+                    
+                    if (bytes != null) {
+                        // Compress if needed (simple implementation)
+                        val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                        "data:image/jpeg;base64,$base64"
+                    } else null
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to convert URI to base64")
+                    null
+                }
+            }
+
+            if (base64Images.isEmpty()) {
+                return Result.failure(Exception("Failed to process images"))
+            }
+
+            // For MVP, return the base64 strings directly
+            // In production, you would upload to Supabase Storage via API
+            Timber.d("Prepared ${base64Images.size} images for listing $listingId")
+            Result.success(base64Images)
+        } catch (e: Exception) {
+            Timber.e(e, "Error uploading images")
+            Result.failure(e)
         }
     }
 }

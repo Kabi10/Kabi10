@@ -163,4 +163,40 @@
     <string name="unit_kg">கிலோ</string>
     <string name="unit_ton">டன்</string>
     <string name="unit_units">அலகுகள்</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">பயிர்கள், இடங்களைத் தேடுங்கள்…</string>
+    <string name="search_filters">வடிகட்டிகள்</string>
+    <string name="search_clear_all">அனைத்தையும் அழி</string>
+    <string name="search_crop_types">பயிர் வகைகள்</string>
+    <string name="search_locations">இடங்கள்</string>
+    <string name="search_results_count">%1$d முடிவுகள் கிடைத்தன</string>
+    <string name="search_no_results">தேடல் முடிவுகள் இல்லை</string>
+    <string name="search_no_results_subtitle">வெவ்வேறு முக்கிய வார்த்தைகளைத் தேட முயற்சிக்கவும் அல்லது உங்கள் எழுத்துப்பிழையைச் சரிபார்க்கவும்</string>
+    <string name="search_popular">பிரபலமான தேடல்கள்</string>
+
+    <!-- Transactions Screen -->
+    <string name="transactions_title">பரிவர்த்தனைகள்</string>
+    <string name="transactions_filter_status">நிலையின்படி வடிகட்டவும்</string>
+    <string name="transactions_all">அனைத்தும்</string>
+    <string name="transactions_pending">நிலுவையில்</string>
+    <string name="transactions_confirmed">உறுதிப்படுத்தப்பட்டது</string>
+    <string name="transactions_in_progress">செயல்பாட்டில்</string>
+    <string name="transactions_completed">முடிந்தது</string>
+    <string name="transactions_cancelled">ரத்து செய்யப்பட்டது</string>
+    <string name="transactions_id">பரிவர்த்தனை #%1$s</string>
+    <string name="transactions_quantity">அளவு</string>
+    <string name="transactions_total_amount">மொத்த தொகை</string>
+    <string name="transactions_pickup">எடுத்துச் செல்லும் இடம்: %1$s</string>
+    <string name="transactions_date">தேதி: %1$s</string>
+    <string name="transactions_contact">தொடர்பு கொள்ளவும்</string>
+    <string name="transactions_units">%1$s அலகுகள்</string>
+
+    <!-- Listings Screen -->
+    <string name="listings_title">பட்டியல்கள்</string>
+    <string name="listings_quantity_label">அளவு: %1$s %2$s</string>
+    <string name="listings_grade">தரம் %1$s</string>
+    <string name="listings_per_unit">ஒரு %1$s</string>
+    <string name="listings_coming_soon">புதிய பட்டியல்கள் விரைவில் கிடைக்கும்</string>
 </resources>
+

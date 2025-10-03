@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TransactionsScreen(
     onNavigateBack: () -> Unit,
+    onTransactionClick: (String) -> Unit = {},
     onContactUser: (String) -> Unit = {},
     viewModel: TransactionsViewModel = hiltViewModel()
 ) {
@@ -92,6 +93,7 @@ fun TransactionsScreen(
                         TransactionCard(
                             transaction = transaction,
                             currentUserType = currentUser?.userType ?: UserType.BUYER,
+                            onClick = { onTransactionClick(transaction.id) },
                             onStatusUpdate = { newStatus ->
                                 viewModel.updateTransactionStatus(transaction.id, newStatus)
                             },
@@ -157,6 +159,7 @@ private fun StatusFiltersSection(
 private fun TransactionCard(
     transaction: Transaction,
     currentUserType: UserType,
+    onClick: () -> Unit,
     onStatusUpdate: (TransactionStatus) -> Unit,
     onContactUser: (String) -> Unit,
     canUpdateStatus: Boolean,
@@ -164,6 +167,7 @@ private fun TransactionCard(
     actionText: String?
 ) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(

@@ -50,6 +50,9 @@ data class Listing(
     @Json(name = "farmerId")
     val farmerId: String,
 
+    @Json(name = "farmerName")
+    val farmerName: String? = null,
+
     @Json(name = "cropType")
     val cropType: String,
 
@@ -539,6 +542,23 @@ object CropTypes {
         RED_ONION, CHILI, TOMATO, BRINJAL, OKRA,
         COCONUT, PALMYRA, MANGO, BANANA, RICE
     )
+
+    /**
+     * Get crop emoji
+     */
+    fun getCropEmoji(cropType: String): String = when (cropType) {
+        RED_ONION -> "🧅"
+        CHILI -> "🌶️"
+        TOMATO -> "🍅"
+        BRINJAL -> "🍆"
+        OKRA -> "🥒"
+        COCONUT -> "🥥"
+        PALMYRA -> "🌴"
+        MANGO -> "🥭"
+        BANANA -> "🍌"
+        RICE -> "🌾"
+        else -> "🌱"
+    }
 
     /**
      * Get crop name in specified language

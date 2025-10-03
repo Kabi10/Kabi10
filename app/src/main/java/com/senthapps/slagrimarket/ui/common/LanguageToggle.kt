@@ -31,7 +31,7 @@ fun LanguageToggleButton(
     var showDropdown by remember { mutableStateOf(false) }
     
     Box(modifier = modifier) {
-        // Language toggle button
+        // Language toggle button - shows single character
         OutlinedButton(
             onClick = { showDropdown = true },
             modifier = Modifier.size(48.dp),
@@ -44,9 +44,14 @@ fun LanguageToggleButton(
             border = ButtonDefaults.outlinedButtonBorder
         ) {
             Text(
-                text = LanguagePreferences.LANGUAGE_CODES[currentLanguage] ?: "EN",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+                text = when (currentLanguage) {
+                    "en" -> "E"
+                    "ta" -> "த"
+                    "si" -> "සි"
+                    else -> "E"
+                },
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
             )
         }
         

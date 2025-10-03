@@ -15,10 +15,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
+import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
 import com.senthapps.slagrimarket.ui.home.HomeScreen
 import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
 import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
+import com.senthapps.slagrimarket.ui.listings.ListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.ListingsScreen
 import com.senthapps.slagrimarket.ui.profile.ProfileScreen
 import com.senthapps.slagrimarket.ui.search.SearchScreen
@@ -30,6 +33,7 @@ import com.senthapps.slagrimarket.ui.transactions.TransactionsScreen
  */
 @Composable
 fun AppNavigationWithBottomBar(
+    startWithAuth: Boolean = false,
     navController: NavHostController = rememberNavController(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -48,6 +52,9 @@ fun AppNavigationWithBottomBar(
     
     // Check if current route should show bottom bar
     val shouldShowBottomBar = currentDestination?.route in bottomBarRoutes
+    
+    // Choose start destination based on auth requirement
+    val startDestination = if (startWithAuth) Screen.PhoneInput.route else "home_direct"
     
     Scaffold(
         bottomBar = {
@@ -80,9 +87,34 @@ fun AppNavigationWithBottomBar(
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "home_direct",
+            startDestination = startDestination,
             modifier = Modifier.padding(paddingValues)
         ) {
+            // Authentication screens
+            composable(Screen.PhoneInput.route) {
+                PhoneInputScreen(
+                    onNavigateToOtpVerification = { phoneNumber, otpId ->
+                        navController.navigate(Screen.OtpVerification.createRoute(phoneNumber, otpId))
+                    }
+                )
+            }
+
+            composable(Screen.OtpVerification.route) { backStackEntry ->
+                val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+                val otpId = backStackEntry.arguments?.getString("otpId") ?: ""
+                OtpVerificationScreen(
+                    phoneNumber = phoneNumber,
+                    otpId = otpId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onVerificationSuccess = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.PhoneInput.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
             // MVP: Direct home screen access with unique route
             composable("home_direct") {
                 HomeScreen(

@@ -43,6 +43,7 @@ fun HomeScreen(
     onNavigateToCreateListing: () -> Unit,
     onNavigateToTransactions: () -> Unit,
     onNavigateToMarketPrices: () -> Unit,
+    onNavigateToAnalytics: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -151,6 +152,7 @@ fun HomeScreen(
                             onNavigateToListings = onNavigateToListings,
                             onNavigateToCreateListing = onNavigateToCreateListing,
                             onNavigateToTransactions = onNavigateToTransactions,
+                            onNavigateToAnalytics = onNavigateToAnalytics,
                             currentLanguage = currentLanguage
                         )
                     }
@@ -366,6 +368,7 @@ private fun QuickActionsSection(
     onNavigateToListings: () -> Unit,
     onNavigateToCreateListing: () -> Unit,
     onNavigateToTransactions: () -> Unit,
+    onNavigateToAnalytics: () -> Unit = {},
     currentLanguage: String
 ) {
     Column {
@@ -414,7 +417,7 @@ private fun QuickActionsSection(
                         else -> "View insights"
                     },
                     icon = Icons.Default.Info,
-                    onClick = onNavigateToTransactions, // TODO: Add analytics screen
+                    onClick = onNavigateToAnalytics,
                     currentLanguage = currentLanguage
                 )
             }

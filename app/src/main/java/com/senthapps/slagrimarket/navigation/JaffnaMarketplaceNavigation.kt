@@ -5,26 +5,57 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
+import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
+import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
 import com.senthapps.slagrimarket.ui.home.HomeScreen
 import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
 import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
+import com.senthapps.slagrimarket.ui.listings.ListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.ListingsScreen
 import com.senthapps.slagrimarket.ui.profile.ProfileScreen
 import com.senthapps.slagrimarket.ui.search.SearchScreen
 import com.senthapps.slagrimarket.ui.transactions.CreateTransactionScreen
+import com.senthapps.slagrimarket.ui.transactions.TransactionDetailScreen
 import com.senthapps.slagrimarket.ui.transactions.TransactionsScreen
 
 @Composable
 fun JaffnaMarketplaceNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    startWithAuth: Boolean = false // Set to true to enable auth flow
 ) {
-    // MVP: FORCE DIRECT HOME SCREEN ACCESS - NO AUTHENTICATION
-    // This completely bypasses any authentication logic that might exist elsewhere
+    // Choose start destination based on auth requirement
+    val startDestination = if (startWithAuth) Screen.PhoneInput.route else "home_direct"
 
     NavHost(
         navController = navController,
-        startDestination = "home_direct" // Use unique route to avoid conflicts
+        startDestination = startDestination
     ) {
+        // Authentication screens
+        composable(Screen.PhoneInput.route) {
+            PhoneInputScreen(
+                onNavigateToOtpVerification = { phoneNumber, otpId ->
+                    navController.navigate(Screen.OtpVerification.createRoute(phoneNumber, otpId))
+                }
+            )
+        }
+
+        composable(Screen.OtpVerification.route) { backStackEntry ->
+            val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+            val otpId = backStackEntry.arguments?.getString("otpId") ?: ""
+            OtpVerificationScreen(
+                phoneNumber = phoneNumber,
+                otpId = otpId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onVerificationSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.PhoneInput.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         // MVP: Direct home screen access with unique route
         composable("home_direct") {
             HomeScreen(
@@ -42,6 +73,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToMarketPrices = {
                     navController.navigate(Screen.MarketPrices.route)
+                },
+                onNavigateToAnalytics = {
+                    navController.navigate(Screen.Analytics.route)
                 }
             )
         }
@@ -63,6 +97,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToMarketPrices = {
                     navController.navigate(Screen.MarketPrices.route)
+                },
+                onNavigateToAnalytics = {
+                    navController.navigate(Screen.Analytics.route)
                 }
             )
         }
@@ -74,6 +111,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToSearch = {
                     navController.navigate(Screen.Search.route)
+                },
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
                 }
             )
         }
@@ -100,10 +140,29 @@ fun JaffnaMarketplaceNavigation(
             )
         }
 
+        composable(Screen.ListingDetail.route) { backStackEntry ->
+            val listingId = backStackEntry.arguments?.getString("listingId") ?: ""
+            ListingDetailScreen(
+                listingId = listingId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onPlaceOrder = { listingId ->
+                    navController.navigate(Screen.CreateTransaction.createRoute(listingId))
+                },
+                onContactFarmer = { farmerId ->
+                    // TODO: Implement contact farmer functionality
+                }
+            )
+        }
+
         composable(Screen.Transactions.route) {
             TransactionsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onTransactionClick = { transactionId ->
+                    navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
                 }
             )
         }
@@ -119,6 +178,19 @@ fun JaffnaMarketplaceNavigation(
                     navController.navigate(Screen.Transactions.route) {
                         popUpTo(Screen.Home.route)
                     }
+                }
+            )
+        }
+
+        composable(Screen.TransactionDetail.route) { backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+            TransactionDetailScreen(
+                transactionId = transactionId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onContactUser = { userId ->
+                    // TODO: Implement contact user functionality
                 }
             )
         }
@@ -142,12 +214,25 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.Analytics.route) {
+            AnalyticsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
 sealed class Screen(val route: String) {
-    // MVP: ALL AUTHENTICATION SCREENS COMPLETELY REMOVED
-    // NO PHONE INPUT, NO OTP VERIFICATION, NO AUTH FLOWS
+    // Authentication screens
+    object PhoneInput : Screen("phone_input")
+    object OtpVerification : Screen("otp_verification/{phoneNumber}/{otpId}") {
+        fun createRoute(phoneNumber: String, otpId: String) = "otp_verification/$phoneNumber/$otpId"
+    }
+    
+    // Main app screens
     object Home : Screen("home")
     object Listings : Screen("listings")
     object Profile : Screen("profile")
@@ -164,4 +249,5 @@ sealed class Screen(val route: String) {
     object TransactionDetail : Screen("transaction_detail/{transactionId}") {
         fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
     }
+    object Analytics : Screen("analytics")
 }

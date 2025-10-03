@@ -163,4 +163,39 @@
     <string name="unit_kg">කිලෝ</string>
     <string name="unit_ton">ටොන්</string>
     <string name="unit_units">ඒකක</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">බෝග, ස්ථාන සොයන්න…</string>
+    <string name="search_filters">පෙරහන්</string>
+    <string name="search_clear_all">සියල්ල ඉවත් කරන්න</string>
+    <string name="search_crop_types">බෝග වර්ග</string>
+    <string name="search_locations">ස්ථාන</string>
+    <string name="search_results_count">ප්‍රතිඵල %1$d ක් හමු විය</string>
+    <string name="search_no_results">ප්‍රතිඵල හමු නොවීය</string>
+    <string name="search_no_results_subtitle">විවිධ මූල පද සෙවීමට උත්සාහ කරන්න හෝ ඔබේ අක්ෂර වින්‍යාසය පරීක්ෂා කරන්න</string>
+    <string name="search_popular">ජනප්‍රිය සෙවීම්</string>
+
+    <!-- Transactions Screen -->
+    <string name="transactions_title">ගනුදෙනු</string>
+    <string name="transactions_filter_status">තත්ත්වය අනුව පෙරන්න</string>
+    <string name="transactions_all">සියල්ල</string>
+    <string name="transactions_pending">අපේක්ෂාවේ</string>
+    <string name="transactions_confirmed">තහවුරු කළා</string>
+    <string name="transactions_in_progress">ක්‍රියාත්මකයි</string>
+    <string name="transactions_completed">සම්පූර්ණයි</string>
+    <string name="transactions_cancelled">අවලංගු කළා</string>
+    <string name="transactions_id">ගනුදෙනුව #%1$s</string>
+    <string name="transactions_quantity">ප්‍රමාණය</string>
+    <string name="transactions_total_amount">මුළු මුදල</string>
+    <string name="transactions_pickup">ලබා ගන්නා ස්ථානය: %1$s</string>
+    <string name="transactions_date">දිනය: %1$s</string>
+    <string name="transactions_contact">සම්බන්ධ කරන්න</string>
+    <string name="transactions_units">ඒකක %1$s</string>
+
+    <!-- Listings Screen -->
+    <string name="listings_title">ලැයිස්තු</string>
+    <string name="listings_quantity_label">ප්‍රමාණය: %1$s %2$s</string>
+    <string name="listings_grade">ශ්‍රේණිය %1$s</string>
+    <string name="listings_per_unit">එක් %1$s</string>
+    <string name="listings_coming_soon">නව ලැයිස්තු ඉක්මනින් ලබා ගත හැකිය</string>
 </resources>

@@ -23,7 +23,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigationWithBottomBar()
+                    // 🔐 AUTHENTICATION CONTROL
+                    // Set startWithAuth = true to enable phone/OTP authentication
+                    // Set startWithAuth = false to bypass auth (MVP mode)
+                    AppNavigationWithBottomBar(startWithAuth = false)
                 }
             }
         }

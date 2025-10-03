@@ -29,25 +29,23 @@ class CreateTransactionViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
             
             try {
-                val result = listingRepository.getListingById(listingId)
-                when (result) {
-                    is com.senthapps.slagrimarket.data.repository.Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            listing = result.data,
-                            isLoading = false
-                        )
-                    }
-                    is com.senthapps.slagrimarket.data.repository.Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = result.message ?: "Listing not found"
-                        )
-                    }
-                    else -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = "Listing not found"
-                        )
+                listingRepository.getListingById(listingId).collect { resource ->
+                    when (resource) {
+                        is com.senthapps.slagrimarket.data.repository.Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                listing = resource.data,
+                                isLoading = false
+                            )
+                        }
+                        is com.senthapps.slagrimarket.data.repository.Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                error = resource.message ?: "Listing not found"
+                            )
+                        }
+                        is com.senthapps.slagrimarket.data.repository.Resource.Loading -> {
+                            _uiState.value = _uiState.value.copy(isLoading = true)
+                        }
                     }
                 }
             } catch (e: Exception) {

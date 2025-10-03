@@ -22,6 +22,7 @@ import com.senthapps.slagrimarket.data.model.Listing
 fun ListingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToSearch: () -> Unit,
+    onListingClick: (String) -> Unit = {},
     viewModel: ListingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -117,7 +118,7 @@ fun ListingsScreen(
                 items(uiState.listings) { listing ->
                     ListingCard(
                         listing = listing,
-                        onClick = { /* TODO: Navigate to listing detail */ }
+                        onClick = { onListingClick(listing.id) }
                     )
                 }
             }

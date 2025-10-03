@@ -20,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateListingViewModel @Inject constructor(
     private val listingRepository: ListingRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(CreateListingUiState())
@@ -114,6 +115,16 @@ class CreateListingViewModel @Inject constructor(
                     return@launch
                 }
                 
+                // Upload images first if any
+                val imageUrls = if (state.images.isNotEmpty()) {
+                    listingRepository.uploadImages("temp", state.images, context).getOrElse {
+                        Timber.e(it, "Failed to upload images")
+                        emptyList()
+                    }
+                } else {
+                    emptyList()
+                }
+                
                 listingRepository.createListing(
                     cropType = state.cropType,
                     quantity = quantityValue!!,
@@ -122,14 +133,15 @@ class CreateListingViewModel @Inject constructor(
                     quality = state.quality,
                     harvestDate = state.harvestDate,
                     location = state.location,
-                    farmerId = currentUser.id
+                    farmerId = currentUser.id,
+                    imageUrls = imageUrls
                 ).fold(
                     onSuccess = { listing ->
                         _uiState.value = state.copy(
                             isLoading = false,
                             isSuccess = true
                         )
-                        Timber.d("Listing created successfully: ${listing.id}")
+                        Timber.d("Listing created successfully: ${listing.id} with ${imageUrls.size} images")
                     },
                     onFailure = { error ->
                         _uiState.value = state.copy(
@@ -273,6 +285,16 @@ class CreateListingViewModel @Inject constructor(
 
         return isValid
     }
+
+    fun updateImages(images: List<android.net.Uri>) {
+        _uiState.value = _uiState.value.copy(images = images)
+    }
+
+    fun removeImage(imageUri: android.net.Uri) {
+        val currentImages = _uiState.value.images.toMutableList()
+        currentImages.remove(imageUri)
+        _uiState.value = _uiState.value.copy(images = currentImages)
+    }
 }
 
 data class CreateListingUiState(
@@ -283,6 +305,7 @@ data class CreateListingUiState(
     val quality: String = "",
     val harvestDate: String = "",
     val location: String = "",
+    val images: List<android.net.Uri> = emptyList(),
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,
