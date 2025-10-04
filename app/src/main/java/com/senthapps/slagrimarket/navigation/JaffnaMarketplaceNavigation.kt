@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
 import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
+import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
 import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
 import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.home.HomeScreen
@@ -248,6 +249,23 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.Notifications.route) {
+            NotificationsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNotificationClick = { type, relatedId ->
+                    // Navigate based on notification type
+                    relatedId?.let {
+                        when {
+                            type.contains("ORDER") -> navController.navigate(Screen.TransactionDetail.createRoute(it))
+                            type.contains("LISTING") -> navController.navigate(Screen.ListingDetail.createRoute(it))
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -278,4 +296,5 @@ sealed class Screen(val route: String) {
     object Analytics : Screen("analytics")
     object EditProfile : Screen("edit_profile")
     object AdvancedSearch : Screen("advanced_search")
+    object Notifications : Screen("notifications")
 }

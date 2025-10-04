@@ -63,6 +63,11 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideNotificationDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.NotificationDao {
+        return database.notificationDao()
+    }
+
+    @Provides
     @Singleton
     fun provideLanguagePreferences(
         @ApplicationContext context: Context

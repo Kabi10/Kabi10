@@ -34,9 +34,10 @@ import com.senthapps.slagrimarket.data.model.User
         Transaction::class,
         LocalOp::class,
         MarketPrice::class,
-        Activity::class
+        Activity::class,
+        com.senthapps.slagrimarket.data.model.Notification::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(
@@ -52,6 +53,7 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
     abstract fun localOpDao(): LocalOpDao
     abstract fun marketPriceDao(): MarketPriceDao
     abstract fun activityDao(): ActivityDao
+    abstract fun notificationDao(): com.senthapps.slagrimarket.data.dao.NotificationDao
     
     companion object {
         private const val DATABASE_NAME = "jaffna_marketplace_database"
