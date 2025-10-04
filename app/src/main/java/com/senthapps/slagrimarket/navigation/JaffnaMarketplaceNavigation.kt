@@ -8,6 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
 import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
+import com.senthapps.slagrimarket.ui.chat.ChatScreen
+import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
 import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
 import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
@@ -159,7 +161,9 @@ fun JaffnaMarketplaceNavigation(
                     navController.navigate(Screen.CreateTransaction.createRoute(listingId))
                 },
                 onContactFarmer = { farmerId ->
-                    // TODO: Implement contact farmer functionality
+                    // Navigate to conversations screen for now
+                    // In a real app, this would create/get conversation and navigate to chat
+                    navController.navigate(Screen.Conversations.route)
                 }
             )
         }
@@ -302,6 +306,26 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.Conversations.route) {
+            ConversationsScreen(
+                onNavigateToChat = { conversationId, otherUserName ->
+                    navController.navigate(Screen.Chat.createRoute(conversationId, otherUserName))
+                }
+            )
+        }
+
+        composable(Screen.Chat.route) { backStackEntry ->
+            val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
+            val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
+            ChatScreen(
+                conversationId = conversationId,
+                otherUserName = otherUserName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -339,4 +363,9 @@ sealed class Screen(val route: String) {
     }
     object SyncSettings : Screen("sync_settings")
     object Favorites : Screen("favorites")
+    object Conversations : Screen("conversations")
+    object Chat : Screen("chat/{conversationId}/{otherUserName}") {
+        fun createRoute(conversationId: String, otherUserName: String) = 
+            "chat/$conversationId/$otherUserName"
+    }
 }
