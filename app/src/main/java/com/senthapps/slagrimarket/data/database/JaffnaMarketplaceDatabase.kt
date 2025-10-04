@@ -8,17 +8,22 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
 import com.senthapps.slagrimarket.data.dao.ActivityDao
+import com.senthapps.slagrimarket.data.dao.FavoriteDao
 import com.senthapps.slagrimarket.data.dao.ListingDao
 import com.senthapps.slagrimarket.data.dao.LocalOpDao
 import com.senthapps.slagrimarket.data.dao.MarketPriceDao
+import com.senthapps.slagrimarket.data.dao.MessageDao
 import com.senthapps.slagrimarket.data.dao.TransactionDao
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.Activity
 import com.senthapps.slagrimarket.data.model.ActivityConverters
+import com.senthapps.slagrimarket.data.model.Conversation
+import com.senthapps.slagrimarket.data.model.Favorite
 import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.ListingConverters
 import com.senthapps.slagrimarket.data.model.LocalOp
 import com.senthapps.slagrimarket.data.model.MarketPrice
+import com.senthapps.slagrimarket.data.model.Message
 import com.senthapps.slagrimarket.data.model.Transaction
 import com.senthapps.slagrimarket.data.model.TransactionConverters
 import com.senthapps.slagrimarket.data.model.User
@@ -36,9 +41,12 @@ import com.senthapps.slagrimarket.data.model.User
         MarketPrice::class,
         Activity::class,
         com.senthapps.slagrimarket.data.model.Notification::class,
-        com.senthapps.slagrimarket.data.model.Review::class
+        com.senthapps.slagrimarket.data.model.Review::class,
+        com.senthapps.slagrimarket.data.model.Message::class,
+        com.senthapps.slagrimarket.data.model.Conversation::class,
+        com.senthapps.slagrimarket.data.model.Favorite::class
     ],
-    version = 4,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(
@@ -56,6 +64,8 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
     abstract fun activityDao(): ActivityDao
     abstract fun notificationDao(): com.senthapps.slagrimarket.data.dao.NotificationDao
     abstract fun reviewDao(): com.senthapps.slagrimarket.data.dao.ReviewDao
+    abstract fun messageDao(): com.senthapps.slagrimarket.data.dao.MessageDao
+    abstract fun favoriteDao(): com.senthapps.slagrimarket.data.dao.FavoriteDao
     
     companion object {
         private const val DATABASE_NAME = "jaffna_marketplace_database"

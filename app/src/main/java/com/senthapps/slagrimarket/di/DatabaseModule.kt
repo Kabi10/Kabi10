@@ -73,6 +73,16 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideMessageDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.MessageDao {
+        return database.messageDao()
+    }
+
+    @Provides
+    fun provideFavoriteDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.FavoriteDao {
+        return database.favoriteDao()
+    }
+
+    @Provides
     @Singleton
     fun provideLanguagePreferences(
         @ApplicationContext context: Context

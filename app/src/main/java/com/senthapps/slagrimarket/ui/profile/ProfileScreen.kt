@@ -38,6 +38,7 @@ fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
     onNavigateToEditProfile: () -> Unit = {},
+    onNavigateToSyncSettings: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -118,7 +119,10 @@ fun ProfileScreen(
             ActiveListingsGallerySection(currentLanguage = currentLanguage)
 
             // Settings/Preferences Section
-            SettingsPreferencesSection(currentLanguage = currentLanguage)
+            SettingsPreferencesSection(
+                currentLanguage = currentLanguage,
+                onNavigateToSyncSettings = onNavigateToSyncSettings
+            )
 
             // Logout Button
             Card(
@@ -813,7 +817,10 @@ private fun getSampleListings(): List<SampleListing> {
 }
 
 @Composable
-private fun SettingsPreferencesSection(currentLanguage: String) {
+private fun SettingsPreferencesSection(
+    currentLanguage: String,
+    onNavigateToSyncSettings: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -862,22 +869,22 @@ private fun SettingsPreferencesSection(currentLanguage: String) {
 
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
-            // Notifications Setting
+            // Sync Settings
             SettingsItem(
-                icon = Icons.Default.Notifications,
+                icon = Icons.Default.Settings,
                 title = when (currentLanguage) {
-                    "en" -> "Notifications"
-                    "ta" -> "அறிவிப்புகள்"
-                    "si" -> "දැනුම්දීම්"
-                    else -> "Notifications"
+                    "en" -> "Sync Settings"
+                    "ta" -> "ஒத்திசைவு அமைப்புகள்"
+                    "si" -> "සමමුහුර්ත සැකසුම්"
+                    else -> "Sync Settings"
                 },
                 subtitle = when (currentLanguage) {
-                    "en" -> "Manage notification preferences"
-                    "ta" -> "அறிவிப்பு விருப்பங்களை நிர்வகிக்கவும்"
-                    "si" -> "දැනුම්දීම් මනාපයන් කළමනාකරණය කරන්න"
-                    else -> "Manage notification preferences"
+                    "en" -> "Manage offline sync preferences"
+                    "ta" -> "ஆஃப்லைன் ஒத்திசைவு விருப்பங்களை நிர்வகிக்கவும்"
+                    "si" -> "නොබැඳි සමමුහුර්ත මනාපයන් කළමනාකරණය කරන්න"
+                    else -> "Manage offline sync preferences"
                 },
-                onClick = { /* TODO: Navigate to notifications settings */ }
+                onClick = onNavigateToSyncSettings
             )
 
             Divider(modifier = Modifier.padding(vertical = 4.dp))

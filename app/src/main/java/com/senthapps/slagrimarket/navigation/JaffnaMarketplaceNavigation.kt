@@ -8,10 +8,12 @@ import androidx.navigation.compose.rememberNavController
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
 import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
+import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
 import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
 import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
 import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
+import com.senthapps.slagrimarket.ui.sync.SyncSettingsScreen
 import com.senthapps.slagrimarket.ui.home.HomeScreen
 import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
 import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
@@ -220,6 +222,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToEditProfile = {
                     navController.navigate(Screen.EditProfile.route)
+                },
+                onNavigateToSyncSettings = {
+                    navController.navigate(Screen.SyncSettings.route)
                 }
             )
         }
@@ -281,6 +286,22 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.SyncSettings.route) {
+            SyncSettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Favorites.route) {
+            FavoritesScreen(
+                onNavigateToDetail = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                }
+            )
+        }
     }
 }
 
@@ -316,4 +337,6 @@ sealed class Screen(val route: String) {
         fun createRoute(transactionId: String, revieweeId: String, revieweeName: String) = 
             "write_review/$transactionId/$revieweeId/$revieweeName"
     }
+    object SyncSettings : Screen("sync_settings")
+    object Favorites : Screen("favorites")
 }

@@ -16,19 +16,30 @@ import javax.inject.Inject
 @HiltViewModel
 class ListingDetailViewModel @Inject constructor(
     private val listingRepository: ListingRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val favoriteRepository: com.senthapps.slagrimarket.data.repository.FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ListingDetailUiState())
     val uiState: StateFlow<ListingDetailUiState> = _uiState.asStateFlow()
 
     val currentUser: Flow<User?> = authRepository.currentUser
+    
+    private var currentListingId: String = ""
 
     fun loadListing(listingId: String) {
+        currentListingId = listingId
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             try {
+                // Check if favorite
+                val currentUser = authRepository.getCurrentUser()
+                if (currentUser != null) {
+                    val isFav = favoriteRepository.isFavorite(currentUser.id, listingId)
+                    _uiState.update { it.copy(isFavorite = isFav) }
+                }
+                
                 // First try to get from local database
                 listingRepository.getListingById(listingId).collect { resource ->
                     when (resource) {
@@ -69,6 +80,30 @@ class ListingDetailViewModel @Inject constructor(
             }
         }
     }
+    
+    fun toggleFavorite() {
+        viewModelScope.launch {
+            try {
+                val currentUser = authRepository.getCurrentUser()
+                if (currentUser == null) {
+                    _uiState.update { it.copy(error = "Please login to add favorites") }
+                    return@launch
+                }
+                
+                val result = favoriteRepository.toggleFavorite(currentUser.id, currentListingId)
+                result.fold(
+                    onSuccess = { isFavorite ->
+                        _uiState.update { it.copy(isFavorite = isFavorite) }
+                    },
+                    onFailure = { error ->
+                        Timber.e(error, "Failed to toggle favorite")
+                    }
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Error toggling favorite")
+            }
+        }
+    }
 
     private fun incrementViewCount(listingId: String) {
         viewModelScope.launch {
@@ -96,5 +131,6 @@ class ListingDetailViewModel @Inject constructor(
 data class ListingDetailUiState(
     val listing: Listing? = null,
     val isLoading: Boolean = false,
+    val isFavorite: Boolean = false,
     val error: String? = null
 )
