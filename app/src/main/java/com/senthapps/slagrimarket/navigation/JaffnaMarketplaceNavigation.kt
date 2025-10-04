@@ -11,6 +11,8 @@ import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
 import com.senthapps.slagrimarket.ui.chat.ChatScreen
 import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
 import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
+import com.senthapps.slagrimarket.ui.map.ListingsMapScreen
+import com.senthapps.slagrimarket.ui.map.LocationMapScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
 import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
 import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
@@ -326,6 +328,33 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.LocationMap.route) { backStackEntry ->
+            val latitude = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 9.6615
+            val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 80.0255
+            val locationName = backStackEntry.arguments?.getString("locationName") ?: "Jaffna"
+            LocationMapScreen(
+                latitude = latitude,
+                longitude = longitude,
+                locationName = locationName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.ListingsMap.route) {
+            // TODO: Pass actual listings
+            ListingsMapScreen(
+                listings = emptyList(),
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                }
+            )
+        }
     }
 }
 
@@ -368,4 +397,9 @@ sealed class Screen(val route: String) {
         fun createRoute(conversationId: String, otherUserName: String) = 
             "chat/$conversationId/$otherUserName"
     }
+    object LocationMap : Screen("location_map/{latitude}/{longitude}/{locationName}") {
+        fun createRoute(latitude: Double, longitude: Double, locationName: String) = 
+            "location_map/$latitude/$longitude/$locationName"
+    }
+    object ListingsMap : Screen("listings_map")
 }
