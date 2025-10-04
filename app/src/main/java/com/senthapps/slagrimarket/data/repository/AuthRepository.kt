@@ -203,4 +203,33 @@ class AuthRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun updateUserProfile(
+        userId: String,
+        name: String,
+        location: String
+    ): Result<User> {
+        return try {
+            val currentUser = getCurrentUser()
+            if (currentUser == null) {
+                return Result.failure(Exception("User not found"))
+            }
+
+            val updatedUser = currentUser.copy(
+                name = name
+            )
+
+            // Update in local database
+            userDao.updateUser(updatedUser)
+            
+            // Update in preferences
+            authPreferences.saveUser(updatedUser)
+
+            Timber.d("Profile updated: $name, $location")
+            Result.success(updatedUser)
+        } catch (e: Exception) {
+            Timber.e(e, "Error updating profile")
+            Result.failure(e)
+        }
+    }
 }

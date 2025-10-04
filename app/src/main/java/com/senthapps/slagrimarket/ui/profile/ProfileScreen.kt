@@ -37,6 +37,7 @@ import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
+    onNavigateToEditProfile: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -68,6 +69,9 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToEditProfile) {
+                        Icon(Icons.Default.Edit, "Edit Profile")
+                    }
                     LanguageToggleButton(
                         currentLanguage = currentLanguage,
                         onLanguageChange = languageViewModel::setLanguage,

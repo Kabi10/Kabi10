@@ -8,12 +8,16 @@ import androidx.navigation.compose.rememberNavController
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
 import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
+import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
+import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.home.HomeScreen
 import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
 import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
 import com.senthapps.slagrimarket.ui.listings.ListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.ListingsScreen
+import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
 import com.senthapps.slagrimarket.ui.profile.ProfileScreen
+import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.search.SearchScreen
 import com.senthapps.slagrimarket.ui.transactions.CreateTransactionScreen
 import com.senthapps.slagrimarket.ui.transactions.TransactionDetailScreen
@@ -211,6 +215,9 @@ fun JaffnaMarketplaceNavigation(
                 onLogout = {
                     // MVP: No logout functionality needed
                     navController.popBackStack()
+                },
+                onNavigateToEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
                 }
             )
         }
@@ -219,6 +226,25 @@ fun JaffnaMarketplaceNavigation(
             AnalyticsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.EditProfile.route) {
+            EditProfileScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.AdvancedSearch.route) {
+            AdvancedSearchScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
                 }
             )
         }
@@ -250,4 +276,6 @@ sealed class Screen(val route: String) {
         fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
     }
     object Analytics : Screen("analytics")
+    object EditProfile : Screen("edit_profile")
+    object AdvancedSearch : Screen("advanced_search")
 }

@@ -127,9 +127,10 @@ fun ListingsScreen(
 }
 
 @Composable
-private fun ListingCard(
+fun ListingCard(
     listing: Listing,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    currentLanguage: String = "en"
 ) {
     Card(
         onClick = onClick,

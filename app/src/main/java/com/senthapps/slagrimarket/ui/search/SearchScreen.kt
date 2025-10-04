@@ -28,6 +28,7 @@ import com.senthapps.slagrimarket.data.model.PickupLocations
 fun SearchScreen(
     onNavigateBack: () -> Unit,
     onListingClick: (String) -> Unit,
+    onNavigateToAdvancedSearch: () -> Unit = {},
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -75,6 +76,11 @@ fun SearchScreen(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
                         )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToAdvancedSearch) {
+                        Icon(Icons.Default.Search, "Advanced Search")
                     }
                 }
             )
