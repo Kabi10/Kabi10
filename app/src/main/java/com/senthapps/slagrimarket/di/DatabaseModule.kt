@@ -68,6 +68,11 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideReviewDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.ReviewDao {
+        return database.reviewDao()
+    }
+
+    @Provides
     @Singleton
     fun provideLanguagePreferences(
         @ApplicationContext context: Context

@@ -10,6 +10,7 @@ import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
 import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
 import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
+import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
 import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.home.HomeScreen
 import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
@@ -266,6 +267,20 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.WriteReview.route) { backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+            val revieweeId = backStackEntry.arguments?.getString("revieweeId") ?: ""
+            val revieweeName = backStackEntry.arguments?.getString("revieweeName") ?: ""
+            WriteReviewScreen(
+                transactionId = transactionId,
+                revieweeId = revieweeId,
+                revieweeName = revieweeName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -297,4 +312,8 @@ sealed class Screen(val route: String) {
     object EditProfile : Screen("edit_profile")
     object AdvancedSearch : Screen("advanced_search")
     object Notifications : Screen("notifications")
+    object WriteReview : Screen("write_review/{transactionId}/{revieweeId}/{revieweeName}") {
+        fun createRoute(transactionId: String, revieweeId: String, revieweeName: String) = 
+            "write_review/$transactionId/$revieweeId/$revieweeName"
+    }
 }
