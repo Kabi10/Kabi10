@@ -11,6 +11,8 @@ import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
 import com.senthapps.slagrimarket.ui.chat.ChatScreen
 import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
 import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
+import com.senthapps.slagrimarket.ui.help.FAQScreen
+import com.senthapps.slagrimarket.ui.help.HelpScreen
 import com.senthapps.slagrimarket.ui.map.ListingsMapScreen
 import com.senthapps.slagrimarket.ui.map.LocationMapScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
@@ -355,6 +357,34 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
+
+        composable(Screen.Help.route) {
+            HelpScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToFAQ = {
+                    navController.navigate(Screen.FAQ.route)
+                },
+                onNavigateToContact = {
+                    // TODO: Implement contact screen
+                },
+                onNavigateToTerms = {
+                    // TODO: Implement terms screen
+                },
+                onNavigateToPrivacy = {
+                    // TODO: Implement privacy screen
+                }
+            )
+        }
+
+        composable(Screen.FAQ.route) {
+            FAQScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -402,4 +432,6 @@ sealed class Screen(val route: String) {
             "location_map/$latitude/$longitude/$locationName"
     }
     object ListingsMap : Screen("listings_map")
+    object Help : Screen("help")
+    object FAQ : Screen("faq")
 }
