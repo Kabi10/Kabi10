@@ -28,7 +28,8 @@ class ListingRepository @Inject constructor(
     private val listingApiService: ListingApiService,
     private val listingDao: ListingDao,
     private val localOpDao: LocalOpDao,
-    private val moshi: Moshi
+    private val moshi: Moshi,
+    private val storageRepository: StorageRepository
 ) {
     
     // ============================================================================
@@ -511,8 +512,8 @@ class ListingRepository @Inject constructor(
     }
 
     /**
-     * Upload images for a listing
-     * Converts URIs to base64 and uploads to server
+     * Upload images for a listing to Firebase Storage
+     * Returns list of download URLs
      */
     suspend fun uploadImages(
         listingId: String,
@@ -524,32 +525,18 @@ class ListingRepository @Inject constructor(
                 return Result.success(emptyList())
             }
 
-            // Convert URIs to base64 strings
-            val base64Images = imageUris.mapNotNull { uri ->
-                try {
-                    val inputStream = context.contentResolver.openInputStream(uri)
-                    val bytes = inputStream?.readBytes()
-                    inputStream?.close()
-                    
-                    if (bytes != null) {
-                        // Compress if needed (simple implementation)
-                        val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-                        "data:image/jpeg;base64,$base64"
-                    } else null
-                } catch (e: Exception) {
-                    Timber.e(e, "Failed to convert URI to base64")
-                    null
-                }
-            }
+            // Upload images to Firebase Storage
+            Timber.d("Uploading ${imageUris.size} images to Firebase Storage for listing $listingId")
+            val result = storageRepository.uploadListingImages(imageUris, listingId)
 
-            if (base64Images.isEmpty()) {
-                return Result.failure(Exception("Failed to process images"))
+            if (result.isSuccess) {
+                val downloadUrls = result.getOrNull() ?: emptyList()
+                Timber.d("Successfully uploaded ${downloadUrls.size} images for listing $listingId")
+                Result.success(downloadUrls)
+            } else {
+                Timber.e(result.exceptionOrNull(), "Failed to upload images to Firebase Storage")
+                Result.failure(result.exceptionOrNull() ?: Exception("Failed to upload images"))
             }
-
-            // For MVP, return the base64 strings directly
-            // In production, you would upload to Supabase Storage via API
-            Timber.d("Prepared ${base64Images.size} images for listing $listingId")
-            Result.success(base64Images)
         } catch (e: Exception) {
             Timber.e(e, "Error uploading images")
             Result.failure(e)

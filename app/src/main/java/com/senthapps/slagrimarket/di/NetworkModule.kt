@@ -1,6 +1,6 @@
 package com.senthapps.slagrimarket.di
 
-// import com.senthapps.slagrimarket.BuildConfig
+import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.ActivityApiService
 import com.senthapps.slagrimarket.data.api.AuthApiService
 import com.senthapps.slagrimarket.data.api.ListingApiService
@@ -25,8 +25,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/" // Serverless API URL
-    
     @Provides
     @Singleton
     fun provideMoshi(): Moshi {
@@ -34,12 +32,12 @@ object NetworkModule {
             .add(KotlinJsonAdapterFactory())
             .build()
     }
-    
+
     @Provides
     @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
-            level = if (true) { // Always enable debug logging for now
+            level = if (BuildConfig.ENABLE_LOGGING) {
                 HttpLoggingInterceptor.Level.BODY
             } else {
                 HttpLoggingInterceptor.Level.NONE
@@ -71,7 +69,7 @@ object NetworkModule {
         moshi: Moshi
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

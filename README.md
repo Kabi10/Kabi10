@@ -2,6 +2,90 @@
 
 A Tamil-first, offline-first agricultural marketplace connecting farmers in Jaffna with local buyers.
 
+---
+
+## 👋 Welcome Interns!
+
+**Congratulations on joining the Agrimarket project!** This is a real-world Android application that will help you learn modern Android development while building something meaningful for farmers in Jaffna, Sri Lanka.
+
+### 🎓 What You'll Learn
+
+By contributing to this project, you'll gain hands-on experience with:
+
+- ✅ **Modern Android Development**: Jetpack Compose, Material Design 3, Kotlin
+- ✅ **Clean Architecture**: MVVM pattern, Repository pattern, Dependency Injection (Hilt)
+- ✅ **Offline-First Design**: Room database, data synchronization, background workers
+- ✅ **Testing**: Unit tests, UI tests, MockK, Turbine
+- ✅ **Real-World Features**: Authentication, image upload, maps, notifications
+- ✅ **Trilingual Support**: English, Tamil (தமிழ்), Sinhala (සිංහල)
+- ✅ **Professional Workflow**: Git, code reviews, documentation, issue tracking
+
+### 🚀 Quick Start for Interns
+
+**New to the project? Follow these steps:**
+
+1. **Read the Documentation** (30 minutes)
+   - 📖 [SETUP.md](SETUP.md) - Get your development environment ready
+   - 🏗️ [ARCHITECTURE.md](ARCHITECTURE.md) - Understand how the app is built
+   - 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) - Learn our development workflow
+   - ⚠️ [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - See current limitations
+
+2. **Set Up Your Environment** (1-2 hours)
+   - Install Android Studio
+   - Clone the repository
+   - Configure Firebase
+   - Build and run the app
+
+3. **Pick Your First Issue** (Start coding!)
+   - Look for issues labeled [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+   - Start with something small to get familiar with the codebase
+   - Don't hesitate to ask questions!
+
+### 🌟 Recommended First Issues
+
+We've prepared beginner-friendly issues to help you get started:
+
+1. **[Easy]** [Implement Language Preference Persistence](../../issues) - Learn DataStore and state management (2-4 hours)
+2. **[Medium]** [Add Unit Tests for ViewModels](../../issues) - Learn testing with JUnit and MockK (4-6 hours)
+3. **[Hard]** [Add Search Filters to Listings](../../issues) - Build a complete feature with UI and logic (6-10 hours)
+
+### 💡 Learning Resources
+
+- **Android Basics**: [Android Developer Guides](https://developer.android.com/guide)
+- **Jetpack Compose**: [Compose Tutorial](https://developer.android.com/jetpack/compose/tutorial)
+- **Kotlin**: [Kotlin Documentation](https://kotlinlang.org/docs/home.html)
+- **Git Workflow**: [GitHub Flow Guide](https://guides.github.com/introduction/flow/)
+
+### 🤝 Getting Help
+
+**Stuck? Don't worry, we're here to help!**
+
+- 💬 **Ask Questions**: Comment on the issue you're working on
+- 📚 **Check Documentation**: Most answers are in `ARCHITECTURE.md` or `SETUP.md`
+- 🐛 **Report Problems**: Create a new issue if you find bugs
+- 🔍 **Search First**: Check if someone else had the same question
+
+### 📊 Project Status
+
+- **Build Status**: ✅ Passing
+- **Test Coverage**: ~0% (Help us improve this!)
+- **Code Quality**: Good (MVVM architecture, clean code)
+- **Documentation**: Comprehensive
+- **Intern Readiness**: 9.5/10
+
+### 🎯 Project Goals
+
+This app aims to:
+- 🌾 Help farmers in Jaffna sell their produce directly to buyers
+- 📱 Work offline in areas with poor internet connectivity
+- 🌍 Support Tamil, English, and Sinhala languages
+- 💰 Enable both cash and digital transactions
+- 📊 Provide market price insights to farmers
+
+**Your contributions will directly impact real farmers!** 🚜✨
+
+---
+
 ## 🌾 Overview
 
 This is a complete mobile-first marketplace application built to serve the agricultural community in Jaffna, Sri Lanka. The platform enables farmers to list their produce and connect directly with local buyers, supporting both cash transactions and future digital payment integration.

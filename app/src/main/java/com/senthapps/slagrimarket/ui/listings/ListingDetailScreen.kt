@@ -2,6 +2,8 @@ package com.senthapps.slagrimarket.ui.listings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,16 +16,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.senthapps.slagrimarket.R
 import com.senthapps.slagrimarket.data.model.CropTypes
 import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.UserType
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.util.CropImageProvider
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -144,8 +152,12 @@ private fun ListingDetailContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Image placeholder (for future image implementation)
-        ImagePlaceholder(cropType = listing.cropType)
+        // Image gallery with farmer photos or generic crop image
+        ListingImageGallery(
+            cropType = listing.cropType,
+            farmerImages = listing.images,
+            currentLanguage = currentLanguage
+        )
 
         // Main info card
         MainInfoCard(
@@ -188,36 +200,165 @@ private fun ListingDetailContent(
     }
 }
 
+/**
+ * Image gallery component that displays farmer-uploaded photos or falls back to generic crop images
+ */
 @Composable
-private fun ImagePlaceholder(cropType: String) {
+private fun ListingImageGallery(
+    cropType: String,
+    farmerImages: List<String>,
+    currentLanguage: String,
+    modifier: Modifier = Modifier
+) {
+    val hasFarmerPhotos = CropImageProvider.hasFarmerPhotos(farmerImages)
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Image display
+        if (hasFarmerPhotos) {
+            // Show farmer-uploaded photos in a horizontal scrollable gallery
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(farmerImages) { imageUrl ->
+                    FarmerPhotoCard(imageUrl = imageUrl)
+                }
+            }
+        } else {
+            // Show generic crop image as fallback
+            GenericCropImageCard(cropType = cropType)
+        }
+
+        // Image type indicator badge
+        ImageTypeBadge(
+            hasFarmerPhotos = hasFarmerPhotos,
+            currentLanguage = currentLanguage
+        )
+    }
+}
+
+/**
+ * Card displaying a farmer-uploaded photo
+ */
+@Composable
+private fun FarmerPhotoCard(
+    imageUrl: String,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
+            .width(300.dp)
+            .height(240.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "Farmer's produce photo",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            error = painterResource(R.drawable.crop_generic)
+        )
+    }
+}
+
+/**
+ * Card displaying generic crop image
+ */
+@Composable
+private fun GenericCropImageCard(
+    cropType: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
             .fillMaxWidth()
             .height(240.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        shape = RoundedCornerShape(16.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            // Display generic crop image from drawable resources
+            AsyncImage(
+                model = CropImageProvider.getGenericCropImage(cropType),
+                contentDescription = "Generic ${cropType.replace("_", " ")} image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // Overlay with crop emoji for visual appeal
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .size(64.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
             ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = CropTypes.getCropEmoji(cropType),
-                    style = MaterialTheme.typography.displayLarge
-                )
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = CropTypes.getCropEmoji(cropType),
+                        style = MaterialTheme.typography.headlineLarge
+                    )
+                }
             }
+        }
+    }
+}
+
+/**
+ * Badge indicating whether showing generic stock image or actual farmer photos
+ */
+@Composable
+private fun ImageTypeBadge(
+    hasFarmerPhotos: Boolean,
+    currentLanguage: String,
+    modifier: Modifier = Modifier
+) {
+    val (badgeText, badgeColor) = if (hasFarmerPhotos) {
+        when (currentLanguage) {
+            "ta" -> "விவசாயியின் புகைப்படங்கள்" to MaterialTheme.colorScheme.primary
+            "si" -> "ගොවියාගේ ඡායාරූප" to MaterialTheme.colorScheme.primary
+            else -> "Farmer's Photos" to MaterialTheme.colorScheme.primary
+        }
+    } else {
+        when (currentLanguage) {
+            "ta" -> "பொதுவான படம்" to MaterialTheme.colorScheme.secondary
+            "si" -> "සාමාන්‍ය රූපය" to MaterialTheme.colorScheme.secondary
+            else -> "Stock Image" to MaterialTheme.colorScheme.secondary
+        }
+    }
+
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = badgeColor.copy(alpha = 0.15f)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (hasFarmerPhotos) Icons.Default.Check else Icons.Default.Info,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = badgeColor
+            )
+            Text(
+                text = badgeText,
+                style = MaterialTheme.typography.labelMedium,
+                color = badgeColor,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }

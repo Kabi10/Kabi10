@@ -22,22 +22,60 @@ class AuthPreferences @Inject constructor(
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
-    
-    private val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        "auth_prefs",
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
-    
+
+    private val sharedPreferences: SharedPreferences = createEncryptedPreferences()
+
     private val userAdapter = moshi.adapter(User::class.java)
-    
+
     private val _currentUser = MutableStateFlow<User?>(getCurrentUser())
     val currentUser: Flow<User?> = _currentUser.asStateFlow()
-    
+
     private val _isLoggedIn = MutableStateFlow(sharedPreferences.getString(KEY_ACCESS_TOKEN, null) != null)
     val isLoggedIn: Flow<Boolean> = _isLoggedIn.asStateFlow()
+
+    /**
+     * Create encrypted shared preferences with error recovery
+     * If the preferences are corrupted, delete them and create new ones
+     */
+    private fun createEncryptedPreferences(): SharedPreferences {
+        return try {
+            EncryptedSharedPreferences.create(
+                context,
+                "auth_prefs",
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to create encrypted preferences, attempting recovery...")
+
+            // Delete corrupted preferences file
+            try {
+                val prefsFile = java.io.File(context.applicationInfo.dataDir, "shared_prefs/auth_prefs.xml")
+                if (prefsFile.exists()) {
+                    prefsFile.delete()
+                    Timber.d("Deleted corrupted preferences file")
+                }
+            } catch (deleteException: Exception) {
+                Timber.e(deleteException, "Failed to delete corrupted preferences")
+            }
+
+            // Try creating again
+            try {
+                EncryptedSharedPreferences.create(
+                    context,
+                    "auth_prefs",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+            } catch (retryException: Exception) {
+                Timber.e(retryException, "Failed to create encrypted preferences after recovery, falling back to regular preferences")
+                // Fallback to regular SharedPreferences if encryption fails
+                context.getSharedPreferences("auth_prefs_fallback", Context.MODE_PRIVATE)
+            }
+        }
+    }
     
     companion object {
         private const val KEY_ACCESS_TOKEN = "access_token"

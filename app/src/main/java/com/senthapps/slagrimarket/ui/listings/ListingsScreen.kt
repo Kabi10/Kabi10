@@ -16,6 +16,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.data.model.Listing
+import com.senthapps.slagrimarket.data.model.CropTypes
+import com.senthapps.slagrimarket.data.model.QualityGrade
+import com.senthapps.slagrimarket.data.model.Units
+import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.util.TranslationUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,9 +28,11 @@ fun ListingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onListingClick: (String) -> Unit = {},
-    viewModel: ListingsViewModel = hiltViewModel()
+    viewModel: ListingsViewModel = hiltViewModel(),
+    languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -33,15 +40,22 @@ fun ListingsScreen(
                 title = {
                     Column {
                         Text(
-                            text = "பட்டியல்கள்",
+                            text = when (currentLanguage) {
+                                "en" -> "Listings"
+                                "ta" -> "பட்டியல்கள்"
+                                "si" -> "ලැයිස්තු"
+                                else -> "Listings"
+                            },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = "Listings",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (currentLanguage !in listOf("en", "ta", "si")) {
+                            Text(
+                                text = "Listings",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 },
                 navigationIcon = {
@@ -82,29 +96,27 @@ fun ListingsScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "பட்டியல்கள் இல்லை",
+                    text = when (currentLanguage) {
+                        "en" -> "No listings available"
+                        "ta" -> "பட்டியல்கள் இல்லை"
+                        "si" -> "ලැයිස්තු නොමැත"
+                        else -> "No listings available"
+                    },
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = "No listings available",
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                Text(
-                    text = "புதிய பட்டியல்கள் விரைவில் கிடைக்கும்",
+                    text = when (currentLanguage) {
+                        "en" -> "New listings will be available soon"
+                        "ta" -> "புதிய பட்டியல்கள் விரைவில் கிடைக்கும்"
+                        "si" -> "නව ලැයිස්තු ඉක්මනින් ලබා ගත හැකිය"
+                        else -> "New listings will be available soon"
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 16.dp)
-                )
-                Text(
-                    text = "New listings will be available soon",
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
@@ -118,7 +130,8 @@ fun ListingsScreen(
                 items(uiState.listings) { listing ->
                     ListingCard(
                         listing = listing,
-                        onClick = { onListingClick(listing.id) }
+                        onClick = { onListingClick(listing.id) },
+                        currentLanguage = currentLanguage
                     )
                 }
             }
@@ -132,6 +145,34 @@ fun ListingCard(
     onClick: () -> Unit,
     currentLanguage: String = "en"
 ) {
+    // Get translated values
+    val cropName = CropTypes.getCropName(listing.cropType, currentLanguage)
+    val locationName = TranslationUtil.getLocationName(listing.location, currentLanguage)
+    val unitName = Units.getUnitName(listing.unit, currentLanguage)
+    val qualityGrade = listing.quality.getDisplayString(currentLanguage)
+
+    // Get labels in the selected language
+    val quantityLabel = when (currentLanguage) {
+        "en" -> "Quantity"
+        "ta" -> "அளவு"
+        "si" -> "ප්‍රමාණය"
+        else -> "Quantity"
+    }
+
+    val gradeLabel = when (currentLanguage) {
+        "en" -> "Grade"
+        "ta" -> "தரம்"
+        "si" -> "ශ්‍රේණිය"
+        else -> "Grade"
+    }
+
+    val perLabel = when (currentLanguage) {
+        "en" -> "per"
+        "ta" -> "ஒரு"
+        "si" -> "එක්"
+        else -> "per"
+    }
+
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
@@ -146,12 +187,12 @@ fun ListingCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = listing.cropType.replace("_", " ").capitalize(),
+                        text = cropName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = listing.location,
+                        text = locationName,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -165,7 +206,7 @@ fun ListingCard(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "per ${listing.unit}",
+                        text = "$perLabel $unitName",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -179,11 +220,11 @@ fun ListingCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Quantity: ${listing.quantity} ${listing.unit}",
+                    text = "$quantityLabel: ${listing.quantity} $unitName",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Grade ${listing.quality}",
+                    text = "$gradeLabel $qualityGrade",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )

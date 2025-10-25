@@ -20,7 +20,7 @@ class JaffnaMarketplaceApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         // Initialize Timber for logging
-        if (true) { // Always enable debug logging for now
+        if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
 

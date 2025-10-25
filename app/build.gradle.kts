@@ -34,7 +34,10 @@ android {
             isDebuggable = true
             // Removed applicationIdSuffix for Firebase compatibility
             versionNameSuffix = "-debug"
-            // MVP: OTP configuration removed
+
+            // API Configuration for debug builds
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/api/\"")
+            buildConfigField("boolean", "ENABLE_LOGGING", "true")
         }
 
         release {
@@ -43,7 +46,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // MVP: OTP configuration removed
+
+            // API Configuration for release builds
+            buildConfigField("String", "BASE_URL", "\"https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/\"")
+            buildConfigField("boolean", "ENABLE_LOGGING", "false")
         }
     }
     compileOptions {
@@ -126,6 +132,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
 
     // DataStore for preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
