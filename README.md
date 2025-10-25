@@ -1,6 +1,6 @@
 # Jaffna Farmers Marketplace (யாழ்ப்பாணம் விவசாயிகள் சந்தை)
 
-A Tamil-first, offline-first agricultural marketplace connecting farmers in Jaffna with local buyers.
+An offline-first agricultural marketplace for Jaffna farmers, supporting Tamil, Sinhala, and English.
 
 ---
 
