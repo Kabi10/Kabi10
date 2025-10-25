@@ -4,85 +4,94 @@ A Tamil-first, offline-first agricultural marketplace connecting farmers in Jaff
 
 ---
 
-## 👋 Welcome Interns!
+## 👋 Welcome to the Team!
 
-**Congratulations on joining the Agrimarket project!** This is a real-world Android application that will help you learn modern Android development while building something meaningful for farmers in Jaffna, Sri Lanka.
+**Welcome to the Agrimarket project!** This is a **production-ready Android application** being developed to serve farmers in Jaffna, Sri Lanka. This is not a learning project—it's a **real-world, time-sensitive initiative** where your contributions will directly impact the agricultural community.
 
-### 🎓 What You'll Learn
+### ⚡ Project Status: Active Development
 
-By contributing to this project, you'll gain hands-on experience with:
+**This is a production project with real deadlines.** We're building a critical tool for farmers who need reliable technology to connect with buyers. Quality, reliability, and timely delivery are our top priorities.
 
-- ✅ **Modern Android Development**: Jetpack Compose, Material Design 3, Kotlin
-- ✅ **Clean Architecture**: MVVM pattern, Repository pattern, Dependency Injection (Hilt)
-- ✅ **Offline-First Design**: Room database, data synchronization, background workers
-- ✅ **Testing**: Unit tests, UI tests, MockK, Turbine
-- ✅ **Real-World Features**: Authentication, image upload, maps, notifications
-- ✅ **Trilingual Support**: English, Tamil (தமிழ்), Sinhala (සිංහල)
-- ✅ **Professional Workflow**: Git, code reviews, documentation, issue tracking
+- **Build Status**: ✅ Passing
+- **Target Launch**: Q1 2026
+- **Current Phase**: Pre-production development
+- **Code Quality**: Production-grade (MVVM architecture, clean code)
+- **Documentation**: Comprehensive and maintained
 
-### 🚀 Quick Start for Interns
+### 🎯 Mission-Critical Goals
 
-**New to the project? Follow these steps:**
+This application serves a real community need:
+- 🌾 **Enable farmers** in Jaffna to sell produce directly to buyers
+- 📱 **Work offline** in areas with poor internet connectivity
+- 🌍 **Support trilingual** communication (Tamil, English, Sinhala)
+- 💰 **Facilitate transactions** with both cash and digital payments
+- 📊 **Provide market insights** to help farmers make informed decisions
 
-1. **Read the Documentation** (30 minutes)
-   - 📖 [SETUP.md](SETUP.md) - Get your development environment ready
-   - 🏗️ [ARCHITECTURE.md](ARCHITECTURE.md) - Understand how the app is built
-   - 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) - Learn our development workflow
-   - ⚠️ [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - See current limitations
+**Every feature you build, every bug you fix, every test you write matters to real people.**
+
+### 🚀 Quick Start for New Team Members
+
+**Get up to speed quickly—we need you productive ASAP:**
+
+1. **Read the Documentation** (Required - 30 minutes)
+   - 📖 [SETUP.md](SETUP.md) - Development environment setup
+   - 🏗️ [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and patterns
+   - 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow and standards
+   - ⚠️ [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - Current limitations and technical debt
 
 2. **Set Up Your Environment** (1-2 hours)
-   - Install Android Studio
-   - Clone the repository
-   - Configure Firebase
-   - Build and run the app
+   - Install Android Studio and required tools
+   - Clone the repository and configure Firebase
+   - Build and run the app successfully
+   - Verify all tests pass
 
-3. **Pick Your First Issue** (Start coding!)
-   - Look for issues labeled [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-   - Start with something small to get familiar with the codebase
-   - Don't hesitate to ask questions!
+3. **Start Contributing** (Day 1)
+   - Check the [issue tracker](../../issues) for assigned tasks
+   - Look for [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels to get familiar with the codebase
+   - Review the [ROADMAP.md](ROADMAP.md) to understand priorities
+   - Ask questions early—clarity is critical
 
-### 🌟 Recommended First Issues
+### 🎓 What You'll Work With
 
-We've prepared beginner-friendly issues to help you get started:
+This is a modern, professional Android codebase using industry-standard tools:
 
-1. **[Easy]** [Implement Language Preference Persistence](../../issues) - Learn DataStore and state management (2-4 hours)
-2. **[Medium]** [Add Unit Tests for ViewModels](../../issues) - Learn testing with JUnit and MockK (4-6 hours)
-3. **[Hard]** [Add Search Filters to Listings](../../issues) - Build a complete feature with UI and logic (6-10 hours)
+- ✅ **Modern Android Stack**: Jetpack Compose, Material Design 3, Kotlin 2.0
+- ✅ **Clean Architecture**: MVVM pattern, Repository pattern, Hilt dependency injection
+- ✅ **Offline-First Design**: Room database, WorkManager, data synchronization
+- ✅ **Testing Infrastructure**: JUnit, MockK, Turbine (needs expansion—see roadmap)
+- ✅ **Production Features**: Firebase integration, image upload, maps, push notifications
+- ✅ **Trilingual Support**: Full i18n for English, Tamil (தமிழ்), Sinhala (සිංහල)
+- ✅ **Professional Workflow**: Git flow, code reviews, CI/CD readiness
 
-### 💡 Learning Resources
+### 💡 Resources
 
 - **Android Basics**: [Android Developer Guides](https://developer.android.com/guide)
 - **Jetpack Compose**: [Compose Tutorial](https://developer.android.com/jetpack/compose/tutorial)
 - **Kotlin**: [Kotlin Documentation](https://kotlinlang.org/docs/home.html)
 - **Git Workflow**: [GitHub Flow Guide](https://guides.github.com/introduction/flow/)
 
-### 🤝 Getting Help
+### 🤝 Communication & Support
 
-**Stuck? Don't worry, we're here to help!**
+**Clear communication is essential for meeting our deadlines:**
 
-- 💬 **Ask Questions**: Comment on the issue you're working on
-- 📚 **Check Documentation**: Most answers are in `ARCHITECTURE.md` or `SETUP.md`
-- 🐛 **Report Problems**: Create a new issue if you find bugs
-- 🔍 **Search First**: Check if someone else had the same question
+- 💬 **Ask Questions Early**: Comment on issues, don't wait until you're blocked
+- 📚 **Check Documentation First**: Most answers are in `ARCHITECTURE.md` or `SETUP.md`
+- 🐛 **Report Issues Immediately**: Create detailed bug reports with reproduction steps
+- 🔍 **Search Before Asking**: Check existing issues and discussions
+- ⏰ **Communicate Blockers**: If you're stuck for >2 hours, raise it immediately
 
-### 📊 Project Status
+### ⚠️ Expectations
 
-- **Build Status**: ✅ Passing
-- **Test Coverage**: ~0% (Help us improve this!)
-- **Code Quality**: Good (MVVM architecture, clean code)
-- **Documentation**: Comprehensive
-- **Intern Readiness**: 9.5/10
+This is a professional development environment:
 
-### 🎯 Project Goals
+- ✅ **Code Quality**: Follow established patterns, write clean code, add tests
+- ✅ **Timely Delivery**: Meet deadlines or communicate delays early
+- ✅ **Documentation**: Update docs when you change functionality
+- ✅ **Code Reviews**: Respond to feedback promptly and professionally
+- ✅ **Testing**: All features must include appropriate test coverage
+- ✅ **Collaboration**: Help teammates, share knowledge, review PRs
 
-This app aims to:
-- 🌾 Help farmers in Jaffna sell their produce directly to buyers
-- 📱 Work offline in areas with poor internet connectivity
-- 🌍 Support Tamil, English, and Sinhala languages
-- 💰 Enable both cash and digital transactions
-- 📊 Provide market price insights to farmers
-
-**Your contributions will directly impact real farmers!** 🚜✨
+**We're building something that matters. Let's build it right.** 🚀
 
 ---
 
