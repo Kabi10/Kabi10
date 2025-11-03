@@ -1,0 +1,26 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="32" fill="#16a34a"/>
+  
+  <!-- Wheat/Agriculture Icon -->
+  <!-- Stem -->
+  <path d="M32 48 L32 20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Left grains -->
+  <ellipse cx="28" cy="22" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="27" cy="26" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="26" cy="30" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="27" cy="34" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="28" cy="38" rx="3" ry="5" fill="white" opacity="0.9"/>
+  
+  <!-- Right grains -->
+  <ellipse cx="36" cy="22" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="37" cy="26" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="38" cy="30" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="37" cy="34" rx="3" ry="5" fill="white" opacity="0.9"/>
+  <ellipse cx="36" cy="38" rx="3" ry="5" fill="white" opacity="0.9"/>
+  
+  <!-- Top grain -->
+  <ellipse cx="32" cy="18" rx="3" ry="5" fill="white"/>
+</svg>
+

@@ -1,0 +1,30 @@
+{
+  "name": "agrimarket-landing",
+  "version": "1.0.0",
+  "description": "Professional landing page for Agrimarket.lk - connecting farmers directly to consumers in Jaffna, Sri Lanka",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000 || php -S localhost:8000 || npx http-server -p 8000",
+    "deploy": "vercel --prod",
+    "deploy:netlify": "netlify deploy --prod"
+  },
+  "keywords": [
+    "agrimarket",
+    "agriculture",
+    "farmers",
+    "marketplace",
+    "jaffna",
+    "sri-lanka",
+    "tamil",
+    "landing-page"
+  ],
+  "author": "Agrimarket Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/agrimarket.git",
+    "directory": "web"
+  },
+  "homepage": "https://agrimarket.lk"
+}
+
