@@ -219,7 +219,7 @@ This landing page is part of the larger Agrimarket project. For contribution gui
 
 For questions or support:
 - Email: info@agrimarket.lk
-- GitHub: [Agrimarket Repository](https://github.com/yourusername/agrimarket)
+- GitHub: [Agrimarket Repository](https://github.com/Kabi10/Srilanka-Farmers-Marketplace)
 
 ---
 

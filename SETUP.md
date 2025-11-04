@@ -53,8 +53,8 @@ This guide will walk you through setting up the Agrimarket Android app developme
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Agrimarket.git
-cd Agrimarket
+git clone https://github.com/Kabi10/Srilanka-Farmers-Marketplace.git
+cd Srilanka-Farmers-Marketplace
 ```
 
 ### Step 2: Configure Local Properties

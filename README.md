@@ -115,27 +115,50 @@ This is a complete mobile-first marketplace application built to serve the agric
 
 ## 🏗️ Quick Start
 
+**New to the project? Start here:** 👉 **[QUICKSTART.md](QUICKSTART.md)** - Complete setup guide in 5 steps!
+
 ### Prerequisites
 
-- **Android Development**: Android Studio, JDK 11+
-- **Backend Development**: Node.js 18+, npm 9+
-- **Database**: Supabase CLI
-- **Deployment**: Vercel CLI
+#### Required (Android App)
+- ✅ **Android Studio** Hedgehog (2023.1.1) or later
+- ✅ **JDK 11+** (bundled with Android Studio)
+- ✅ **Git** for version control
+- ✅ **Android device or emulator** (API 24+)
 
-### Building the Android App
+#### Optional (Backend & Web)
+- 🔧 **Node.js 18+** and npm 9+ (for backend)
+- 🔧 **Supabase account** (free tier, for database)
+- 🔧 **Vercel CLI** (for web deployment)
+
+### Quick Clone & Build
 
 ```bash
+# Clone the repository
+git clone https://github.com/Kabi10/Srilanka-Farmers-Marketplace.git
+cd Srilanka-Farmers-Marketplace
+
+# Set up local.properties (see QUICKSTART.md for details)
+cp local.properties.template local.properties
+# Edit local.properties with your Android SDK path
+
+# Set up Firebase (see QUICKSTART.md for details)
+cp app/google-services.json.template app/google-services.json
+# Replace with your Firebase configuration
+
 # Build debug APK
 ./gradlew assembleDebug
 
 # Install on connected device
 adb install app/build/outputs/apk/debug/app-debug.apk
-
-# Build release APK
-./gradlew assembleRelease
 ```
 
-### Backend Development
+**✅ Success?** The app should launch with demo data and work fully offline!
+
+**❌ Issues?** See [QUICKSTART.md](QUICKSTART.md) for detailed troubleshooting.
+
+### Backend Development (Optional)
+
+The app works fully offline! Backend is only needed for multi-user sync and OTP authentication.
 
 ```bash
 # Navigate to backend directory
@@ -144,27 +167,39 @@ cd backend
 # Install dependencies
 npm install
 
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your Supabase credentials
+
 # Start local development server
 npm run dev
+
+# Test the backend
+curl http://localhost:3000/health
+# Expected: {"status":"ok"}
 
 # Run tests
 npm test
 ```
 
-### Database Setup
+### Database Setup (Optional)
 
 ```bash
-# Initialize Supabase project
-npx supabase init
+# Install Supabase CLI
+npm install -g supabase
 
-# Start local Supabase stack
-npx supabase start
+# Login to Supabase
+npx supabase login
+
+# Link to your Supabase project
+cd supabase
+npx supabase link --project-ref YOUR_PROJECT_REF
 
 # Apply database migrations
 npx supabase db push
 
-# View local dashboard
-npx supabase status
+# Verify migrations
+npx supabase db diff
 ```
 
 ### Deployment
@@ -172,13 +207,15 @@ npx supabase status
 ```bash
 # Deploy backend to Vercel
 cd backend
-vercel deploy --prod
+npx vercel deploy --prod
+
+# Deploy web landing page
+cd web
+npx vercel deploy --prod
 
 # Deploy database migrations to production
+cd supabase
 npx supabase db push --linked
-
-# Link local project to remote Supabase project
-npx supabase link --project-ref YOUR_PROJECT_REF
 ```
 
 ## 📱 Key Features
@@ -227,14 +264,88 @@ npx supabase link --project-ref YOUR_PROJECT_REF
 - **Activities**: User activity feed and notifications
 - **Market Prices**: Real-time commodity pricing data
 
+## ✅ Verification & Testing
+
+### Verify Your Setup
+
+After building the app, verify everything works:
+
+```bash
+# Run Android unit tests
+./gradlew test
+
+# Run instrumented tests (requires device/emulator)
+./gradlew connectedAndroidTest
+
+# Check for lint issues
+./gradlew lint
+
+# Generate test coverage report
+./gradlew jacocoTestReport
+```
+
+### Manual Testing Checklist
+
+- [ ] App launches without crashing
+- [ ] Demo user is automatically logged in
+- [ ] Language switching works (EN/TA/SI)
+- [ ] All bottom navigation tabs are accessible
+- [ ] Sample listings are visible on home screen
+- [ ] Offline mode works (enable airplane mode)
+- [ ] Firebase integration works (check Firebase Console)
+
+### Backend Verification (if running backend)
+
+```bash
+# Test health endpoint
+curl http://localhost:3000/health
+
+# Test with Android emulator
+# Update app/build.gradle.kts BASE_URL to http://10.0.2.2:3000/api/
+
+# Test with physical device
+# Update BASE_URL to http://YOUR_COMPUTER_IP:3000/api/
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**"SDK location not found"**
+- Ensure `local.properties` exists with correct SDK path
+- Use double backslashes on Windows: `C\:\\Users\\...`
+
+**"google-services.json is missing"**
+- Download from Firebase Console
+- Place in `app/` directory (not `app/src/`)
+
+**"Cannot connect to backend"**
+- Emulator: Use `http://10.0.2.2:3000/api/`
+- Physical device: Use `http://YOUR_IP:3000/api/`
+- Verify backend is running: `curl http://localhost:3000/health`
+
+**More help:** See [QUICKSTART.md](QUICKSTART.md) for detailed troubleshooting.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📚 Documentation
 
-For comprehensive project specifications, development guidelines, and implementation details, see:
+### Essential Reading
+- 🚀 **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 steps
+- 🔧 **[SETUP.md](SETUP.md)** - Detailed setup instructions
+- 🏗️ **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture
+- 🤝 **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development workflow
+- ⚠️ **[KNOWN_ISSUES.md](KNOWN_ISSUES.md)** - Current limitations
+- 🗺️ **[ROADMAP.md](ROADMAP.md)** - Future plans
+
+### Additional Resources
 - [Complete Project Blueprint](jaffna_farmers_marketplace_full_blueprint_developer_prompt.md)
+- [Firebase Integration Guide](docs/FIREBASE_INTEGRATION.md)
+- [Image Upload Implementation](docs/IMAGE_UPLOAD_IMPLEMENTATION.md)
+- [Map Implementation](docs/MAP_IMPLEMENTATION.md)
+- [Production Deployment Guide](docs/PRODUCTION_DEPLOYMENT_GUIDE.md)
 
 ## 🤝 Contributing
 

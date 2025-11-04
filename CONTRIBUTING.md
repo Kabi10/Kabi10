@@ -29,13 +29,13 @@ Before you begin, ensure you have:
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Agrimarket.git
-   cd Agrimarket
+   git clone https://github.com/YOUR_USERNAME/Srilanka-Farmers-Marketplace.git
+   cd Srilanka-Farmers-Marketplace
    ```
 
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/Agrimarket.git
+   git remote add upstream https://github.com/Kabi10/Srilanka-Farmers-Marketplace.git
    ```
 
 4. **Set up Firebase** (see `SETUP.md` for detailed instructions):
