@@ -193,7 +193,10 @@ fun HomeScreen(
                         visible = true,
                         enter = fadeIn() + slideInVertically()
                     ) {
-                        PopularCropsSection(currentLanguage = currentLanguage)
+                        PopularCropsSection(
+                            currentLanguage = currentLanguage,
+                            onNavigateToListings = onNavigateToListings
+                        )
                     }
                 }
 
@@ -540,7 +543,10 @@ private fun QuickActionCard(
 }
 
 @Composable
-private fun PopularCropsSection(currentLanguage: String) {
+private fun PopularCropsSection(
+    currentLanguage: String,
+    onNavigateToListings: () -> Unit
+) {
     Column {
         Text(
             text = when (currentLanguage) {
@@ -553,13 +559,16 @@ private fun PopularCropsSection(currentLanguage: String) {
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(CropTypes.ALL_CROPS.take(6)) { cropType ->
                 FilterChip(
-                    onClick = { /* Filter by crop type */ },
+                    onClick = {
+                        // Navigate to listings screen where users can filter by crop type
+                        onNavigateToListings()
+                    },
                     label = { Text(cropType.replace("_", " ").capitalize()) },
                     selected = false
                 )

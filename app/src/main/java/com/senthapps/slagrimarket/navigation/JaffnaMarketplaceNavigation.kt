@@ -233,6 +233,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToSyncSettings = {
                     navController.navigate(Screen.SyncSettings.route)
+                },
+                onNavigateToListingDetail = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
                 }
             )
         }
