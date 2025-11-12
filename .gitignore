@@ -116,6 +116,9 @@ supabase/functions/.vscode
 *.tar.gz
 supabase.exe
 
-# Scripts output
-*.txt
-!gradle/wrapper/gradle-wrapper.properties
+# Scripts
+scripts/clickup_automation/.env
+scripts/clickup_automation/*.txt
+!scripts/clickup_automation/requirements.txt
+scripts/clickup_automation/__pycache__/
+scripts/clickup_automation/*.pyc

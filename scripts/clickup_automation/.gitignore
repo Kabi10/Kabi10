@@ -1,0 +1,22 @@
+# Environment variables (contains sensitive API tokens)
+.env
+
+# Python virtual environment
+venv/
+env/
+*.pyc
+__pycache__/
+
+# Generated CSV files
+*.csv
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
