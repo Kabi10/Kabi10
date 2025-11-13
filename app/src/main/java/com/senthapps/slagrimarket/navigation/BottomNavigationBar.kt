@@ -230,6 +230,15 @@ fun AppNavigationWithBottomBar(
                     onLogout = {
                         // MVP: No logout functionality needed
                         navController.popBackStack()
+                    },
+                    onNavigateToEditProfile = {
+                        navController.navigate(Screen.EditProfile.route)
+                    },
+                    onNavigateToSyncSettings = {
+                        navController.navigate(Screen.SyncSettings.route)
+                    },
+                    onNavigateToListingDetail = { listingId ->
+                        navController.navigate(Screen.ListingDetail.createRoute(listingId))
                     }
                 )
             }

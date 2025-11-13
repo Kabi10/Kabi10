@@ -39,6 +39,7 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToSyncSettings: () -> Unit = {},
+    onNavigateToListingDetail: (String) -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -116,7 +117,10 @@ fun ProfileScreen(
             LocationAndSocialMetricsSection(currentLanguage = currentLanguage)
 
             // Active Listings Gallery Section
-            ActiveListingsGallerySection(currentLanguage = currentLanguage)
+            ActiveListingsGallerySection(
+                currentLanguage = currentLanguage,
+                onNavigateToListingDetail = onNavigateToListingDetail
+            )
 
             // Settings/Preferences Section
             SettingsPreferencesSection(
@@ -577,108 +581,44 @@ private fun RatingRow(
 
 @Composable
 private fun LocationAndSocialMetricsSection(currentLanguage: String) {
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    // Location Display
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
-        // Location Display
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = when (currentLanguage) {
-                        "en" -> stringResource(R.string.profile_location)
-                        "ta" -> stringResource(R.string.profile_location)
-                        "si" -> stringResource(R.string.profile_location)
-                        else -> "${stringResource(R.string.profile_location)} / Jaffna District"
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-
-        // Social Metrics
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Followers Card
-            Card(
-                modifier = Modifier.weight(1f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "127",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = when (currentLanguage) {
-                            "en" -> stringResource(R.string.profile_followers)
-                            "ta" -> stringResource(R.string.profile_followers)
-                            "si" -> stringResource(R.string.profile_followers)
-                            else -> stringResource(R.string.profile_followers)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // Completed Orders Card
-            Card(
-                modifier = Modifier.weight(1f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "89",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = when (currentLanguage) {
-                            "en" -> stringResource(R.string.profile_completed_orders)
-                            "ta" -> stringResource(R.string.profile_completed_orders)
-                            "si" -> stringResource(R.string.profile_completed_orders)
-                            else -> stringResource(R.string.profile_completed_orders)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Text(
+                text = when (currentLanguage) {
+                    "en" -> stringResource(R.string.profile_location)
+                    "ta" -> stringResource(R.string.profile_location)
+                    "si" -> stringResource(R.string.profile_location)
+                    else -> "${stringResource(R.string.profile_location)} / Jaffna District"
+                },
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
 
 @Composable
-private fun ActiveListingsGallerySection(currentLanguage: String) {
+private fun ActiveListingsGallerySection(
+    currentLanguage: String,
+    onNavigateToListingDetail: (String) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -711,7 +651,8 @@ private fun ActiveListingsGallerySection(currentLanguage: String) {
                 items(getSampleListings()) { listing ->
                     ListingCard(
                         listing = listing,
-                        currentLanguage = currentLanguage
+                        currentLanguage = currentLanguage,
+                        onNavigateToListingDetail = onNavigateToListingDetail
                     )
                 }
             }
@@ -722,7 +663,8 @@ private fun ActiveListingsGallerySection(currentLanguage: String) {
 @Composable
 private fun ListingCard(
     listing: SampleListing,
-    currentLanguage: String
+    currentLanguage: String,
+    onNavigateToListingDetail: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -777,7 +719,7 @@ private fun ListingCard(
 
             // View Details button
             TextButton(
-                onClick = { /* Navigate to listing details */ },
+                onClick = { onNavigateToListingDetail(listing.id) },
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(vertical = 4.dp)
             ) {
