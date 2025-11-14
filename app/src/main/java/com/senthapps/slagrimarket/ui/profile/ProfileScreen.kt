@@ -809,7 +809,7 @@ private fun SettingsPreferencesSection(
                 onClick = { /* Language is handled by top bar toggle */ }
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // Sync Settings
             SettingsItem(
@@ -829,7 +829,7 @@ private fun SettingsPreferencesSection(
                 onClick = onNavigateToSyncSettings
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // Help Setting
             SettingsItem(
@@ -849,7 +849,7 @@ private fun SettingsPreferencesSection(
                 onClick = { /* TODO: Navigate to help screen */ }
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // About Setting
             SettingsItem(

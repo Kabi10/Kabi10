@@ -218,7 +218,7 @@ fun HelpScreen(
                             },
                             value = "1.0.0"
                         )
-                        Divider()
+                        HorizontalDivider()
                         InfoRow(
                             label = when (currentLanguage) {
                                 "en" -> "Email"
@@ -228,7 +228,7 @@ fun HelpScreen(
                             },
                             value = "support@jaffnamarket.lk"
                         )
-                        Divider()
+                        HorizontalDivider()
                         InfoRow(
                             label = when (currentLanguage) {
                                 "en" -> "Phone"
