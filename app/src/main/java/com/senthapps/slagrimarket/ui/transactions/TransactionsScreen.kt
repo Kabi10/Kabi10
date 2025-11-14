@@ -72,7 +72,7 @@ fun TransactionsScreen(
                 onStatusSelected = viewModel::filterTransactionsByStatus
             )
             
-            Divider()
+            HorizontalDivider()
             
             // Transactions list
             if (uiState.isLoading) {

@@ -428,7 +428,7 @@ private fun MainInfoCard(
                 }
             }
 
-            Divider()
+            HorizontalDivider()
 
             // Quantity available
             Row(
@@ -668,7 +668,7 @@ private fun LocationCard(
             }
 
             if (pickupLocations.isNotEmpty()) {
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = when (currentLanguage) {
                         "en" -> "Pickup Locations"
