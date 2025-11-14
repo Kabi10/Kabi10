@@ -341,7 +341,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🗺️ **[ROADMAP.md](ROADMAP.md)** - Future plans
 
 ### Additional Resources
-- [Complete Project Blueprint](jaffna_farmers_marketplace_full_blueprint_developer_prompt.md)
 - [Firebase Integration Guide](docs/FIREBASE_INTEGRATION.md)
 - [Image Upload Implementation](docs/IMAGE_UPLOAD_IMPLEMENTATION.md)
 - [Map Implementation](docs/MAP_IMPLEMENTATION.md)
