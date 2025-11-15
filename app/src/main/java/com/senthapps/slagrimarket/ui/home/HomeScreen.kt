@@ -31,6 +31,8 @@ import com.senthapps.slagrimarket.R
 import com.senthapps.slagrimarket.data.model.*
 import com.senthapps.slagrimarket.ui.common.LanguageToggleButton
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.WeatherWidget
+import com.senthapps.slagrimarket.ui.components.WeatherCondition
 import com.senthapps.slagrimarket.ui.theme.DarkGradientBackground
 import com.senthapps.slagrimarket.ui.theme.HeroGradientBackground
 import kotlinx.coroutines.delay
@@ -153,6 +155,23 @@ fun HomeScreen(
                             onNavigateToCreateListing = onNavigateToCreateListing,
                             onNavigateToTransactions = onNavigateToTransactions,
                             onNavigateToAnalytics = onNavigateToAnalytics,
+                            currentLanguage = currentLanguage
+                        )
+                    }
+                }
+
+                // Weather widget
+                item {
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn() + slideInVertically()
+                    ) {
+                        WeatherWidget(
+                            temperature = 28,
+                            condition = WeatherCondition.SUNNY,
+                            humidity = 65,
+                            windSpeed = 12,
+                            location = "Jaffna",
                             currentLanguage = currentLanguage
                         )
                     }

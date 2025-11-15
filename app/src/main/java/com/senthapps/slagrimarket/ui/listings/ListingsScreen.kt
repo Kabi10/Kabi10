@@ -20,6 +20,7 @@ import com.senthapps.slagrimarket.data.model.CropTypes
 import com.senthapps.slagrimarket.data.model.QualityGrade
 import com.senthapps.slagrimarket.data.model.Units
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.EnhancedListingCard
 import com.senthapps.slagrimarket.util.TranslationUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,10 +129,11 @@ fun ListingsScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(uiState.listings) { listing ->
-                    ListingCard(
+                    EnhancedListingCard(
                         listing = listing,
                         onClick = { onListingClick(listing.id) },
-                        currentLanguage = currentLanguage
+                        currentLanguage = currentLanguage,
+                        showPriceTrend = false // Can be enabled when market prices are available
                     )
                 }
             }
