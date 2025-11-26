@@ -9,7 +9,6 @@ import com.senthapps.slagrimarket.data.dao.MarketPriceDao
 import com.senthapps.slagrimarket.data.dao.TransactionDao
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.database.JaffnaMarketplaceDatabase
-import com.senthapps.slagrimarket.data.preferences.LanguagePreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -80,13 +79,5 @@ object DatabaseModule {
     @Provides
     fun provideFavoriteDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.FavoriteDao {
         return database.favoriteDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideLanguagePreferences(
-        @ApplicationContext context: Context
-    ): LanguagePreferences {
-        return LanguagePreferences(context)
     }
 }
