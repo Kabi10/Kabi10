@@ -588,7 +588,7 @@ private fun PopularCropsSection(
                         // Navigate to listings screen where users can filter by crop type
                         onNavigateToListings()
                     },
-                    label = { Text(cropType.replace("_", " ").capitalize()) },
+                    label = { Text(CropTypes.getCropName(cropType, currentLanguage)) },
                     selected = false
                 )
             }

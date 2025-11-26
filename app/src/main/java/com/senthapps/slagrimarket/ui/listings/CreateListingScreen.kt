@@ -441,7 +441,14 @@ fun CreateListingScreen(
                             else -> "Location *"
                         })
                     },
-                    placeholder = { Text("e.g., Chavakachcheri, Jaffna") },
+                    placeholder = {
+                        Text(when (currentLanguage) {
+                            "en" -> "e.g., Chavakachcheri, Jaffna"
+                            "ta" -> "எ.கா., சாவகச்சேரி, யாழ்ப்பாணம்"
+                            "si" -> "උදා., චාවකච්චේරි, යාපනය"
+                            else -> "e.g., Chavakachcheri, Jaffna"
+                        })
+                    },
                     isError = uiState.locationError != null,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done

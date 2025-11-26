@@ -550,7 +550,12 @@ private fun FarmerInfoCard(
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "(89 reviews)",
+                        text = when (currentLanguage) {
+                            "en" -> "(89 reviews)"
+                            "ta" -> "(89 மதிப்புரைகள்)"
+                            "si" -> "(89 සමාලෝචන)"
+                            else -> "(89 reviews)"
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
