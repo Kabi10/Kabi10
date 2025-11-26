@@ -18,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.data.model.Transaction
 import com.senthapps.slagrimarket.data.model.TransactionStatus
 import com.senthapps.slagrimarket.data.model.UserType
+import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -28,33 +29,38 @@ fun TransactionsScreen(
     onNavigateBack: () -> Unit,
     onTransactionClick: (String) -> Unit = {},
     onContactUser: (String) -> Unit = {},
-    viewModel: TransactionsViewModel = hiltViewModel()
+    viewModel: TransactionsViewModel = hiltViewModel(),
+    languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState(initial = null)
+    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = "பரிவர்த்தனைகள்",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Transactions",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = when (currentLanguage) {
+                            "en" -> "Transactions"
+                            "ta" -> "பரிவர்த்தனைகள்"
+                            "si" -> "ගනුදෙනු"
+                            else -> "Transactions"
+                        },
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = when (currentLanguage) {
+                                "en" -> "Back"
+                                "ta" -> "பின்செல்"
+                                "si" -> "ආපසු"
+                                else -> "Back"
+                            }
                         )
                     }
                 }
@@ -69,7 +75,8 @@ fun TransactionsScreen(
             // Status filters
             StatusFiltersSection(
                 selectedStatus = uiState.selectedStatus,
-                onStatusSelected = viewModel::filterTransactionsByStatus
+                onStatusSelected = viewModel::filterTransactionsByStatus,
+                currentLanguage = currentLanguage
             )
             
             HorizontalDivider()
@@ -83,7 +90,7 @@ fun TransactionsScreen(
                     CircularProgressIndicator()
                 }
             } else if (viewModel.getFilteredTransactions().isEmpty()) {
-                EmptyTransactionsState()
+                EmptyTransactionsState(currentLanguage = currentLanguage)
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
@@ -99,7 +106,7 @@ fun TransactionsScreen(
                             },
                             onContactUser = onContactUser,
                             canUpdateStatus = viewModel.canUpdateStatus(
-                                transaction, 
+                                transaction,
                                 currentUser?.userType ?: UserType.BUYER
                             ),
                             nextStatus = viewModel.getNextStatusForUser(
@@ -109,7 +116,8 @@ fun TransactionsScreen(
                             actionText = viewModel.getStatusActionText(
                                 transaction,
                                 currentUser?.userType ?: UserType.BUYER
-                            )
+                            ),
+                            currentLanguage = currentLanguage
                         )
                     }
                 }
@@ -121,33 +129,46 @@ fun TransactionsScreen(
 @Composable
 private fun StatusFiltersSection(
     selectedStatus: TransactionStatus?,
-    onStatusSelected: (TransactionStatus?) -> Unit
+    onStatusSelected: (TransactionStatus?) -> Unit,
+    currentLanguage: String
 ) {
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
         Text(
-            text = "Filter by Status",
+            text = when (currentLanguage) {
+                "en" -> "Filter by Status"
+                "ta" -> "நிலையின்படி வடிகட்டு"
+                "si" -> "තත්ත්වය අනුව පෙරන්න"
+                else -> "Filter by Status"
+            },
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 FilterChip(
                     onClick = { onStatusSelected(null) },
-                    label = { Text("All") },
+                    label = {
+                        Text(when (currentLanguage) {
+                            "en" -> "All"
+                            "ta" -> "அனைத்தும்"
+                            "si" -> "සියල්ල"
+                            else -> "All"
+                        })
+                    },
                     selected = selectedStatus == null
                 )
             }
-            
+
             items(TransactionStatus.values()) { status ->
                 FilterChip(
                     onClick = { onStatusSelected(status) },
-                    label = { Text(getStatusDisplayName(status)) },
+                    label = { Text(getStatusDisplayName(status, currentLanguage)) },
                     selected = selectedStatus == status
                 )
             }
@@ -164,7 +185,8 @@ private fun TransactionCard(
     onContactUser: (String) -> Unit,
     canUpdateStatus: Boolean,
     nextStatus: TransactionStatus?,
-    actionText: String?
+    actionText: String?,
+    currentLanguage: String
 ) {
     Card(
         onClick = onClick,
@@ -181,7 +203,12 @@ private fun TransactionCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Transaction #${transaction.id.take(8)}",
+                        text = when (currentLanguage) {
+                            "en" -> "Transaction #${transaction.id.take(8)}"
+                            "ta" -> "பரிவர்த்தனை #${transaction.id.take(8)}"
+                            "si" -> "ගනුදෙනුව #${transaction.id.take(8)}"
+                            else -> "Transaction #${transaction.id.take(8)}"
+                        },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -191,8 +218,8 @@ private fun TransactionCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
-                StatusChip(status = transaction.status)
+
+                StatusChip(status = transaction.status, currentLanguage = currentLanguage)
             }
             
             Spacer(modifier = Modifier.height(12.dp))
@@ -204,20 +231,35 @@ private fun TransactionCard(
             ) {
                 Column {
                     Text(
-                        text = "Quantity",
+                        text = when (currentLanguage) {
+                            "en" -> "Quantity"
+                            "ta" -> "அளவு"
+                            "si" -> "ප්‍රමාණය"
+                            else -> "Quantity"
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${transaction.quantity} units",
+                        text = when (currentLanguage) {
+                            "en" -> "${transaction.quantity} units"
+                            "ta" -> "${transaction.quantity} அலகுகள்"
+                            "si" -> "${transaction.quantity} ඒකක"
+                            else -> "${transaction.quantity} units"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
                 }
-                
+
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Total Amount",
+                        text = when (currentLanguage) {
+                            "en" -> "Total Amount"
+                            "ta" -> "மொத்த தொகை"
+                            "si" -> "මුළු මුදල"
+                            else -> "Total Amount"
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -231,14 +273,24 @@ private fun TransactionCard(
             }
             
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Pickup details
             Text(
-                text = "Pickup: ${transaction.pickupLocation}",
+                text = when (currentLanguage) {
+                    "en" -> "Pickup: ${transaction.pickupLocation}"
+                    "ta" -> "எடுத்துச் செல்லும் இடம்: ${transaction.pickupLocation}"
+                    "si" -> "ලබා ගන්නා ස්ථානය: ${transaction.pickupLocation}"
+                    else -> "Pickup: ${transaction.pickupLocation}"
+                },
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Date: ${formatDate(transaction.pickupDate)}",
+                text = when (currentLanguage) {
+                    "en" -> "Date: ${formatDate(transaction.pickupDate)}"
+                    "ta" -> "தேதி: ${formatDate(transaction.pickupDate)}"
+                    "si" -> "දිනය: ${formatDate(transaction.pickupDate)}"
+                    else -> "Date: ${formatDate(transaction.pickupDate)}"
+                },
                 style = MaterialTheme.typography.bodyMedium
             )
             
@@ -258,7 +310,7 @@ private fun TransactionCard(
                     }
                     
                     OutlinedButton(
-                        onClick = { 
+                        onClick = {
                             // Contact the other party
                             val contactId = if (currentUserType == UserType.FARMER) {
                                 transaction.buyerId
@@ -270,7 +322,12 @@ private fun TransactionCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Phone,
-                            contentDescription = "Contact",
+                            contentDescription = when (currentLanguage) {
+                                "en" -> "Contact"
+                                "ta" -> "தொடர்பு கொள்ள"
+                                "si" -> "සම්බන්ධ වන්න"
+                                else -> "Contact"
+                            },
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -281,7 +338,7 @@ private fun TransactionCard(
 }
 
 @Composable
-private fun StatusChip(status: TransactionStatus) {
+private fun StatusChip(status: TransactionStatus, currentLanguage: String) {
     val (backgroundColor, contentColor) = when (status) {
         TransactionStatus.PENDING -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
         TransactionStatus.CONFIRMED -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
@@ -289,14 +346,14 @@ private fun StatusChip(status: TransactionStatus) {
         TransactionStatus.COMPLETED -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
         TransactionStatus.CANCELLED -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
     }
-    
+
     Surface(
         color = backgroundColor,
         shape = MaterialTheme.shapes.small,
         modifier = Modifier.padding(4.dp)
     ) {
         Text(
-            text = getStatusDisplayName(status),
+            text = getStatusDisplayName(status, currentLanguage),
             style = MaterialTheme.typography.labelSmall,
             color = contentColor,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -305,7 +362,7 @@ private fun StatusChip(status: TransactionStatus) {
 }
 
 @Composable
-private fun EmptyTransactionsState() {
+private fun EmptyTransactionsState(currentLanguage: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -314,13 +371,23 @@ private fun EmptyTransactionsState() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "பரிவர்த்தனைகள் இல்லை",
+            text = when (currentLanguage) {
+                "en" -> "No transactions yet"
+                "ta" -> "பரிவர்த்தனைகள் இல்லை"
+                "si" -> "තවම ගනුදෙනු නැත"
+                else -> "No transactions yet"
+            },
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
         Text(
-            text = "No transactions yet",
+            text = when (currentLanguage) {
+                "en" -> "Your orders will appear here"
+                "ta" -> "உங்கள் ஆர்டர்கள் இங்கே தோன்றும்"
+                "si" -> "ඔබේ ඇණවුම් මෙහි දිස්වනු ඇත"
+                else -> "Your orders will appear here"
+            },
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -329,13 +396,38 @@ private fun EmptyTransactionsState() {
     }
 }
 
-private fun getStatusDisplayName(status: TransactionStatus): String {
+private fun getStatusDisplayName(status: TransactionStatus, currentLanguage: String): String {
     return when (status) {
-        TransactionStatus.PENDING -> "Pending"
-        TransactionStatus.CONFIRMED -> "Confirmed"
-        TransactionStatus.IN_PROGRESS -> "In Progress"
-        TransactionStatus.COMPLETED -> "Completed"
-        TransactionStatus.CANCELLED -> "Cancelled"
+        TransactionStatus.PENDING -> when (currentLanguage) {
+            "en" -> "Pending"
+            "ta" -> "நிலுவையில்"
+            "si" -> "අපේක්ෂාවේ"
+            else -> "Pending"
+        }
+        TransactionStatus.CONFIRMED -> when (currentLanguage) {
+            "en" -> "Confirmed"
+            "ta" -> "உறுதிப்படுத்தப்பட்டது"
+            "si" -> "තහවුරු කළා"
+            else -> "Confirmed"
+        }
+        TransactionStatus.IN_PROGRESS -> when (currentLanguage) {
+            "en" -> "In Progress"
+            "ta" -> "செயல்பாட்டில்"
+            "si" -> "ක්‍රියාත්මකයි"
+            else -> "In Progress"
+        }
+        TransactionStatus.COMPLETED -> when (currentLanguage) {
+            "en" -> "Completed"
+            "ta" -> "முடிந்தது"
+            "si" -> "සම්පූර්ණයි"
+            else -> "Completed"
+        }
+        TransactionStatus.CANCELLED -> when (currentLanguage) {
+            "en" -> "Cancelled"
+            "ta" -> "ரத்து செய்யப்பட்டது"
+            "si" -> "අවලංගු කරන ලදී"
+            else -> "Cancelled"
+        }
     }
 }
 

@@ -75,7 +75,7 @@ fun HomeScreen(
                             text = when (currentLanguage) {
                                 "en" -> stringResource(R.string.app_title_english)
                                 "ta" -> stringResource(R.string.app_title_tamil)
-                                "si" -> stringResource(R.string.app_title_tamil)
+                                "si" -> stringResource(R.string.app_title_sinhala)
                                 else -> "${stringResource(R.string.app_title_tamil)} / ${stringResource(R.string.app_title_english)}"
                             },
                             style = MaterialTheme.typography.titleMedium,

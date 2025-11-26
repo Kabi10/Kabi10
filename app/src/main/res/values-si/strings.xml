@@ -2,8 +2,9 @@
     <string name="app_name">SL Agrimarket</string>
     
     <!-- App Title -->
-    <string name="app_title_tamil">යාපනය ගොවි වෙළඳපොළ</string>
+    <string name="app_title_tamil">யாழ்ப்பாணம் விவசாயிகள் சந்தை</string>
     <string name="app_title_english">Jaffna Farmers Marketplace</string>
+    <string name="app_title_sinhala">යාපනය ගොවි වෙළඳපොළ</string>
     
     <!-- Navigation -->
     <string name="nav_home">මුල් පිටුව</string>
@@ -98,6 +99,27 @@
     <string name="error_quantity_range">ප්‍රමාණය 0 සහ 100,000 අතර විය යුතුය</string>
     <string name="error_price_range">මිල 0 සහ 1,000,000 අතර විය යුතුය</string>
     <string name="error_future_date">දිනය අනාගතයේ විය නොහැක</string>
+    <string name="error_select_crop_type">කරුණාකර බෝග වර්ගය තෝරන්න</string>
+    <string name="error_quantity_required">ප්‍රමාණය අවශ්‍යයි</string>
+    <string name="error_quantity_positive">ප්‍රමාණය 0 ට වඩා වැඩි විය යුතුය</string>
+    <string name="error_quantity_max">ප්‍රමාණය 100,000 ඉක්මවිය නොහැක</string>
+    <string name="error_select_unit">කරුණාකර ඒකකය තෝරන්න</string>
+    <string name="error_price_required">මිල අවශ්‍යයි</string>
+    <string name="error_invalid_price">කරුණාකර වලංගු මිලක් ඇතුළත් කරන්න</string>
+    <string name="error_price_positive">මිල 0 ට වඩා වැඩි විය යුතුය</string>
+    <string name="error_price_max">මිල 1,000,000 ඉක්මවිය නොහැක</string>
+    <string name="error_select_quality">කරුණාකර ගුණාත්මක ශ්‍රේණිය තෝරන්න</string>
+    <string name="error_harvest_date_required">අස්වනු නෙලීමේ දිනය අවශ්‍යයි</string>
+    <string name="error_location_required">ස්ථානය අවශ්‍යයි</string>
+    <string name="error_name_required">නම අවශ්‍යයි</string>
+    <string name="error_name_min_length">නම අවම වශයෙන් අක්ෂර 2 ක් විය යුතුය</string>
+    <string name="error_user_not_found">පරිශීලකයා හමු නොවීය</string>
+    <string name="error_update_profile_failed">පැතිකඩ යාවත්කාලීන කිරීමට අසමත් විය</string>
+    <string name="error_unexpected">අනපේක්ෂිත දෝෂයක් සිදු විය</string>
+    <string name="error_fill_required_fields">කරුණාකර අවශ්‍ය සියලුම ක්ෂේත්‍ර නිවැරදිව පුරවන්න</string>
+    <string name="error_user_not_authenticated">පරිශීලකයා සත්‍යාපනය කර නැත</string>
+    <string name="error_send_otp_failed">OTP යැවීමට අසමත් විය. කරුණාකර නැවත උත්සාහ කරන්න.</string>
+    <string name="error_invalid_otp">වලංගු නොවන OTP. කරුණාකර නැවත උත්සාහ කරන්න.</string>
 
     <!-- Profile Settings -->
     <string name="settings_title">සැකසුම් &amp; මනාපයන්</string>

@@ -18,7 +18,8 @@ import javax.inject.Inject
 class CreateTransactionViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val listingRepository: ListingRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(CreateTransactionUiState())
@@ -132,7 +133,7 @@ class CreateTransactionViewModel @Inject constructor(
 
         if (!state.isFormValid || listing == null) {
             _uiState.value = _uiState.value.copy(
-                error = "Please fill all required fields correctly"
+                error = context.getString(com.senthapps.slagrimarket.R.string.error_fill_required_fields)
             )
             return
         }
@@ -146,7 +147,7 @@ class CreateTransactionViewModel @Inject constructor(
             if (currentUser == null) {
                 _uiState.value = _uiState.value.copy(
                     isCreating = false,
-                    error = "User not authenticated"
+                    error = context.getString(com.senthapps.slagrimarket.R.string.error_user_not_authenticated)
                 )
                 return@launch
             }

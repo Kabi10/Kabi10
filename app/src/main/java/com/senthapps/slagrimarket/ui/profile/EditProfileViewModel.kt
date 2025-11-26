@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditProfileUiState())
@@ -37,7 +38,7 @@ class EditProfileViewModel @Inject constructor(
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "User not found"
+                        error = context.getString(com.senthapps.slagrimarket.R.string.error_user_not_found)
                     )
                 }
             } catch (e: Exception) {
@@ -77,7 +78,7 @@ class EditProfileViewModel @Inject constructor(
                 if (user == null) {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "User not found"
+                        error = context.getString(com.senthapps.slagrimarket.R.string.error_user_not_found)
                     )
                     return@launch
                 }
@@ -99,7 +100,7 @@ class EditProfileViewModel @Inject constructor(
                     onFailure = { error ->
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = error.message ?: "Failed to update profile"
+                            error = error.message ?: context.getString(com.senthapps.slagrimarket.R.string.error_update_profile_failed)
                         )
                         Timber.e(error, "Failed to update profile")
                     }
@@ -108,7 +109,7 @@ class EditProfileViewModel @Inject constructor(
                 Timber.e(e, "Error updating profile")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "An unexpected error occurred: ${e.message}"
+                    error = "${context.getString(com.senthapps.slagrimarket.R.string.error_unexpected)}: ${e.message}"
                 )
             }
         }
@@ -127,15 +128,15 @@ class EditProfileViewModel @Inject constructor(
         var isValid = true
 
         if (state.name.isBlank()) {
-            _uiState.value = _uiState.value.copy(nameError = "Name is required")
+            _uiState.value = _uiState.value.copy(nameError = context.getString(com.senthapps.slagrimarket.R.string.error_name_required))
             isValid = false
         } else if (state.name.length < 2) {
-            _uiState.value = _uiState.value.copy(nameError = "Name must be at least 2 characters")
+            _uiState.value = _uiState.value.copy(nameError = context.getString(com.senthapps.slagrimarket.R.string.error_name_min_length))
             isValid = false
         }
 
         if (state.location.isBlank()) {
-            _uiState.value = _uiState.value.copy(locationError = "Location is required")
+            _uiState.value = _uiState.value.copy(locationError = context.getString(com.senthapps.slagrimarket.R.string.error_location_required))
             isValid = false
         }
 

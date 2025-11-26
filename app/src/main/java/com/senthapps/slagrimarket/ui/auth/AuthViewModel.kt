@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -45,7 +46,7 @@ class AuthViewModel @Inject constructor(
                     Timber.e(error, "Failed to send OTP")
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to send OTP. Please try again."
+                        error = error.message ?: context.getString(com.senthapps.slagrimarket.R.string.error_send_otp_failed)
                     )
                 }
             )
@@ -72,7 +73,7 @@ class AuthViewModel @Inject constructor(
                     Timber.e(error, "Failed to verify OTP")
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Invalid OTP. Please try again."
+                        error = error.message ?: context.getString(com.senthapps.slagrimarket.R.string.error_invalid_otp)
                     )
                 }
             )

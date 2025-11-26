@@ -4,6 +4,7 @@
     <!-- App Title -->
     <string name="app_title_tamil">Jaffna Farmers Marketplace</string>
     <string name="app_title_english">Jaffna Farmers Marketplace</string>
+    <string name="app_title_sinhala">Jaffna Farmers Marketplace</string>
 
     <!-- Navigation -->
     <string name="nav_home">Home</string>
@@ -98,6 +99,27 @@
     <string name="error_quantity_range">Quantity must be between 0 and 100,000</string>
     <string name="error_price_range">Price must be between 0 and 1,000,000</string>
     <string name="error_future_date">Date cannot be in the future</string>
+    <string name="error_select_crop_type">Please select a crop type</string>
+    <string name="error_quantity_required">Quantity is required</string>
+    <string name="error_quantity_positive">Quantity must be greater than 0</string>
+    <string name="error_quantity_max">Quantity cannot exceed 100,000</string>
+    <string name="error_select_unit">Please select a unit</string>
+    <string name="error_price_required">Price is required</string>
+    <string name="error_invalid_price">Please enter a valid price</string>
+    <string name="error_price_positive">Price must be greater than 0</string>
+    <string name="error_price_max">Price cannot exceed 1,000,000</string>
+    <string name="error_select_quality">Please select a quality grade</string>
+    <string name="error_harvest_date_required">Harvest date is required</string>
+    <string name="error_location_required">Location is required</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_name_min_length">Name must be at least 2 characters</string>
+    <string name="error_user_not_found">User not found</string>
+    <string name="error_update_profile_failed">Failed to update profile</string>
+    <string name="error_unexpected">An unexpected error occurred</string>
+    <string name="error_fill_required_fields">Please fill all required fields correctly</string>
+    <string name="error_user_not_authenticated">User not authenticated</string>
+    <string name="error_send_otp_failed">Failed to send OTP. Please try again.</string>
+    <string name="error_invalid_otp">Invalid OTP. Please try again.</string>
 
     <!-- Profile Settings -->
     <string name="settings_title">Settings &amp; Preferences</string>

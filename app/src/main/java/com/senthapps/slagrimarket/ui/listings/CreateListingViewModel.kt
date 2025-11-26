@@ -213,7 +213,7 @@ class CreateListingViewModel @Inject constructor(
 
         // Validate crop type
         if (state.cropType.isBlank()) {
-            _uiState.value = _uiState.value.copy(cropTypeError = "Please select a crop type")
+            _uiState.value = _uiState.value.copy(cropTypeError = context.getString(com.senthapps.slagrimarket.R.string.error_select_crop_type))
             isValid = false
         }
 
@@ -221,26 +221,26 @@ class CreateListingViewModel @Inject constructor(
         val quantityValue = state.quantity.toDoubleOrNull()
         when {
             state.quantity.isBlank() -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Quantity is required")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_quantity_required))
                 isValid = false
             }
             quantityValue == null -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Please enter a valid number")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_invalid_number))
                 isValid = false
             }
             quantityValue <= 0 -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Quantity must be greater than 0")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_quantity_positive))
                 isValid = false
             }
             quantityValue > 100000 -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Quantity cannot exceed 100,000")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_quantity_max))
                 isValid = false
             }
         }
 
         // Validate unit
         if (state.unit.isBlank()) {
-            _uiState.value = _uiState.value.copy(unitError = "Please select a unit")
+            _uiState.value = _uiState.value.copy(unitError = context.getString(com.senthapps.slagrimarket.R.string.error_select_unit))
             isValid = false
         }
 
@@ -248,38 +248,38 @@ class CreateListingViewModel @Inject constructor(
         val priceValue = state.pricePerUnit.toDoubleOrNull()
         when {
             state.pricePerUnit.isBlank() -> {
-                _uiState.value = _uiState.value.copy(priceError = "Price is required")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_price_required))
                 isValid = false
             }
             priceValue == null -> {
-                _uiState.value = _uiState.value.copy(priceError = "Please enter a valid price")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_invalid_price))
                 isValid = false
             }
             priceValue <= 0 -> {
-                _uiState.value = _uiState.value.copy(priceError = "Price must be greater than 0")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_price_positive))
                 isValid = false
             }
             priceValue > 1000000 -> {
-                _uiState.value = _uiState.value.copy(priceError = "Price cannot exceed 1,000,000")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_price_max))
                 isValid = false
             }
         }
 
         // Validate quality
         if (state.quality.isBlank()) {
-            _uiState.value = _uiState.value.copy(qualityError = "Please select a quality grade")
+            _uiState.value = _uiState.value.copy(qualityError = context.getString(com.senthapps.slagrimarket.R.string.error_select_quality))
             isValid = false
         }
 
         // Validate harvest date
         if (state.harvestDate.isBlank()) {
-            _uiState.value = _uiState.value.copy(harvestDateError = "Harvest date is required")
+            _uiState.value = _uiState.value.copy(harvestDateError = context.getString(com.senthapps.slagrimarket.R.string.error_harvest_date_required))
             isValid = false
         }
 
         // Validate location
         if (state.location.isBlank()) {
-            _uiState.value = _uiState.value.copy(locationError = "Location is required")
+            _uiState.value = _uiState.value.copy(locationError = context.getString(com.senthapps.slagrimarket.R.string.error_location_required))
             isValid = false
         }
 

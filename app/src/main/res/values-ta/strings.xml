@@ -4,6 +4,7 @@
     <!-- App Title -->
     <string name="app_title_tamil">யாழ்ப்பாணம் விவசாயிகள் சந்தை</string>
     <string name="app_title_english">Jaffna Farmers Marketplace</string>
+    <string name="app_title_sinhala">යාපනය ගොවි වෙළඳපොළ</string>
     
     <!-- Navigation -->
     <string name="nav_home">முகப்பு</string>
@@ -98,6 +99,27 @@
     <string name="error_quantity_range">அளவு 0 மற்றும் 100,000 இடையே இருக்க வேண்டும்</string>
     <string name="error_price_range">விலை 0 மற்றும் 1,000,000 இடையே இருக்க வேண்டும்</string>
     <string name="error_future_date">தேதி எதிர்காலத்தில் இருக்க முடியாது</string>
+    <string name="error_select_crop_type">பயிர் வகையைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="error_quantity_required">அளவு தேவை</string>
+    <string name="error_quantity_positive">அளவு 0 விட அதிகமாக இருக்க வேண்டும்</string>
+    <string name="error_quantity_max">அளவு 100,000 ஐ மீற முடியாது</string>
+    <string name="error_select_unit">அலகைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="error_price_required">விலை தேவை</string>
+    <string name="error_invalid_price">சரியான விலையை உள்ளிடவும்</string>
+    <string name="error_price_positive">விலை 0 விட அதிகமாக இருக்க வேண்டும்</string>
+    <string name="error_price_max">விலை 1,000,000 ஐ மீற முடியாது</string>
+    <string name="error_select_quality">தர தரத்தைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="error_harvest_date_required">அறுவடை தேதி தேவை</string>
+    <string name="error_location_required">இடம் தேவை</string>
+    <string name="error_name_required">பெயர் தேவை</string>
+    <string name="error_name_min_length">பெயர் குறைந்தது 2 எழுத்துக்களாக இருக்க வேண்டும்</string>
+    <string name="error_user_not_found">பயனர் கண்டுபிடிக்கப்படவில்லை</string>
+    <string name="error_update_profile_failed">சுயவிவரத்தைப் புதுப்பிக்க முடியவில்லை</string>
+    <string name="error_unexpected">எதிர்பாராத பிழை ஏற்பட்டது</string>
+    <string name="error_fill_required_fields">தேவையான அனைத்து புலங்களையும் சரியாக நிரப்பவும்</string>
+    <string name="error_user_not_authenticated">பயனர் அங்கீகரிக்கப்படவில்லை</string>
+    <string name="error_send_otp_failed">OTP அனுப்ப முடியவில்லை. மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="error_invalid_otp">தவறான OTP. மீண்டும் முயற்சிக்கவும்.</string>
 
     <!-- Profile Settings -->
     <string name="settings_title">அமைப்புகள் &amp; விருப்பத்தேர்வுகள்</string>
