@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    jacoco
 }
 
 android {
@@ -19,7 +20,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.senthapps.slagrimarket.HiltTestRunner"
 
         // Room schema export directory
         javaCompileOptions {
@@ -150,7 +151,57 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // LeakCanary for memory leak detection in debug builds
+    debugImplementation(libs.leakcanary)
+}
+
+// JaCoCo Test Coverage Configuration
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/html"))
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/di/**",
+        "**/*_Factory*",
+        "**/*_MembersInjector*",
+        "**/Hilt_*",
+        "**/*_HiltModules*",
+        "**/Dagger*Component*",
+        "**/*Module_*",
+        "**/ComposableSingletons*",
+        "**/*Kt$*"
+    )
+
+    val debugTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(layout.buildDirectory) {
+        include("jacoco/testDebugUnitTest.exec")
+    })
 }

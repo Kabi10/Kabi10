@@ -12,6 +12,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ import java.util.Locale
 /**
  * Enhanced Listing Card with quality badges, urgent sale indicators, and animations
  * Matches the HTML mockup design with Material Design 3 styling
+ * Includes accessibility support for TalkBack
  */
 @Composable
 fun EnhancedListingCard(
@@ -44,10 +47,31 @@ fun EnhancedListingCard(
     val cropName = listing.getCropName(currentLanguage)
     val locationName = TranslationUtil.getLocationName(listing.location, currentLanguage)
     val unitName = Units.getUnitName(listing.unit, currentLanguage)
-    
+
     // Check if listing is urgent (expiring soon or needs attention)
     val isUrgent = listing.needsAttention()
-    
+
+    // Build accessibility description for TalkBack
+    val urgentLabel = if (isUrgent) {
+        when (currentLanguage) {
+            "ta" -> ", அவசர விற்பனை"
+            "si" -> ", හදිසි විකිණීම"
+            else -> ", urgent sale"
+        }
+    } else ""
+
+    val qualityLabel = when (currentLanguage) {
+        "ta" -> "தரம் ${listing.quality.name}"
+        "si" -> "ශ්‍රේණිය ${listing.quality.name}"
+        else -> "Grade ${listing.quality.name}"
+    }
+
+    val cardDescription = when (currentLanguage) {
+        "ta" -> "$cropName, $locationName, ${listing.quantity} $unitName, LKR ${String.format(Locale.US, "%.0f", listing.pricePerUnit)} ஒரு $unitName, $qualityLabel$urgentLabel"
+        "si" -> "$cropName, $locationName, ${listing.quantity} $unitName, LKR ${String.format(Locale.US, "%.0f", listing.pricePerUnit)} එක් $unitName, $qualityLabel$urgentLabel"
+        else -> "$cropName, $locationName, ${listing.quantity} $unitName, LKR ${String.format(Locale.US, "%.0f", listing.pricePerUnit)} per $unitName, $qualityLabel$urgentLabel"
+    }
+
     // Pulse animation for urgent badge
     val infiniteTransition = rememberInfiniteTransition(label = "urgent_pulse")
     val pulseScale by infiniteTransition.animateFloat(
@@ -62,7 +86,9 @@ fun EnhancedListingCard(
 
     Card(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { contentDescription = cardDescription },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {

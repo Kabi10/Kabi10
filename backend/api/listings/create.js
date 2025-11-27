@@ -1,10 +1,12 @@
 ﻿const { supabaseAdmin } = require('../../src/config/supabase');
 const { authenticateToken } = require('../../src/middleware/auth');
+const { rateLimit } = require('../../src/middleware/rateLimit');
 const logger = require('../../src/utils/logger');
 
 /**
  * Vercel Serverless Function: Create Listing
  * POST /api/listings/create
+ * Rate limited: 20 write requests per minute per IP
  */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -19,6 +21,12 @@ module.exports = async (req, res) => {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
+  }
+
+  // Apply rate limiting for write operations (20 per minute)
+  const rateLimitCheck = rateLimit('write');
+  if (!rateLimitCheck(req, res)) {
+    return; // Rate limit exceeded, response already sent
   }
 
   try {

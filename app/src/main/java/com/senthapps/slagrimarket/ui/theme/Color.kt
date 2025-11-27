@@ -72,6 +72,7 @@ val Error600 = Color(0xFFdc2626)    // Primary error
 val Error700 = Color(0xFFb91c1c)    // Dark error
 val Red40 = Error600                // Legacy compatibility
 val Red80 = Error100                // Legacy compatibility
+val ErrorRed = Error600             // Primary error color for UI components
 
 // ============================================================================
 // NEUTRAL GRAYS - Backgrounds, Borders, Text (WCAG AA Compliant)

@@ -1,12 +1,14 @@
 const jwt = require('jsonwebtoken');
 const { supabaseAdmin } = require('../../src/config/supabase');
+const { rateLimit } = require('../../src/middleware/rateLimit');
 
 function isValidSriLankanPhone(phone) {
   return /^\+94[0-9]{9}$/.test(phone);
 }
 
 /**
- * Debug Verify OTP endpoint with extensive logging
+ * Verify OTP endpoint with rate limiting
+ * Rate limited: 10 requests per 15 minutes per IP
  */
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -25,6 +27,12 @@ module.exports = async (req, res) => {
       success: false,
       message: 'Method not allowed'
     });
+  }
+
+  // Apply rate limiting for auth requests (10 per 15 minutes)
+  const rateLimitCheck = rateLimit('auth');
+  if (!rateLimitCheck(req, res)) {
+    return; // Rate limit exceeded, response already sent
   }
 
   const debugInfo = {

@@ -1,8 +1,10 @@
 const { supabaseAdmin } = require('../../src/config/supabase');
+const { rateLimit } = require('../../src/middleware/rateLimit');
 
 /**
  * Vercel Serverless Function: Get Market Prices
  * GET /api/market-prices - Get all market prices
+ * Rate limited: 60 requests per minute per IP
  */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -17,6 +19,12 @@ module.exports = async (req, res) => {
 
   if (req.method !== 'GET') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
+  }
+
+  // Apply rate limiting for API requests (60 per minute)
+  const rateLimitCheck = rateLimit('api');
+  if (!rateLimitCheck(req, res)) {
+    return; // Rate limit exceeded, response already sent
   }
 
   try {

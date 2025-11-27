@@ -21,6 +21,9 @@ import com.senthapps.slagrimarket.data.model.QualityGrade
 import com.senthapps.slagrimarket.data.model.Units
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
 import com.senthapps.slagrimarket.ui.components.EnhancedListingCard
+import com.senthapps.slagrimarket.ui.components.EmptyListingsState
+import com.senthapps.slagrimarket.ui.components.ListingCardSkeleton
+import com.senthapps.slagrimarket.ui.theme.Spacing
 import com.senthapps.slagrimarket.util.TranslationUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,63 +81,54 @@ fun ListingsScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+        when {
+            // Loading state with shimmer skeletons
+            uiState.isLoading -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(Spacing.Large),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
+                ) {
+                    items(5) {
+                        ListingCardSkeleton()
+                    }
+                }
             }
-        } else if (uiState.listings.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = when (currentLanguage) {
-                        "en" -> "No listings available"
-                        "ta" -> "பட்டியல்கள் இல்லை"
-                        "si" -> "ලැයිස්තු නොමැත"
-                        else -> "No listings available"
-                    },
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = when (currentLanguage) {
-                        "en" -> "New listings will be available soon"
-                        "ta" -> "புதிய பட்டியல்கள் விரைவில் கிடைக்கும்"
-                        "si" -> "නව ලැයිස්තු ඉක්මනින් ලබා ගත හැකිය"
-                        else -> "New listings will be available soon"
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(uiState.listings) { listing ->
-                    EnhancedListingCard(
-                        listing = listing,
-                        onClick = { onListingClick(listing.id) },
+
+            // Empty state
+            uiState.listings.isEmpty() -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    EmptyListingsState(
                         currentLanguage = currentLanguage,
-                        showPriceTrend = false // Can be enabled when market prices are available
+                        onCreateListing = null // Can be connected to create listing action
                     )
+                }
+            }
+
+            // Content state
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(Spacing.Large),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
+                ) {
+                    items(uiState.listings) { listing ->
+                        EnhancedListingCard(
+                            listing = listing,
+                            onClick = { onListingClick(listing.id) },
+                            currentLanguage = currentLanguage,
+                            showPriceTrend = false // Can be enabled when market prices are available
+                        )
+                    }
                 }
             }
         }

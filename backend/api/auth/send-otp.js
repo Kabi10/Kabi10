@@ -1,4 +1,5 @@
 const { supabaseAdmin } = require('../../src/config/supabase');
+const { rateLimit } = require('../../src/middleware/rateLimit');
 // const smsService = require('../../src/services/smsService');
 // const { generateOTP, isValidSriLankanPhone } = require('../../src/utils/helpers');
 // const logger = require('../../src/utils/logger');
@@ -15,7 +16,7 @@ function isValidSriLankanPhone(phone) {
 /**
  * Vercel Serverless Function: Send OTP
  * POST /api/auth/send-otp
- * Matches original Express route exactly
+ * Rate limited: 5 requests per hour per IP
  */
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -34,6 +35,12 @@ module.exports = async (req, res) => {
       success: false,
       message: 'Method not allowed'
     });
+  }
+
+  // Apply rate limiting for OTP requests (strict: 5 per hour)
+  const rateLimitCheck = rateLimit('otp');
+  if (!rateLimitCheck(req, res)) {
+    return; // Rate limit exceeded, response already sent
   }
 
   try {

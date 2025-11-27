@@ -1,19 +1,25 @@
 const { supabaseAdmin } = require('../../src/config/supabase');
 const { authenticateToken } = require('../../src/middleware/auth');
+const { rateLimit } = require('../../src/middleware/rateLimit');
+const { requireSignedRequest } = require('../../src/middleware/requestSigning');
 const { validateUUID } = require('../../src/utils/helpers');
 const logger = require('../../src/utils/logger');
 
 /**
  * Vercel Serverless Function: Create Transaction
  * POST /api/transactions/create
- * Matches original Express route exactly
+ *
+ * Security layers:
+ * - Rate limiting: 20 write requests per minute per IP
+ * - Request signing: HMAC-SHA256 signature validation (when configured)
+ * - Authentication: JWT token validation
  */
 module.exports = async (req, res) => {
-  // Set CORS headers
+  // Set CORS headers (include signature headers)
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, X-Signature, X-Timestamp, X-Nonce');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -25,6 +31,17 @@ module.exports = async (req, res) => {
       success: false,
       message: 'Method not allowed'
     });
+  }
+
+  // Apply rate limiting for write operations (20 per minute)
+  const rateLimitCheck = rateLimit('write');
+  if (!rateLimitCheck(req, res)) {
+    return; // Rate limit exceeded, response already sent
+  }
+
+  // Validate request signature for transaction creation (financial operation)
+  if (!requireSignedRequest(req, res)) {
+    return; // Invalid signature, response already sent
   }
 
   try {

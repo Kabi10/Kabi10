@@ -19,6 +19,10 @@ import com.senthapps.slagrimarket.data.model.Transaction
 import com.senthapps.slagrimarket.data.model.TransactionStatus
 import com.senthapps.slagrimarket.data.model.UserType
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.EmptyTransactionsState
+import com.senthapps.slagrimarket.ui.components.EnhancedTransactionCard
+import com.senthapps.slagrimarket.ui.components.TransactionCardSkeleton
+import com.senthapps.slagrimarket.ui.theme.Spacing
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -82,43 +86,62 @@ fun TransactionsScreen(
             HorizontalDivider()
             
             // Transactions list
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+            when {
+                // Loading state with shimmer skeletons
+                uiState.isLoading -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(Spacing.Large),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
+                    ) {
+                        items(4) {
+                            TransactionCardSkeleton()
+                        }
+                    }
                 }
-            } else if (viewModel.getFilteredTransactions().isEmpty()) {
-                EmptyTransactionsState(currentLanguage = currentLanguage)
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(viewModel.getFilteredTransactions()) { transaction ->
-                        TransactionCard(
-                            transaction = transaction,
-                            currentUserType = currentUser?.userType ?: UserType.BUYER,
-                            onClick = { onTransactionClick(transaction.id) },
-                            onStatusUpdate = { newStatus ->
-                                viewModel.updateTransactionStatus(transaction.id, newStatus)
-                            },
-                            onContactUser = onContactUser,
-                            canUpdateStatus = viewModel.canUpdateStatus(
-                                transaction,
-                                currentUser?.userType ?: UserType.BUYER
-                            ),
-                            nextStatus = viewModel.getNextStatusForUser(
-                                transaction,
-                                currentUser?.userType ?: UserType.BUYER
-                            ),
-                            actionText = viewModel.getStatusActionText(
-                                transaction,
-                                currentUser?.userType ?: UserType.BUYER
-                            ),
-                            currentLanguage = currentLanguage
+
+                // Empty state
+                viewModel.getFilteredTransactions().isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyTransactionsState(
+                            currentLanguage = currentLanguage,
+                            onBrowseListings = null // Can be connected to browse action
                         )
+                    }
+                }
+
+                // Content state with enhanced transaction cards
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(Spacing.Large),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
+                    ) {
+                        items(viewModel.getFilteredTransactions()) { transaction ->
+                            EnhancedTransactionCard(
+                                transaction = transaction,
+                                currentLanguage = currentLanguage,
+                                onClick = { onTransactionClick(transaction.id) },
+                                onActionClick = if (viewModel.canUpdateStatus(
+                                    transaction,
+                                    currentUser?.userType ?: UserType.BUYER
+                                )) {
+                                    {
+                                        viewModel.getNextStatusForUser(
+                                            transaction,
+                                            currentUser?.userType ?: UserType.BUYER
+                                        )?.let { nextStatus ->
+                                            viewModel.updateTransactionStatus(transaction.id, nextStatus)
+                                        }
+                                    }
+                                } else null,
+                                actionText = viewModel.getStatusActionText(
+                                    transaction,
+                                    currentUser?.userType ?: UserType.BUYER
+                                )
+                            )
+                        }
                     }
                 }
             }

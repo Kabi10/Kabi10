@@ -94,3 +94,18 @@ object AppShapes {
     val CategoryCard = RoundedCornerShape(CornerRadius.Large)
     val SearchBar = RoundedCornerShape(CornerRadius.Full)
 }
+
+// ============================================================================
+// SPACING SYSTEM - 8dp Grid System
+// ============================================================================
+
+object Spacing {
+    val None = 0.dp
+    val ExtraSmall = 4.dp
+    val Small = 8.dp
+    val Medium = 12.dp
+    val Large = 16.dp
+    val ExtraLarge = 24.dp
+    val XXLarge = 32.dp
+    val XXXLarge = 48.dp
+}
