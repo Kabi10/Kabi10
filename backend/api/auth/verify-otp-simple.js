@@ -157,20 +157,29 @@ module.exports = async (req, res) => {
       userData = updatedUser;
     }
 
-    // Generate simple JWT token
+    // Validate JWT secrets are configured
+    if (!process.env.JWT_SECRET) {
+      console.error('CRITICAL: JWT_SECRET environment variable is not set');
+      return res.status(500).json({
+        success: false,
+        message: 'Server configuration error'
+      });
+    }
+
+    // Generate JWT tokens with production secrets
     const accessToken = jwt.sign(
-      { 
-        userId: userData.id, 
+      {
+        userId: userData.id,
         phoneNumber: userData.phone_number,
         userType: userData.user_type
       },
-      process.env.JWT_SECRET || 'fallback-secret-for-development',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
     const refreshToken = jwt.sign(
       { userId: userData.id },
-      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'fallback-refresh-secret',
+      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 

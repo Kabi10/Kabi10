@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,10 +25,34 @@ class JaffnaMarketplaceApplication : Application(), Configuration.Provider {
             Timber.plant(Timber.DebugTree())
         }
 
+        // Initialize Firebase Crashlytics
+        initializeCrashlytics()
+
         // Create notification channels
         createNotificationChannels()
 
         Timber.d("Jaffna Marketplace Application started")
+    }
+
+    /**
+     * Initialize Firebase Crashlytics for crash reporting
+     * - Enabled in release builds for production crash monitoring
+     * - Disabled in debug builds to avoid polluting crash data
+     */
+    private fun initializeCrashlytics() {
+        val crashlytics = FirebaseCrashlytics.getInstance()
+
+        // Disable Crashlytics in debug builds
+        crashlytics.isCrashlyticsCollectionEnabled = !BuildConfig.DEBUG
+
+        if (!BuildConfig.DEBUG) {
+            // Set custom keys for easier debugging in production
+            crashlytics.setCustomKey("app_version", BuildConfig.VERSION_NAME)
+            crashlytics.setCustomKey("build_type", "release")
+            Timber.d("✅ Firebase Crashlytics initialized for production")
+        } else {
+            Timber.d("⚠️ Firebase Crashlytics disabled in debug build")
+        }
     }
 
     override val workManagerConfiguration: Configuration

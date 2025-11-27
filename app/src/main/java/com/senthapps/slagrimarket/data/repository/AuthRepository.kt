@@ -1,19 +1,16 @@
 package com.senthapps.slagrimarket.data.repository
 
-import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.AuthApiService
 import com.senthapps.slagrimarket.data.api.SendOtpRequest
 import com.senthapps.slagrimarket.data.api.VerifyOtpRequest
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.User
-import com.senthapps.slagrimarket.data.model.UserType
 import com.senthapps.slagrimarket.data.preferences.AuthPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,49 +21,28 @@ class AuthRepository @Inject constructor(
     private val userDao: UserDao
 ) {
 
-    // MVP: Provide mock user for demonstration
-    private val mockUser = User(
-        id = "mvp_user_001",
-        phone = "0771234567",
-        name = "Demo User",
-        userType = UserType.FARMER,
-        verified = true,
-        language = "ta",
-        createdAt = java.time.Instant.now().toString()
-    )
-
-    // MVP: Use AuthPreferences for consistent authentication state
+    // Production: Use AuthPreferences for consistent authentication state
     val currentUser: Flow<User?> = authPreferences.currentUser
     val isLoggedIn: Flow<Boolean> = authPreferences.isLoggedIn
 
     init {
-        // MVP: Initialize mock authentication state on app start
-        initializeMockAuthState()
+        // Log authentication state on app start for debugging
+        logAuthenticationState()
     }
 
-    private fun initializeMockAuthState() {
+    private fun logAuthenticationState() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Check if user is already authenticated
                 val existingUser = authPreferences.getCurrentUser()
-                val existingToken = authPreferences.getAccessToken()
+                val hasToken = !authPreferences.getAccessToken().isNullOrBlank()
 
-                if (existingUser == null || existingToken.isNullOrBlank()) {
-                    // Initialize mock authentication state
-                    val mockAccessToken = "mvp_access_token_${System.currentTimeMillis()}"
-                    val mockRefreshToken = "mvp_refresh_token_${System.currentTimeMillis()}"
-
-                    // Save mock authentication data
-                    authPreferences.saveTokens(mockAccessToken, mockRefreshToken)
-                    authPreferences.saveUser(mockUser)
-                    userDao.insertUser(mockUser)
-
-                    Timber.d("🚀 MVP: Mock authentication state initialized - User: ${mockUser.name}")
+                if (existingUser != null && hasToken) {
+                    Timber.d("✅ Authenticated user found: ${existingUser.name}")
                 } else {
-                    Timber.d("🚀 MVP: Existing authentication state found - User: ${existingUser.name}")
+                    Timber.d("⚠️ No authenticated user - login required")
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Error initializing mock authentication state")
+                Timber.e(e, "Error checking authentication state")
             }
         }
     }
@@ -131,17 +107,17 @@ class AuthRepository @Inject constructor(
     }
     
     suspend fun getCurrentUser(): User? {
-        // MVP: Return mock user for demonstration
-        return mockUser
+        // Return authenticated user from preferences
+        return authPreferences.getCurrentUser()
     }
-    
+
     suspend fun refreshToken(): Result<String> {
         return try {
             val refreshToken = authPreferences.getRefreshToken()
             if (refreshToken.isNullOrBlank()) {
                 return Result.failure(Exception("No refresh token available"))
             }
-            
+
             // TODO: Implement refresh token API call
             // For now, just return failure to trigger re-login
             Result.failure(Exception("Token refresh not implemented"))
@@ -150,58 +126,10 @@ class AuthRepository @Inject constructor(
             Result.failure(e)
         }
     }
-    
+
     suspend fun isUserLoggedIn(): Boolean {
         val token = authPreferences.getAccessToken()
         return !token.isNullOrBlank()
-    }
-
-    /**
-     * 🚨 TEMPORARY DEVELOPMENT BYPASS METHOD 🚨
-     * This method bypasses OTP verification for development and testing purposes.
-     * It creates a mock user and authentication state without server verification.
-     *
-     * ⚠️ WARNING: This should NEVER be enabled in production builds!
-     *
-     * @param phoneNumber The phone number to associate with the mock user
-     * @param name The name for the mock user
-     * @param userType The type of user (FARMER or BUYER)
-     * @return Result containing the mock user data
-     */
-    suspend fun bypassOtpWithMockUser(phoneNumber: String, name: String, userType: UserType): Result<User> {
-        return try {
-            // MVP: Always allow bypass for demonstration
-            Timber.d("Creating mock user for MVP demonstration")
-
-            Timber.w("🚨 CREATING MOCK USER FOR DEVELOPMENT BYPASS 🚨")
-
-            // Create mock user data
-            val mockUser = User(
-                id = UUID.randomUUID().toString(),
-                phone = phoneNumber,
-                name = name,
-                userType = userType,
-                verified = true,
-                language = "ta", // Tamil by default
-                createdAt = java.time.Instant.now().toString()
-            )
-
-            // Generate mock tokens for development
-            val mockAccessToken = "dev_access_token_${System.currentTimeMillis()}"
-            val mockRefreshToken = "dev_refresh_token_${System.currentTimeMillis()}"
-
-            // Save mock authentication data
-            authPreferences.saveTokens(mockAccessToken, mockRefreshToken)
-            authPreferences.saveUser(mockUser)
-            userDao.insertUser(mockUser)
-
-            Timber.d("🚨 BYPASS: Mock user created successfully - Name: ${mockUser.name}, Type: ${mockUser.userType}")
-
-            Result.success(mockUser)
-        } catch (e: Exception) {
-            Timber.e(e, "Error creating mock user for bypass")
-            Result.failure(e)
-        }
     }
 
     suspend fun updateUserProfile(

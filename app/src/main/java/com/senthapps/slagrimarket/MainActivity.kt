@@ -24,9 +24,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     // 🔐 AUTHENTICATION CONTROL
-                    // Set startWithAuth = true to enable phone/OTP authentication
-                    // Set startWithAuth = false to bypass auth (MVP mode)
-                    AppNavigationWithBottomBar(startWithAuth = false)
+                    // Authentication is now enabled for production security
+                    // Users must authenticate via phone/OTP before accessing the app
+                    AppNavigationWithBottomBar(startWithAuth = true)
                 }
             }
         }
