@@ -56,6 +56,7 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage-ktx" }
+firebase-perf = { group = "com.google.firebase", name = "firebase-perf-ktx" }
 
 
 # Core Android
@@ -138,4 +139,5 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
+firebase-perf-plugin = { id = "com.google.firebase.firebase-perf", version = "1.4.2" }
 

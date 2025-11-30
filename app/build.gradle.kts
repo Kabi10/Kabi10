@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.firebase.perf.plugin)
     jacoco
 }
 
@@ -135,6 +136,7 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.perf)
 
     // DataStore for preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")

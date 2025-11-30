@@ -7,10 +7,16 @@ const { rateLimit } = require('../../src/middleware/rateLimit');
  * Rate limited: 60 requests per minute per IP
  */
 module.exports = async (req, res) => {
+  // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  // Edge caching headers for Vercel CDN (INFRA-01 optimization)
+  // Cache for 60 seconds, allow stale content for 10 minutes while revalidating
+  // Market prices are relatively static data that can be cached
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=600');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
