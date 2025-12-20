@@ -70,23 +70,35 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = when (currentLanguage) {
-                                "en" -> stringResource(R.string.app_title_english)
-                                "ta" -> stringResource(R.string.app_title_tamil)
-                                "si" -> stringResource(R.string.app_title_sinhala)
-                                else -> "${stringResource(R.string.app_title_tamil)} / ${stringResource(R.string.app_title_english)}"
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Image(
+                            painter = androidx.compose.ui.res.painterResource(id = R.mipmap.ic_launcher_round),
+                            contentDescription = "App Logo",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
                         )
-                        if (currentLanguage !in listOf("en", "ta", "si")) {
+                        Column {
                             Text(
-                                text = stringResource(R.string.app_title_english),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                text = when (currentLanguage) {
+                                    "en" -> stringResource(R.string.app_title_english)
+                                    "ta" -> stringResource(R.string.app_title_tamil)
+                                    "si" -> stringResource(R.string.app_title_sinhala)
+                                    else -> "${stringResource(R.string.app_title_tamil)} / ${stringResource(R.string.app_title_english)}"
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
                             )
+                            if (currentLanguage !in listOf("en", "ta", "si")) {
+                                Text(
+                                    text = stringResource(R.string.app_title_english),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 },
