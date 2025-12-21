@@ -129,7 +129,23 @@ data class Listing(
     val viewCount: Int = 0,
 
     @Json(name = "inquiryCount")
-    val inquiryCount: Int = 0
+    val inquiryCount: Int = 0,
+
+    @Json(name = "story")
+    val story: String = "",
+
+    @Json(name = "farmingMethods")
+    val farmingMethods: List<String> = emptyList(),
+
+    // Stored as JSON string in Room, parsed via Moshi in API
+    @Json(name = "certifications")
+    val certifications: List<Certification> = emptyList(),
+
+    @Json(name = "harvestedAt")
+    val harvestedAt: String = "",
+
+    @Json(name = "sustainabilityPractices")
+    val sustainabilityPractices: List<String> = emptyList()
 ) {
     /**
      * Validation rules for listing data
@@ -200,6 +216,14 @@ data class Listing(
         const val MAX_AVAILABILITY_DAYS = 30 // Maximum availability period
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class Certification(
+    @Json(name = "name") val name: String,
+    @Json(name = "issuer") val issuer: String,
+    @Json(name = "numericId") val numericId: String? = null,
+    @Json(name = "imageUrl") val imageUrl: String? = null
+)
 
 /**
  * Enhanced Quality Grade enum with trilingual support
@@ -360,6 +384,19 @@ class ListingConverters {
         } catch (e: Exception) {
             SyncStatus.PENDING // Default to pending
         }
+    }
+
+    private val certificationListType = Types.newParameterizedType(List::class.java, Certification::class.java)
+    private val certificationAdapter = moshi.adapter<List<Certification>>(certificationListType)
+
+    @TypeConverter
+    fun fromCertificationList(value: List<Certification>): String {
+        return certificationAdapter.toJson(value)
+    }
+
+    @TypeConverter
+    fun toCertificationList(value: String): List<Certification> {
+        return certificationAdapter.fromJson(value) ?: emptyList()
     }
 }
 

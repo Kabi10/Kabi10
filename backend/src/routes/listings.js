@@ -22,7 +22,13 @@ const createListingValidation = [
   body('availableFrom').isISO8601().withMessage('Invalid date format'),
   body('availableUntil').isISO8601().withMessage('Invalid date format'),
   body('pickupLocations').isArray({ min: 1 }).withMessage('At least one pickup location required'),
-  body('description').optional().isLength({ max: 1000 }).withMessage('Description too long')
+  body('description').optional().isLength({ max: 1000 }).withMessage('Description too long'),
+  // Storytelling fields
+  body('story').optional().isString(),
+  body('farmingMethods').optional().isArray(),
+  body('certifications').optional().isArray(),
+  body('harvestedAt').optional().isISO8601().withMessage('Invalid harvest date format'),
+  body('sustainabilityPractices').optional().isArray()
 ];
 
 /**
@@ -46,7 +52,7 @@ router.get('/', async (req, res) => {
     } = req.query;
 
     // Build dynamic query
-    let whereConditions = ['l.is_active = true', 'l.available_until >= CURRENT_DATE'];
+    let whereConditions = ['l.is_active = true', 'l.available_until >= CURRENT_DATE', 'l.deleted_at IS NULL'];
     let queryParams = [];
     let paramIndex = 1;
 
@@ -135,7 +141,13 @@ router.get('/', async (req, res) => {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       farmerName: row.farmer_name,
-      farmerContact: row.farmer_contact
+      farmerContact: row.farmer_contact,
+      // Storytelling fields
+      story: row.story || "",
+      farmingMethods: row.farming_methods || [],
+      certifications: row.certifications || [],
+      harvestedAt: row.harvested_at ? row.harvested_at.toISOString().split('T')[0] : "",
+      sustainabilityPractices: row.sustainability_practices || []
     }));
 
     res.json({
@@ -183,7 +195,7 @@ router.get('/:id', async (req, res) => {
         u.location as farmer_location
       FROM listings l
       JOIN users u ON l.farmer_id = u.id
-      WHERE l.id = $1 AND l.is_active = true
+      WHERE l.id = $1 AND l.is_active = true AND l.deleted_at IS NULL
     `, [id]);
 
     if (result.rows.length === 0) {
@@ -219,7 +231,13 @@ router.get('/:id', async (req, res) => {
           name: listing.farmer_name,
           contact: listing.farmer_contact,
           location: listing.farmer_location
-        }
+        },
+        // Storytelling fields
+        story: listing.story || "",
+        farmingMethods: listing.farming_methods || [],
+        certifications: listing.certifications || [],
+        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : "",
+        sustainabilityPractices: listing.sustainability_practices || []
       }
     });
   } catch (error) {
@@ -258,7 +276,13 @@ router.post('/', createListingValidation, async (req, res) => {
       availableFrom,
       availableUntil,
       description,
-      images = []
+      images = [],
+      // Storytelling fields
+      story,
+      farmingMethods = [],
+      certifications = [],
+      harvestedAt,
+      sustainabilityPractices = []
     } = req.body;
 
     // Validate date range
@@ -271,14 +295,15 @@ router.post('/', createListingValidation, async (req, res) => {
 
     // Check if user is a farmer
     const user = await db.query(
-      'SELECT user_type FROM users WHERE id = $1',
+      'SELECT user_type, can_sell FROM users WHERE id = $1',
       [req.user.userId]
     );
 
-    if (user.rows.length === 0 || user.rows[0].user_type !== 'FARMER') {
+    // Allow if user is FARMER OR can_sell is TRUE
+    if (user.rows.length === 0 || (user.rows[0].user_type !== 'FARMER' && !user.rows[0].can_sell)) {
       return res.status(403).json({
         success: false,
-        message: 'Only farmers can create listings'
+        message: 'Only farmers or approved sellers can create listings'
       });
     }
 
@@ -286,8 +311,9 @@ router.post('/', createListingValidation, async (req, res) => {
       INSERT INTO listings (
         farmer_id, crop_type, quantity, unit, price_per_unit,
         quality, location, pickup_locations, available_from,
-        available_until, description, images
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        available_until, description, images,
+        story, farming_methods, certifications, harvested_at, sustainability_practices
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *
     `, [
       req.user.userId,
@@ -301,7 +327,12 @@ router.post('/', createListingValidation, async (req, res) => {
       availableFrom,
       availableUntil,
       description,
-      images
+      images,
+      story,
+      farmingMethods,
+      JSON.stringify(certifications), // Store JSONB as string if needed, or pass object if pg driver handles it. pg usually handles objects for JSONB.
+      harvestedAt,
+      sustainabilityPractices
     ]);
 
     const listing = result.rows[0];
@@ -330,7 +361,13 @@ router.post('/', createListingValidation, async (req, res) => {
         images: listing.images || [],
         isActive: listing.is_active,
         createdAt: listing.created_at,
-        updatedAt: listing.updated_at
+        updatedAt: listing.updated_at,
+        // Storytelling fields
+        story: listing.story || "",
+        farmingMethods: listing.farming_methods || [],
+        certifications: listing.certifications || [],
+        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : "",
+        sustainabilityPractices: listing.sustainability_practices || []
       }
     });
   } catch (error) {
@@ -368,7 +405,7 @@ router.put('/:id', createListingValidation, async (req, res) => {
 
     // Check if listing exists and belongs to user
     const existingListing = await db.query(
-      'SELECT farmer_id FROM listings WHERE id = $1',
+      'SELECT farmer_id FROM listings WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -397,7 +434,13 @@ router.put('/:id', createListingValidation, async (req, res) => {
       availableFrom,
       availableUntil,
       description,
-      images = []
+      images = [],
+      // Storytelling fields
+      story,
+      farmingMethods = [],
+      certifications = [],
+      harvestedAt,
+      sustainabilityPractices = []
     } = req.body;
 
     const result = await db.query(`
@@ -413,13 +456,19 @@ router.put('/:id', createListingValidation, async (req, res) => {
         available_until = $10,
         description = $11,
         images = $12,
+        story = $13,
+        farming_methods = $14,
+        certifications = $15,
+        harvested_at = $16,
+        sustainability_practices = $17,
         updated_at = NOW()
       WHERE id = $1
       RETURNING *
     `, [
       id, cropType, quantity, unit, pricePerUnit,
       quality, location, pickupLocations, availableFrom,
-      availableUntil, description, images
+      availableUntil, description, images,
+      story, farmingMethods, JSON.stringify(certifications), harvestedAt, sustainabilityPractices
     ]);
 
     const listing = result.rows[0];

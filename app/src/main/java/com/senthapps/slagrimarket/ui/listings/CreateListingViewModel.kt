@@ -76,6 +76,30 @@ class CreateListingViewModel @Inject constructor(
         )
     }
 
+    fun updateStory(story: String) {
+        _uiState.value = _uiState.value.copy(story = story)
+    }
+
+    fun toggleFarmingMethod(method: String) {
+        val currentMethods = _uiState.value.farmingMethods.toMutableList()
+        if (currentMethods.contains(method)) {
+            currentMethods.remove(method)
+        } else {
+            currentMethods.add(method)
+        }
+        _uiState.value = _uiState.value.copy(farmingMethods = currentMethods)
+    }
+
+    fun toggleSustainabilityPractice(practice: String) {
+        val currentPractices = _uiState.value.sustainabilityPractices.toMutableList()
+        if (currentPractices.contains(practice)) {
+            currentPractices.remove(practice)
+        } else {
+            currentPractices.add(practice)
+        }
+        _uiState.value = _uiState.value.copy(sustainabilityPractices = currentPractices)
+    }
+
     fun setHarvestDateError(error: String) {
         _uiState.value = _uiState.value.copy(harvestDateError = error)
     }
@@ -134,7 +158,11 @@ class CreateListingViewModel @Inject constructor(
                     harvestDate = state.harvestDate,
                     location = state.location,
                     farmerId = currentUser.id,
-                    imageUrls = imageUrls
+                    imageUrls = imageUrls,
+                    story = state.story,
+                    farmingMethods = state.farmingMethods,
+                    harvestedAt = state.harvestDate, // Re-using harvest date for now, ideally separate logic if needed
+                    sustainabilityPractices = state.sustainabilityPractices
                 ).fold(
                     onSuccess = { listing ->
                         _uiState.value = state.copy(
@@ -170,6 +198,8 @@ class CreateListingViewModel @Inject constructor(
     fun getAvailableCropTypes(): List<String> = CropTypes.ALL_CROPS
     fun getAvailableUnits(): List<String> = Units.ALL_UNITS
     fun getAvailableQualityGrades(): List<String> = QualityGrades.ALL_GRADES
+    fun getAvailableFarmingMethods(): List<String> = listOf("Organic", "Traditional", "Hydroponic", "Greenhouse", "Open Field")
+    fun getAvailableSustainabilityPractices(): List<String> = listOf("No Pesticides", "Water Conservation", "Plastic Free", "Composting", "Renewable Energy")
     
     fun getTodayDate(): String {
         return LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -315,5 +345,9 @@ data class CreateListingUiState(
     val priceError: String? = null,
     val qualityError: String? = null,
     val harvestDateError: String? = null,
-    val locationError: String? = null
+
+    val locationError: String? = null,
+    val story: String = "",
+    val farmingMethods: List<String> = emptyList(),
+    val sustainabilityPractices: List<String> = emptyList()
 )

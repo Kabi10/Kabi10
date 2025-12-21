@@ -200,7 +200,22 @@ data class CreateListingRequest(
     val availableUntil: String? = null,
 
     @Json(name = "pickupLocations")
-    val pickupLocations: List<String> = emptyList()
+    val pickupLocations: List<String> = emptyList(),
+
+    @Json(name = "story")
+    val story: String? = null,
+
+    @Json(name = "farmingMethods")
+    val farmingMethods: List<String> = emptyList(),
+
+    @Json(name = "certifications")
+    val certifications: List<com.senthapps.slagrimarket.data.model.Certification> = emptyList(),
+
+    @Json(name = "harvestedAt")
+    val harvestedAt: String? = null,
+
+    @Json(name = "sustainabilityPractices")
+    val sustainabilityPractices: List<String> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)

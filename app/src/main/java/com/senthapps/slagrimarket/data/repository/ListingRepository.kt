@@ -226,7 +226,12 @@ class ListingRepository @Inject constructor(
         harvestDate: String,
         location: String,
         farmerId: String,
-        imageUrls: List<String> = emptyList()
+        imageUrls: List<String> = emptyList(),
+        story: String = "",
+        farmingMethods: List<String> = emptyList(),
+        certifications: List<com.senthapps.slagrimarket.data.model.Certification> = emptyList(),
+        harvestedAt: String = "",
+        sustainabilityPractices: List<String> = emptyList()
     ): Result<Listing> {
         return try {
             // Parse quality string to enum
@@ -250,7 +255,12 @@ class ListingRepository @Inject constructor(
                 images = imageUrls,
                 isActive = true,
                 createdAt = Instant.now().toString(),
-                updatedAt = Instant.now().toString()
+                updatedAt = Instant.now().toString(),
+                story = story,
+                farmingMethods = farmingMethods,
+                certifications = certifications,
+                harvestedAt = harvestedAt,
+                sustainabilityPractices = sustainabilityPractices
             )
             
             // Save locally first (optimistic update)
@@ -264,7 +274,12 @@ class ListingRepository @Inject constructor(
                 pricePerUnit = pricePerUnit,
                 quality = quality,
                 harvestDate = harvestDate,
-                location = location
+                location = location,
+                story = story,
+                farmingMethods = farmingMethods,
+                certifications = certifications,
+                harvestedAt = harvestedAt,
+                sustainabilityPractices = sustainabilityPractices
             )
             
             val op = LocalOp(

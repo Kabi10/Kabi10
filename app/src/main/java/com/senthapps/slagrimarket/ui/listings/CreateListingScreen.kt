@@ -472,6 +472,86 @@ fun CreateListingScreen(
                 }
             }
 
+            // Story / Description
+            Column {
+                OutlinedTextField(
+                    value = uiState.story,
+                    onValueChange = viewModel::updateStory,
+                    label = { 
+                        Text(when (currentLanguage) {
+                            "en" -> "Story / Description"
+                            "ta" -> "கதை / விளக்கம்"
+                            "si" -> "කතාව / විස්තරය"
+                            else -> "Story / Description"
+                        })
+                    },
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    maxLines = 5,
+                    placeholder = {
+                        Text(when (currentLanguage) {
+                            "en" -> "Tell us about how this crop was grown..."
+                            "ta" -> "இந்த பயிர் எப்படி வளர்க்கப்பட்டது என்று சொல்லுங்கள்..."
+                            "si" -> "මෙම බෝගය වගා කළ ආකාරය ගැන අපට කියන්න..."
+                            else -> "Tell us about how this crop was grown..."
+                        })
+                    }
+                )
+            }
+
+            // Farming Methods
+            Column {
+                Text(
+                    text = when (currentLanguage) {
+                        "en" -> "Farming Methods"
+                        "ta" -> "விவசாய முறைகள்"
+                        "si" -> "ගොවිතැන් ක්‍රම"
+                        else -> "Farming Methods"
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    viewModel.getAvailableFarmingMethods().forEach { method ->
+                        FilterChip(
+                            selected = uiState.farmingMethods.contains(method),
+                            onClick = { viewModel.toggleFarmingMethod(method) },
+                            label = { Text(method) }
+                        )
+                    }
+                }
+            }
+
+            // Sustainability Practices
+            Column {
+                Text(
+                    text = when (currentLanguage) {
+                        "en" -> "Sustainability Practices"
+                        "ta" -> "நிலைத்தன்மை நடைமுறைகள்"
+                        "si" -> "තිරසාර පිළිවෙත්"
+                        else -> "Sustainability Practices"
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    viewModel.getAvailableSustainabilityPractices().forEach { practice ->
+                        FilterChip(
+                            selected = uiState.sustainabilityPractices.contains(practice),
+                            onClick = { viewModel.toggleSustainabilityPractice(practice) },
+                            label = { Text(practice) }
+                        )
+                    }
+                }
+            }
+            
             // Image picker
             com.senthapps.slagrimarket.ui.common.ImagePicker(
                 images = uiState.images,
