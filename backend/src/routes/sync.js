@@ -369,9 +369,9 @@ async function processCreateTransaction(client, payload, userId, clientId) {
     }
   }
 
-  // Validate listing exists and is available
+  // Validate listing exists and is available with locking
   const listing = await client.query(
-    'SELECT farmer_id, quantity, is_active FROM listings WHERE id = $1',
+    'SELECT farmer_id, quantity, is_active FROM listings WHERE id = $1 FOR UPDATE',
     [payload.listingId],
   );
 

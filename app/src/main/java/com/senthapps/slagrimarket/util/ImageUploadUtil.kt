@@ -87,9 +87,42 @@ object ImageUploadUtil {
         quality: Int = 85
     ): File? = withContext(Dispatchers.IO) {
         try {
-            // For now, just convert to file
-            // TODO: Add compression logic
-            uriToFile(context, uri)
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext null
+            val originalBitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+            inputStream.close()
+
+            if (originalBitmap == null) return@withContext null
+
+            // Calculate scaling
+            val ratio = Math.min(
+                maxWidth.toFloat() / originalBitmap.width,
+                maxHeight.toFloat() / originalBitmap.height
+            )
+            
+            val finalBitmap = if (ratio < 1.0) {
+                val width = (originalBitmap.width * ratio).toInt()
+                val height = (originalBitmap.height * ratio).toInt()
+                android.graphics.Bitmap.createScaledBitmap(originalBitmap, width, height, true)
+            } else {
+                originalBitmap
+            }
+
+            // Create temp file for compressed image
+            val fileName = "comp_${System.currentTimeMillis()}.jpg"
+            val file = File(context.cacheDir, fileName)
+            val outputStream = FileOutputStream(file)
+            
+            finalBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, quality, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            // Cleanup bitmaps
+            if (finalBitmap != originalBitmap) {
+                finalBitmap.recycle()
+            }
+            originalBitmap.recycle()
+
+            file
         } catch (e: Exception) {
             Timber.e(e, "Error preparing image for upload")
             null

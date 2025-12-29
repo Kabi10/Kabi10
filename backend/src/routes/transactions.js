@@ -263,78 +263,66 @@ router.post('/', createTransactionValidation, async (req, res) => {
       });
     }
 
-    // Get listing details and validate
-    const listing = await db.query(
-      'SELECT farmer_id, quantity, price_per_unit, is_active, available_until FROM listings WHERE id = $1',
-      [listingId],
-    );
+    // Validate listing exists and is available with locking inside a transaction
+    const result = await db.transaction(async (client) => {
+      const listing = await client.query(
+        'SELECT farmer_id, quantity, price_per_unit, is_active, available_until FROM listings WHERE id = $1 FOR UPDATE',
+        [listingId],
+      );
 
-    if (listing.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Listing not found',
-      });
-    }
+      if (listing.rows.length === 0) {
+        throw new Error('Listing not found');
+      }
 
-    const listingData = listing.rows[0];
+      const listingData = listing.rows[0];
 
-    if (!listingData.is_active) {
-      return res.status(400).json({
-        success: false,
-        message: 'Listing is not active',
-      });
-    }
+      if (!listingData.is_active) {
+        throw new Error('Listing is not active');
+      }
 
-    if (new Date(listingData.available_until) < new Date()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Listing is no longer available',
-      });
-    }
+      if (new Date(listingData.available_until) < new Date()) {
+        throw new Error('Listing is no longer available');
+      }
 
-    if (listingData.farmer_id === req.user.userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot create transaction for your own listing',
-      });
-    }
+      if (listingData.farmer_id === req.user.userId) {
+        throw new Error('Cannot create transaction for your own listing');
+      }
 
-    if (quantity > parseFloat(listingData.quantity)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Requested quantity exceeds available quantity',
-      });
-    }
+      if (quantity > parseFloat(listingData.quantity)) {
+        throw new Error('Requested quantity exceeds available quantity');
+      }
 
-    // Validate total amount
-    const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
-    if (Math.abs(totalAmount - expectedAmount) > 0.01) {
-      return res.status(400).json({
-        success: false,
-        message: 'Total amount does not match expected calculation',
-      });
-    }
+      // Calculate total amount
+      const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
+      
+      // Allow 1 cent difference for floating point errors
+      if (Math.abs(totalAmount - expectedAmount) > 0.01) {
+        throw new Error('Total amount does not match expected calculation');
+      }
 
-    // Create transaction
-    const result = await db.query(`
-      INSERT INTO transactions (
-        listing_id, farmer_id, buyer_id, quantity, total_amount,
-        pickup_location, pickup_date, buyer_contact, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING *
-    `, [
-      listingId,
-      listingData.farmer_id,
-      req.user.userId,
-      quantity,
-      totalAmount,
-      pickupLocation,
-      pickupDate,
-      buyerContact || req.user.phoneNumber,
-      notes,
-    ]);
+      // Create transaction
+      const insertResult = await client.query(`
+        INSERT INTO transactions (
+          listing_id, farmer_id, buyer_id, quantity, total_amount,
+          pickup_location, pickup_date, buyer_contact, notes
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING *
+      `, [
+        listingId,
+        listingData.farmer_id,
+        req.user.userId,
+        quantity,
+        totalAmount,
+        pickupLocation,
+        pickupDate,
+        buyerContact || req.user.phoneNumber,
+        notes,
+      ]);
 
-    const transaction = result.rows[0];
+      return insertResult.rows[0];
+    });
+
+    const transaction = result;
 
     logger.info('Transaction created', {
       transactionId: transaction.id,

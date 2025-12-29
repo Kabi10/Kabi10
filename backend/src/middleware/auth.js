@@ -5,19 +5,19 @@ const logger = require('../utils/logger');
 
 /**
  * JWT Authentication Middleware for Serverless Functions
- * Validates JWT tokens and returns user info
+ * Validates JWT tokens and attaches user info to request
  */
-const authenticateToken = async (req) => {
+const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-      return {
+      return res.status(401).json({
         success: false,
         message: 'Access token required',
         code: 'TOKEN_MISSING',
-      };
+      });
     }
 
     // Verify JWT token
@@ -31,63 +31,62 @@ const authenticateToken = async (req) => {
       .single();
 
     if (error || !userData) {
-      return {
+      return res.status(401).json({
         success: false,
         message: 'User not found',
         code: 'USER_NOT_FOUND',
-      };
+      });
     }
 
     if (!userData.is_active) {
-      return {
+      return res.status(403).json({
         success: false,
         message: 'Account is deactivated',
         code: 'ACCOUNT_DEACTIVATED',
-      };
+      });
     }
 
     if (!userData.verified) {
-      return {
+      return res.status(403).json({
         success: false,
         message: 'Account not verified',
         code: 'ACCOUNT_NOT_VERIFIED',
-      };
+      });
     }
 
-    // Return user info
-    return {
-      success: true,
-      user: {
-        userId: userData.id,
-        phoneNumber: userData.phone_number,
-        userType: userData.user_type,
-        isActive: userData.is_active,
-        verified: userData.verified,
-      },
+    // Attach user info to request
+    req.user = {
+      userId: userData.id,
+      phoneNumber: userData.phone_number,
+      userType: userData.user_type,
+      isActive: userData.is_active,
+      verified: userData.verified,
     };
+
+    next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
-      return {
+      return res.status(401).json({
         success: false,
         message: 'Invalid token',
         code: 'TOKEN_INVALID',
-      };
+      });
     }
 
     if (error.name === 'TokenExpiredError') {
-      return {
+      return res.status(401).json({
         success: false,
         message: 'Token expired',
         code: 'TOKEN_EXPIRED',
-      };
+      });
     }
 
     logger.error('Authentication error:', error);
-    return {
+    return res.status(500).json({
       success: false,
       message: 'Authentication failed',
       code: 'AUTH_ERROR',
-    };
+    });
   }
 };
 

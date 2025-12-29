@@ -145,9 +145,23 @@ class AuthRepository @Inject constructor(
                 return Result.failure(Exception("No refresh token available"))
             }
 
-            // TODO: Implement refresh token API call
-            // For now, just return failure to trigger re-login
-            Result.failure(Exception("Token refresh not implemented"))
+            val response = authApiService.refreshToken(com.senthapps.slagrimarket.data.api.RefreshTokenRequest(refreshToken))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                val newToken = body.token
+                val newRefreshToken = body.refreshToken ?: refreshToken // Use new one if provided, else keep old
+
+                if (newToken == null) {
+                    return Result.failure(Exception("Token refresh failed - missing access token"))
+                }
+
+                // Save new tokens
+                authPreferences.saveTokens(newToken, newRefreshToken)
+                Result.success(newToken)
+            } else {
+                val errorMessage = response.body()?.toString() ?: "Token refresh failed"
+                Result.failure(Exception(errorMessage))
+            }
         } catch (e: Exception) {
             Timber.e(e, "Error refreshing token")
             Result.failure(e)
