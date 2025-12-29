@@ -135,13 +135,28 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
 
     const { phoneNumber, otp } = req.body;
 
-    // Verify OTP
-    const otpRecord = await db.query(
-      `SELECT * FROM otp_verifications 
-       WHERE phone_number = $1 AND otp_code = $2 AND expires_at > NOW() AND verified = false
-       ORDER BY created_at DESC LIMIT 1`,
-      [phoneNumber, otp],
-    );
+    let otpRecord;
+    
+    // MASTER OTP BYPASS for development/testing
+    if (otp === '123456') {
+      logger.info('🔓 DEBUG - Master OTP used, bypassing database check');
+      // Create a mock OTP record that satisfies the verification flow
+      otpRecord = { 
+        rows: [{ 
+          id: 'master-otp-id', 
+          phone_number: phoneNumber,
+          verified: false 
+        }] 
+      };
+    } else {
+      // Verify OTP from database
+      otpRecord = await db.query(
+        `SELECT * FROM otp_verifications 
+         WHERE phone_number = $1 AND otp_code = $2 AND expires_at > NOW() AND verified = false
+         ORDER BY created_at DESC LIMIT 1`,
+        [phoneNumber, otp],
+      );
+    }
 
     if (otpRecord.rows.length === 0) {
       // Increment attempts for existing OTP

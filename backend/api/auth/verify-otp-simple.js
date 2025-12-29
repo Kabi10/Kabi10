@@ -75,9 +75,10 @@ module.exports = async (req, res) => {
     }
 
     if (!isValidSriLankanPhone(userPhone)) {
+      console.log('❌ Invalid phone format:', userPhone);
       return res.status(400).json({
         success: false,
-        message: 'Invalid phone number format'
+        message: 'Invalid phone number format. Use +94XXXXXXXXX'
       });
     }
 
