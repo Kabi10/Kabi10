@@ -1,10 +1,13 @@
-﻿const { supabaseAdmin } = require('../../src/config/supabase');
+﻿const { supabaseAdmin, getReadClient } = require('../../src/config/supabase');
 const { rateLimit } = require('../../src/middleware/rateLimit');
 
 /**
  * Vercel Serverless Function: Get Listings
  * GET /api/listings - Get all active listings
  * Rate limited: 60 requests per minute per IP
+ * 
+ * Performance: Uses read replica (if available) for GET requests
+ * to reduce load on primary database (INFRA-02)
  */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -30,7 +33,9 @@ module.exports = async (req, res) => {
   try {
     const { cropType, location, minPrice, maxPrice, quality, page = 1, limit = 20, sortBy = 'created_at', sortOrder = 'desc' } = req.query;
 
-    let query = supabaseAdmin
+    // Use read replica for GET requests (reduces primary DB load - INFRA-02)
+    const client = getReadClient();
+    let query = client
       .from('listings')
       .select('*, users!farmer_id(id,phone_number,user_type,profile_data)', { count: 'exact' })
       .eq('is_active', true);

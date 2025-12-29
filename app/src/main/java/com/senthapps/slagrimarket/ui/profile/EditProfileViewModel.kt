@@ -29,8 +29,8 @@ class EditProfileViewModel @Inject constructor(
                 val user = authRepository.getCurrentUser()
                 if (user != null) {
                     _uiState.value = _uiState.value.copy(
-                        name = user.name,
-                        phoneNumber = user.phone,
+                        name = user.name ?: "",
+                        phoneNumber = user.phone ?: "",
                         location = "", // User model doesn't have location field yet
                         userType = user.userType,
                         isLoading = false

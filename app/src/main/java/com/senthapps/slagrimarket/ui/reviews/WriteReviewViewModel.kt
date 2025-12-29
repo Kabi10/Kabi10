@@ -59,7 +59,7 @@ class WriteReviewViewModel @Inject constructor(
                 val result = reviewRepository.createReview(
                     transactionId = transactionId,
                     reviewerId = currentUser.id,
-                    reviewerName = currentUser.name,
+                    reviewerName = currentUser.name ?: "Anonymous",
                     revieweeId = revieweeId,
                     rating = _uiState.value.rating,
                     comment = _uiState.value.comment,

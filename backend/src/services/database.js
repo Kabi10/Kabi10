@@ -13,7 +13,7 @@ class DatabaseService {
       .insert(userData)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -24,7 +24,7 @@ class DatabaseService {
       .select('*')
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -35,7 +35,7 @@ class DatabaseService {
       .select('*')
       .eq('phone', phone)
       .single();
-    
+
     if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows returned
     return data;
   }
@@ -47,7 +47,7 @@ class DatabaseService {
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -59,7 +59,7 @@ class DatabaseService {
       .insert(productData)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -113,7 +113,7 @@ class DatabaseService {
       `)
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -125,7 +125,7 @@ class DatabaseService {
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -135,7 +135,7 @@ class DatabaseService {
       .from('products')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
     return true;
   }
@@ -147,7 +147,7 @@ class DatabaseService {
       .insert(transactionData)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -176,7 +176,7 @@ class DatabaseService {
       `)
       .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data;
   }
@@ -188,7 +188,7 @@ class DatabaseService {
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -198,7 +198,7 @@ class DatabaseService {
     const { data, error } = await this.client.storage
       .from(bucket)
       .upload(path, file, options);
-    
+
     if (error) throw error;
     return data;
   }
@@ -207,7 +207,7 @@ class DatabaseService {
     const { data } = this.client.storage
       .from(bucket)
       .getPublicUrl(path);
-    
+
     return data.publicUrl;
   }
 
@@ -215,7 +215,7 @@ class DatabaseService {
     const { error } = await this.client.storage
       .from(bucket)
       .remove([path]);
-    
+
     if (error) throw error;
     return true;
   }
@@ -224,9 +224,10 @@ class DatabaseService {
   subscribeToProducts(callback) {
     return this.client
       .channel('products')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'products' }, 
-        callback
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        callback,
       )
       .subscribe();
   }
@@ -234,14 +235,15 @@ class DatabaseService {
   subscribeToTransactions(userId, callback) {
     return this.client
       .channel(`transactions:${userId}`)
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
           table: 'transactions',
-          filter: `buyer_id=eq.${userId} or seller_id=eq.${userId}`
-        }, 
-        callback
+          filter: `buyer_id=eq.${userId} or seller_id=eq.${userId}`,
+        },
+        callback,
       )
       .subscribe();
   }

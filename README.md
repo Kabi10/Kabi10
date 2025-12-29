@@ -13,7 +13,7 @@ An offline-first agricultural marketplace for Sri Lankan farmers, supporting Tam
 | 🔴 Critical Blockers | ✅ Complete | 8/8 (100%) |
 | 🟡 High Priority (MVP) | ✅ Complete | 7/7 (100%) |
 | 🟢 Medium Priority | ✅ Complete | 8/8 (100%) |
-| 🔵 Post-Launch | ⏳ Deferred | 0/6 (0%) |
+| 🔵 Post-Launch | ✅ Complete | 6/6 (100%) |
 
 **Total: 23/23 MVP items complete**
 
@@ -50,10 +50,8 @@ This application serves a real community need:
 **Get up to speed quickly—we need you productive ASAP:**
 
 1. **Read the Documentation** (Required - 30 minutes)
-   - 📖 [SETUP.md](SETUP.md) - Development environment setup
-   - 🏗️ [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and patterns
-   - 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow and standards
-   - ⚠️ [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - Current limitations and technical debt
+   - 📖 **[docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)** - Complete project documentation
+   - 📊 **[PRODUCTION_READINESS_ASSESSMENT.md](PRODUCTION_READINESS_ASSESSMENT.md)** - Production status
 
 2. **Set Up Your Environment** (1-2 hours)
    - Install Android Studio and required tools
@@ -63,8 +61,7 @@ This application serves a real community need:
 
 3. **Start Contributing** (Day 1)
    - Check the [issue tracker](../../issues) for assigned tasks
-   - Look for [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels to get familiar with the codebase
-   - Review the [ROADMAP.md](ROADMAP.md) to understand priorities
+   - Review the documentation to understand priorities
    - Ask questions early—clarity is critical
 
 ### 🎓 What You'll Work With
@@ -138,7 +135,7 @@ This is a complete mobile-first marketplace application built to serve the agric
 
 ## 🏗️ Quick Start
 
-**New to the project? Start here:** 👉 **[QUICKSTART.md](QUICKSTART.md)** - Complete setup guide in 5 steps!
+**New to the project? Start here:** 👉 **[docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)** - Complete setup guide!
 
 ### Prerequisites
 
@@ -177,7 +174,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 **✅ Success?** The app should launch with demo data and work fully offline!
 
-**❌ Issues?** See [QUICKSTART.md](QUICKSTART.md) for detailed troubleshooting.
+**❌ Issues?** See [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) for detailed troubleshooting.
 
 ### Backend Development (Optional)
 
@@ -291,11 +288,9 @@ npx supabase db push --linked
 
 ### Test Coverage
 
-| Test Type | Count | Files |
-|-----------|-------|-------|
-| **Unit Tests** | 48 | 6 test files |
-| **UI Automation Tests** | 26 | 4 test files |
-| **Total** | 74 | 10 test files |
+| **Unit Tests** | 48 | 7 test files |
+| **UI Automation Tests** | 27 | 5 test files |
+| **Total** | 75 | 12 test files |
 
 **Unit Test Files:**
 - `AuthRepositoryTest.kt` - Authentication repository tests
@@ -327,30 +322,6 @@ npx supabase db push --linked
 ./gradlew jacocoTestReport
 ```
 
-### Manual Testing Checklist
-
-- [ ] App launches without crashing
-- [ ] OTP authentication flow works
-- [ ] Language switching works (EN/TA/SI)
-- [ ] All bottom navigation tabs are accessible
-- [ ] Listings are visible on home screen
-- [ ] Offline mode works (enable airplane mode)
-- [ ] Firebase Crashlytics integration works (check Firebase Console)
-- [ ] TalkBack accessibility works correctly
-
-### Backend Verification (if running backend)
-
-```bash
-# Test health endpoint
-curl http://localhost:3000/health
-
-# Test with Android emulator
-# Update app/build.gradle.kts BASE_URL to http://10.0.2.2:3000/api/
-
-# Test with physical device
-# Update BASE_URL to http://YOUR_COMPUTER_IP:3000/api/
-```
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -368,7 +339,7 @@ curl http://localhost:3000/health
 - Physical device: Use `http://YOUR_IP:3000/api/`
 - Verify backend is running: `curl http://localhost:3000/health`
 
-**More help:** See [QUICKSTART.md](QUICKSTART.md) for detailed troubleshooting.
+**More help:** See [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) for detailed troubleshooting.
 
 ## 📄 License
 
@@ -376,20 +347,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Documentation
 
-### Essential Reading
-### Production Readiness
-- 📊 **[PRODUCTION_READINESS_ASSESSMENT.md](PRODUCTION_READINESS_ASSESSMENT.md)** - Complete production readiness checklist
-- 🚨 **[Disaster Recovery Runbook](docs/DISASTER_RECOVERY_RUNBOOK.md)** - Incident response procedures
-
-### Implementation Guides
-- [Firebase Integration Guide](docs/FIREBASE_INTEGRATION.md)
-- [Image Upload Implementation](docs/IMAGE_UPLOAD_IMPLEMENTATION.md)
-- [Map Implementation](docs/MAP_IMPLEMENTATION.md)
-- [Production Deployment Guide](docs/PRODUCTION_DEPLOYMENT_GUIDE.md)
+- 📖 **[docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)** - Complete project documentation (architecture, setup, development, integrations, operations)
+- 📊 **[PRODUCTION_READINESS_ASSESSMENT.md](PRODUCTION_READINESS_ASSESSMENT.md)** - Production readiness status and checklist
 
 ## 🤝 Contributing
 
-This is a focused agricultural marketplace project serving the Sri Lankan farming community. The codebase prioritizes hands-on development and testing.
+This is a focused agricultural marketplace project serving the Sri Lankan farming community.
 
 ### Development Workflow
 1. Build and test Android app on physical devices
@@ -399,4 +362,4 @@ This is a focused agricultural marketplace project serving the Sri Lankan farmin
 5. Ensure OTP authentication works with Sri Lankan phone numbers
 6. Run unit tests and UI automation tests before submitting PRs
 
-For detailed development guidelines and project requirements, refer to the complete blueprint documentation.
+For detailed guidelines, see [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).

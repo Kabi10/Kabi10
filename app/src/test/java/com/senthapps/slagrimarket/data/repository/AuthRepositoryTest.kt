@@ -55,9 +55,12 @@ class AuthRepositoryTest {
         // When: sendOtp is called
         val result = repository.sendOtp("+94771234567")
 
-        // Then: Should return success with otpId
+        // Then: Should return success with OtpResult containing otpId
         assertTrue(result.isSuccess)
-        assertEquals("otp123", result.getOrNull())
+        val otpResult = result.getOrNull()
+        assertNotNull(otpResult)
+        assertEquals("otp123", otpResult?.otpId)
+        assertNull(otpResult?.otp)
     }
 
     @Test

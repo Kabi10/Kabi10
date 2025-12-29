@@ -74,7 +74,7 @@ class AuthViewModelTest {
     @Test
     fun `sendOtp should set loading state and then success state`() = runTest {
         // Given: Repository returns success
-        coEvery { repository.sendOtp("+94771234567") } returns Result.success("otp123")
+        coEvery { repository.sendOtp("+94771234567") } returns Result.success(AuthRepository.OtpResult("otp123", null))
         viewModel = createViewModel()
 
         // When: sendOtp is called
@@ -162,7 +162,7 @@ class AuthViewModelTest {
     @Test
     fun `resetOtpState should reset OTP-related state`() = runTest {
         // Given: ViewModel with OTP sent
-        coEvery { repository.sendOtp(any()) } returns Result.success("otp123")
+        coEvery { repository.sendOtp(any()) } returns Result.success(AuthRepository.OtpResult("otp123", null))
         viewModel = createViewModel()
         viewModel.sendOtp("+94771234567")
         testDispatcher.scheduler.advanceUntilIdle()

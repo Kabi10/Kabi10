@@ -18,14 +18,14 @@ router.post('/operations', async (req, res) => {
     if (!Array.isArray(operations)) {
       return res.status(400).json({
         success: false,
-        message: 'Operations must be an array'
+        message: 'Operations must be an array',
       });
     }
 
     const results = {
       appliedOps: [],
       conflicts: [],
-      errors: []
+      errors: [],
     };
 
     // Process each operation in a transaction
@@ -33,10 +33,10 @@ router.post('/operations', async (req, res) => {
       try {
         await db.transaction(async (client) => {
           const result = await processOperation(client, op, req.user.userId);
-          
+
           if (result.success) {
             results.appliedOps.push(op.opId);
-            
+
             // Store the operation in local_ops table for tracking
             await client.query(`
               INSERT INTO local_ops (
@@ -53,18 +53,18 @@ router.post('/operations', async (req, res) => {
               JSON.stringify(op.payload),
               op.clientTs,
               op.clientId,
-              result.entityId
+              result.entityId,
             ]);
           } else if (result.conflict) {
             results.conflicts.push({
               opId: op.opId,
               reason: result.reason,
-              serverObject: result.serverObject
+              serverObject: result.serverObject,
             });
           } else {
             results.errors.push({
               opId: op.opId,
-              error: result.error
+              error: result.error,
             });
           }
         });
@@ -72,7 +72,7 @@ router.post('/operations', async (req, res) => {
         logger.error('Operation processing error:', { opId: op.opId, error });
         results.errors.push({
           opId: op.opId,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -85,7 +85,7 @@ router.post('/operations', async (req, res) => {
       totalOps: operations.length,
       applied: results.appliedOps.length,
       conflicts: results.conflicts.length,
-      errors: results.errors.length
+      errors: results.errors.length,
     });
 
     res.json({
@@ -94,13 +94,13 @@ router.post('/operations', async (req, res) => {
       conflicts: results.conflicts,
       errors: results.errors,
       serverData: updatedData,
-      serverTimestamp: new Date().toISOString()
+      serverTimestamp: new Date().toISOString(),
     });
   } catch (error) {
     logger.error('Sync operations error:', error);
     res.status(500).json({
       success: false,
-      message: 'Sync failed'
+      message: 'Sync failed',
     });
   }
 });
@@ -112,19 +112,19 @@ router.post('/operations', async (req, res) => {
 router.get('/data', async (req, res) => {
   try {
     const { lastSyncAt } = req.query;
-    
+
     const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId);
-    
+
     res.json({
       success: true,
       data: updatedData,
-      serverTimestamp: new Date().toISOString()
+      serverTimestamp: new Date().toISOString(),
     });
   } catch (error) {
     logger.error('Get sync data error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get sync data'
+      message: 'Failed to get sync data',
     });
   }
 });
@@ -133,39 +133,41 @@ router.get('/data', async (req, res) => {
  * Process individual operation based on type
  */
 async function processOperation(client, operation, userId) {
-  const { type, payload, opId, clientId } = operation;
+  const {
+    type, payload, opId, clientId,
+  } = operation;
 
   try {
     switch (type) {
       case 'CREATE_LISTING':
         return await processCreateListing(client, payload, userId, clientId);
-      
+
       case 'UPDATE_LISTING':
         return await processUpdateListing(client, payload, userId);
-      
+
       case 'DELETE_LISTING':
         return await processDeleteListing(client, payload, userId);
-      
+
       case 'CREATE_TRANSACTION':
         return await processCreateTransaction(client, payload, userId, clientId);
-      
+
       case 'UPDATE_TRANSACTION':
         return await processUpdateTransaction(client, payload, userId);
-      
+
       case 'UPDATE_USER':
         return await processUpdateUser(client, payload, userId);
-      
+
       default:
         return {
           success: false,
-          error: `Unknown operation type: ${type}`
+          error: `Unknown operation type: ${type}`,
         };
     }
   } catch (error) {
     logger.error('Operation processing error:', { type, opId, error });
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 }
@@ -178,13 +180,13 @@ async function processCreateListing(client, payload, userId, clientId) {
   if (clientId) {
     const existing = await client.query(
       'SELECT id FROM listings WHERE client_id = $1',
-      [clientId]
+      [clientId],
     );
-    
+
     if (existing.rows.length > 0) {
       return {
         success: true,
-        entityId: existing.rows[0].id
+        entityId: existing.rows[0].id,
       };
     }
   }
@@ -192,13 +194,13 @@ async function processCreateListing(client, payload, userId, clientId) {
   // Validate user is a farmer
   const user = await client.query(
     'SELECT user_type FROM users WHERE id = $1',
-    [userId]
+    [userId],
   );
 
   if (user.rows.length === 0 || user.rows[0].user_type !== 'FARMER') {
     return {
       success: false,
-      error: 'Only farmers can create listings'
+      error: 'Only farmers can create listings',
     };
   }
 
@@ -223,12 +225,12 @@ async function processCreateListing(client, payload, userId, clientId) {
     payload.availableUntil,
     payload.description,
     payload.images || [],
-    clientId
+    clientId,
   ]);
 
   return {
     success: true,
-    entityId: result.rows[0].id
+    entityId: result.rows[0].id,
   };
 }
 
@@ -241,20 +243,20 @@ async function processUpdateListing(client, payload, userId) {
   // Check if listing exists and belongs to user
   const existing = await client.query(
     'SELECT farmer_id, updated_at FROM listings WHERE id = $1',
-    [listingId]
+    [listingId],
   );
 
   if (existing.rows.length === 0) {
     return {
       success: false,
-      error: 'Listing not found'
+      error: 'Listing not found',
     };
   }
 
   if (existing.rows[0].farmer_id !== userId) {
     return {
       success: false,
-      error: 'You can only update your own listings'
+      error: 'You can only update your own listings',
     };
   }
 
@@ -262,14 +264,14 @@ async function processUpdateListing(client, payload, userId) {
   if (payload.lastUpdated && existing.rows[0].updated_at > new Date(payload.lastUpdated)) {
     const serverListing = await client.query(
       'SELECT * FROM listings WHERE id = $1',
-      [listingId]
+      [listingId],
     );
 
     return {
       success: false,
       conflict: true,
       reason: 'Server version is newer',
-      serverObject: JSON.stringify(serverListing.rows[0])
+      serverObject: JSON.stringify(serverListing.rows[0]),
     };
   }
 
@@ -301,12 +303,12 @@ async function processUpdateListing(client, payload, userId) {
     updateData.availableFrom,
     updateData.availableUntil,
     updateData.description,
-    updateData.images
+    updateData.images,
   ]);
 
   return {
     success: true,
-    entityId: listingId
+    entityId: listingId,
   };
 }
 
@@ -319,32 +321,32 @@ async function processDeleteListing(client, payload, userId) {
   // Check if listing exists and belongs to user
   const existing = await client.query(
     'SELECT farmer_id FROM listings WHERE id = $1',
-    [listingId]
+    [listingId],
   );
 
   if (existing.rows.length === 0) {
     return {
       success: false,
-      error: 'Listing not found'
+      error: 'Listing not found',
     };
   }
 
   if (existing.rows[0].farmer_id !== userId) {
     return {
       success: false,
-      error: 'You can only delete your own listings'
+      error: 'You can only delete your own listings',
     };
   }
 
   // Soft delete
   await client.query(
     'UPDATE listings SET is_active = false, updated_at = NOW() WHERE id = $1',
-    [listingId]
+    [listingId],
   );
 
   return {
     success: true,
-    entityId: listingId
+    entityId: listingId,
   };
 }
 
@@ -356,13 +358,13 @@ async function processCreateTransaction(client, payload, userId, clientId) {
   if (clientId) {
     const existing = await client.query(
       'SELECT id FROM transactions WHERE client_id = $1',
-      [clientId]
+      [clientId],
     );
-    
+
     if (existing.rows.length > 0) {
       return {
         success: true,
-        entityId: existing.rows[0].id
+        entityId: existing.rows[0].id,
       };
     }
   }
@@ -370,13 +372,13 @@ async function processCreateTransaction(client, payload, userId, clientId) {
   // Validate listing exists and is available
   const listing = await client.query(
     'SELECT farmer_id, quantity, is_active FROM listings WHERE id = $1',
-    [payload.listingId]
+    [payload.listingId],
   );
 
   if (listing.rows.length === 0 || !listing.rows[0].is_active) {
     return {
       success: false,
-      error: 'Listing not found or not available'
+      error: 'Listing not found or not available',
     };
   }
 
@@ -384,7 +386,7 @@ async function processCreateTransaction(client, payload, userId, clientId) {
   if (payload.quantity > listing.rows[0].quantity) {
     return {
       success: false,
-      error: 'Requested quantity exceeds available quantity'
+      error: 'Requested quantity exceeds available quantity',
     };
   }
 
@@ -405,12 +407,12 @@ async function processCreateTransaction(client, payload, userId, clientId) {
     payload.pickupDate,
     payload.buyerContact,
     payload.notes,
-    clientId
+    clientId,
   ]);
 
   return {
     success: true,
-    entityId: result.rows[0].id
+    entityId: result.rows[0].id,
   };
 }
 
@@ -423,13 +425,13 @@ async function processUpdateTransaction(client, payload, userId) {
   // Check if transaction exists and user has permission
   const existing = await client.query(
     'SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1',
-    [transactionId]
+    [transactionId],
   );
 
   if (existing.rows.length === 0) {
     return {
       success: false,
-      error: 'Transaction not found'
+      error: 'Transaction not found',
     };
   }
 
@@ -440,23 +442,23 @@ async function processUpdateTransaction(client, payload, userId) {
   if (!isFarmer && !isBuyer) {
     return {
       success: false,
-      error: 'You can only update your own transactions'
+      error: 'You can only update your own transactions',
     };
   }
 
   // Validate status transition
   const validTransitions = {
-    'PENDING': ['CONFIRMED', 'CANCELLED'],
-    'CONFIRMED': ['IN_PROGRESS', 'CANCELLED'],
-    'IN_PROGRESS': ['COMPLETED', 'CANCELLED'],
-    'COMPLETED': [],
-    'CANCELLED': []
+    PENDING: ['CONFIRMED', 'CANCELLED'],
+    CONFIRMED: ['IN_PROGRESS', 'CANCELLED'],
+    IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+    COMPLETED: [],
+    CANCELLED: [],
   };
 
   if (status && !validTransitions[transaction.status].includes(status)) {
     return {
       success: false,
-      error: `Invalid status transition from ${transaction.status} to ${status}`
+      error: `Invalid status transition from ${transaction.status} to ${status}`,
     };
   }
 
@@ -471,9 +473,9 @@ async function processUpdateTransaction(client, payload, userId) {
     paramIndex++;
 
     if (status === 'COMPLETED') {
-      updateFields.push(`completed_at = NOW()`);
+      updateFields.push('completed_at = NOW()');
     } else if (status === 'CANCELLED') {
-      updateFields.push(`cancelled_at = NOW()`);
+      updateFields.push('cancelled_at = NOW()');
       if (notes) {
         updateFields.push(`cancellation_reason = $${paramIndex}`);
         updateValues.push(notes);
@@ -497,7 +499,7 @@ async function processUpdateTransaction(client, payload, userId) {
 
   return {
     success: true,
-    entityId: transactionId
+    entityId: transactionId,
   };
 }
 
@@ -538,7 +540,7 @@ async function processUpdateUser(client, payload, userId) {
 
   return {
     success: true,
-    entityId: userId
+    entityId: userId,
   };
 }
 
@@ -549,7 +551,7 @@ async function getUpdatedDataSince(lastSyncAt, userId) {
   const data = {
     users: [],
     listings: [],
-    transactions: []
+    transactions: [],
   };
 
   const syncTimestamp = lastSyncAt ? new Date(lastSyncAt) : new Date(0);
@@ -557,7 +559,7 @@ async function getUpdatedDataSince(lastSyncAt, userId) {
   // Get updated users (only current user)
   const users = await db.query(
     'SELECT * FROM users WHERE id = $1 AND updated_at > $2',
-    [userId, syncTimestamp]
+    [userId, syncTimestamp],
   );
   data.users = users.rows;
 
@@ -575,7 +577,7 @@ async function getUpdatedDataSince(lastSyncAt, userId) {
   // Get updated transactions (user's transactions only)
   const transactions = await db.query(
     'SELECT * FROM transactions WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2',
-    [userId, syncTimestamp]
+    [userId, syncTimestamp],
   );
   data.transactions = transactions.rows;
 

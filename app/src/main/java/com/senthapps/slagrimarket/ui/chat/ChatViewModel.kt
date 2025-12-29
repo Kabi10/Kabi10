@@ -99,7 +99,7 @@ class ChatViewModel @Inject constructor(
                 val result = messageRepository.sendMessage(
                     conversationId = currentConversationId,
                     senderId = currentUser.id,
-                    senderName = currentUser.name,
+                    senderName = currentUser.name ?: "Anonymous",
                     receiverId = receiverId,
                     content = message
                 )

@@ -14,7 +14,7 @@ const createTransactionValidation = [
   body('pickupLocation').isLength({ min: 1, max: 255 }).withMessage('Pickup location is required'),
   body('pickupDate').isISO8601().withMessage('Invalid pickup date format'),
   body('buyerContact').optional().isLength({ max: 20 }).withMessage('Buyer contact too long'),
-  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long')
+  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long'),
 ];
 
 /**
@@ -29,12 +29,12 @@ router.get('/', async (req, res) => {
       page = 1,
       limit = 20,
       sortBy = 'created_at',
-      sortOrder = 'DESC'
+      sortOrder = 'DESC',
     } = req.query;
 
     // Build dynamic query based on user role
-    let whereConditions = [];
-    let queryParams = [req.user.userId];
+    const whereConditions = [];
+    const queryParams = [req.user.userId];
     let paramIndex = 2;
 
     // Role-based filtering
@@ -89,7 +89,7 @@ router.get('/', async (req, res) => {
     const total = parseInt(countResult.rows[0].total);
 
     // Transform data
-    const transactions = result.rows.map(row => ({
+    const transactions = result.rows.map((row) => ({
       id: row.id,
       listingId: row.listing_id,
       farmerId: row.farmer_id,
@@ -109,16 +109,16 @@ router.get('/', async (req, res) => {
       listing: {
         cropType: row.crop_type,
         unit: row.unit,
-        pricePerUnit: parseFloat(row.price_per_unit)
+        pricePerUnit: parseFloat(row.price_per_unit),
       },
       farmer: {
         name: row.farmer_name,
-        contact: row.farmer_contact
+        contact: row.farmer_contact,
       },
       buyer: {
         name: row.buyer_name,
-        contact: row.buyer_contact
-      }
+        contact: row.buyer_contact,
+      },
     }));
 
     res.json({
@@ -128,14 +128,14 @@ router.get('/', async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        totalPages: Math.ceil(total / parseInt(limit))
-      }
+        totalPages: Math.ceil(total / parseInt(limit)),
+      },
     });
   } catch (error) {
     logger.error('Get transactions error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch transactions'
+      message: 'Failed to fetch transactions',
     });
   }
 });
@@ -151,7 +151,7 @@ router.get('/:id', async (req, res) => {
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid transaction ID'
+        message: 'Invalid transaction ID',
       });
     }
 
@@ -178,7 +178,7 @@ router.get('/:id', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Transaction not found'
+        message: 'Transaction not found',
       });
     }
 
@@ -208,24 +208,24 @@ router.get('/:id', async (req, res) => {
           unit: transaction.unit,
           pricePerUnit: parseFloat(transaction.price_per_unit),
           quality: transaction.quality,
-          description: transaction.listing_description
+          description: transaction.listing_description,
         },
         farmer: {
           name: transaction.farmer_name,
           contact: transaction.farmer_contact,
-          location: transaction.farmer_location
+          location: transaction.farmer_location,
         },
         buyer: {
           name: transaction.buyer_name,
-          contact: transaction.buyer_contact
-        }
-      }
+          contact: transaction.buyer_contact,
+        },
+      },
     });
   } catch (error) {
     logger.error('Get transaction error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch transaction'
+      message: 'Failed to fetch transaction',
     });
   }
 });
@@ -241,7 +241,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -252,27 +252,27 @@ router.post('/', createTransactionValidation, async (req, res) => {
       pickupLocation,
       pickupDate,
       buyerContact,
-      notes
+      notes,
     } = req.body;
 
     // Validate pickup date is in the future
     if (!isFutureDate(pickupDate)) {
       return res.status(400).json({
         success: false,
-        message: 'Pickup date must be in the future'
+        message: 'Pickup date must be in the future',
       });
     }
 
     // Get listing details and validate
     const listing = await db.query(
       'SELECT farmer_id, quantity, price_per_unit, is_active, available_until FROM listings WHERE id = $1',
-      [listingId]
+      [listingId],
     );
 
     if (listing.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Listing not found'
+        message: 'Listing not found',
       });
     }
 
@@ -281,28 +281,28 @@ router.post('/', createTransactionValidation, async (req, res) => {
     if (!listingData.is_active) {
       return res.status(400).json({
         success: false,
-        message: 'Listing is not active'
+        message: 'Listing is not active',
       });
     }
 
     if (new Date(listingData.available_until) < new Date()) {
       return res.status(400).json({
         success: false,
-        message: 'Listing is no longer available'
+        message: 'Listing is no longer available',
       });
     }
 
     if (listingData.farmer_id === req.user.userId) {
       return res.status(400).json({
         success: false,
-        message: 'Cannot create transaction for your own listing'
+        message: 'Cannot create transaction for your own listing',
       });
     }
 
     if (quantity > parseFloat(listingData.quantity)) {
       return res.status(400).json({
         success: false,
-        message: 'Requested quantity exceeds available quantity'
+        message: 'Requested quantity exceeds available quantity',
       });
     }
 
@@ -311,7 +311,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
     if (Math.abs(totalAmount - expectedAmount) > 0.01) {
       return res.status(400).json({
         success: false,
-        message: 'Total amount does not match expected calculation'
+        message: 'Total amount does not match expected calculation',
       });
     }
 
@@ -331,7 +331,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
       pickupLocation,
       pickupDate,
       buyerContact || req.user.phoneNumber,
-      notes
+      notes,
     ]);
 
     const transaction = result.rows[0];
@@ -342,7 +342,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
       farmerId: listingData.farmer_id,
       listingId,
       quantity,
-      totalAmount
+      totalAmount,
     });
 
     res.status(201).json({
@@ -360,14 +360,14 @@ router.post('/', createTransactionValidation, async (req, res) => {
         paymentMethod: transaction.payment_method,
         notes: transaction.notes,
         createdAt: transaction.created_at,
-        updatedAt: transaction.updated_at
-      }
+        updatedAt: transaction.updated_at,
+      },
     });
   } catch (error) {
     logger.error('Create transaction error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create transaction'
+      message: 'Failed to create transaction',
     });
   }
 });
@@ -379,7 +379,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
 router.patch('/:id/status', [
   body('status').isIn(['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])
     .withMessage('Invalid status'),
-  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long')
+  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long'),
 ], async (req, res) => {
   try {
     const { id } = req.params;
@@ -390,27 +390,27 @@ router.patch('/:id/status', [
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid transaction ID'
+        message: 'Invalid transaction ID',
       });
     }
 
     // Get current transaction
     const current = await db.query(
       'SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1',
-      [id]
+      [id],
     );
 
     if (current.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Transaction not found'
+        message: 'Transaction not found',
       });
     }
 
@@ -421,23 +421,23 @@ router.patch('/:id/status', [
     if (!isFarmer && !isBuyer) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied'
+        message: 'Access denied',
       });
     }
 
     // Validate status transitions
     const validTransitions = {
-      'PENDING': ['CONFIRMED', 'CANCELLED'],
-      'CONFIRMED': ['IN_PROGRESS', 'CANCELLED'],
-      'IN_PROGRESS': ['COMPLETED', 'CANCELLED'],
-      'COMPLETED': [],
-      'CANCELLED': []
+      PENDING: ['CONFIRMED', 'CANCELLED'],
+      CONFIRMED: ['IN_PROGRESS', 'CANCELLED'],
+      IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+      COMPLETED: [],
+      CANCELLED: [],
     };
 
     if (!validTransitions[transaction.status].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: `Cannot change status from ${transaction.status} to ${status}`
+        message: `Cannot change status from ${transaction.status} to ${status}`,
       });
     }
 
@@ -474,7 +474,7 @@ router.patch('/:id/status', [
       transactionId: id,
       userId: req.user.userId,
       oldStatus: transaction.status,
-      newStatus: status
+      newStatus: status,
     });
 
     res.json({
@@ -486,14 +486,14 @@ router.patch('/:id/status', [
         completedAt: updatedTransaction.completed_at,
         cancelledAt: updatedTransaction.cancelled_at,
         cancellationReason: updatedTransaction.cancellation_reason,
-        notes: updatedTransaction.notes
-      }
+        notes: updatedTransaction.notes,
+      },
     });
   } catch (error) {
     logger.error('Update transaction status error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update transaction status'
+      message: 'Failed to update transaction status',
     });
   }
 });

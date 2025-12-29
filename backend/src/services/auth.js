@@ -1,6 +1,6 @@
-const { supabase, supabaseAdmin } = require('../config/supabase');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class AuthService {
   constructor() {
@@ -10,7 +10,7 @@ class AuthService {
 
   // Generate OTP
   generateOTP(length = 6) {
-    return Math.floor(Math.random() * Math.pow(10, length)).toString().padStart(length, '0');
+    return Math.floor(Math.random() * 10 ** length).toString().padStart(length, '0');
   }
 
   // Send OTP (integrate with your SMS service)
@@ -25,7 +25,7 @@ class AuthService {
         phone,
         otp_code: otp,
         purpose,
-        expires_at: expiresAt.toISOString()
+        expires_at: expiresAt.toISOString(),
       })
       .select()
       .single();
@@ -82,7 +82,7 @@ class AuthService {
       const { data: authData, error: authError } = await this.adminClient.auth.admin.createUser({
         phone,
         phone_confirmed: true,
-        user_metadata: userData
+        user_metadata: userData,
       });
 
       if (authError) throw authError;
@@ -93,7 +93,7 @@ class AuthService {
         .insert({
           id: authData.user.id,
           phone,
-          ...userData
+          ...userData,
         })
         .select()
         .single();
@@ -102,7 +102,7 @@ class AuthService {
 
       return {
         user: profileData,
-        session: authData.session
+        session: authData.session,
       };
     } catch (error) {
       throw error;
@@ -120,19 +120,19 @@ class AuthService {
 
       // Generate custom JWT token
       const token = jwt.sign(
-        { 
+        {
           sub: user.id,
           phone: user.phone,
-          role: 'authenticated'
+          role: 'authenticated',
         },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
       );
 
       return {
         user,
         token,
-        expires_in: 24 * 60 * 60 // 24 hours in seconds
+        expires_in: 24 * 60 * 60, // 24 hours in seconds
       };
     } catch (error) {
       throw error;
@@ -168,7 +168,7 @@ class AuthService {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await this.getUserById(decoded.sub);
-      
+
       if (!user || !user.is_active) {
         throw new Error('User not found or inactive');
       }
@@ -184,26 +184,26 @@ class AuthService {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
       const user = await this.getUserById(decoded.sub);
-      
+
       if (!user || !user.is_active) {
         throw new Error('User not found or inactive');
       }
 
       // Generate new token
       const newToken = jwt.sign(
-        { 
+        {
           sub: user.id,
           phone: user.phone,
-          role: 'authenticated'
+          role: 'authenticated',
         },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
       );
 
       return {
         user,
         token: newToken,
-        expires_in: 24 * 60 * 60
+        expires_in: 24 * 60 * 60,
       };
     } catch (error) {
       throw new Error('Invalid refresh token');

@@ -18,19 +18,19 @@ const dbConfig = {
 const pool = new Pool(dbConfig);
 
 // Pool event handlers
-pool.on('connect', (client) => {
+pool.on('connect', () => {
   logger.debug('New database client connected');
 });
 
-pool.on('error', (err, client) => {
+pool.on('error', (err) => {
   logger.error('Unexpected error on idle database client:', err);
 });
 
-pool.on('acquire', (client) => {
+pool.on('acquire', () => {
   logger.debug('Database client acquired from pool');
 });
 
-pool.on('remove', (client) => {
+pool.on('remove', () => {
   logger.debug('Database client removed from pool');
 });
 
@@ -42,21 +42,21 @@ const db = {
     try {
       const result = await pool.query(text, params);
       const duration = Date.now() - start;
-      
+
       if (process.env.DEBUG_SQL === 'true') {
         logger.debug('Executed query', {
           text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
           duration: `${duration}ms`,
-          rows: result.rowCount
+          rows: result.rowCount,
         });
       }
-      
+
       return result;
     } catch (error) {
       logger.error('Database query error:', {
         error: error.message,
         query: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-        params: params
+        params,
       });
       throw error;
     }
@@ -66,34 +66,34 @@ const db = {
   async getClient() {
     try {
       const client = await pool.connect();
-      
+
       // Add query method to client
       const originalQuery = client.query;
-      client.query = async function(text, params) {
+      client.query = async function (text, params) {
         const start = Date.now();
         try {
           const result = await originalQuery.call(this, text, params);
           const duration = Date.now() - start;
-          
+
           if (process.env.DEBUG_SQL === 'true') {
             logger.debug('Executed transaction query', {
               text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
               duration: `${duration}ms`,
-              rows: result.rowCount
+              rows: result.rowCount,
             });
           }
-          
+
           return result;
         } catch (error) {
           logger.error('Transaction query error:', {
             error: error.message,
             query: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-            params: params
+            params,
           });
           throw error;
         }
       };
-      
+
       return client;
     } catch (error) {
       logger.error('Failed to get database client:', error);
@@ -104,7 +104,7 @@ const db = {
   // Execute multiple queries in a transaction
   async transaction(callback) {
     const client = await this.getClient();
-    
+
     try {
       await client.query('BEGIN');
       const result = await callback(client);
@@ -129,13 +129,13 @@ const db = {
         pool: {
           totalCount: pool.totalCount,
           idleCount: pool.idleCount,
-          waitingCount: pool.waitingCount
-        }
+          waitingCount: pool.waitingCount,
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
-        error: error.message
+        error: error.message,
       };
     }
   },
@@ -149,30 +149,7 @@ const db = {
       logger.error('Error closing database connection pool:', error);
       throw error;
     }
-  }
+  },
 };
-
-// Test connection on startup
-const testConnection = async () => {
-  try {
-    const result = await db.query('SELECT NOW()');
-    logger.info('Database connection test successful', {
-      timestamp: result.rows[0].now,
-      host: dbConfig.host,
-      database: dbConfig.database
-    });
-  } catch (error) {
-    logger.error('Database connection test failed:', error);
-    throw error;
-  }
-};
-
-// Initialize connection test
-if (process.env.NODE_ENV !== 'test') {
-  testConnection().catch((error) => {
-    logger.error('Failed to establish database connection:', error);
-    process.exit(1);
-  });
-}
 
 module.exports = db;

@@ -14,13 +14,13 @@ router.get('/profile', async (req, res) => {
   try {
     const result = await db.query(
       'SELECT id, phone_number, name, user_type, location, verified, created_at, updated_at FROM users WHERE id = $1',
-      [req.user.userId]
+      [req.user.userId],
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
@@ -36,14 +36,14 @@ router.get('/profile', async (req, res) => {
         location: user.location,
         verified: user.verified,
         createdAt: user.created_at,
-        updatedAt: user.updated_at
-      }
+        updatedAt: user.updated_at,
+      },
     });
   } catch (error) {
     logger.error('Get user profile error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get user profile'
+      message: 'Failed to get user profile',
     });
   }
 });
@@ -55,7 +55,7 @@ router.get('/profile', async (req, res) => {
 router.put('/profile', [
   body('name').optional().isLength({ min: 1, max: 255 }).withMessage('Name must be 1-255 characters'),
   body('location').optional().isLength({ min: 1, max: 255 }).withMessage('Location must be 1-255 characters'),
-  body('userType').optional().isIn(['FARMER', 'BUYER']).withMessage('User type must be FARMER or BUYER')
+  body('userType').optional().isIn(['FARMER', 'BUYER']).withMessage('User type must be FARMER or BUYER'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -63,7 +63,7 @@ router.put('/profile', [
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -95,7 +95,7 @@ router.put('/profile', [
     if (updateFields.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No fields to update'
+        message: 'No fields to update',
       });
     }
 
@@ -122,14 +122,14 @@ router.put('/profile', [
         location: user.location,
         verified: user.verified,
         createdAt: user.created_at,
-        updatedAt: user.updated_at
-      }
+        updatedAt: user.updated_at,
+      },
     });
   } catch (error) {
     logger.error('Update user profile error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update user profile'
+      message: 'Failed to update user profile',
     });
   }
 });
@@ -145,19 +145,19 @@ router.get('/:id', async (req, res) => {
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid user ID'
+        message: 'Invalid user ID',
       });
     }
 
     const result = await db.query(
       'SELECT id, name, user_type, location, created_at FROM users WHERE id = $1 AND is_active = true',
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
@@ -170,14 +170,14 @@ router.get('/:id', async (req, res) => {
         name: user.name,
         userType: user.user_type,
         location: user.location,
-        memberSince: user.created_at
-      }
+        memberSince: user.created_at,
+      },
     });
   } catch (error) {
     logger.error('Get user error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get user'
+      message: 'Failed to get user',
     });
   }
 });
@@ -216,7 +216,7 @@ router.get('/stats/dashboard', async (req, res) => {
 
       stats = {
         listings: listingsResult.rows[0],
-        transactions: transactionsResult.rows[0]
+        transactions: transactionsResult.rows[0],
       };
     } else {
       // Buyer statistics
@@ -231,19 +231,19 @@ router.get('/stats/dashboard', async (req, res) => {
       `, [userId]);
 
       stats = {
-        purchases: transactionsResult.rows[0]
+        purchases: transactionsResult.rows[0],
       };
     }
 
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     logger.error('Get user stats error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get user statistics'
+      message: 'Failed to get user statistics',
     });
   }
 });
@@ -257,26 +257,26 @@ router.delete('/account', async (req, res) => {
     // Soft delete by setting is_active to false
     await db.query(
       'UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1',
-      [req.user.userId]
+      [req.user.userId],
     );
 
     // Also deactivate user's listings
     await db.query(
       'UPDATE listings SET is_active = false, updated_at = NOW() WHERE farmer_id = $1',
-      [req.user.userId]
+      [req.user.userId],
     );
 
     logger.info('User account deactivated', { userId: req.user.userId });
 
     res.json({
       success: true,
-      message: 'Account deactivated successfully'
+      message: 'Account deactivated successfully',
     });
   } catch (error) {
     logger.error('Deactivate account error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to deactivate account'
+      message: 'Failed to deactivate account',
     });
   }
 });

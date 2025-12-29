@@ -76,7 +76,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Image(
-                            painter = androidx.compose.ui.res.painterResource(id = R.mipmap.ic_launcher_round),
+                            painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_launcher_foreground),
                             contentDescription = "App Logo",
                             modifier = Modifier
                                 .size(40.dp)

@@ -6,11 +6,11 @@ const crypto = require('crypto');
 function generateOTP(length = 6) {
   const digits = '0123456789';
   let otp = '';
-  
+
   for (let i = 0; i < length; i++) {
     otp += digits[Math.floor(Math.random() * digits.length)];
   }
-  
+
   return otp;
 }
 
@@ -37,12 +37,12 @@ function validateUUID(uuid) {
  */
 function formatPhoneNumber(phoneNumber) {
   if (!phoneNumber) return '';
-  
+
   // Convert +94XXXXXXXXX to +94 XX XXX XXXX
   if (phoneNumber.startsWith('+94') && phoneNumber.length === 12) {
     return `+94 ${phoneNumber.slice(3, 5)} ${phoneNumber.slice(5, 8)} ${phoneNumber.slice(8)}`;
   }
-  
+
   return phoneNumber;
 }
 
@@ -55,8 +55,8 @@ function maskSensitiveData(data, fields = ['password', 'token', 'otp', 'phoneNum
   }
 
   const masked = { ...data };
-  
-  fields.forEach(field => {
+
+  fields.forEach((field) => {
     if (masked[field]) {
       if (field === 'phoneNumber') {
         masked[field] = maskPhoneNumber(masked[field]);
@@ -74,11 +74,11 @@ function maskSensitiveData(data, fields = ['password', 'token', 'otp', 'phoneNum
  */
 function maskPhoneNumber(phoneNumber) {
   if (!phoneNumber || phoneNumber.length <= 4) return phoneNumber;
-  
+
   const start = phoneNumber.substring(0, 3);
   const end = phoneNumber.substring(phoneNumber.length - 2);
   const middle = '*'.repeat(phoneNumber.length - 5);
-  
+
   return `${start}${middle}${end}`;
 }
 
@@ -96,7 +96,7 @@ function hashPassword(password, salt = null) {
   if (!salt) {
     salt = crypto.randomBytes(16).toString('hex');
   }
-  
+
   const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
   return { hash, salt };
 }
@@ -116,14 +116,14 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
-  
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  
+
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2))
+    * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c;
-  
+
   return distance;
 }
 
@@ -147,7 +147,7 @@ function isValidEmail(email) {
  */
 function sanitizeString(str) {
   if (typeof str !== 'string') return str;
-  
+
   return str
     .trim()
     .replace(/[<>]/g, '') // Remove potential HTML tags
@@ -159,11 +159,11 @@ function sanitizeString(str) {
  */
 function formatCurrency(amount, currency = 'LKR') {
   if (typeof amount !== 'number') return amount;
-  
+
   return new Intl.NumberFormat('en-LK', {
     style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 2
+    currency,
+    minimumFractionDigits: 2,
   }).format(amount);
 }
 
@@ -172,13 +172,13 @@ function formatCurrency(amount, currency = 'LKR') {
  */
 function parseDate(dateString) {
   if (!dateString) return null;
-  
+
   const date = new Date(dateString);
-  
+
   if (isNaN(date.getTime())) {
     throw new Error('Invalid date format');
   }
-  
+
   return date;
 }
 
@@ -188,7 +188,7 @@ function parseDate(dateString) {
 function isFutureDate(date) {
   const now = new Date();
   const checkDate = typeof date === 'string' ? new Date(date) : date;
-  
+
   return checkDate > now;
 }
 
@@ -198,7 +198,7 @@ function isFutureDate(date) {
 function getDateRange(period = '7d') {
   const now = new Date();
   const start = new Date();
-  
+
   switch (period) {
     case '1d':
       start.setDate(now.getDate() - 1);
@@ -215,7 +215,7 @@ function getDateRange(period = '7d') {
     default:
       start.setDate(now.getDate() - 7);
   }
-  
+
   return { start, end: now };
 }
 
@@ -225,15 +225,15 @@ function getDateRange(period = '7d') {
 function paginate(array, page = 1, limit = 10) {
   const offset = (page - 1) * limit;
   const paginatedItems = array.slice(offset, offset + limit);
-  
+
   return {
     data: paginatedItems,
     pagination: {
       page: parseInt(page),
       limit: parseInt(limit),
       total: array.length,
-      totalPages: Math.ceil(array.length / limit)
-    }
+      totalPages: Math.ceil(array.length / limit),
+    },
   };
 }
 
@@ -242,13 +242,13 @@ function paginate(array, page = 1, limit = 10) {
  */
 function debounce(func, wait) {
   let timeout;
-  
+
   return function executedFunction(...args) {
     const later = () => {
       clearTimeout(timeout);
       func(...args);
     };
-    
+
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
@@ -259,19 +259,19 @@ function debounce(func, wait) {
  */
 async function retry(fn, maxAttempts = 3, baseDelay = 1000) {
   let lastError;
-  
+
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       if (attempt === maxAttempts) {
         throw lastError;
       }
-      
-      const delay = baseDelay * Math.pow(2, attempt - 1);
-      await new Promise(resolve => setTimeout(resolve, delay));
+
+      const delay = baseDelay * 2 ** (attempt - 1);
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 }
@@ -282,10 +282,10 @@ async function retry(fn, maxAttempts = 3, baseDelay = 1000) {
 function deepClone(obj) {
   if (obj === null || typeof obj !== 'object') return obj;
   if (obj instanceof Date) return new Date(obj.getTime());
-  if (obj instanceof Array) return obj.map(item => deepClone(item));
+  if (obj instanceof Array) return obj.map((item) => deepClone(item));
   if (typeof obj === 'object') {
     const cloned = {};
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       cloned[key] = deepClone(obj[key]);
     });
     return cloned;
@@ -325,5 +325,5 @@ module.exports = {
   debounce,
   retry,
   deepClone,
-  isEmpty
+  isEmpty,
 };

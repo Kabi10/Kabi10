@@ -24,9 +24,23 @@ import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
 import com.senthapps.slagrimarket.ui.listings.ListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.ListingsScreen
 import com.senthapps.slagrimarket.ui.profile.ProfileScreen
+import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
 import com.senthapps.slagrimarket.ui.search.SearchScreen
+import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.transactions.CreateTransactionScreen
+import com.senthapps.slagrimarket.ui.transactions.TransactionDetailScreen
 import com.senthapps.slagrimarket.ui.transactions.TransactionsScreen
+import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
+import com.senthapps.slagrimarket.ui.chat.ChatScreen
+import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
+import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
+import com.senthapps.slagrimarket.ui.help.FAQScreen
+import com.senthapps.slagrimarket.ui.help.HelpScreen
+import com.senthapps.slagrimarket.ui.map.ListingsMapScreen
+import com.senthapps.slagrimarket.ui.map.LocationMapScreen
+import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
+import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
+import com.senthapps.slagrimarket.ui.sync.SyncSettingsScreen
 
 /**
  * Main navigation composable with bottom navigation bar
@@ -132,6 +146,9 @@ fun AppNavigationWithBottomBar(
                     },
                     onNavigateToMarketPrices = {
                         navController.navigate(Screen.MarketPrices.route)
+                    },
+                    onNavigateToAnalytics = {
+                        navController.navigate(Screen.Analytics.route)
                     }
                 )
             }
@@ -153,6 +170,9 @@ fun AppNavigationWithBottomBar(
                     },
                     onNavigateToMarketPrices = {
                         navController.navigate(Screen.MarketPrices.route)
+                    },
+                    onNavigateToAnalytics = {
+                        navController.navigate(Screen.Analytics.route)
                     }
                 )
             }
@@ -239,6 +259,165 @@ fun AppNavigationWithBottomBar(
                     },
                     onNavigateToListingDetail = { listingId ->
                         navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                    }
+                )
+            }
+
+            composable(Screen.Analytics.route) {
+                AnalyticsScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.EditProfile.route) {
+                EditProfileScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.ListingDetail.route) { backStackEntry ->
+                val listingId = backStackEntry.arguments?.getString("listingId") ?: ""
+                ListingDetailScreen(
+                    listingId = listingId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onPlaceOrder = { lid ->
+                        navController.navigate(Screen.CreateTransaction.createRoute(lid))
+                    },
+                    onContactFarmer = { farmerId ->
+                        navController.navigate(Screen.Conversations.route)
+                    }
+                )
+            }
+
+            composable(Screen.TransactionDetail.route) { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+                TransactionDetailScreen(
+                    transactionId = transactionId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onContactUser = { userId ->
+                        // TODO
+                    }
+                )
+            }
+
+            composable(Screen.SyncSettings.route) {
+                SyncSettingsScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.Notifications.route) {
+                NotificationsScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNotificationClick = { type, relatedId ->
+                        relatedId?.let {
+                            when {
+                                type.contains("ORDER") -> navController.navigate(Screen.TransactionDetail.createRoute(it))
+                                type.contains("LISTING") -> navController.navigate(Screen.ListingDetail.createRoute(it))
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable(Screen.WriteReview.route) { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+                val revieweeId = backStackEntry.arguments?.getString("revieweeId") ?: ""
+                val revieweeName = backStackEntry.arguments?.getString("revieweeName") ?: ""
+                WriteReviewScreen(
+                    transactionId = transactionId,
+                    revieweeId = revieweeId,
+                    revieweeName = revieweeName,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.Favorites.route) {
+                FavoritesScreen(
+                    onNavigateToDetail = { listingId ->
+                        navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                    }
+                )
+            }
+
+            composable(Screen.Conversations.route) {
+                ConversationsScreen(
+                    onNavigateToChat = { conversationId, otherUserName ->
+                        navController.navigate(Screen.Chat.createRoute(conversationId, otherUserName))
+                    }
+                )
+            }
+
+            composable(Screen.Chat.route) { backStackEntry ->
+                val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
+                val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
+                ChatScreen(
+                    conversationId = conversationId,
+                    otherUserName = otherUserName,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.LocationMap.route) { backStackEntry ->
+                val latitude = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 9.6615
+                val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 80.0255
+                val locationName = backStackEntry.arguments?.getString("locationName") ?: "Jaffna"
+                LocationMapScreen(
+                    latitude = latitude,
+                    longitude = longitude,
+                    locationName = locationName,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.ListingsMap.route) {
+                ListingsMapScreen(
+                    listings = emptyList(),
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onListingClick = { listingId ->
+                        navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                    }
+                )
+            }
+
+            composable(Screen.Help.route) {
+                HelpScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToFAQ = {
+                        navController.navigate(Screen.FAQ.route)
+                    },
+                    onNavigateToContact = {},
+                    onNavigateToTerms = {},
+                    onNavigateToPrivacy = {}
+                )
+            }
+
+            composable(Screen.FAQ.route) {
+                FAQScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }

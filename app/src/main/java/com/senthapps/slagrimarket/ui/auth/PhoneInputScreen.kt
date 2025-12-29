@@ -274,7 +274,12 @@ fun PhoneInputScreen(
     }
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        try {
+            focusRequester.requestFocus()
+        } catch (e: IllegalStateException) {
+            // Focus requester may not be attached yet in test environments
+            // This is expected and can be safely ignored
+        }
     }
 }
 

@@ -58,7 +58,7 @@ data class VerifyOtpResponse(
     val success: Boolean,
     
     @Json(name = "message")
-    val message: String,
+    val message: String? = null,
     
     @Json(name = "token")
     val token: String? = null,

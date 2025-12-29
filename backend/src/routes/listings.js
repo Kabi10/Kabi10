@@ -12,7 +12,7 @@ const createListingValidation = [
     'rice', 'coconut', 'banana', 'mango', 'papaya', 'pineapple',
     'tomato', 'onion', 'potato', 'carrot', 'cabbage', 'beans',
     'okra', 'eggplant', 'chili', 'curry_leaves', 'coriander',
-    'mint', 'lemongrass', 'ginger', 'turmeric', 'other'
+    'mint', 'lemongrass', 'ginger', 'turmeric', 'other',
   ]).withMessage('Invalid crop type'),
   body('quantity').isFloat({ min: 0.1 }).withMessage('Quantity must be greater than 0'),
   body('unit').isIn(['kg', 'g', 'lb', 'piece', 'bunch', 'bag']).withMessage('Invalid unit'),
@@ -28,7 +28,7 @@ const createListingValidation = [
   body('farmingMethods').optional().isArray(),
   body('certifications').optional().isArray(),
   body('harvestedAt').optional().isISO8601().withMessage('Invalid harvest date format'),
-  body('sustainabilityPractices').optional().isArray()
+  body('sustainabilityPractices').optional().isArray(),
 ];
 
 /**
@@ -48,12 +48,12 @@ router.get('/', async (req, res) => {
       page = 1,
       limit = 20,
       sortBy = 'created_at',
-      sortOrder = 'DESC'
+      sortOrder = 'DESC',
     } = req.query;
 
     // Build dynamic query
-    let whereConditions = ['l.is_active = true', 'l.available_until >= CURRENT_DATE', 'l.deleted_at IS NULL'];
-    let queryParams = [];
+    const whereConditions = ['l.is_active = true', 'l.available_until >= CURRENT_DATE', 'l.deleted_at IS NULL'];
+    const queryParams = [];
     let paramIndex = 1;
 
     if (cropType) {
@@ -123,7 +123,7 @@ router.get('/', async (req, res) => {
     const total = parseInt(countResult.rows[0].total);
 
     // Transform data to match Android model
-    const listings = result.rows.map(row => ({
+    const listings = result.rows.map((row) => ({
       id: row.id,
       farmerId: row.farmer_id,
       cropType: row.crop_type,
@@ -143,11 +143,11 @@ router.get('/', async (req, res) => {
       farmerName: row.farmer_name,
       farmerContact: row.farmer_contact,
       // Storytelling fields
-      story: row.story || "",
+      story: row.story || '',
       farmingMethods: row.farming_methods || [],
       certifications: row.certifications || [],
-      harvestedAt: row.harvested_at ? row.harvested_at.toISOString().split('T')[0] : "",
-      sustainabilityPractices: row.sustainability_practices || []
+      harvestedAt: row.harvested_at ? row.harvested_at.toISOString().split('T')[0] : '',
+      sustainabilityPractices: row.sustainability_practices || [],
     }));
 
     res.json({
@@ -157,14 +157,14 @@ router.get('/', async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        totalPages: Math.ceil(total / parseInt(limit))
-      }
+        totalPages: Math.ceil(total / parseInt(limit)),
+      },
     });
   } catch (error) {
     logger.error('Get listings error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch listings'
+      message: 'Failed to fetch listings',
     });
   }
 });
@@ -180,7 +180,7 @@ router.get('/:id', async (req, res) => {
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid listing ID'
+        message: 'Invalid listing ID',
       });
     }
 
@@ -201,7 +201,7 @@ router.get('/:id', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Listing not found'
+        message: 'Listing not found',
       });
     }
 
@@ -230,21 +230,21 @@ router.get('/:id', async (req, res) => {
         farmer: {
           name: listing.farmer_name,
           contact: listing.farmer_contact,
-          location: listing.farmer_location
+          location: listing.farmer_location,
         },
         // Storytelling fields
-        story: listing.story || "",
+        story: listing.story || '',
         farmingMethods: listing.farming_methods || [],
         certifications: listing.certifications || [],
-        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : "",
-        sustainabilityPractices: listing.sustainability_practices || []
-      }
+        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : '',
+        sustainabilityPractices: listing.sustainability_practices || [],
+      },
     });
   } catch (error) {
     logger.error('Get listing error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch listing'
+      message: 'Failed to fetch listing',
     });
   }
 });
@@ -261,7 +261,7 @@ router.post('/', createListingValidation, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -282,28 +282,28 @@ router.post('/', createListingValidation, async (req, res) => {
       farmingMethods = [],
       certifications = [],
       harvestedAt,
-      sustainabilityPractices = []
+      sustainabilityPractices = [],
     } = req.body;
 
     // Validate date range
     if (new Date(availableUntil) <= new Date(availableFrom)) {
       return res.status(400).json({
         success: false,
-        message: 'Available until date must be after available from date'
+        message: 'Available until date must be after available from date',
       });
     }
 
     // Check if user is a farmer
     const user = await db.query(
       'SELECT user_type, can_sell FROM users WHERE id = $1',
-      [req.user.userId]
+      [req.user.userId],
     );
 
     // Allow if user is FARMER OR can_sell is TRUE
     if (user.rows.length === 0 || (user.rows[0].user_type !== 'FARMER' && !user.rows[0].can_sell)) {
       return res.status(403).json({
         success: false,
-        message: 'Only farmers or approved sellers can create listings'
+        message: 'Only farmers or approved sellers can create listings',
       });
     }
 
@@ -332,15 +332,15 @@ router.post('/', createListingValidation, async (req, res) => {
       farmingMethods,
       JSON.stringify(certifications), // Store JSONB as string if needed, or pass object if pg driver handles it. pg usually handles objects for JSONB.
       harvestedAt,
-      sustainabilityPractices
+      sustainabilityPractices,
     ]);
 
     const listing = result.rows[0];
 
-    logger.info('Listing created', { 
-      listingId: listing.id, 
+    logger.info('Listing created', {
+      listingId: listing.id,
       farmerId: req.user.userId,
-      cropType 
+      cropType,
     });
 
     res.status(201).json({
@@ -363,18 +363,18 @@ router.post('/', createListingValidation, async (req, res) => {
         createdAt: listing.created_at,
         updatedAt: listing.updated_at,
         // Storytelling fields
-        story: listing.story || "",
+        story: listing.story || '',
         farmingMethods: listing.farming_methods || [],
         certifications: listing.certifications || [],
-        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : "",
-        sustainabilityPractices: listing.sustainability_practices || []
-      }
+        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : '',
+        sustainabilityPractices: listing.sustainability_practices || [],
+      },
     });
   } catch (error) {
     logger.error('Create listing error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create listing'
+      message: 'Failed to create listing',
     });
   }
 });
@@ -391,7 +391,7 @@ router.put('/:id', createListingValidation, async (req, res) => {
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid listing ID'
+        message: 'Invalid listing ID',
       });
     }
 
@@ -399,27 +399,27 @@ router.put('/:id', createListingValidation, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
     // Check if listing exists and belongs to user
     const existingListing = await db.query(
       'SELECT farmer_id FROM listings WHERE id = $1 AND deleted_at IS NULL',
-      [id]
+      [id],
     );
 
     if (existingListing.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Listing not found'
+        message: 'Listing not found',
       });
     }
 
     if (existingListing.rows[0].farmer_id !== req.user.userId) {
       return res.status(403).json({
         success: false,
-        message: 'You can only update your own listings'
+        message: 'You can only update your own listings',
       });
     }
 
@@ -440,7 +440,7 @@ router.put('/:id', createListingValidation, async (req, res) => {
       farmingMethods = [],
       certifications = [],
       harvestedAt,
-      sustainabilityPractices = []
+      sustainabilityPractices = [],
     } = req.body;
 
     const result = await db.query(`
@@ -468,14 +468,14 @@ router.put('/:id', createListingValidation, async (req, res) => {
       id, cropType, quantity, unit, pricePerUnit,
       quality, location, pickupLocations, availableFrom,
       availableUntil, description, images,
-      story, farmingMethods, JSON.stringify(certifications), harvestedAt, sustainabilityPractices
+      story, farmingMethods, JSON.stringify(certifications), harvestedAt, sustainabilityPractices,
     ]);
 
     const listing = result.rows[0];
 
-    logger.info('Listing updated', { 
-      listingId: id, 
-      farmerId: req.user.userId 
+    logger.info('Listing updated', {
+      listingId: id,
+      farmerId: req.user.userId,
     });
 
     res.json({
@@ -496,14 +496,14 @@ router.put('/:id', createListingValidation, async (req, res) => {
         images: listing.images || [],
         isActive: listing.is_active,
         createdAt: listing.created_at,
-        updatedAt: listing.updated_at
-      }
+        updatedAt: listing.updated_at,
+      },
     });
   } catch (error) {
     logger.error('Update listing error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update listing'
+      message: 'Failed to update listing',
     });
   }
 });
@@ -520,41 +520,41 @@ router.post('/:id/images', async (req, res) => {
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid listing ID'
+        message: 'Invalid listing ID',
       });
     }
 
     if (!images || !Array.isArray(images) || images.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No images provided'
+        message: 'No images provided',
       });
     }
 
     if (images.length > 5) {
       return res.status(400).json({
         success: false,
-        message: 'Maximum 5 images allowed'
+        message: 'Maximum 5 images allowed',
       });
     }
 
     // Check if listing exists and belongs to user
     const existingListing = await db.query(
       'SELECT farmer_id, images FROM listings WHERE id = $1',
-      [id]
+      [id],
     );
 
     if (existingListing.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Listing not found'
+        message: 'Listing not found',
       });
     }
 
     if (existingListing.rows[0].farmer_id !== req.user.userId) {
       return res.status(403).json({
         success: false,
-        message: 'You can only upload images to your own listings'
+        message: 'You can only upload images to your own listings',
       });
     }
 
@@ -565,25 +565,25 @@ router.post('/:id/images', async (req, res) => {
 
     await db.query(
       'UPDATE listings SET images = $1, updated_at = NOW() WHERE id = $2',
-      [updatedImages, id]
+      [updatedImages, id],
     );
 
-    logger.info('Images uploaded to listing', { 
-      listingId: id, 
-      imageCount: images.length 
+    logger.info('Images uploaded to listing', {
+      listingId: id,
+      imageCount: images.length,
     });
 
     res.json({
       success: true,
       data: {
-        images: updatedImages
-      }
+        images: updatedImages,
+      },
     });
   } catch (error) {
     logger.error('Upload images error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to upload images'
+      message: 'Failed to upload images',
     });
   }
 });
@@ -599,50 +599,50 @@ router.delete('/:id', async (req, res) => {
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid listing ID'
+        message: 'Invalid listing ID',
       });
     }
 
     // Check if listing exists and belongs to user
     const existingListing = await db.query(
       'SELECT farmer_id FROM listings WHERE id = $1',
-      [id]
+      [id],
     );
 
     if (existingListing.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Listing not found'
+        message: 'Listing not found',
       });
     }
 
     if (existingListing.rows[0].farmer_id !== req.user.userId) {
       return res.status(403).json({
         success: false,
-        message: 'You can only delete your own listings'
+        message: 'You can only delete your own listings',
       });
     }
 
     // Soft delete by setting is_active to false
     await db.query(
       'UPDATE listings SET is_active = false, updated_at = NOW() WHERE id = $1',
-      [id]
+      [id],
     );
 
-    logger.info('Listing deleted', { 
-      listingId: id, 
-      farmerId: req.user.userId 
+    logger.info('Listing deleted', {
+      listingId: id,
+      farmerId: req.user.userId,
     });
 
     res.json({
       success: true,
-      message: 'Listing deleted successfully'
+      message: 'Listing deleted successfully',
     });
   } catch (error) {
     logger.error('Delete listing error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete listing'
+      message: 'Failed to delete listing',
     });
   }
 });

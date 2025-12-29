@@ -39,7 +39,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid phone number format',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -49,7 +49,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     if (!isValidSriLankanPhone(phoneNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid Sri Lankan phone number'
+        message: 'Invalid Sri Lankan phone number',
       });
     }
 
@@ -58,13 +58,13 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
       `SELECT * FROM otp_verifications 
        WHERE phone_number = $1 AND created_at > NOW() - INTERVAL '1 minute'
        ORDER BY created_at DESC LIMIT 1`,
-      [phoneNumber]
+      [phoneNumber],
     );
 
     if (recentOTP.rows.length > 0) {
       return res.status(429).json({
         success: false,
-        message: 'Please wait before requesting another OTP'
+        message: 'Please wait before requesting another OTP',
       });
     }
 
@@ -76,34 +76,34 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     await db.query(
       `INSERT INTO otp_verifications (phone_number, otp_code, expires_at)
        VALUES ($1, $2, $3)`,
-      [phoneNumber, otpCode, expiresAt]
+      [phoneNumber, otpCode, expiresAt],
     );
 
     // Send SMS
     try {
       const message = `Your Jaffna Marketplace verification code is: ${otpCode}. Valid for 5 minutes. Do not share this code.`;
       await smsService.sendSMS(phoneNumber, message);
-      
+
       logger.info('OTP sent successfully', { phoneNumber, masked: true });
-      
+
       res.json({
         success: true,
-        message: 'OTP sent successfully'
+        message: 'OTP sent successfully',
       });
     } catch (smsError) {
       logger.error('Failed to send SMS:', smsError);
-      
+
       // In development, return the OTP for testing
       if (process.env.NODE_ENV === 'development' || process.env.MOCK_SMS === 'true') {
         res.json({
           success: true,
           message: 'OTP sent successfully',
-          otp: otpCode // Only in development
+          otp: otpCode, // Only in development
         });
       } else {
         res.status(500).json({
           success: false,
-          message: 'Failed to send OTP. Please try again.'
+          message: 'Failed to send OTP. Please try again.',
         });
       }
     }
@@ -111,7 +111,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     logger.error('Send OTP error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error'
+      message: 'Internal server error',
     });
   }
 });
@@ -129,7 +129,7 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid input',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -140,7 +140,7 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
       `SELECT * FROM otp_verifications 
        WHERE phone_number = $1 AND otp_code = $2 AND expires_at > NOW() AND verified = false
        ORDER BY created_at DESC LIMIT 1`,
-      [phoneNumber, otp]
+      [phoneNumber, otp],
     );
 
     if (otpRecord.rows.length === 0) {
@@ -149,25 +149,25 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
         `UPDATE otp_verifications 
          SET attempts = attempts + 1 
          WHERE phone_number = $1 AND expires_at > NOW()`,
-        [phoneNumber]
+        [phoneNumber],
       );
 
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired OTP'
+        message: 'Invalid or expired OTP',
       });
     }
 
     // Mark OTP as verified
     await db.query(
-      `UPDATE otp_verifications SET verified = true WHERE id = $1`,
-      [otpRecord.rows[0].id]
+      'UPDATE otp_verifications SET verified = true WHERE id = $1',
+      [otpRecord.rows[0].id],
     );
 
     // Check if user exists
     let user = await db.query(
       'SELECT * FROM users WHERE phone_number = $1',
-      [phoneNumber]
+      [phoneNumber],
     );
 
     if (user.rows.length === 0) {
@@ -176,14 +176,14 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
         `INSERT INTO users (phone_number, verified, user_type)
          VALUES ($1, true, 'BUYER')
          RETURNING *`,
-        [phoneNumber]
+        [phoneNumber],
       );
       user = newUser;
     } else {
       // Update existing user
       await db.query(
-        `UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1`,
-        [user.rows[0].id]
+        'UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1',
+        [user.rows[0].id],
       );
     }
 
@@ -191,37 +191,37 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
 
     // Generate JWT tokens
     const accessToken = jwt.sign(
-      { 
-        userId: userData.id, 
+      {
+        userId: userData.id,
         phoneNumber: userData.phone_number,
-        userType: userData.user_type
+        userType: userData.user_type,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
     );
 
     const refreshToken = jwt.sign(
       { userId: userData.id },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
+      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' },
     );
 
     // Clean up old OTPs
     await db.query(
       'DELETE FROM otp_verifications WHERE phone_number = $1',
-      [phoneNumber]
+      [phoneNumber],
     );
 
-    logger.info('User authenticated successfully', { 
-      userId: userData.id, 
-      phoneNumber: userData.phone_number 
+    logger.info('User authenticated successfully', {
+      userId: userData.id,
+      phoneNumber: userData.phone_number,
     });
 
     // Response matches Android LoginResponse
     res.json({
       success: true,
       token: accessToken,
-      refreshToken: refreshToken,
+      refreshToken,
       user: {
         id: userData.id,
         phoneNumber: userData.phone_number,
@@ -229,14 +229,14 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
         userType: userData.user_type,
         location: userData.location,
         verified: userData.verified,
-        createdAt: userData.created_at
-      }
+        createdAt: userData.created_at,
+      },
     });
   } catch (error) {
     logger.error('Verify OTP error:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error'
+      message: 'Internal server error',
     });
   }
 });
@@ -252,23 +252,23 @@ router.post('/refresh-token', async (req, res) => {
     if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        message: 'Refresh token is required'
+        message: 'Refresh token is required',
       });
     }
 
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    
+
     // Get user data
     const user = await db.query(
       'SELECT * FROM users WHERE id = $1 AND is_active = true',
-      [decoded.userId]
+      [decoded.userId],
     );
 
     if (user.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid refresh token'
+        message: 'Invalid refresh token',
       });
     }
 
@@ -276,24 +276,24 @@ router.post('/refresh-token', async (req, res) => {
 
     // Generate new access token
     const accessToken = jwt.sign(
-      { 
-        userId: userData.id, 
+      {
+        userId: userData.id,
         phoneNumber: userData.phone_number,
-        userType: userData.user_type
+        userType: userData.user_type,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
     );
 
     res.json({
       success: true,
-      token: accessToken
+      token: accessToken,
     });
   } catch (error) {
     logger.error('Refresh token error:', error);
     res.status(401).json({
       success: false,
-      message: 'Invalid refresh token'
+      message: 'Invalid refresh token',
     });
   }
 });
@@ -307,7 +307,7 @@ router.post('/logout', async (req, res) => {
   // For now, we rely on client-side token removal
   res.json({
     success: true,
-    message: 'Logged out successfully'
+    message: 'Logged out successfully',
   });
 });
 

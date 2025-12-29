@@ -33,14 +33,20 @@ class AuthViewModel @Inject constructor(
             )
 
             authRepository.sendOtp(phoneNumber).fold(
-                onSuccess = { otpId ->
-                    Timber.d("OTP sent successfully. OTP ID: $otpId")
+                onSuccess = { result ->
+                    Timber.d("OTP sent successfully. OTP ID: ${result.otpId}")
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         otpSent = true,
-                        otpId = otpId,
+                        otpId = result.otpId,
                         phoneNumber = phoneNumber
                     )
+                    
+                    // AUTO-VERIFY if OTP is returned (development/bypass mode)
+                    result.otp?.let { otpCode ->
+                        Timber.d("🚀 Bypassing manual OTP entry. Auto-verifying: $otpCode")
+                        verifyOtp(phoneNumber, otpCode, result.otpId)
+                    }
                 },
                 onFailure = { error ->
                     Timber.e(error, "Failed to send OTP")

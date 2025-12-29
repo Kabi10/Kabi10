@@ -1,11 +1,13 @@
-const { supabaseAdmin } = require('../../src/config/supabase');
+const { supabaseAdmin, getReadClient } = require('../../src/config/supabase');
 const { authenticateToken } = require('../../src/middleware/auth');
 const logger = require('../../src/utils/logger');
 
 /**
  * Vercel Serverless Function: Get Transactions
  * GET /api/transactions
- * Matches original Express route exactly
+ * 
+ * Performance: Uses read replica (if available) for GET requests
+ * to reduce load on primary database (INFRA-02)
  */
 module.exports = async (req, res) => {
   // Set CORS headers
@@ -42,8 +44,11 @@ module.exports = async (req, res) => {
       sortOrder = 'desc'
     } = req.query;
 
+    // Use read replica for GET requests (reduces primary DB load - INFRA-02)
+    const client = getReadClient();
+
     // Build query based on user role
-    let query = supabaseAdmin
+    let query = client
       .from('transactions')
       .select(`
         *,
@@ -113,25 +118,25 @@ module.exports = async (req, res) => {
       completedAt: transaction.completed_at,
       cancelledAt: transaction.cancelled_at,
       cancellationReason: transaction.cancellation_reason,
-      
+
       // Listing information
       cropType: transaction.listings?.crop_type,
       unit: transaction.listings?.unit,
       pricePerUnit: parseFloat(transaction.listings?.price_per_unit || 0),
       listingLocation: transaction.listings?.location,
-      
+
       // User information
       farmerName: transaction.farmer?.name,
       farmerContact: transaction.farmer?.phone_number,
       buyerName: transaction.buyer?.name,
       buyerContact: transaction.buyer?.phone_number,
-      
+
       // User's role in this transaction
       userRole: transaction.buyer_id === authResult.user.userId ? 'BUYER' : 'FARMER'
     }));
 
-    // Get total count for pagination
-    let countQuery = supabaseAdmin
+    // Get total count for pagination (also use read replica)
+    let countQuery = client
       .from('transactions')
       .select('*', { count: 'exact', head: true });
 

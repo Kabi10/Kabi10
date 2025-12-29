@@ -1,10 +1,14 @@
-const { supabaseAdmin } = require('../../src/config/supabase');
+const { supabaseAdmin, getReadClient } = require('../../src/config/supabase');
 const { rateLimit } = require('../../src/middleware/rateLimit');
 
 /**
  * Vercel Serverless Function: Get Market Prices
  * GET /api/market-prices - Get all market prices
  * Rate limited: 60 requests per minute per IP
+ * 
+ * Performance optimizations:
+ * - Uses read replica (if available) for GET requests (INFRA-02)
+ * - Edge caching via Cache-Control headers (INFRA-01)
  */
 module.exports = async (req, res) => {
   // CORS headers
@@ -36,7 +40,9 @@ module.exports = async (req, res) => {
   try {
     const { cropType, location, trend, minPrice, maxPrice, page = 1, limit = 20, sortBy = 'last_updated', sortOrder = 'desc' } = req.query;
 
-    let query = supabaseAdmin
+    // Use read replica for GET requests (reduces primary DB load - INFRA-02)
+    const client = getReadClient();
+    let query = client
       .from('market_prices')
       .select('*', { count: 'exact' });
 
@@ -78,4 +84,3 @@ module.exports = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
 };
-

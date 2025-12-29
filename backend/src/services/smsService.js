@@ -32,7 +32,7 @@ class SMSService {
       }
     } catch (error) {
       logger.error('SMS sending failed:', { provider: this.provider, error: error.message });
-      
+
       // Try fallback provider if primary fails
       if (this.provider !== 'twilio') {
         logger.info('Attempting SMS fallback to Twilio');
@@ -43,7 +43,7 @@ class SMSService {
           throw fallbackError;
         }
       }
-      
+
       throw error;
     }
   }
@@ -66,36 +66,35 @@ class SMSService {
 
     const payload = {
       to: formattedNumber,
-      message: message,
-      sender: senderId
+      message,
+      sender: senderId,
     };
 
     const config = {
       method: 'POST',
       url: apiUrl,
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       data: payload,
-      timeout: 10000
+      timeout: 10000,
     };
 
     const response = await axios(config);
 
     if (response.data.status === 'success' || response.status === 200) {
-      logger.info('SMS sent via Dialog', { 
+      logger.info('SMS sent via Dialog', {
         to: this.maskPhoneNumber(phoneNumber),
-        messageId: response.data.messageId 
+        messageId: response.data.messageId,
       });
       return {
         success: true,
         provider: 'dialog',
-        messageId: response.data.messageId
+        messageId: response.data.messageId,
       };
-    } else {
-      throw new Error(`Dialog API error: ${response.data.message || 'Unknown error'}`);
     }
+    throw new Error(`Dialog API error: ${response.data.message || 'Unknown error'}`);
   }
 
   /**
@@ -114,38 +113,37 @@ class SMSService {
     const formattedNumber = phoneNumber.replace('+94', '94');
 
     const payload = {
-      username: username,
-      password: password,
+      username,
+      password,
       to: formattedNumber,
-      message: message,
-      from: 'JaffnaFarm'
+      message,
+      from: 'JaffnaFarm',
     };
 
     const config = {
       method: 'POST',
       url: `${apiUrl}/send`,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       data: payload,
-      timeout: 10000
+      timeout: 10000,
     };
 
     const response = await axios(config);
 
     if (response.data.status === 'OK' || response.status === 200) {
-      logger.info('SMS sent via Mobitel', { 
+      logger.info('SMS sent via Mobitel', {
         to: this.maskPhoneNumber(phoneNumber),
-        messageId: response.data.messageId 
+        messageId: response.data.messageId,
       });
       return {
         success: true,
         provider: 'mobitel',
-        messageId: response.data.messageId
+        messageId: response.data.messageId,
       };
-    } else {
-      throw new Error(`Mobitel API error: ${response.data.message || 'Unknown error'}`);
     }
+    throw new Error(`Mobitel API error: ${response.data.message || 'Unknown error'}`);
   }
 
   /**
@@ -165,53 +163,52 @@ class SMSService {
     const payload = new URLSearchParams({
       To: phoneNumber,
       From: fromNumber,
-      Body: message
+      Body: message,
     });
 
     const config = {
       method: 'POST',
       url: apiUrl,
       headers: {
-        'Authorization': `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
+        Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       data: payload,
-      timeout: 10000
+      timeout: 10000,
     };
 
     const response = await axios(config);
 
     if (response.status === 201) {
-      logger.info('SMS sent via Twilio', { 
+      logger.info('SMS sent via Twilio', {
         to: this.maskPhoneNumber(phoneNumber),
-        sid: response.data.sid 
+        sid: response.data.sid,
       });
       return {
         success: true,
         provider: 'twilio',
-        messageId: response.data.sid
+        messageId: response.data.sid,
       };
-    } else {
-      throw new Error(`Twilio API error: ${response.data.message || 'Unknown error'}`);
     }
+    throw new Error(`Twilio API error: ${response.data.message || 'Unknown error'}`);
   }
 
   /**
    * Mock SMS sending for development/testing
    */
   async mockSend(phoneNumber, message) {
-    logger.info('Mock SMS sent', { 
+    logger.info('Mock SMS sent', {
       to: this.maskPhoneNumber(phoneNumber),
-      message: message.substring(0, 50) + '...'
+      message: `${message.substring(0, 50)}...`,
     });
 
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return {
       success: true,
       provider: 'mock',
-      messageId: `mock_${Date.now()}`
+      messageId: `mock_${Date.now()}`,
     };
   }
 
@@ -240,11 +237,11 @@ class SMSService {
    */
   getCostEstimate(provider = this.provider) {
     const costs = {
-      dialog: 0.50,    // ~0.50 LKR per SMS
-      mobitel: 0.45,   // ~0.45 LKR per SMS
-      twilio: 2.50     // ~2.50 LKR per SMS (international rates)
+      dialog: 0.50, // ~0.50 LKR per SMS
+      mobitel: 0.45, // ~0.45 LKR per SMS
+      twilio: 2.50, // ~2.50 LKR per SMS (international rates)
     };
-    
+
     return costs[provider] || 1.00;
   }
 
@@ -261,23 +258,23 @@ class SMSService {
           configured: !!(process.env.DIALOG_API_KEY && process.env.DIALOG_API_SECRET),
           costPerSMS: 0.50,
           coverage: 'Sri Lanka',
-          recommended: true
+          recommended: true,
         },
         mobitel: {
           name: 'Mobitel mSpace',
           configured: !!(process.env.MOBITEL_USERNAME && process.env.MOBITEL_PASSWORD),
           costPerSMS: 0.45,
           coverage: 'Sri Lanka',
-          recommended: true
+          recommended: true,
         },
         twilio: {
           name: 'Twilio',
           configured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
           costPerSMS: 2.50,
           coverage: 'International',
-          recommended: false
-        }
-      }
+          recommended: false,
+        },
+      },
     };
   }
 }

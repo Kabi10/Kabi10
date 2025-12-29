@@ -19,7 +19,7 @@ async function migrate() {
     await db.query(schema);
 
     logger.info('Database migration completed successfully');
-    
+
     // Verify tables were created
     const tables = await db.query(`
       SELECT table_name 
@@ -28,8 +28,7 @@ async function migrate() {
       ORDER BY table_name
     `);
 
-    logger.info('Created tables:', tables.rows.map(row => row.table_name));
-
+    logger.info('Created tables:', tables.rows.map((row) => row.table_name));
   } catch (error) {
     logger.error('Database migration failed:', error);
     throw error;

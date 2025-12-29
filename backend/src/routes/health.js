@@ -11,7 +11,7 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
   const startTime = Date.now();
-  
+
   try {
     // Basic health check
     const health = {
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
       version: process.env.npm_package_version || '1.0.0',
-      responseTime: 0
+      responseTime: 0,
     };
 
     health.responseTime = Date.now() - startTime;
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
       error: error.message,
-      responseTime: Date.now() - startTime
+      responseTime: Date.now() - startTime,
     });
   }
 });
@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/detailed', async (req, res) => {
   const startTime = Date.now();
-  
+
   try {
     const health = {
       status: 'healthy',
@@ -56,8 +56,8 @@ router.get('/detailed', async (req, res) => {
         memory: process.memoryUsage(),
         cpu: process.cpuUsage(),
         platform: process.platform,
-        nodeVersion: process.version
-      }
+        nodeVersion: process.version,
+      },
     };
 
     // Check database health
@@ -67,7 +67,7 @@ router.get('/detailed', async (req, res) => {
     } catch (error) {
       health.services.database = {
         status: 'unhealthy',
-        error: error.message
+        error: error.message,
       };
       health.status = 'degraded';
     }
@@ -79,12 +79,12 @@ router.get('/detailed', async (req, res) => {
         status: 'healthy',
         provider: smsHealth.current,
         mockMode: smsHealth.mockMode,
-        configured: smsHealth.available[smsHealth.current]?.configured || false
+        configured: smsHealth.available[smsHealth.current]?.configured || false,
       };
     } catch (error) {
       health.services.sms = {
         status: 'unhealthy',
-        error: error.message
+        error: error.message,
       };
       health.status = 'degraded';
     }
@@ -92,7 +92,7 @@ router.get('/detailed', async (req, res) => {
     // Check if any critical services are down
     const criticalServices = ['database'];
     const unhealthyServices = criticalServices.filter(
-      service => health.services[service]?.status === 'unhealthy'
+      (service) => health.services[service]?.status === 'unhealthy',
     );
 
     if (unhealthyServices.length > 0) {
@@ -109,7 +109,7 @@ router.get('/detailed', async (req, res) => {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
       error: error.message,
-      responseTime: Date.now() - startTime
+      responseTime: Date.now() - startTime,
     });
   }
 });
@@ -120,11 +120,11 @@ router.get('/detailed', async (req, res) => {
  */
 router.get('/database', async (req, res) => {
   const startTime = Date.now();
-  
+
   try {
     const dbHealth = await db.healthCheck();
     dbHealth.responseTime = Date.now() - startTime;
-    
+
     const statusCode = dbHealth.status === 'healthy' ? 200 : 503;
     res.status(statusCode).json(dbHealth);
   } catch (error) {
@@ -132,7 +132,7 @@ router.get('/database', async (req, res) => {
     res.status(503).json({
       status: 'unhealthy',
       error: error.message,
-      responseTime: Date.now() - startTime
+      responseTime: Date.now() - startTime,
     });
   }
 });
@@ -143,17 +143,17 @@ router.get('/database', async (req, res) => {
  */
 router.get('/sms', async (req, res) => {
   const startTime = Date.now();
-  
+
   try {
     const smsHealth = smsService.getProviderInfo();
-    
+
     const health = {
       status: 'healthy',
       provider: smsHealth.current,
       mockMode: smsHealth.mockMode,
       configured: smsHealth.available[smsHealth.current]?.configured || false,
       availableProviders: smsHealth.available,
-      responseTime: Date.now() - startTime
+      responseTime: Date.now() - startTime,
     };
 
     if (!health.configured && !health.mockMode) {
@@ -168,7 +168,7 @@ router.get('/sms', async (req, res) => {
     res.status(503).json({
       status: 'unhealthy',
       error: error.message,
-      responseTime: Date.now() - startTime
+      responseTime: Date.now() - startTime,
     });
   }
 });
@@ -181,17 +181,17 @@ router.get('/readiness', async (req, res) => {
   try {
     // Check if the application is ready to serve traffic
     const dbHealth = await db.healthCheck();
-    
+
     if (dbHealth.status === 'healthy') {
       res.status(200).json({
         status: 'ready',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } else {
       res.status(503).json({
         status: 'not ready',
         reason: 'Database not available',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   } catch (error) {
@@ -199,7 +199,7 @@ router.get('/readiness', async (req, res) => {
     res.status(503).json({
       status: 'not ready',
       reason: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -213,7 +213,7 @@ router.get('/liveness', (req, res) => {
   res.status(200).json({
     status: 'alive',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
   });
 });
 
@@ -230,7 +230,7 @@ router.get('/metrics', async (req, res) => {
       cpu: process.cpuUsage(),
       platform: process.platform,
       nodeVersion: process.version,
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
     };
 
     // Add database metrics if available
@@ -240,7 +240,7 @@ router.get('/metrics', async (req, res) => {
         metrics.database = {
           totalConnections: dbHealth.pool.totalCount,
           idleConnections: dbHealth.pool.idleCount,
-          waitingConnections: dbHealth.pool.waitingCount
+          waitingConnections: dbHealth.pool.waitingCount,
         };
       }
     } catch (error) {
@@ -252,7 +252,7 @@ router.get('/metrics', async (req, res) => {
     logger.error('Metrics error:', error);
     res.status(500).json({
       error: 'Failed to fetch metrics',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });

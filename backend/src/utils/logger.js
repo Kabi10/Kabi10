@@ -50,7 +50,7 @@ const transports = [
   // Console transport
   new winston.transports.Console({
     level: level(),
-    format: format,
+    format,
   }),
 ];
 
@@ -71,7 +71,7 @@ if (process.env.NODE_ENV === 'production') {
       format: fileFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    })
+    }),
   );
 
   // Combined log file
@@ -81,7 +81,7 @@ if (process.env.NODE_ENV === 'production') {
       format: fileFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    })
+    }),
   );
 }
 
@@ -96,18 +96,18 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple()
-      )
-    })
+        winston.format.simple(),
+      ),
+    }),
   ],
   // Handle unhandled promise rejections
   rejectionHandlers: [
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple()
-      )
-    })
+        winston.format.simple(),
+      ),
+    }),
   ],
   exitOnError: false,
 });
@@ -135,7 +135,7 @@ logger.logError = (error, context = {}) => {
   const errorData = {
     message: error.message,
     stack: error.stack,
-    ...context
+    ...context,
   };
 
   logger.error('Application Error', errorData);
@@ -148,7 +148,7 @@ logger.logAuth = (action, userId, phoneNumber, success = true, details = {}) => 
     phoneNumber: phoneNumber ? phoneNumber.replace(/(\+94)(\d{2})(\d{3})(\d{4})/, '$1 $2 *** $4') : null,
     success,
     timestamp: new Date().toISOString(),
-    ...details
+    ...details,
   };
 
   if (success) {
@@ -162,7 +162,7 @@ logger.logBusiness = (event, data = {}) => {
   const logData = {
     event,
     timestamp: new Date().toISOString(),
-    ...data
+    ...data,
   };
 
   logger.info('Business Event', logData);
@@ -173,7 +173,7 @@ logger.logPerformance = (operation, duration, details = {}) => {
     operation,
     duration: `${duration}ms`,
     timestamp: new Date().toISOString(),
-    ...details
+    ...details,
   };
 
   if (duration > 1000) {
@@ -188,7 +188,7 @@ logger.logSecurity = (event, severity = 'medium', details = {}) => {
     securityEvent: event,
     severity,
     timestamp: new Date().toISOString(),
-    ...details
+    ...details,
   };
 
   if (severity === 'high') {
@@ -204,7 +204,7 @@ logger.logSecurity = (event, severity = 'medium', details = {}) => {
 logger.info('Logger initialized', {
   level: level(),
   environment: process.env.NODE_ENV || 'development',
-  transports: transports.map(t => t.constructor.name)
+  transports: transports.map((t) => t.constructor.name),
 });
 
 module.exports = logger;

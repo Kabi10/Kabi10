@@ -37,8 +37,8 @@ android {
             // Removed applicationIdSuffix for Firebase compatibility
             versionNameSuffix = "-debug"
 
-            // API Configuration for debug builds
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/api/\"")
+            // API Configuration for debug builds - using production backend for physical device testing
+            buildConfigField("String", "BASE_URL", "\"https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "true")
         }
 
@@ -56,6 +56,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -69,6 +70,9 @@ android {
 }
 
 dependencies {
+    // Core Library Desugaring for Java 8+ APIs on older Android versions
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
     // Core Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

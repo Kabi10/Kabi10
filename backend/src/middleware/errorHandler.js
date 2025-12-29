@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 const logger = require('../utils/logger');
 
 /**
@@ -19,7 +20,7 @@ const errorHandler = (error, req, res, next) => {
     userId: req.user?.userId,
     body: req.body,
     params: req.params,
-    query: req.query
+    query: req.query,
   });
 
   // Handle specific error types
@@ -61,7 +62,7 @@ const errorHandler = (error, req, res, next) => {
     statusCode = 409;
     message = 'Resource already exists';
     code = 'DUPLICATE_RESOURCE';
-    
+
     // Extract field name from error detail if available
     if (error.detail) {
       const match = error.detail.match(/Key \(([^)]+)\)/);
@@ -112,10 +113,10 @@ const errorHandler = (error, req, res, next) => {
   const errorResponse = {
     success: false,
     error: message,
-    code: code,
+    code,
     timestamp: new Date().toISOString(),
     path: req.originalUrl,
-    method: req.method
+    method: req.method,
   };
 
   // Add details in development mode or for validation errors
@@ -123,7 +124,7 @@ const errorHandler = (error, req, res, next) => {
     if (details) {
       errorResponse.details = details;
     }
-    
+
     // Add stack trace in development
     if (process.env.NODE_ENV === 'development') {
       errorResponse.stack = error.stack;
@@ -139,7 +140,7 @@ const errorHandler = (error, req, res, next) => {
   res.set({
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block'
+    'X-XSS-Protection': '1; mode=block',
   });
 
   res.status(statusCode).json(errorResponse);
@@ -162,8 +163,8 @@ const notFoundHandler = (req, res) => {
       listings: '/api/v1/listings',
       transactions: '/api/v1/transactions',
       sync: '/api/v1/sync',
-      health: '/health'
-    }
+      health: '/health',
+    },
   };
 
   logger.warn('404 - Endpoint not found', {
@@ -171,7 +172,7 @@ const notFoundHandler = (req, res) => {
     url: req.originalUrl,
     userAgent: req.get('User-Agent'),
     ip: req.ip,
-    userId: req.user?.userId
+    userId: req.user?.userId,
   });
 
   res.status(404).json(error);
@@ -181,10 +182,8 @@ const notFoundHandler = (req, res) => {
  * Async error wrapper
  * Wraps async route handlers to catch errors
  */
-const asyncHandler = (fn) => {
-  return (req, res, next) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
 };
 
 /**
@@ -253,5 +252,5 @@ module.exports = {
   ForbiddenError,
   NotFoundError,
   ConflictError,
-  TooManyRequestsError
+  TooManyRequestsError,
 };

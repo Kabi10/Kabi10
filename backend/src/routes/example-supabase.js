@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const DatabaseService = require('../services/database');
 const AuthService = require('../services/auth');
@@ -8,22 +9,22 @@ router.get('/products', async (req, res) => {
   try {
     const { category, location, available } = req.query;
     const filters = {};
-    
+
     if (category) filters.category = category;
     if (location) filters.location = location;
     if (available !== undefined) filters.available = available === 'true';
 
     const products = await DatabaseService.getProducts(filters);
-    
+
     res.json({
       success: true,
       data: products,
-      count: products.length
+      count: products.length,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -34,19 +35,19 @@ router.post('/products', async (req, res) => {
     // In a real app, you'd get user_id from JWT token
     const productData = {
       ...req.body,
-      user_id: req.user?.id // Assuming you have auth middleware
+      user_id: req.user?.id, // Assuming you have auth middleware
     };
 
     const product = await DatabaseService.createProduct(productData);
-    
+
     res.status(201).json({
       success: true,
-      data: product
+      data: product,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -55,26 +56,26 @@ router.post('/products', async (req, res) => {
 router.post('/auth/send-otp', async (req, res) => {
   try {
     const { phone } = req.body;
-    
+
     if (!phone) {
       return res.status(400).json({
         success: false,
-        error: 'Phone number is required'
+        error: 'Phone number is required',
       });
     }
 
     const result = await AuthService.sendOTP(phone, 'login');
-    
+
     res.json({
       success: true,
       message: 'OTP sent successfully',
       // Remove this in production:
-      ...(process.env.NODE_ENV === 'development' && { otp: result.otp })
+      ...(process.env.NODE_ENV === 'development' && { otp: result.otp }),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -83,28 +84,28 @@ router.post('/auth/send-otp', async (req, res) => {
 router.post('/auth/verify-otp', async (req, res) => {
   try {
     const { phone, otp } = req.body;
-    
+
     if (!phone || !otp) {
       return res.status(400).json({
         success: false,
-        error: 'Phone and OTP are required'
+        error: 'Phone and OTP are required',
       });
     }
 
     // Verify OTP
     await AuthService.verifyOTP(phone, otp, 'login');
-    
+
     // Login user
     const result = await AuthService.loginWithPhone(phone);
-    
+
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -114,11 +115,11 @@ router.post('/products/:id/images', async (req, res) => {
   try {
     const { id } = req.params;
     const file = req.file; // Assuming you're using multer
-    
+
     if (!file) {
       return res.status(400).json({
         success: false,
-        error: 'No file uploaded'
+        error: 'No file uploaded',
       });
     }
 
@@ -130,24 +131,24 @@ router.post('/products/:id/images', async (req, res) => {
       file.buffer,
       {
         contentType: file.mimetype,
-        upsert: false
-      }
+        upsert: false,
+      },
     );
 
     // Get public URL
     const publicUrl = await DatabaseService.getFileUrl('product-images', fileName);
-    
+
     res.json({
       success: true,
       data: {
         path: uploadResult.path,
-        url: publicUrl
-      }
+        url: publicUrl,
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -158,8 +159,8 @@ router.get('/products/subscribe', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*'
+    Connection: 'keep-alive',
+    'Access-Control-Allow-Origin': '*',
   });
 
   // Subscribe to product changes
