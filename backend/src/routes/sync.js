@@ -111,9 +111,20 @@ router.post('/operations', async (req, res) => {
  */
 router.get('/data', async (req, res) => {
   try {
-    const { lastSyncAt } = req.query;
+    const { 
+      lastSyncAt,
+      listingPage,
+      listingLimit,
+      transactionPage,
+      transactionLimit
+    } = req.query;
 
-    const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId);
+    const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId, {
+      listingPage: parseInt(listingPage) || 1,
+      listingLimit: parseInt(listingLimit) || 50,
+      transactionPage: parseInt(transactionPage) || 1,
+      transactionLimit: parseInt(transactionLimit) || 50,
+    });
 
     res.json({
       success: true,
@@ -545,41 +556,75 @@ async function processUpdateUser(client, payload, userId) {
 }
 
 /**
- * Get updated data since last sync timestamp
+ * Get updated data since last sync timestamp with pagination
  */
-async function getUpdatedDataSince(lastSyncAt, userId) {
+async function getUpdatedDataSince(lastSyncAt, userId, options = {}) {
+  const {
+    listingPage = 1,
+    listingLimit = 50,
+    transactionPage = 1,
+    transactionLimit = 50,
+  } = options;
+
   const data = {
     users: [],
-    listings: [],
-    transactions: [],
+    listings: { data: [], total: 0 },
+    transactions: { data: [], total: 0 },
   };
 
   const syncTimestamp = lastSyncAt ? new Date(lastSyncAt) : new Date(0);
 
-  // Get updated users (only current user)
+  // 1. Get updated users (only current user - no pagination needed for 1 record)
   const users = await db.query(
     'SELECT * FROM users WHERE id = $1 AND updated_at > $2',
     [userId, syncTimestamp],
   );
   data.users = users.rows;
 
-  // Get updated listings (user's own + all active listings)
-  const listings = await db.query(`
+  // 2. Get updated listings (paginated)
+  const listingOffset = (listingPage - 1) * listingLimit;
+  const listingsResult = await db.query(`
     SELECT l.*, u.name as farmer_name 
     FROM listings l
     JOIN users u ON l.farmer_id = u.id
     WHERE (l.farmer_id = $1 OR l.is_active = true) 
     AND l.updated_at > $2
     ORDER BY l.updated_at DESC
-  `, [userId, syncTimestamp]);
-  data.listings = listings.rows;
+    LIMIT $3 OFFSET $4
+  `, [userId, syncTimestamp, listingLimit, listingOffset]);
 
-  // Get updated transactions (user's transactions only)
-  const transactions = await db.query(
-    'SELECT * FROM transactions WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2',
-    [userId, syncTimestamp],
-  );
-  data.transactions = transactions.rows;
+  const listingsCount = await db.query(`
+    SELECT COUNT(*) as total FROM listings 
+    WHERE (farmer_id = $1 OR is_active = true) AND updated_at > $2
+  `, [userId, syncTimestamp]);
+
+  data.listings = {
+    data: listingsResult.rows,
+    total: parseInt(listingsCount.rows[0].total),
+    page: parseInt(listingPage),
+    limit: parseInt(listingLimit),
+  };
+
+  // 3. Get updated transactions (paginated)
+  const transactionOffset = (transactionPage - 1) * transactionLimit;
+  const transactionsResult = await db.query(`
+    SELECT * FROM transactions 
+    WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2
+    ORDER BY updated_at DESC
+    LIMIT $3 OFFSET $4
+  `, [userId, syncTimestamp, transactionLimit, transactionOffset]);
+
+  const transactionsCount = await db.query(`
+    SELECT COUNT(*) as total FROM transactions 
+    WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2
+  `, [userId, syncTimestamp]);
+
+  data.transactions = {
+    data: transactionsResult.rows,
+    total: parseInt(transactionsCount.rows[0].total),
+    page: parseInt(transactionPage),
+    limit: parseInt(transactionLimit),
+  };
 
   return data;
 }

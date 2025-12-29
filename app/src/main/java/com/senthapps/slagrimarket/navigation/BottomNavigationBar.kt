@@ -194,8 +194,7 @@ fun AppNavigationWithBottomBar(
                         navController.popBackStack()
                     },
                     onListingClick = { listingId ->
-                        // TODO: Navigate to listing detail
-                        navController.popBackStack()
+                        navController.navigate(Screen.ListingDetail.createRoute(listingId))
                     }
                 )
             }
@@ -223,6 +222,9 @@ fun AppNavigationWithBottomBar(
                 TransactionsScreen(
                     onNavigateBack = {
                         navController.popBackStack()
+                    },
+                    onTransactionClick = { transactionId ->
+                        navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
                     }
                 )
             }
