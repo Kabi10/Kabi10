@@ -29,6 +29,9 @@ const level = () => {
   return isDevelopment ? 'debug' : 'warn';
 };
 
+// Detect if running on Vercel
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
+
 // Define format for logs
 const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
@@ -47,42 +50,47 @@ const fileFormat = winston.format.combine(
 
 // Define transports
 const transports = [
-  // Console transport
+  // Console transport - Always active and works on Vercel
   new winston.transports.Console({
     level: level(),
     format,
   }),
 ];
 
-// Add file transports in production
-if (process.env.NODE_ENV === 'production') {
+// Add file transports in production ONLY if not running on Vercel
+// Vercel has a read-only filesystem which causes fs.mkdirSync to fail
+if (process.env.NODE_ENV === 'production' && !isVercel) {
   // Ensure logs directory exists
   const fs = require('fs');
   const logsDir = path.join(process.cwd(), 'logs');
   if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
+    try {
+      fs.mkdirSync(logsDir, { recursive: true });
+      
+      // Error log file
+      transports.push(
+        new winston.transports.File({
+          filename: path.join(logsDir, 'error.log'),
+          level: 'error',
+          format: fileFormat,
+          maxsize: 5242880, // 5MB
+          maxFiles: 5,
+        }),
+      );
+
+      // Combined log file
+      transports.push(
+        new winston.transports.File({
+          filename: path.join(logsDir, 'combined.log'),
+          format: fileFormat,
+          maxsize: 5242880, // 5MB
+          maxFiles: 5,
+        }),
+      );
+    } catch (err) {
+      console.error('Failed to initialize file logging:', err);
+    }
   }
-
-  // Error log file
-  transports.push(
-    new winston.transports.File({
-      filename: path.join(logsDir, 'error.log'),
-      level: 'error',
-      format: fileFormat,
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-  );
-
-  // Combined log file
-  transports.push(
-    new winston.transports.File({
-      filename: path.join(logsDir, 'combined.log'),
-      format: fileFormat,
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-  );
 }
 
 // Create the logger
