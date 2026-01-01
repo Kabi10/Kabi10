@@ -1,0 +1,6 @@
+# Ignore everything in api except app.js
+api/*
+!api/app.js
+
+# Ignore node_modules
+node_modules
