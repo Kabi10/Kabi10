@@ -100,6 +100,7 @@ apiRouter.use('/sync', authenticateToken, syncRoutes);
 
 // Mount API router
 app.use(`/api/${API_VERSION}`, apiRouter);
+app.use('/api', apiRouter); // Support paths without version prefix (e.g., /api/auth/...)
 
 // Static file serving for uploads
 app.use('/uploads', express.static('uploads'));
