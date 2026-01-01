@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "buildCommand": "cd backend && npm install",
+  "functions": {
+    "backend/api/app.js": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/api/app.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/backend/api/app.js"
+    }
+  ],
+  "installCommand": "cd backend && npm install"
+}
