@@ -89,6 +89,9 @@ app.use('/health', healthRoutes);
 // API routes
 const apiRouter = express.Router();
 
+// Health check endpoint (also available under /api/health)
+apiRouter.use('/health', healthRoutes);
+
 // Public routes (no authentication required)
 apiRouter.use('/auth', otpLimiter, authRoutes);
 
