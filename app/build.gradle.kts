@@ -38,7 +38,7 @@ android {
             versionNameSuffix = "-debug"
 
             // API Configuration for debug builds - using production backend for physical device testing
-            buildConfigField("String", "BASE_URL", "\"https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/\"")
+            buildConfigField("String", "BASE_URL", "\"https://backend-psi-tan-18.vercel.app/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "true")
         }
 
@@ -51,7 +51,7 @@ android {
             )
 
             // API Configuration for release builds
-            buildConfigField("String", "BASE_URL", "\"https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/\"")
+            buildConfigField("String", "BASE_URL", "\"https://backend-psi-tan-18.vercel.app/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "false")
         }
     }

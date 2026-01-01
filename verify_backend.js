@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Default to your production URL from build.gradle.kts
-const BASE_URL = process.env.API_URL || "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app";
+const BASE_URL = process.env.API_URL || "https://backend-psi-tan-18.vercel.app";
 const TEST_PHONE = "+94771234567";
 
 async function runTests() {
