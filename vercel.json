@@ -1,9 +1,11 @@
 {
   "version": 2,
   "buildCommand": "cd backend && npm install",
+  "outputDirectory": "backend",
   "functions": {
-    "backend/api/app.js": {
-      "maxDuration": 30
+    "backend/api/**/*.js": {
+      "maxDuration": 30,
+      "excludeFiles": "backend/src/**"
     }
   },
   "routes": [
@@ -11,6 +13,5 @@
       "src": "/(.*)",
       "dest": "/backend/api/app.js"
     }
-  ],
-  "installCommand": "cd backend && npm install"
+  ]
 }
