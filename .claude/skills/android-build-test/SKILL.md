@@ -11,8 +11,8 @@ description: Build commands, test structure, error interpretation, and verificat
 ---
 
 ## Reference Docs First
-- [README.md](file:///c:/Dev/Agrimarket/README.md#287) - Test commands section
-- [DOCUMENTATION.md](file:///c:/Dev/Agrimarket/docs/DOCUMENTATION.md#185) - Testing section
+- `README.md` (line ~287) - Test commands section
+- `docs/DOCUMENTATION.md` (line ~185) - Testing section
 
 ---
 
