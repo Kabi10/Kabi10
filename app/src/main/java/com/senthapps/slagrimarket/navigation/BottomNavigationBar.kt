@@ -391,8 +391,11 @@ fun AppNavigationWithBottomBar(
             }
 
             composable(Screen.ListingsMap.route) {
+                val viewModel: com.senthapps.slagrimarket.ui.listings.ListingsViewModel = hiltViewModel()
+                val uiState by viewModel.uiState.collectAsState()
+
                 ListingsMapScreen(
-                    listings = emptyList(),
+                    listings = uiState.listings,
                     onNavigateBack = {
                         navController.popBackStack()
                     },

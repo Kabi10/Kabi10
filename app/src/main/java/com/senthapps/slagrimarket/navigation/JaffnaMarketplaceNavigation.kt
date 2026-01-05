@@ -1,6 +1,9 @@
 package com.senthapps.slagrimarket.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -349,9 +352,11 @@ fun JaffnaMarketplaceNavigation(
         }
 
         composable(Screen.ListingsMap.route) {
-            // TODO: Pass actual listings
+            val viewModel: com.senthapps.slagrimarket.ui.listings.ListingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
             ListingsMapScreen(
-                listings = emptyList(),
+                listings = uiState.listings,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
