@@ -28,7 +28,7 @@ An offline-first agricultural marketplace for Sri Lankan farmers, supporting Tam
 | Metric | Status |
 |--------|--------|
 | **Build Status** | ✅ Passing |
-| **Test Coverage** | ✅ 74 tests (48 unit + 26 UI automation) |
+| **Test Coverage** | ✅ 75 tests (48 unit + 27 UI automation) |
 | **Security** | ✅ ProGuard, rate limiting, request signing |
 | **CI/CD** | ✅ GitHub Actions + CodeQL scanning |
 | **Accessibility** | ✅ TalkBack support with trilingual descriptions |

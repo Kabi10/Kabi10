@@ -23,6 +23,78 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 
 ---
 
+## ⚡ Quick Reference (Copy-Paste Commands)
+
+> **TL;DR:** Most common testing commands for rapid verification. See detailed sections below for full context.
+
+### Automated Tests
+```powershell
+.\gradlew test                     # Unit tests (48)
+.\gradlew lint                     # Lint checks
+.\gradlew connectedAndroidTest     # UI tests (27)
+.\gradlew assembleRelease          # Release build
+```
+
+### Logcat Monitoring
+```powershell
+& $env:ADB logcat -v time | Select-String "(OkHttp|HTTP|200|201|Auth|Sync)"
+```
+
+### App Control
+```powershell
+& $env:ADB shell pm clear com.senthapps.slagrimarket          # Fresh start
+& $env:ADB shell am start -n com.senthapps.slagrimarket/.MainActivity
+& $env:ADB shell am force-stop com.senthapps.slagrimarket     # Kill app
+```
+
+### Network Testing
+```powershell
+& $env:ADB shell cmd connectivity airplane-mode enable   # Offline
+& $env:ADB shell cmd connectivity airplane-mode disable  # Online
+```
+
+### Language Testing
+```powershell
+& $env:ADB shell "setprop persist.sys.locale ta-IN; stop; start"  # Tamil
+& $env:ADB shell "setprop persist.sys.locale si-LK; stop; start"  # Sinhala
+& $env:ADB shell "setprop persist.sys.locale en-US; stop; start"  # English
+```
+
+### Dark Mode & Screenshots
+```powershell
+& $env:ADB shell "cmd uimode night yes"    # Dark mode ON
+& $env:ADB shell "cmd uimode night no"     # Dark mode OFF
+& $env:ADB exec-out screencap -p > screenshot.png
+```
+
+### TalkBack Accessibility
+```powershell
+# Enable
+& $env:ADB shell settings put secure enabled_accessibility_services com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+& $env:ADB shell settings put secure accessibility_enabled 1
+
+# Disable
+& $env:ADB shell settings put secure enabled_accessibility_services ""
+& $env:ADB shell settings put secure accessibility_enabled 0
+```
+
+### 10-Point Verification Checklist
+
+| # | Item | Command/Action | ✓ |
+|---|------|----------------|---|
+| 1 | API Health | `Invoke-RestMethod "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/health"` | [ ] |
+| 2 | Auth Flow | Manual login with OTP | [ ] |
+| 3 | Sync Test | Toggle airplane mode | [ ] |
+| 4 | Offline Data | View cached listings offline | [ ] |
+| 5 | Create Listing | Add new listing, check logcat | [ ] |
+| 6 | Unit Tests | `.\gradlew test` | [ ] |
+| 7 | UI Tests | `.\gradlew connectedAndroidTest` | [ ] |
+| 8 | Tamil UI | Language toggle | [ ] |
+| 9 | Dark Mode | Theme consistency | [ ] |
+| 10 | TalkBack | Accessibility | [ ] |
+
+---
+
 ## 🔴 CRITICAL - Core Functionality (Highest Priority)
 
 ### 1. Backend API Connectivity & Supabase Integration

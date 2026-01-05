@@ -122,3 +122,5 @@ scripts/clickup_automation/*.txt
 !scripts/clickup_automation/requirements.txt
 scripts/clickup_automation/__pycache__/
 scripts/clickup_automation/*.pyc
+
+.vercel
