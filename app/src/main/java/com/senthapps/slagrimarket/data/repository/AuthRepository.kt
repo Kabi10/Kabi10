@@ -1,10 +1,12 @@
 package com.senthapps.slagrimarket.data.repository
 
+import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.AuthApiService
 import com.senthapps.slagrimarket.data.api.SendOtpRequest
 import com.senthapps.slagrimarket.data.api.VerifyOtpRequest
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.User
+import com.senthapps.slagrimarket.data.model.UserType
 import com.senthapps.slagrimarket.data.preferences.AuthPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,10 +24,51 @@ class AuthRepository @Inject constructor(
 ) {
 
     // Production: Use AuthPreferences for consistent authentication state
-    val currentUser: Flow<User?> = authPreferences.currentUser
-    val isLoggedIn: Flow<Boolean> = authPreferences.isLoggedIn
+    // DEBUG BYPASS: Return fake user flow in debug builds
+    val currentUser: Flow<User?> = if (BuildConfig.DEBUG) {
+        kotlinx.coroutines.flow.flowOf(
+            User(
+                id = "debug_user_123",
+                name = "Debug Farmer",
+                phone = "+94771234567",
+                userType = UserType.FARMER,
+                verified = true,
+                language = "en",
+                createdAt = "2025-01-04T00:00:00Z"
+            )
+        )
+    } else {
+        authPreferences.currentUser
+    }
+
+    val isLoggedIn: Flow<Boolean> = if (BuildConfig.DEBUG) {
+        kotlinx.coroutines.flow.flowOf(true)
+    } else {
+        authPreferences.isLoggedIn
+    }
 
     init {
+        // DEBUG: Persist fake user to database to satisfy FK constraints
+        if (BuildConfig.DEBUG) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val debugUser = User(
+                        id = "debug_user_123",
+                        name = "Debug Farmer",
+                        phone = "+94771234567",
+                        userType = UserType.FARMER,
+                        verified = true,
+                        language = "en",
+                        createdAt = "2025-01-04T00:00:00Z"
+                    )
+                    userDao.insertUser(debugUser)
+                    Timber.d("🔧 DEBUG: Persisted debug user to database for FK constraints")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to persist debug user (may already exist)")
+                }
+            }
+        }
+
         // Log authentication state on app start for debugging
         logAuthenticationState()
     }
@@ -134,6 +177,20 @@ class AuthRepository @Inject constructor(
     }
     
     suspend fun getCurrentUser(): User? {
+        // DEBUG BYPASS: Return fake authenticated user to skip auth flow
+        if (BuildConfig.DEBUG) {
+            Timber.d("🔧 DEBUG: Returning fake authenticated user to bypass auth")
+            return User(
+                id = "debug_user_123",
+                name = "Debug Farmer",
+                phone = "+94771234567",
+                userType = UserType.FARMER,
+                verified = true,
+                language = "en",
+                createdAt = "2025-01-04T00:00:00Z"
+            )
+        }
+
         // Return authenticated user from preferences
         return authPreferences.getCurrentUser()
     }

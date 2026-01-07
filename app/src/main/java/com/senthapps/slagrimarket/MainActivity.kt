@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.senthapps.slagrimarket.navigation.AppNavigationWithBottomBar
 import com.senthapps.slagrimarket.ui.theme.SLAgrimarketTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -24,9 +25,13 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     // 🔐 AUTHENTICATION CONTROL
-                    // Authentication is now enabled for production security
-                    // Users must authenticate via phone/OTP before accessing the app
-                    AppNavigationWithBottomBar(startWithAuth = true)
+                    // DEBUG: Skip auth in debug builds to bypass broken backend
+                    // PRODUCTION: Require authentication via phone/OTP
+                    val requireAuth = !BuildConfig.DEBUG
+                    if (BuildConfig.DEBUG) {
+                        Timber.d("🔧 DEBUG: Skipping authentication - going straight to app")
+                    }
+                    AppNavigationWithBottomBar(startWithAuth = requireAuth)
                 }
             }
         }

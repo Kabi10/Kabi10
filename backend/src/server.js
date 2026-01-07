@@ -18,6 +18,7 @@ const listingRoutes = require('./routes/listings');
 const transactionRoutes = require('./routes/transactions');
 const syncRoutes = require('./routes/sync');
 const healthRoutes = require('./routes/health');
+const marketPricesRoutes = require('./routes/market-prices');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -97,6 +98,7 @@ apiRouter.use('/health', healthRoutes);
 
 // Public routes (no authentication required)
 apiRouter.use('/auth', otpLimiter, authRoutes);
+apiRouter.use('/market-prices', marketPricesRoutes); // Public market data
 
 // Protected routes (authentication required)
 apiRouter.use('/users', authenticateToken, userRoutes);
@@ -121,6 +123,7 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       auth: `/api/${API_VERSION}/auth`,
+      marketPrices: `/api/market-prices`,
       users: `/api/${API_VERSION}/users`,
       listings: `/api/${API_VERSION}/listings`,
       transactions: `/api/${API_VERSION}/transactions`,

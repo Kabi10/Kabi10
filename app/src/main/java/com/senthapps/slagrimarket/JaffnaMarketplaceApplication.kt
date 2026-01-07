@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -25,6 +26,11 @@ class JaffnaMarketplaceApplication : Application(), Configuration.Provider {
             Timber.plant(Timber.DebugTree())
         }
 
+        // DEBUG: Initialize Firebase Anonymous Auth for Storage uploads
+        if (BuildConfig.DEBUG) {
+            initializeDebugFirebaseAuth()
+        }
+
         // Initialize Firebase Crashlytics
         initializeCrashlytics()
 
@@ -32,6 +38,29 @@ class JaffnaMarketplaceApplication : Application(), Configuration.Provider {
         createNotificationChannels()
 
         Timber.d("Jaffna Marketplace Application started")
+    }
+
+    /**
+     * Initialize Firebase Anonymous Authentication for DEBUG builds
+     * This allows Firebase Storage uploads to work without real phone/OTP auth
+     */
+    private fun initializeDebugFirebaseAuth() {
+        val auth = FirebaseAuth.getInstance()
+
+        // Check if already signed in
+        if (auth.currentUser != null) {
+            Timber.d("🔧 DEBUG: Firebase user already signed in: ${auth.currentUser?.uid}")
+            return
+        }
+
+        // Sign in anonymously
+        auth.signInAnonymously()
+            .addOnSuccessListener { result ->
+                Timber.d("🔧 DEBUG: Firebase anonymous auth successful: ${result.user?.uid}")
+            }
+            .addOnFailureListener { e ->
+                Timber.e(e, "🔧 DEBUG: Firebase anonymous auth failed")
+            }
     }
 
     /**

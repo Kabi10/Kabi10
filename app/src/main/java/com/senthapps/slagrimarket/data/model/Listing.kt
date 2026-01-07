@@ -355,12 +355,16 @@ class ListingConverters {
 
     @TypeConverter
     fun toStringList(value: String): List<String> {
-        return adapter.fromJson(value) ?: emptyList()
+        return try {
+            adapter.fromJson(value) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     @TypeConverter
-    fun fromQualityGrade(value: QualityGrade): String {
-        return value.name
+    fun fromQualityGrade(value: QualityGrade?): String {
+        return value?.name ?: QualityGrade.C.name
     }
 
     @TypeConverter
@@ -373,8 +377,8 @@ class ListingConverters {
     }
 
     @TypeConverter
-    fun fromSyncStatus(value: SyncStatus): String {
-        return value.name
+    fun fromSyncStatus(value: SyncStatus?): String {
+        return value?.name ?: SyncStatus.PENDING.name
     }
 
     @TypeConverter
@@ -396,7 +400,11 @@ class ListingConverters {
 
     @TypeConverter
     fun toCertificationList(value: String): List<Certification> {
-        return certificationAdapter.fromJson(value) ?: emptyList()
+        return try {
+            certificationAdapter.fromJson(value) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
 
