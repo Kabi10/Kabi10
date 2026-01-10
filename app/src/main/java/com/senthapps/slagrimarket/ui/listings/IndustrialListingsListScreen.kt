@@ -59,13 +59,19 @@ data class ListingPreview(
  * @param listings List of listings to display
  * @param onListingClick Callback when user taps a listing
  * @param onNavigateBack Callback to navigate back
+ * @param isLoading Whether listings are currently loading
+ * @param isError Whether there was an error loading listings
+ * @param onRetry Callback to retry loading listings
  */
 @Composable
 fun IndustrialListingsListScreen(
     categoryName: String,
     listings: List<ListingPreview>,
     onListingClick: (String) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    isLoading: Boolean = false,
+    isError: Boolean = false,
+    onRetry: () -> Unit = {}
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -107,18 +113,111 @@ fun IndustrialListingsListScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Listing rows
-            itemsIndexed(listings) { index, listing ->
-                ListingRow(
-                    listing = listing,
-                    useAlternateBackground = index % 2 == 1,
-                    onClick = { onListingClick(listing.id) }
-                )
+        when {
+            isLoading -> {
+                // Loading state
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "LOADING LISTINGS",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AgrimarketBlack,
+                            letterSpacing = 0.sp
+                        )
+                    )
+                }
+            }
+            isError -> {
+                // Error state
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.Base),
+                        modifier = Modifier.padding(Spacing.Base)
+                    ) {
+                        Text(
+                            text = "NETWORK ERROR",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AgrimarketBlack,
+                                letterSpacing = 0.sp
+                            )
+                        )
+                        androidx.compose.material3.Button(
+                            onClick = onRetry,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .border(
+                                    width = BorderWidth.Thin,
+                                    color = AgrimarketBlack,
+                                    shape = RectangleShape
+                                ),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = AgrimarketWhite,
+                                contentColor = AgrimarketBlack
+                            ),
+                            shape = RectangleShape
+                        ) {
+                            Text(
+                                text = "RETRY",
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = 0.sp
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            listings.isEmpty() -> {
+                // Empty state
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "NO LISTINGS FOUND",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AgrimarketGray,
+                            letterSpacing = 0.sp
+                        )
+                    )
+                }
+            }
+            else -> {
+                // Content state
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    // Listing rows
+                    itemsIndexed(listings) { index, listing ->
+                        ListingRow(
+                            listing = listing,
+                            useAlternateBackground = index % 2 == 1,
+                            onClick = { onListingClick(listing.id) }
+                        )
+                    }
+                }
             }
         }
     }

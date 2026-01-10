@@ -46,12 +46,18 @@ import com.senthapps.slagrimarket.ui.theme.Spacing
  * @param marketPrices List of market prices to display
  * @param onNavigateBack Callback to navigate back
  * @param lastUpdatedText Text showing last update time (e.g., "UPDATED: 2 HOURS AGO")
+ * @param isLoading Whether prices are currently loading
+ * @param isError Whether there was an error loading prices
+ * @param onRetry Callback to retry loading prices
  */
 @Composable
 fun IndustrialMarketPricesScreen(
     marketPrices: List<MarketPrice>,
     onNavigateBack: () -> Unit,
-    lastUpdatedText: String = "UPDATED: JUST NOW"
+    lastUpdatedText: String = "UPDATED: JUST NOW",
+    isLoading: Boolean = false,
+    isError: Boolean = false,
+    onRetry: () -> Unit = {}
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,48 +88,146 @@ fun IndustrialMarketPricesScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Header section
-            item {
-                Column(
+        when {
+            isLoading -> {
+                // Loading state
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(AgrimarketWhite)
-                        .padding(vertical = Spacing.Base),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.Base)
+                    ) {
+                        Text(
+                            text = "LOADING PRICES",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AgrimarketBlack,
+                                letterSpacing = 0.sp
+                            )
+                        )
+                    }
+                }
+            }
+            isError -> {
+                // Error state
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.Base),
+                        modifier = Modifier.padding(Spacing.Base)
+                    ) {
+                        Text(
+                            text = "NETWORK ERROR",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AgrimarketBlack,
+                                letterSpacing = 0.sp
+                            )
+                        )
+                        androidx.compose.material3.Button(
+                            onClick = onRetry,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .border(
+                                    width = BorderWidth.Thin,
+                                    color = AgrimarketBlack,
+                                    shape = RectangleShape
+                                ),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = AgrimarketWhite,
+                                contentColor = AgrimarketBlack
+                            ),
+                            shape = RectangleShape
+                        ) {
+                            Text(
+                                text = "RETRY",
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Black,
+                                    letterSpacing = 0.sp
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            marketPrices.isEmpty() -> {
+                // Empty state
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "MARKET PRICES",
+                        text = "NO PRICES AVAILABLE",
                         style = TextStyle(
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Black,
-                            color = AgrimarketBlack,
-                            letterSpacing = 0.sp
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = lastUpdatedText.uppercase(),
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
                             color = AgrimarketGray,
                             letterSpacing = 0.sp
                         )
                     )
                 }
             }
+            else -> {
+                // Content state
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    // Header section
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(AgrimarketWhite)
+                                .padding(vertical = Spacing.Base),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "MARKET PRICES",
+                                style = TextStyle(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = AgrimarketBlack,
+                                    letterSpacing = 0.sp
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = lastUpdatedText.uppercase(),
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = AgrimarketGray,
+                                    letterSpacing = 0.sp
+                                )
+                            )
+                        }
+                    }
 
-            // Price list rows
-            itemsIndexed(marketPrices) { index, price ->
-                MarketPriceRow(
-                    marketPrice = price,
-                    useAlternateBackground = index % 2 == 1
-                )
+                    // Price list rows
+                    itemsIndexed(marketPrices) { index, price ->
+                        MarketPriceRow(
+                            marketPrice = price,
+                            useAlternateBackground = index % 2 == 1
+                        )
+                    }
+                }
             }
         }
     }

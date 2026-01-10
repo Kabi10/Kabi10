@@ -304,7 +304,10 @@ fun JaffnaMarketplaceNavigation(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                lastUpdatedText = "UPDATED: JUST NOW" // TODO: Calculate actual time since last update
+                lastUpdatedText = "UPDATED: JUST NOW", // TODO: Calculate actual time since last update
+                isLoading = uiState.isLoadingPrices,
+                isError = uiState.error != null && uiState.marketPrices.isEmpty(),
+                onRetry = { viewModel.refreshData() }
             )
         }
 
