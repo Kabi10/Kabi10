@@ -191,29 +191,56 @@ Content-Type: application/json
 
 ## 📱 SMS Integration
 
-### Sri Lankan Providers
+### SMS_MODE Configuration
 
-**Dialog Ideamart (Primary):**
-- Cost: ~0.50 LKR per SMS
-- Coverage: Excellent in Sri Lanka
-- Configuration: `DIALOG_API_KEY`, `DIALOG_API_SECRET`
+The `SMS_MODE` environment variable controls OTP delivery:
 
-**Mobitel mSpace (Alternative):**
-- Cost: ~0.45 LKR per SMS
-- Coverage: Good in Sri Lanka
-- Configuration: `MOBITEL_USERNAME`, `MOBITEL_PASSWORD`
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `mock` | Logs OTP to console, does NOT send SMS | Development/testing |
+| `dialog` | Send via Dialog Ideamart API | Production (Sri Lanka) |
+| `mobitel` | Send via Mobitel mSpace API | Production (Sri Lanka) |
+| `twilio` | Send via Twilio API | International fallback |
 
-**Twilio (International Fallback):**
-- Cost: ~2.50 LKR per SMS
-- Coverage: Global
-- Configuration: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
+**Mock Mode Example Output:**
+```
+============================================================
+📱 MOCK SMS - OTP CODE (NOT SENT)
+============================================================
+Phone: +94771234567
+OTP:   482615
+============================================================
+```
 
-### SMS Configuration
+### OTP Security Features
+- **Max 3 attempts** per OTP before invalidation
+- **60-second cooldown** between OTP requests
+- **5-minute expiry** for each OTP
+- **No master OTP bypass** in any environment
+
+### Provider Configuration
+
+**Dialog Ideamart (Primary Sri Lankan):**
 ```env
-SMS_PROVIDER=dialog
+SMS_MODE=dialog
 DIALOG_API_KEY=your_api_key
 DIALOG_API_SECRET=your_api_secret
 DIALOG_SENDER_ID=JaffnaFarm
+```
+
+**Mobitel mSpace (Alternative):**
+```env
+SMS_MODE=mobitel
+MOBITEL_USERNAME=your_username
+MOBITEL_PASSWORD=your_password
+```
+
+**Twilio (International):**
+```env
+SMS_MODE=twilio
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_PHONE_NUMBER=+1234567890
 ```
 
 ## 🚀 Deployment
