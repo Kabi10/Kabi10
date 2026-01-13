@@ -25,10 +25,10 @@ object ApiConfig {
     // ============================================================================
     
     object Endpoints {
-        // Authentication endpoints
-        const val AUTH_SEND_OTP = "auth/send-otp.js"
-        const val AUTH_VERIFY_OTP = "auth/verify-otp-simple.js"
-        const val AUTH_REFRESH_TOKEN = "auth/refresh-token.js"
+        // Authentication endpoints (v1 prefix, no .js suffix)
+        const val AUTH_SEND_OTP = "v1/auth/send-otp"
+        const val AUTH_VERIFY_OTP = "v1/auth/verify-otp"
+        const val AUTH_REFRESH_TOKEN = "v1/auth/refresh-token"
 
         // User endpoints
         const val USERS_PROFILE = "users/profile"

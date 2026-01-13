@@ -121,15 +121,13 @@ router.get('/', async (req, res) => {
       },
     }));
 
+    // Response matches Android TransactionsResponse DTO
     res.json({
       success: true,
-      data: transactions,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages: Math.ceil(total / parseInt(limit)),
-      },
+      transactions: transactions,  // Android expects 'transactions' not 'data'
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
     logger.error('Get transactions error:', error);
