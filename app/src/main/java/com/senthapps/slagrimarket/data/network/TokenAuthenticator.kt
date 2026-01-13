@@ -57,7 +57,7 @@ class TokenAuthenticator @Inject constructor(
                 .toRequestBody("application/json".toMediaType())
 
             val request = Request.Builder()
-                .url("${BuildConfig.BASE_URL}auth/refresh-token.js") // Ensure .js extension for Vercel
+                .url("${BuildConfig.BASE_URL}v1/auth/refresh-token")
                 .post(requestBody)
                 .build()
 

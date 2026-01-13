@@ -8,14 +8,14 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthApiService {
-    
-    @POST("auth/send-otp.js")
+
+    @POST("v1/auth/send-otp")
     suspend fun sendOtp(@Body request: SendOtpRequest): Response<SendOtpResponse>
 
-    @POST("auth/verify-otp-simple.js")
+    @POST("v1/auth/verify-otp")
     suspend fun verifyOtp(@Body request: VerifyOtpRequest): Response<VerifyOtpResponse>
 
-    @POST("auth/refresh-token.js")
+    @POST("v1/auth/refresh-token")
     suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<RefreshTokenResponse>
 }
 
