@@ -81,11 +81,19 @@ object Spacing {
     val ExtraLarge = 24.dp
     val XXLarge = 32.dp
     val XXXLarge = 48.dp
+
+    // Human Industrial Design System v1.0 - Int values for .dp extension
+    const val xs = 4    // Inside components
+    const val sm = 8    // Label to field
+    const val md = 16   // Standard padding
+    const val lg = 24   // Between sections
+    const val xl = 32   // Screen edges
 }
 
-// Border widths
+// Border widths per Human Industrial Design System
 object BorderWidth {
-    val Thin = 1.dp         // Dividers, subtle borders
+    val Thin = 1.dp         // Dividers between rows
     val Standard = 2.dp     // Input fields, regular borders
-    val Thick = 3.dp        // Tile divisions, emphasized borders
+    val Thick = 4.dp        // Tiles, headers, grid dividers
+    val Accent = 4.dp       // Left accent bars on list items
 }

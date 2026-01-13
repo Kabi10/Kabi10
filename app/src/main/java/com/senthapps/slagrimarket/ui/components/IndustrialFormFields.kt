@@ -27,21 +27,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.senthapps.slagrimarket.ui.theme.AgrimarketBlack
-import com.senthapps.slagrimarket.ui.theme.AgrimarketGray
-import com.senthapps.slagrimarket.ui.theme.AgrimarketRed
-import com.senthapps.slagrimarket.ui.theme.AgrimarketWhite
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.Spacing
+import com.senthapps.slagrimarket.ui.theme.TouchTargets
 
 // ============================================================================
-// INDUSTRIAL FORM FIELD COMPONENTS
-// Hard-bordered input fields with no Material styling
+// HUMAN INDUSTRIAL FORM FIELD COMPONENTS v1.0
+// "The Sturdy Inputs" - Earth borders, Rice background, clear labels
 // ============================================================================
 
 /**
- * Industrial text input field with hard borders
- * No Material TextField styling - pure BasicTextField with custom border
+ * Industrial text input field with Earth borders
+ * Label: 14sp Bold UPPERCASE Stone
+ * Input: 56dp height, 2dp Earth border, Rice background
+ * Text: 18sp Regular Ink
  */
 @Composable
 fun IndustrialFormField(
@@ -56,84 +57,63 @@ fun IndustrialFormField(
     singleLine: Boolean = true
 ) {
     Column(modifier = modifier) {
-        // Label (if provided)
+        // Label (if provided) - 14sp Bold UPPERCASE Stone
         if (label.isNotEmpty()) {
             Text(
                 text = label.uppercase(),
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black,
-                    color = AgrimarketBlack,
-                    letterSpacing = 0.sp
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
+                style = HumanIndustrialType.sectionLabel,
+                color = HumanIndustrial.Stone,
+                modifier = Modifier.padding(bottom = Spacing.sm.dp)
             )
         }
 
-        // Input field with hard border
+        // Input field with Earth border
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(TouchTargets.button.dp)
                 .border(
                     width = BorderWidth.Standard,
-                    color = if (errorMessage != null) AgrimarketRed else AgrimarketBlack,
+                    color = if (errorMessage != null) HumanIndustrial.Urgent else HumanIndustrial.Earth,
                     shape = RectangleShape
                 )
-                .background(AgrimarketWhite)
-                .padding(horizontal = Spacing.Base, vertical = Spacing.Base),
-            textStyle = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Normal,
-                color = AgrimarketBlack,
-                letterSpacing = 0.sp
-            ),
+                .background(HumanIndustrial.Rice)
+                .padding(horizontal = Spacing.md.dp, vertical = Spacing.md.dp),
+            textStyle = HumanIndustrialType.input.copy(color = HumanIndustrial.Ink),
             keyboardOptions = keyboardOptions,
             singleLine = singleLine,
             decorationBox = { innerTextField ->
                 if (value.isEmpty() && placeholder.isNotEmpty()) {
                     Text(
-                        text = placeholder.uppercase(),
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = AgrimarketGray,
-                            letterSpacing = 0.sp
-                        )
+                        text = placeholder,
+                        style = HumanIndustrialType.input,
+                        color = HumanIndustrial.Stone
                     )
                 }
                 innerTextField()
             }
         )
 
-        // Error message (if present)
+        // Error message (if present) - Urgent color
         errorMessage?.let {
             Text(
                 text = it.uppercase(),
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = AgrimarketRed,
-                    letterSpacing = 0.sp
-                ),
-                modifier = Modifier.padding(top = 4.dp)
+                style = HumanIndustrialType.unit,
+                color = HumanIndustrial.Urgent,
+                modifier = Modifier.padding(top = Spacing.xs.dp)
             )
         }
 
-        // Supporting text (if present and no error)
+        // Supporting text (if present and no error) - Stone color
         if (errorMessage == null) {
             supportingText?.let {
                 Text(
                     text = it.uppercase(),
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = AgrimarketGray,
-                        letterSpacing = 0.sp
-                    ),
-                    modifier = Modifier.padding(top = 4.dp)
+                    style = HumanIndustrialType.unit,
+                    color = HumanIndustrial.Stone,
+                    modifier = Modifier.padding(top = Spacing.xs.dp)
                 )
             }
         }
@@ -141,8 +121,9 @@ fun IndustrialFormField(
 }
 
 /**
- * Industrial dropdown field with hard borders
- * No Material styling - pure Box with custom border and dropdown
+ * Industrial dropdown field with Earth borders
+ * Label: 14sp Bold UPPERCASE Stone
+ * Dropdown: 56dp height, 2dp Earth border, Rice background
  */
 @Composable
 fun IndustrialFormDropdown(
@@ -156,17 +137,13 @@ fun IndustrialFormDropdown(
     var expanded by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
-        // Label (if provided)
+        // Label (if provided) - 14sp Bold UPPERCASE Stone
         if (label.isNotEmpty()) {
             Text(
                 text = label.uppercase(),
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black,
-                    color = AgrimarketBlack,
-                    letterSpacing = 0.sp
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
+                style = HumanIndustrialType.sectionLabel,
+                color = HumanIndustrial.Stone,
+                modifier = Modifier.padding(bottom = Spacing.sm.dp)
             )
         }
 
@@ -175,29 +152,25 @@ fun IndustrialFormDropdown(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(TouchTargets.button.dp)
                     .border(
                         width = BorderWidth.Standard,
-                        color = AgrimarketBlack,
+                        color = HumanIndustrial.Earth,
                         shape = RectangleShape
                     )
-                    .background(AgrimarketWhite)
+                    .background(HumanIndustrial.Rice)
                     .clickable(
                         onClick = { expanded = true },
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     )
-                    .padding(horizontal = Spacing.Base),
+                    .padding(horizontal = Spacing.md.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(
-                    text = if (selectedOption.isEmpty()) placeholder.uppercase() else selectedOption.uppercase(),
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = if (selectedOption.isEmpty()) AgrimarketGray else AgrimarketBlack,
-                        letterSpacing = 0.sp
-                    )
+                    text = if (selectedOption.isEmpty()) placeholder else selectedOption.uppercase(),
+                    style = HumanIndustrialType.input,
+                    color = if (selectedOption.isEmpty()) HumanIndustrial.Stone else HumanIndustrial.Ink
                 )
             }
 
@@ -207,10 +180,10 @@ fun IndustrialFormDropdown(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(AgrimarketWhite)
+                    .background(HumanIndustrial.Rice)
                     .border(
                         width = BorderWidth.Standard,
-                        color = AgrimarketBlack,
+                        color = HumanIndustrial.Earth,
                         shape = RectangleShape
                     )
             ) {
@@ -219,19 +192,15 @@ fun IndustrialFormDropdown(
                         text = {
                             Text(
                                 text = option.uppercase(),
-                                style = TextStyle(
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    color = AgrimarketBlack,
-                                    letterSpacing = 0.sp
-                                )
+                                style = HumanIndustrialType.input,
+                                color = HumanIndustrial.Ink
                             )
                         },
                         onClick = {
                             onOptionSelected(option)
                             expanded = false
                         },
-                        modifier = Modifier.background(AgrimarketWhite)
+                        modifier = Modifier.background(HumanIndustrial.Rice)
                     )
                 }
             }

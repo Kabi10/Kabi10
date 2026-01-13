@@ -23,57 +23,45 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.senthapps.slagrimarket.data.model.MarketPrice
-import com.senthapps.slagrimarket.ui.theme.AgrimarketBlack
-import com.senthapps.slagrimarket.ui.theme.AgrimarketGray
-import com.senthapps.slagrimarket.ui.theme.AgrimarketOffWhite
-import com.senthapps.slagrimarket.ui.theme.AgrimarketWhite
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.Spacing
+import com.senthapps.slagrimarket.ui.theme.TouchTargets
 
 // ============================================================================
-// INDUSTRIAL MARKET PRICES SCREEN
-// Full-screen list with prices. Scan down, find product, done.
+// HUMAN INDUSTRIAL MARKET PRICES SCREEN v1.0
+// "The Government Price Board" - Authoritative, trustworthy, clear
+// Product 18sp left, Price 28sp right, alternating Rice/Dust rows
 // ============================================================================
 
 /**
- * Industrial market prices screen - simple list view
- *
- * @param marketPrices List of market prices to display
- * @param onNavigateBack Callback to navigate back
- * @param lastUpdatedText Text showing last update time (e.g., "UPDATED: 2 HOURS AGO")
- * @param isLoading Whether prices are currently loading
- * @param isError Whether there was an error loading prices
- * @param onRetry Callback to retry loading prices
+ * Market prices screen - the authoritative price reference
+ * Header: Earth background, Rice text, timestamp
+ * Rows: Product name left, price right, no unit per row
  */
 @Composable
 fun IndustrialMarketPricesScreen(
     marketPrices: List<MarketPrice>,
     onNavigateBack: () -> Unit,
-    lastUpdatedText: String = "UPDATED: JUST NOW",
+    lastUpdatedText: String = "Updated: Just now",
     isLoading: Boolean = false,
     isError: Boolean = false,
     onRetry: () -> Unit = {}
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = AgrimarketWhite,
+        containerColor = HumanIndustrial.Rice,
         topBar = {
-            // Title bar with back button
+            // Header: Earth background, Rice text
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .background(AgrimarketWhite)
-                    .border(
-                        width = BorderWidth.Thin,
-                        color = AgrimarketBlack,
-                        shape = RectangleShape
-                    )
+                    .height(TouchTargets.button.dp)
+                    .background(HumanIndustrial.Earth)
             ) {
                 IconButton(
                     onClick = onNavigateBack,
@@ -82,7 +70,7 @@ fun IndustrialMarketPricesScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = AgrimarketBlack
+                        tint = HumanIndustrial.Rice
                     )
                 }
             }
@@ -90,81 +78,6 @@ fun IndustrialMarketPricesScreen(
     ) { paddingValues ->
         when {
             isLoading -> {
-                // Loading state
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacing.Base)
-                    ) {
-                        Text(
-                            text = "LOADING PRICES",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AgrimarketBlack,
-                                letterSpacing = 0.sp
-                            )
-                        )
-                    }
-                }
-            }
-            isError -> {
-                // Error state
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Spacing.Base),
-                        modifier = Modifier.padding(Spacing.Base)
-                    ) {
-                        Text(
-                            text = "NETWORK ERROR",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AgrimarketBlack,
-                                letterSpacing = 0.sp
-                            )
-                        )
-                        androidx.compose.material3.Button(
-                            onClick = onRetry,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .border(
-                                    width = BorderWidth.Thin,
-                                    color = AgrimarketBlack,
-                                    shape = RectangleShape
-                                ),
-                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                containerColor = AgrimarketWhite,
-                                contentColor = AgrimarketBlack
-                            ),
-                            shape = RectangleShape
-                        ) {
-                            Text(
-                                text = "RETRY",
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Black,
-                                    letterSpacing = 0.sp
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-            marketPrices.isEmpty() -> {
-                // Empty state
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -172,50 +85,102 @@ fun IndustrialMarketPricesScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "NO PRICES AVAILABLE",
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AgrimarketGray,
-                            letterSpacing = 0.sp
+                        text = "Loading prices...",
+                        style = HumanIndustrialType.emptyState,
+                        color = HumanIndustrial.Stone
+                    )
+                }
+            }
+            isError -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md.dp),
+                        modifier = Modifier.padding(Spacing.md.dp)
+                    ) {
+                        Text(
+                            text = "Could not load prices",
+                            style = HumanIndustrialType.emptyState,
+                            color = HumanIndustrial.Stone
                         )
+                        androidx.compose.material3.Button(
+                            onClick = onRetry,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(TouchTargets.button.dp)
+                                .border(
+                                    width = BorderWidth.Standard,
+                                    color = HumanIndustrial.Earth,
+                                    shape = RectangleShape
+                                ),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = HumanIndustrial.Rice,
+                                contentColor = HumanIndustrial.Earth
+                            ),
+                            shape = RectangleShape
+                        ) {
+                            Text(
+                                text = "TRY AGAIN",
+                                style = HumanIndustrialType.button,
+                                color = HumanIndustrial.Earth
+                            )
+                        }
+                    }
+                }
+            }
+            marketPrices.isEmpty() -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No prices today",
+                        style = HumanIndustrialType.emptyState,
+                        color = HumanIndustrial.Stone
                     )
                 }
             }
             else -> {
-                // Content state
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    // Header section
+                    // Title section with timestamp
                     item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(AgrimarketWhite)
-                                .padding(vertical = Spacing.Base),
+                                .background(HumanIndustrial.Rice)
+                                .padding(vertical = Spacing.lg.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 text = "MARKET PRICES",
-                                style = TextStyle(
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = AgrimarketBlack,
-                                    letterSpacing = 0.sp
-                                )
+                                style = HumanIndustrialType.screenTitle,
+                                color = HumanIndustrial.Ink,
+                                textAlign = TextAlign.Center
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(Spacing.xs.dp))
                             Text(
-                                text = lastUpdatedText.uppercase(),
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = AgrimarketGray,
-                                    letterSpacing = 0.sp
-                                )
+                                text = lastUpdatedText,
+                                style = HumanIndustrialType.timestamp,
+                                color = HumanIndustrial.Stone,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(Spacing.xs.dp))
+                            Text(
+                                text = "Prices per kg",
+                                style = HumanIndustrialType.unit,
+                                color = HumanIndustrial.Stone,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -234,54 +199,40 @@ fun IndustrialMarketPricesScreen(
 }
 
 /**
- * Single row in the market prices list
- * Product name on left, price on right, alternating backgrounds
+ * Price row per Human Industrial spec:
+ * - Product: 18sp Bold UPPERCASE Ink, left-aligned
+ * - Price: 28sp Bold Ink, right-aligned
+ * - No unit per row (stated once in header)
+ * - Rice/Dust alternating backgrounds
+ * - 20dp vertical padding
  */
 @Composable
 private fun MarketPriceRow(
     marketPrice: MarketPrice,
     useAlternateBackground: Boolean
 ) {
+    val backgroundColor = if (useAlternateBackground) HumanIndustrial.Dust else HumanIndustrial.Rice
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
-            .background(if (useAlternateBackground) AgrimarketOffWhite else AgrimarketWhite)
-            .padding(horizontal = Spacing.Base),
+            .background(backgroundColor)
+            .padding(horizontal = Spacing.md.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Product name (left)
         Text(
             text = marketPrice.cropNameEnglish.uppercase(),
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = AgrimarketBlack,
-                letterSpacing = 0.sp
-            )
+            style = HumanIndustrialType.priceRowProduct,
+            color = HumanIndustrial.Ink
         )
 
-        // Price and unit (right)
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = marketPrice.currentPrice.toInt().toString(),
-                style = TextStyle(
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Black,
-                    color = AgrimarketBlack,
-                    letterSpacing = 0.sp
-                )
-            )
-            Text(
-                text = marketPrice.unit.uppercase(),
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = AgrimarketGray,
-                    letterSpacing = 0.sp
-                )
-            )
-        }
+        // Price (right) - no unit, just the number
+        Text(
+            text = marketPrice.currentPrice.toInt().toString(),
+            style = HumanIndustrialType.price,
+            color = HumanIndustrial.Ink
+        )
     }
 }

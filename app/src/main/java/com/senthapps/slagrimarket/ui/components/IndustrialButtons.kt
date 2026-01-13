@@ -15,19 +15,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.senthapps.slagrimarket.ui.theme.AgrimarketBlack
-import com.senthapps.slagrimarket.ui.theme.AgrimarketOrange
-import com.senthapps.slagrimarket.ui.theme.AgrimarketRed
-import com.senthapps.slagrimarket.ui.theme.AgrimarketWhite
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
+import com.senthapps.slagrimarket.ui.theme.TouchTargets
 
 // ============================================================================
-// INDUSTRIAL BUTTON COMPONENTS
-// Flat, heavy, text-only buttons with no elevation or ripples
+// HUMAN INDUSTRIAL BUTTON COMPONENTS v1.0
+// "The Sturdy Work Buttons" - Bold, tactile, no decoration
+// Gold for primary action, Earth borders for secondary
 // ============================================================================
 
 /**
- * Primary action button - Orange background, white text
+ * Primary action button - Gold background, Rice text
  * Used for main CTAs like "CALL SELLER", "SUBMIT LISTING"
  */
 @Composable
@@ -39,13 +39,13 @@ fun PrimaryButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(TouchTargets.button.dp),
         shape = RectangleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = AgrimarketOrange,
-            contentColor = AgrimarketWhite,
-            disabledContainerColor = AgrimarketOrange.copy(alpha = 0.4f),
-            disabledContentColor = AgrimarketWhite.copy(alpha = 0.4f)
+            containerColor = HumanIndustrial.Gold,
+            contentColor = HumanIndustrial.Rice,
+            disabledContainerColor = HumanIndustrial.Gold.copy(alpha = 0.4f),
+            disabledContentColor = HumanIndustrial.Rice.copy(alpha = 0.4f)
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 0.dp,
@@ -59,17 +59,14 @@ fun PrimaryButton(
     ) {
         Text(
             text = text.uppercase(),
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 0.sp
-            )
+            style = HumanIndustrialType.button,
+            color = HumanIndustrial.Rice
         )
     }
 }
 
 /**
- * Secondary button - White background, black border and text
+ * Secondary button - Rice background, Earth border and text
  * Used for secondary actions like "EDIT", "CANCEL"
  */
 @Composable
@@ -81,31 +78,28 @@ fun SecondaryButton(
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(TouchTargets.button.dp),
         shape = RectangleShape,
-        border = BorderStroke(BorderWidth.Thick, AgrimarketBlack),
+        border = BorderStroke(BorderWidth.Standard, HumanIndustrial.Earth),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = AgrimarketWhite,
-            contentColor = AgrimarketBlack,
-            disabledContainerColor = AgrimarketWhite,
-            disabledContentColor = AgrimarketBlack.copy(alpha = 0.4f)
+            containerColor = HumanIndustrial.Rice,
+            contentColor = HumanIndustrial.Earth,
+            disabledContainerColor = HumanIndustrial.Rice,
+            disabledContentColor = HumanIndustrial.Earth.copy(alpha = 0.4f)
         ),
         enabled = enabled,
         interactionSource = remember { MutableInteractionSource() }
     ) {
         Text(
             text = text.uppercase(),
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 0.sp
-            )
+            style = HumanIndustrialType.button,
+            color = HumanIndustrial.Earth
         )
     }
 }
 
 /**
- * Danger button - Red background, white text
+ * Danger button - Urgent (brick red) background, Rice text
  * Used for destructive actions like "DELETE"
  */
 @Composable
@@ -117,13 +111,13 @@ fun DangerButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(TouchTargets.button.dp),
         shape = RectangleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = AgrimarketRed,
-            contentColor = AgrimarketWhite,
-            disabledContainerColor = AgrimarketRed.copy(alpha = 0.4f),
-            disabledContentColor = AgrimarketWhite.copy(alpha = 0.4f)
+            containerColor = HumanIndustrial.Urgent,
+            contentColor = HumanIndustrial.Rice,
+            disabledContainerColor = HumanIndustrial.Urgent.copy(alpha = 0.4f),
+            disabledContentColor = HumanIndustrial.Rice.copy(alpha = 0.4f)
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 0.dp,
@@ -137,11 +131,43 @@ fun DangerButton(
     ) {
         Text(
             text = text.uppercase(),
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 0.sp
-            )
+            style = HumanIndustrialType.button,
+            color = HumanIndustrial.Rice
+        )
+    }
+}
+
+/**
+ * Unified industrial button with primary/secondary toggle
+ * Convenience wrapper for PrimaryButton and SecondaryButton
+ *
+ * @param text Button text (will be uppercased)
+ * @param onClick Click handler
+ * @param modifier Modifier for the button
+ * @param enabled Whether button is enabled
+ * @param isPrimary True for orange primary button, false for outlined secondary
+ */
+@Composable
+fun IndustrialButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    isPrimary: Boolean = true
+) {
+    if (isPrimary) {
+        PrimaryButton(
+            text = text,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled
+        )
+    } else {
+        SecondaryButton(
+            text = text,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled
         )
     }
 }

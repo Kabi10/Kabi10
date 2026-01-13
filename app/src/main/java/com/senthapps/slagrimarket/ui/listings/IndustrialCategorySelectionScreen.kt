@@ -7,95 +7,124 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.senthapps.slagrimarket.ui.theme.AgrimarketBlack
-import com.senthapps.slagrimarket.ui.theme.AgrimarketWhite
+import androidx.compose.ui.text.style.TextAlign
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 
 // ============================================================================
-// INDUSTRIAL CATEGORY SELECTION SCREEN
-// 2×2 grid identical to home screen, but for product categories
+// HUMAN INDUSTRIAL CATEGORY SELECTION SCREEN v1.0
+// "The Market Sections" - Color-coded categories for instant recognition
+// Each category carries the color of its contents
 // ============================================================================
 
 /**
  * Category selection screen for buyer browsing flow
- * Identical structure to home screen - 2×2 grid with category names
+ * 2×2 grid with color-coded category tiles
  *
- * @param onCategorySelected Callback when user selects a category
+ * - VEGETABLES: Green background, Rice text
+ * - FRUITS: Gold background, Ink text
+ * - GRAINS: Lighter gold background, Ink text
+ * - LIVESTOCK: Earth background, Rice text
  */
 @Composable
 fun IndustrialCategorySelectionScreen(
     onCategorySelected: (String) -> Unit
 ) {
-    Column(
+    // Outer container: Rice shows as grid divider color
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AgrimarketWhite)
+            .background(HumanIndustrial.Rice)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
-        // Top row: VEGETABLES | FRUITS
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+                .fillMaxSize()
+                .border(
+                    width = BorderWidth.Thick,
+                    color = HumanIndustrial.Rice,
+                    shape = RectangleShape
+                )
         ) {
-            CategoryTile(
-                text = "VEGETABLES",
-                onClick = { onCategorySelected("VEGETABLES") },
+            // Top row: VEGETABLES | FRUITS
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1f)
-                    .fillMaxHeight()
-            )
-            CategoryTile(
-                text = "FRUITS",
-                onClick = { onCategorySelected("FRUITS") },
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-            )
-        }
+            ) {
+                CategoryTile(
+                    text = "VEGETABLES",
+                    backgroundColor = HumanIndustrial.VegetablesBackground,
+                    textColor = HumanIndustrial.Rice,
+                    onClick = { onCategorySelected("VEGETABLES") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+                CategoryTile(
+                    text = "FRUITS",
+                    backgroundColor = HumanIndustrial.FruitsBackground,
+                    textColor = HumanIndustrial.Ink,
+                    onClick = { onCategorySelected("FRUITS") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+            }
 
-        // Bottom row: GRAINS | LIVESTOCK
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            CategoryTile(
-                text = "GRAINS",
-                onClick = { onCategorySelected("GRAINS") },
+            // Bottom row: GRAINS | LIVESTOCK
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1f)
-                    .fillMaxHeight()
-            )
-            CategoryTile(
-                text = "LIVESTOCK",
-                onClick = { onCategorySelected("LIVESTOCK") },
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-            )
+            ) {
+                CategoryTile(
+                    text = "GRAINS",
+                    backgroundColor = HumanIndustrial.GrainsBackground,
+                    textColor = HumanIndustrial.Ink,
+                    onClick = { onCategorySelected("GRAINS") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+                CategoryTile(
+                    text = "LIVESTOCK",
+                    backgroundColor = HumanIndustrial.LivestockBackground,
+                    textColor = HumanIndustrial.Rice,
+                    onClick = { onCategorySelected("LIVESTOCK") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+            }
         }
     }
 }
 
 /**
- * Individual category tile - identical to home tile
+ * Category tile with colored background
+ * 22sp Bold UPPERCASE centered text
+ * 4dp border matching background color (solid block effect)
  */
 @Composable
 private fun CategoryTile(
     text: String,
+    backgroundColor: Color,
+    textColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -103,7 +132,7 @@ private fun CategoryTile(
         modifier = modifier
             .border(
                 width = BorderWidth.Thick,
-                color = AgrimarketBlack,
+                color = backgroundColor,
                 shape = RectangleShape
             )
             .clickable(
@@ -111,17 +140,14 @@ private fun CategoryTile(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             )
-            .background(AgrimarketWhite),
+            .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            style = TextStyle(
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Black,
-                color = AgrimarketBlack,
-                letterSpacing = 0.sp
-            )
+            style = HumanIndustrialType.categoryTile,
+            color = textColor,
+            textAlign = TextAlign.Center
         )
     }
 }

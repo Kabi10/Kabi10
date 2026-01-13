@@ -7,96 +7,197 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 // ============================================================================
-// AGRIMARKET INDUSTRIAL TYPOGRAPHY SYSTEM
-// Heavy, flat, brutal typography for machinery interface
+// HUMAN INDUSTRIAL TYPOGRAPHY SYSTEM v1.0
+// Heavy, grounded, hand-painted signboard feel
+// System fonts only - loads instantly, feels native
 // ============================================================================
 
-// System sans-serif only - no custom fonts
 val AgrimarketFontFamily = FontFamily.Default
 
-// Typography scale - BINARY sizing (primary vs secondary)
-val AgrimarketTypography = Typography(
-    // HUGE DISPLAY - For prices on detail screens
-    displayLarge = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Black,      // 900
-        fontSize = 56.sp,
-        lineHeight = 56.sp,                 // Tight 1:1 ratio
-        letterSpacing = 0.sp
-    ),
+// Typography Scale per Human Industrial Design System
+// ─────────────────────────────────────────────────────
+// Screen Title:     24sp Bold UPPERCASE
+// Product Name:     20sp Bold UPPERCASE
+// Price:            28sp Bold
+// Section Label:    14sp Bold UPPERCASE
+// Body/Metadata:    16sp Regular
+// Button Text:      18sp Bold UPPERCASE
+// Input Text:       18sp Regular
+// Empty State:      18sp Regular
 
-    // LARGE PRIMARY - For home screen tiles, section titles
-    headlineLarge = TextStyle(
+object HumanIndustrialType {
+    // Screen titles - 24sp Bold UPPERCASE
+    val screenTitle = TextStyle(
         fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Black,      // 900
-        fontSize = 28.sp,
-        lineHeight = 34.sp,                 // 1.2x ratio
-        letterSpacing = 0.sp
-    ),
-
-    // MEDIUM PRIMARY - For detail screen product names, prices in lists
-    headlineMedium = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Black,      // 900
+        fontWeight = FontWeight.Bold,        // 700
         fontSize = 24.sp,
-        lineHeight = 30.sp,                 // 1.25x ratio
-        letterSpacing = 0.sp
-    ),
+        lineHeight = 30.sp,
+        letterSpacing = 0.5.sp
+    )
 
-    // SCREEN TITLES - For top bar titles
-    titleLarge = TextStyle(
+    // Product names in lists - 20sp Bold UPPERCASE
+    val productName = TextStyle(
         fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Black,      // 900
+        fontWeight = FontWeight.Bold,        // 700
         fontSize = 20.sp,
-        lineHeight = 24.sp,                 // 1.2x ratio
-        letterSpacing = 0.sp
-    ),
-
-    // CONTENT TEXT - For list item names, metadata
-    bodyLarge = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Medium,     // 500
-        fontSize = 18.sp,
-        lineHeight = 23.sp,                 // 1.27x ratio
-        letterSpacing = 0.sp
-    ),
-
-    // BUTTON TEXT - For button labels
-    labelLarge = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Black,      // 900
-        fontSize = 18.sp,
-        lineHeight = 22.sp,                 // 1.2x ratio
-        letterSpacing = 0.sp
-    ),
-
-    // SECONDARY TEXT - For units, labels, metadata
-    bodyMedium = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Medium,     // 500
-        fontSize = 16.sp,
-        lineHeight = 20.sp,                 // 1.25x ratio
-        letterSpacing = 0.sp
-    ),
-
-    // FORM FIELD LABELS - For input field labels
-    labelMedium = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Black,      // 900
-        fontSize = 14.sp,
-        lineHeight = 17.sp,                 // 1.2x ratio
-        letterSpacing = 0.sp
-    ),
-
-    // TERTIARY TEXT - For timestamps, supporting info
-    labelSmall = TextStyle(
-        fontFamily = AgrimarketFontFamily,
-        fontWeight = FontWeight.Medium,     // 500
-        fontSize = 14.sp,
-        lineHeight = 17.sp,                 // 1.2x ratio
+        lineHeight = 26.sp,
         letterSpacing = 0.sp
     )
+
+    // Prices - 28sp Bold (largest text for scannability)
+    val price = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 28.sp,
+        lineHeight = 34.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Price in listing rows - 24sp Bold
+    val priceSmall = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 24.sp,
+        lineHeight = 30.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Price row product name - 18sp Bold UPPERCASE
+    val priceRowProduct = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Section labels - 14sp Bold UPPERCASE
+    val sectionLabel = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 14.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp
+    )
+
+    // Body/Metadata - 16sp Regular
+    val body = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Normal,      // 400
+        fontSize = 16.sp,
+        lineHeight = 22.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Button text - 18sp Bold UPPERCASE
+    val button = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 18.sp,
+        lineHeight = 22.sp,
+        letterSpacing = 0.5.sp
+    )
+
+    // Input text - 18sp Regular
+    val input = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Normal,      // 400
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Empty state - 18sp Regular
+    val emptyState = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Normal,      // 400
+        fontSize = 18.sp,
+        lineHeight = 25.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Unit labels (per kg, etc.) - 14sp Regular
+    val unit = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Normal,      // 400
+        fontSize = 14.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Timestamp - 12sp Regular
+    val timestamp = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Normal,      // 400
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.sp
+    )
+
+    // Home tile text - 24sp Bold UPPERCASE (matches screen title)
+    val homeTile = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 24.sp,
+        lineHeight = 30.sp,
+        letterSpacing = 1.sp
+    )
+
+    // Category tile text - 22sp Bold UPPERCASE
+    val categoryTile = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 1.sp
+    )
+
+    // Status badge - 12sp Bold UPPERCASE
+    val statusBadge = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+
+    // Quantity text - 14sp Bold UPPERCASE
+    val quantity = TextStyle(
+        fontFamily = AgrimarketFontFamily,
+        fontWeight = FontWeight.Bold,        // 700
+        fontSize = 14.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp
+    )
+}
+
+// Material3 Typography mapping for backward compatibility
+val AgrimarketTypography = Typography(
+    // Screen titles
+    displayLarge = HumanIndustrialType.price,
+    displayMedium = HumanIndustrialType.screenTitle,
+    displaySmall = HumanIndustrialType.productName,
+
+    // Headlines
+    headlineLarge = HumanIndustrialType.screenTitle,
+    headlineMedium = HumanIndustrialType.productName,
+    headlineSmall = HumanIndustrialType.priceRowProduct,
+
+    // Titles
+    titleLarge = HumanIndustrialType.screenTitle,
+    titleMedium = HumanIndustrialType.productName,
+    titleSmall = HumanIndustrialType.priceRowProduct,
+
+    // Body
+    bodyLarge = HumanIndustrialType.input,
+    bodyMedium = HumanIndustrialType.body,
+    bodySmall = HumanIndustrialType.unit,
+
+    // Labels
+    labelLarge = HumanIndustrialType.button,
+    labelMedium = HumanIndustrialType.sectionLabel,
+    labelSmall = HumanIndustrialType.timestamp
 )
 
-// Legacy compatibility - map old names to new system
+// Legacy compatibility
 val Typography = AgrimarketTypography

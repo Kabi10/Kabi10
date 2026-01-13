@@ -4,62 +4,95 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 // ============================================================================
-// AGRIMARKET INDUSTRIAL COLOR SYSTEM
-// Brutal, high-contrast, machinery-inspired palette
+// HUMAN INDUSTRIAL DESIGN SYSTEM v1.0
+// "A marketplace that lives on a phone"
 // ============================================================================
 
-// CORE PALETTE - Pure, uncompromising colors
-val AgrimarketWhite = Color(0xFFFFFFFF)          // Pure white background
-val AgrimarketOffWhite = Color(0xFFF5F5F5)       // Alternate background (alternating rows)
-val AgrimarketBlack = Color(0xFF000000)          // Pure black text and borders
-val AgrimarketNearBlack = Color(0xFF1A1A1A)      // Near-black text variant
+// PRIMARY PALETTE - The colors of Sri Lankan agriculture
+object HumanIndustrial {
+    // Primary Colors
+    val Earth = Color(0xFF8B4513)      // Terracotta - borders, headers, accents
+    val Gold = Color(0xFFB8860B)       // Harvest gold - buttons, prices, success
+    val Green = Color(0xFF2D5016)      // Field green - confirmed, vegetables
+    val Rice = Color(0xFFFAF6F1)       // Warm off-white - backgrounds
+    val Ink = Color(0xFF1A1A1A)        // Near-black - primary text
 
-// ACTION COLORS - Functional, not decorative
-val AgrimarketOrange = Color(0xFFE65100)         // Primary action (deep orange/amber)
-val AgrimarketRed = Color(0xFFC41E3A)            // Destructive action (deep red)
+    // Secondary Colors
+    val Stone = Color(0xFF6B6B6B)      // Secondary text, metadata, timestamps
+    val Dust = Color(0xFFE8E4DF)       // Dividers, alternate rows, disabled
+    val Urgent = Color(0xFFA63D2F)     // Errors, cancellations only
 
-// SECONDARY TEXT - Gray but visible in sunlight
-val AgrimarketGray = Color(0xFF757575)           // Secondary text, units, timestamps
+    // Category-specific backgrounds
+    val VegetablesBackground = Green   // #2D5016
+    val FruitsBackground = Gold        // #B8860B
+    val GrainsBackground = Color(0xFFD4A84B)  // Lighter gold
+    val LivestockBackground = Earth    // #8B4513
+}
+
+// NOTE: Spacing values are defined in Shape.kt as part of the Spacing object
+// Use Spacing.xs, Spacing.sm, Spacing.md, Spacing.lg, Spacing.xl with .dp extension
+
+// Border widths
+object Borders {
+    const val standard = 2   // Default border width
+    const val tile = 4       // Tiles and headers
+    const val accent = 4     // Left accent bars on list items
+}
+
+// Touch target sizes
+object TouchTargets {
+    const val minimum = 48   // Minimum touch target
+    const val button = 56    // Full-width buttons
+}
+
+// Convenience aliases for existing code compatibility
+val AgrimarketWhite = HumanIndustrial.Rice
+val AgrimarketOffWhite = HumanIndustrial.Dust
+val AgrimarketBlack = HumanIndustrial.Ink
+val AgrimarketNearBlack = HumanIndustrial.Ink
+val AgrimarketOrange = HumanIndustrial.Gold  // Primary action now Gold
+val AgrimarketRed = HumanIndustrial.Urgent
+val AgrimarketGray = HumanIndustrial.Stone
 
 // Legacy compatibility (keep existing color names for gradual migration)
-val Green600 = Color(0xFF16a34a)
-val Blue400 = Color(0xFF60a5fa)
-val Blue600 = Color(0xFF2563eb)
-val Error600 = AgrimarketRed
-val ErrorRed = AgrimarketRed
-val Gray900 = AgrimarketNearBlack
-val Gray800 = AgrimarketNearBlack
+val Green600 = HumanIndustrial.Green
+val Blue400 = HumanIndustrial.Gold
+val Blue600 = HumanIndustrial.Earth
+val Error600 = HumanIndustrial.Urgent
+val ErrorRed = HumanIndustrial.Urgent
+val Gray900 = HumanIndustrial.Ink
+val Gray800 = HumanIndustrial.Ink
 val Gray700 = Color(0xFF374151)
-val Gray600 = Color(0xFF4b5563)
-val Gray500 = Color(0xFF6b7280)
+val Gray600 = HumanIndustrial.Stone
+val Gray500 = HumanIndustrial.Stone
 val Gray400 = Color(0xFF9ca3af)
-val Gray300 = Color(0xFFd1d5db)
-val Gray200 = Color(0xFFe5e7eb)
-val Gray100 = Color(0xFFf3f4f6)
-val Gray50 = AgrimarketOffWhite
-val BackgroundLight = AgrimarketWhite
-val BackgroundDark = AgrimarketNearBlack
-val SurfaceLight = AgrimarketWhite
-val SurfaceDark = AgrimarketNearBlack
+val Gray300 = HumanIndustrial.Dust
+val Gray200 = HumanIndustrial.Dust
+val Gray100 = HumanIndustrial.Rice
+val Gray50 = HumanIndustrial.Rice
+val BackgroundLight = HumanIndustrial.Rice
+val BackgroundDark = HumanIndustrial.Ink
+val SurfaceLight = HumanIndustrial.Rice
+val SurfaceDark = HumanIndustrial.Ink
 
 // Warning colors for backward compatibility
-val Warning500 = Color(0xFFf59e0b)
-val YellowWarning = Warning500
+val Warning500 = HumanIndustrial.Gold
+val YellowWarning = HumanIndustrial.Gold
 
 // Success colors for backward compatibility
-val Success600 = Color(0xFF16a34a)
+val Success600 = HumanIndustrial.Green
 
-// Surface elevation colors (all same as white - no elevation)
-val SurfaceElevation1 = AgrimarketWhite
-val SurfaceElevation2 = AgrimarketWhite
-val SurfaceElevation3 = AgrimarketWhite
-val SurfaceElevation4 = AgrimarketWhite
-val SurfaceElevation5 = AgrimarketWhite
+// Surface elevation colors (all same as Rice - no elevation)
+val SurfaceElevation1 = HumanIndustrial.Rice
+val SurfaceElevation2 = HumanIndustrial.Rice
+val SurfaceElevation3 = HumanIndustrial.Rice
+val SurfaceElevation4 = HumanIndustrial.Rice
+val SurfaceElevation5 = HumanIndustrial.Rice
 
 // Gradient brushes for backward compatibility (all set to solid colors)
-val DarkGradientBackground = Brush.verticalGradient(listOf(AgrimarketWhite, AgrimarketWhite))
-val HeroGradientBackground = Brush.verticalGradient(listOf(AgrimarketWhite, AgrimarketWhite))
-val PrimaryGradient = Brush.horizontalGradient(listOf(AgrimarketWhite, AgrimarketWhite))
-val SecondaryGradient = Brush.horizontalGradient(listOf(AgrimarketWhite, AgrimarketWhite))
+val DarkGradientBackground = Brush.verticalGradient(listOf(HumanIndustrial.Rice, HumanIndustrial.Rice))
+val HeroGradientBackground = Brush.verticalGradient(listOf(HumanIndustrial.Rice, HumanIndustrial.Rice))
+val PrimaryGradient = Brush.horizontalGradient(listOf(HumanIndustrial.Rice, HumanIndustrial.Rice))
+val SecondaryGradient = Brush.horizontalGradient(listOf(HumanIndustrial.Rice, HumanIndustrial.Rice))
 val CardGradientOverlay = Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
-val CardElevationGradient = Brush.verticalGradient(listOf(AgrimarketWhite, AgrimarketWhite))
+val CardElevationGradient = Brush.verticalGradient(listOf(HumanIndustrial.Rice, HumanIndustrial.Rice))
