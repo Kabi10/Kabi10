@@ -331,6 +331,25 @@ npm run test:coverage
 npm test -- auth.test.js
 ```
 
+### E2E Testing (Mock Mode)
+
+Run automated E2E tests against an in-memory mock database:
+
+```powershell
+# Windows (PowerShell)
+npm run e2e:mock
+
+# Or directly:
+powershell -ExecutionPolicy Bypass -File scripts/e2e-mock.ps1
+```
+
+This script:
+1. Starts backend with `MOCK_DB=true` and `SMS_MODE=mock`
+2. Tests auth flow (send-otp → verify-otp)
+3. Tests listings (GET, POST)
+4. Tests transactions (GET)
+5. Reports PASS/FAIL per endpoint
+
 ## 🛡️ Security
 
 - **Rate Limiting:** 100 requests per 15 minutes
