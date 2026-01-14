@@ -247,6 +247,8 @@ TWILIO_PHONE_NUMBER=+1234567890
 
 ### Production Environment
 
+> ⚠️ **MOCK_DB Safety**: `MOCK_DB=true` is for development/testing only. The server will refuse to start if `MOCK_DB=true` and `NODE_ENV=production` are both set.
+
 **Recommended Hosting:**
 - **DigitalOcean Droplets** (Singapore region for low latency to Sri Lanka)
 - **AWS Asia Pacific (Mumbai)** for enterprise scale

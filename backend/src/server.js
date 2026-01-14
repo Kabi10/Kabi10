@@ -6,6 +6,12 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// CRITICAL: Prevent MOCK_DB in production
+if (process.env.NODE_ENV === 'production' && process.env.MOCK_DB === 'true') {
+  console.error('FATAL: MOCK_DB cannot be enabled in production.');
+  process.exit(1);
+}
+
 const logger = require('./utils/logger');
 const database = require('./database/connection');
 const { errorHandler } = require('./middleware/errorHandler');
