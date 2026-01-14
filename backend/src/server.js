@@ -69,6 +69,19 @@ if (process.env.NODE_ENV !== 'test') {
   }));
 }
 
+// Dev-only request logging for Android verification
+// Logs: [REQ] METHOD /path user=<userId>
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    // Skip health checks to reduce noise
+    if (req.path === '/health') return next();
+
+    const userId = req.user?.userId || 'anon';
+    logger.info(`[REQ] ${req.method} ${req.path} user=${userId}`);
+    next();
+  });
+}
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
