@@ -3,16 +3,19 @@ package com.senthapps.slagrimarket.navigation
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
-import com.senthapps.slagrimarket.ui.auth.OtpVerificationScreen
-import com.senthapps.slagrimarket.ui.auth.PhoneInputScreen
+import com.senthapps.slagrimarket.ui.auth.IndustrialOtpVerificationScreen
+import com.senthapps.slagrimarket.ui.auth.IndustrialPhoneInputScreen
 import com.senthapps.slagrimarket.ui.chat.ChatScreen
 import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
 import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
@@ -22,28 +25,23 @@ import com.senthapps.slagrimarket.ui.map.ListingsMapScreen
 import com.senthapps.slagrimarket.ui.map.LocationMapScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
 import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
+import com.senthapps.slagrimarket.ui.profile.ProfileScreen
 import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
 import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
+import com.senthapps.slagrimarket.ui.search.SearchScreen
 import com.senthapps.slagrimarket.ui.sync.SyncSettingsScreen
-import com.senthapps.slagrimarket.ui.home.HomeScreen
 import com.senthapps.slagrimarket.ui.home.IndustrialHomeScreen
 import com.senthapps.slagrimarket.ui.home.IndustrialMarketPricesScreen
-import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
-import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
+import com.senthapps.slagrimarket.ui.listings.CreateListingViewModel
 import com.senthapps.slagrimarket.ui.listings.IndustrialCategorySelectionScreen
 import com.senthapps.slagrimarket.ui.listings.IndustrialCreateListingScreen
 import com.senthapps.slagrimarket.ui.listings.IndustrialListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.IndustrialListingsListScreen
-import com.senthapps.slagrimarket.ui.listings.ListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.ListingPreview
 import com.senthapps.slagrimarket.ui.listings.ListingsScreen
-import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
-import com.senthapps.slagrimarket.ui.profile.ProfileScreen
-import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
-import com.senthapps.slagrimarket.ui.search.SearchScreen
 import com.senthapps.slagrimarket.ui.transactions.CreateTransactionScreen
-import com.senthapps.slagrimarket.ui.transactions.TransactionDetailScreen
-import com.senthapps.slagrimarket.ui.transactions.TransactionsScreen
+import com.senthapps.slagrimarket.ui.transactions.IndustrialTransactionDetailScreen
+import com.senthapps.slagrimarket.ui.transactions.IndustrialTransactionsScreen
 
 @Composable
 fun JaffnaMarketplaceNavigation(
@@ -61,9 +59,9 @@ fun JaffnaMarketplaceNavigation(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        // Authentication screens
+        // Authentication screens - INDUSTRIAL STYLE
         composable(Screen.PhoneInput.route) {
-            PhoneInputScreen(
+            IndustrialPhoneInputScreen(
                 onNavigateToOtpVerification = { phoneNumber, otpId ->
                     navController.navigate(Screen.OtpVerification.createRoute(phoneNumber, otpId))
                 }
@@ -73,7 +71,7 @@ fun JaffnaMarketplaceNavigation(
         composable(Screen.OtpVerification.route) { backStackEntry ->
             val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
             val otpId = backStackEntry.arguments?.getString("otpId") ?: ""
-            OtpVerificationScreen(
+            IndustrialOtpVerificationScreen(
                 phoneNumber = phoneNumber,
                 otpId = otpId,
                 onNavigateBack = {
@@ -195,11 +193,29 @@ fun JaffnaMarketplaceNavigation(
         }
 
         composable(Screen.CreateListing.route) {
+            val viewModel: CreateListingViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            // Navigate back when listing is successfully created
+            LaunchedEffect(uiState.isSuccess) {
+                if (uiState.isSuccess) {
+                    navController.popBackStack()
+                }
+            }
+
             IndustrialCreateListingScreen(
                 onSubmit = { productName, category, quantity, unit, price, location ->
-                    // TODO: Wire up to ViewModel to actually create listing
-                    // For now, just navigate back
-                    navController.popBackStack()
+                    // Set all form values in ViewModel
+                    viewModel.updateCropType(productName)
+                    viewModel.updateQuantity(quantity)
+                    viewModel.updateUnit(unit)
+                    viewModel.updatePricePerUnit(price)
+                    viewModel.updateLocation(location)
+                    // Set defaults for required fields not in industrial form
+                    viewModel.updateQuality("A") // Default quality grade
+                    viewModel.updateHarvestDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                    // Create the listing
+                    viewModel.createListing()
                 },
                 onNavigateBack = {
                     navController.popBackStack()
@@ -257,7 +273,7 @@ fun JaffnaMarketplaceNavigation(
         }
 
         composable(Screen.Transactions.route) {
-            TransactionsScreen(
+            IndustrialTransactionsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
@@ -284,7 +300,7 @@ fun JaffnaMarketplaceNavigation(
 
         composable(Screen.TransactionDetail.route) { backStackEntry ->
             val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
-            TransactionDetailScreen(
+            IndustrialTransactionDetailScreen(
                 transactionId = transactionId,
                 onNavigateBack = {
                     navController.popBackStack()

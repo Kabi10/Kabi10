@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.senthapps.slagrimarket.navigation.AppNavigationWithBottomBar
+import com.senthapps.slagrimarket.navigation.JaffnaMarketplaceNavigation
 import com.senthapps.slagrimarket.ui.theme.SLAgrimarketTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -17,7 +17,12 @@ import timber.log.Timber
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Enable edge-to-edge display safely - may not be supported on all devices
+        try {
+            enableEdgeToEdge()
+        } catch (e: Exception) {
+            Timber.d("EdgeToEdge not available on this device: ${e.message}")
+        }
         setContent {
             SLAgrimarketTheme {
                 Surface(
@@ -31,7 +36,7 @@ class MainActivity : ComponentActivity() {
                     if (BuildConfig.DEBUG) {
                         Timber.d("🔧 DEBUG: Skipping authentication - going straight to app")
                     }
-                    AppNavigationWithBottomBar(startWithAuth = requireAuth)
+                    JaffnaMarketplaceNavigation(startWithAuth = requireAuth)
                 }
             }
         }
