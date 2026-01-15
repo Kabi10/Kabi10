@@ -37,8 +37,11 @@ android {
             // Removed applicationIdSuffix for Firebase compatibility
             versionNameSuffix = "-debug"
 
-            // API Configuration for debug builds - using production backend for physical device testing
-            buildConfigField("String", "BASE_URL", "\"https://backend-psi-tan-18.vercel.app/api/\"")
+            // API Configuration for debug builds
+            // Use 10.0.2.2 for Android emulator to reach host localhost
+            // Change to production URL for physical device testing:
+            // "https://backend-psi-tan-18.vercel.app/api/"
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "true")
         }
 
