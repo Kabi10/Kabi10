@@ -30,8 +30,10 @@ import androidx.compose.ui.unit.sp
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
+import com.senthapps.slagrimarket.ui.theme.LocalAppLanguage
 import com.senthapps.slagrimarket.ui.theme.Spacing
 import com.senthapps.slagrimarket.ui.theme.TouchTargets
+import com.senthapps.slagrimarket.ui.theme.industrialFormat
 
 // ============================================================================
 // HUMAN INDUSTRIAL FORM FIELD COMPONENTS v1.0
@@ -56,11 +58,12 @@ fun IndustrialFormField(
     supportingText: String? = null,
     singleLine: Boolean = true
 ) {
+    val language = LocalAppLanguage.current
     Column(modifier = modifier) {
-        // Label (if provided) - 14sp Bold UPPERCASE Stone
+        // Label (if provided) - 14sp Bold Stone (uppercase only for English)
         if (label.isNotEmpty()) {
             Text(
-                text = label.uppercase(),
+                text = label.industrialFormat(language),
                 style = HumanIndustrialType.sectionLabel,
                 color = HumanIndustrial.Stone,
                 modifier = Modifier.padding(bottom = Spacing.sm.dp)
@@ -99,7 +102,7 @@ fun IndustrialFormField(
         // Error message (if present) - Urgent color
         errorMessage?.let {
             Text(
-                text = it.uppercase(),
+                text = it.industrialFormat(language),
                 style = HumanIndustrialType.unit,
                 color = HumanIndustrial.Urgent,
                 modifier = Modifier.padding(top = Spacing.xs.dp)
@@ -110,7 +113,7 @@ fun IndustrialFormField(
         if (errorMessage == null) {
             supportingText?.let {
                 Text(
-                    text = it.uppercase(),
+                    text = it.industrialFormat(language),
                     style = HumanIndustrialType.unit,
                     color = HumanIndustrial.Stone,
                     modifier = Modifier.padding(top = Spacing.xs.dp)
@@ -135,12 +138,13 @@ fun IndustrialFormDropdown(
     placeholder: String = ""
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val language = LocalAppLanguage.current
 
     Column(modifier = modifier) {
-        // Label (if provided) - 14sp Bold UPPERCASE Stone
+        // Label (if provided) - 14sp Bold Stone (uppercase only for English)
         if (label.isNotEmpty()) {
             Text(
-                text = label.uppercase(),
+                text = label.industrialFormat(language),
                 style = HumanIndustrialType.sectionLabel,
                 color = HumanIndustrial.Stone,
                 modifier = Modifier.padding(bottom = Spacing.sm.dp)
@@ -168,7 +172,7 @@ fun IndustrialFormDropdown(
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(
-                    text = if (selectedOption.isEmpty()) placeholder else selectedOption.uppercase(),
+                    text = if (selectedOption.isEmpty()) placeholder else selectedOption.industrialFormat(language),
                     style = HumanIndustrialType.input,
                     color = if (selectedOption.isEmpty()) HumanIndustrial.Stone else HumanIndustrial.Ink
                 )
@@ -191,7 +195,7 @@ fun IndustrialFormDropdown(
                     DropdownMenuItem(
                         text = {
                             Text(
-                                text = option.uppercase(),
+                                text = option.industrialFormat(language),
                                 style = HumanIndustrialType.input,
                                 color = HumanIndustrial.Ink
                             )

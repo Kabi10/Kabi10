@@ -53,6 +53,10 @@ data class Listing(
     @Json(name = "farmerName")
     val farmerName: String? = null,
 
+    // farmerPhone populated by backend via JOIN with users table
+    @Json(name = "farmerPhone")
+    val farmerPhone: String = "",
+
     @Json(name = "cropType")
     val cropType: String,
 

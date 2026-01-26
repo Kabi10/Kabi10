@@ -18,7 +18,9 @@ import androidx.compose.ui.unit.sp
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
+import com.senthapps.slagrimarket.ui.theme.LocalAppLanguage
 import com.senthapps.slagrimarket.ui.theme.TouchTargets
+import com.senthapps.slagrimarket.ui.theme.industrialFormat
 
 // ============================================================================
 // HUMAN INDUSTRIAL BUTTON COMPONENTS v1.0
@@ -37,6 +39,7 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val language = LocalAppLanguage.current
     Button(
         onClick = onClick,
         modifier = modifier.height(TouchTargets.button.dp),
@@ -58,7 +61,7 @@ fun PrimaryButton(
         interactionSource = remember { MutableInteractionSource() }
     ) {
         Text(
-            text = text.uppercase(),
+            text = text.industrialFormat(language),
             style = HumanIndustrialType.button,
             color = HumanIndustrial.Rice
         )
@@ -76,6 +79,7 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val language = LocalAppLanguage.current
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.height(TouchTargets.button.dp),
@@ -91,7 +95,7 @@ fun SecondaryButton(
         interactionSource = remember { MutableInteractionSource() }
     ) {
         Text(
-            text = text.uppercase(),
+            text = text.industrialFormat(language),
             style = HumanIndustrialType.button,
             color = HumanIndustrial.Earth
         )
@@ -109,6 +113,7 @@ fun DangerButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val language = LocalAppLanguage.current
     Button(
         onClick = onClick,
         modifier = modifier.height(TouchTargets.button.dp),
@@ -130,7 +135,7 @@ fun DangerButton(
         interactionSource = remember { MutableInteractionSource() }
     ) {
         Text(
-            text = text.uppercase(),
+            text = text.industrialFormat(language),
             style = HumanIndustrialType.button,
             color = HumanIndustrial.Rice
         )

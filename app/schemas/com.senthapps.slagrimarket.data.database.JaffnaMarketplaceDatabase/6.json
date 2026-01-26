@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "98d47f5fbd3d9f8192be0a50e2d34b41",
+    "identityHash": "fedfcd111387fb2188ba3d098f0e4fbb",
     "entities": [
       {
         "tableName": "users",
@@ -62,7 +62,7 @@
       },
       {
         "tableName": "listings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `farmerId` TEXT NOT NULL, `farmerName` TEXT, `cropType` TEXT NOT NULL, `cropNameTamil` TEXT NOT NULL, `cropNameEnglish` TEXT NOT NULL, `cropNameSinhala` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `pricePerUnit` REAL NOT NULL, `quality` TEXT NOT NULL, `harvestDate` TEXT NOT NULL, `availableFrom` TEXT NOT NULL, `availableUntil` TEXT NOT NULL, `location` TEXT NOT NULL, `locationTamil` TEXT NOT NULL, `locationSinhala` TEXT NOT NULL, `description` TEXT NOT NULL, `descriptionTamil` TEXT NOT NULL, `descriptionSinhala` TEXT NOT NULL, `images` TEXT NOT NULL, `pickupLocations` TEXT NOT NULL, `isActive` INTEGER NOT NULL, `syncStatus` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `clientId` TEXT, `viewCount` INTEGER NOT NULL, `inquiryCount` INTEGER NOT NULL, `story` TEXT NOT NULL, `farmingMethods` TEXT NOT NULL, `certifications` TEXT NOT NULL, `harvestedAt` TEXT NOT NULL, `sustainabilityPractices` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`farmerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `farmerId` TEXT NOT NULL, `farmerName` TEXT, `farmerPhone` TEXT NOT NULL, `cropType` TEXT NOT NULL, `cropNameTamil` TEXT NOT NULL, `cropNameEnglish` TEXT NOT NULL, `cropNameSinhala` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `pricePerUnit` REAL NOT NULL, `quality` TEXT NOT NULL, `harvestDate` TEXT NOT NULL, `availableFrom` TEXT NOT NULL, `availableUntil` TEXT NOT NULL, `location` TEXT NOT NULL, `locationTamil` TEXT NOT NULL, `locationSinhala` TEXT NOT NULL, `description` TEXT NOT NULL, `descriptionTamil` TEXT NOT NULL, `descriptionSinhala` TEXT NOT NULL, `images` TEXT NOT NULL, `pickupLocations` TEXT NOT NULL, `isActive` INTEGER NOT NULL, `syncStatus` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `clientId` TEXT, `viewCount` INTEGER NOT NULL, `inquiryCount` INTEGER NOT NULL, `story` TEXT NOT NULL, `farmingMethods` TEXT NOT NULL, `certifications` TEXT NOT NULL, `harvestedAt` TEXT NOT NULL, `sustainabilityPractices` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`farmerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -81,6 +81,12 @@
             "columnName": "farmerName",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "farmerPhone",
+            "columnName": "farmerPhone",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "cropType",
@@ -356,7 +362,7 @@
       },
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `listingId` TEXT NOT NULL, `farmerId` TEXT NOT NULL, `buyerId` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `pricePerUnit` REAL NOT NULL, `totalAmount` REAL NOT NULL, `pickupLocation` TEXT NOT NULL, `pickupLocationTamil` TEXT NOT NULL, `pickupLocationSinhala` TEXT NOT NULL, `pickupDate` TEXT NOT NULL, `pickupTime` TEXT NOT NULL, `status` TEXT NOT NULL, `paymentMethod` TEXT NOT NULL, `paymentStatus` TEXT NOT NULL, `notes` TEXT NOT NULL, `notesTamil` TEXT NOT NULL, `notesSinhala` TEXT NOT NULL, `farmerRating` INTEGER, `buyerRating` INTEGER, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `completedAt` TEXT, `clientId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`listingId`) REFERENCES `listings`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`farmerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`buyerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `listingId` TEXT NOT NULL, `farmerId` TEXT NOT NULL, `buyerId` TEXT NOT NULL, `sellerName` TEXT NOT NULL, `buyerName` TEXT NOT NULL, `sellerPhone` TEXT NOT NULL, `buyerPhone` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `pricePerUnit` REAL NOT NULL, `totalAmount` REAL NOT NULL, `pickupLocation` TEXT NOT NULL, `pickupLocationTamil` TEXT NOT NULL, `pickupLocationSinhala` TEXT NOT NULL, `pickupDate` TEXT NOT NULL, `pickupTime` TEXT NOT NULL, `status` TEXT NOT NULL, `paymentMethod` TEXT NOT NULL, `paymentStatus` TEXT NOT NULL, `notes` TEXT NOT NULL, `notesTamil` TEXT NOT NULL, `notesSinhala` TEXT NOT NULL, `farmerRating` INTEGER, `buyerRating` INTEGER, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `completedAt` TEXT, `clientId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`listingId`) REFERENCES `listings`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`farmerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`buyerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -379,6 +385,30 @@
           {
             "fieldPath": "buyerId",
             "columnName": "buyerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellerName",
+            "columnName": "sellerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyerName",
+            "columnName": "buyerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellerPhone",
+            "columnName": "sellerPhone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyerPhone",
+            "columnName": "buyerPhone",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1364,7 +1394,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '98d47f5fbd3d9f8192be0a50e2d34b41')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fedfcd111387fb2188ba3d098f0e4fbb')"
     ]
   }
 }

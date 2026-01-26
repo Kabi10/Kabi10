@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.sp
 import com.senthapps.slagrimarket.ui.theme.AgrimarketBlack
 import com.senthapps.slagrimarket.ui.theme.AgrimarketWhite
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.LocalAppLanguage
 import com.senthapps.slagrimarket.ui.theme.Spacing
+import com.senthapps.slagrimarket.ui.theme.industrialFormat
 
 // ============================================================================
 // INDUSTRIAL BOTTOM SHEET COMPONENT
@@ -68,6 +70,7 @@ fun IndustrialConfirmationBottomSheet(
             shape = RectangleShape
         )
     ) {
+        val language = LocalAppLanguage.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,7 +81,7 @@ fun IndustrialConfirmationBottomSheet(
         ) {
             // Title text
             Text(
-                text = title.uppercase(),
+                text = title.industrialFormat(language),
                 style = TextStyle(
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Black,

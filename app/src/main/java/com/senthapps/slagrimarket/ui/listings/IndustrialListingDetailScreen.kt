@@ -1,74 +1,465 @@
 package com.senthapps.slagrimarket.ui.listings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.senthapps.slagrimarket.ui.components.DangerButton
-import com.senthapps.slagrimarket.ui.components.IndustrialConfirmationBottomSheet
 import com.senthapps.slagrimarket.ui.components.PrimaryButton
 import com.senthapps.slagrimarket.ui.components.SecondaryButton
-import com.senthapps.slagrimarket.ui.theme.AgrimarketBlack
-import com.senthapps.slagrimarket.ui.theme.AgrimarketGray
-import com.senthapps.slagrimarket.ui.theme.AgrimarketWhite
+import com.senthapps.slagrimarket.ui.home.AppLanguage
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.Spacing
-import kotlinx.coroutines.launch
+import com.senthapps.slagrimarket.ui.theme.industrialClickable
 
 // ============================================================================
-// INDUSTRIAL LISTING DETAIL SCREEN
-// Image → Price (huge) → Metadata → Action buttons
+// HUMAN INDUSTRIAL LISTING DETAIL SCREEN v2.0
+// "The Market Stall Detail" - Full details of a listing
+// Sections separated by 4dp Earth dividers
 // ============================================================================
 
 /**
- * Industrial listing detail screen
- *
- * @param productName Product name (e.g., "Fresh Tomatoes")
- * @param price Price amount
- * @param unit Unit of measurement (e.g., "KG")
- * @param quantity Available quantity
- * @param location Seller location
- * @param sellerName Seller's name
- * @param imageUrl Optional image URL
- * @param isOwnListing If true, shows EDIT/DELETE buttons; otherwise shows CALL SELLER
- * @param onNavigateBack Callback to navigate back
- * @param onCallSeller Callback when user taps CALL SELLER
- * @param onEdit Callback when user taps EDIT
- * @param onDelete Callback when user confirms deletion
+ * Data class for listing detail
  */
-@OptIn(ExperimentalMaterial3Api::class)
+data class ListingDetail(
+    val id: String,
+    val productName: String,
+    val price: Double,
+    val unit: String,
+    val categoryName: String,
+    val availableFrom: String? = null,
+    val availableUntil: String? = null,
+    val pickupLocation: String,
+    val sellerName: String,
+    val sellerDistrict: String,
+    val sellerPhone: String,
+    val postedTime: String
+)
+
+/**
+ * Industrial listing detail screen - full details of a listing
+ *
+ * Header: 72dp Rice with back text and category
+ * Sections: Product, Availability, Seller, Actions
+ * Each section separated by 4dp Earth divider
+ *
+ * @param listing Listing detail data
+ * @param language Current language for labels
+ * @param onNavigateBack Callback to navigate back
+ * @param onCallSeller Callback to call seller (or null to use default phone dialer)
+ * @param onSendMessage Callback to send message
+ * @param isLoading Loading state
+ * @param isError Error state
+ * @param onRetry Retry callback
+ */
+@Composable
+fun IndustrialListingDetailScreen(
+    listing: ListingDetail?,
+    language: AppLanguage = AppLanguage.SINHALA,
+    onNavigateBack: () -> Unit,
+    onCallSeller: (() -> Unit)? = null,
+    onSendMessage: () -> Unit = {},
+    isLoading: Boolean = false,
+    isError: Boolean = false,
+    onRetry: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(HumanIndustrial.Rice)
+    ) {
+        // Header
+        DetailHeader(
+            backText = when (language) {
+                AppLanguage.SINHALA -> "ආපසු"
+                AppLanguage.TAMIL -> "பின்"
+                AppLanguage.ENGLISH -> "BACK"
+            },
+            categoryName = listing?.categoryName ?: "",
+            onBackClick = onNavigateBack
+        )
+
+        // Earth divider
+        EarthDivider()
+
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when (language) {
+                            AppLanguage.SINHALA -> "රැඳී සිටින්න"
+                            AppLanguage.TAMIL -> "காத்திருங்கள்"
+                            AppLanguage.ENGLISH -> "WAIT"
+                        },
+                        style = HumanIndustrialType.body,
+                        color = HumanIndustrial.Stone
+                    )
+                }
+            }
+            isError || listing == null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.lg.dp)
+                    ) {
+                        Text(
+                            text = when (language) {
+                                AppLanguage.SINHALA -> "සම්බන්ධ වීමට නොහැකි විය"
+                                AppLanguage.TAMIL -> "இணைக்க முடியவில்லை"
+                                AppLanguage.ENGLISH -> "COULD NOT CONNECT"
+                            },
+                            style = HumanIndustrialType.body,
+                            color = HumanIndustrial.Stone
+                        )
+                        SecondaryButton(
+                            text = when (language) {
+                                AppLanguage.SINHALA -> "නැවත උත්සාහ කරන්න"
+                                AppLanguage.TAMIL -> "மீண்டும் முயற்சிக்கவும்"
+                                AppLanguage.ENGLISH -> "TRY AGAIN"
+                            },
+                            onClick = onRetry
+                        )
+                    }
+                }
+            }
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                ) {
+                    // Product section
+                    ProductSection(listing = listing)
+
+                    EarthDivider()
+
+                    // Availability section
+                    AvailabilitySection(
+                        listing = listing,
+                        language = language
+                    )
+
+                    EarthDivider()
+
+                    // Seller section
+                    SellerSection(
+                        listing = listing,
+                        language = language
+                    )
+
+                    EarthDivider()
+
+                    // Action buttons section
+                    ActionButtonsSection(
+                        language = language,
+                        phoneAvailable = listing.sellerPhone.isNotEmpty(),
+                        onCallSeller = onCallSeller ?: {
+                            // Default: open phone dialer
+                            if (listing.sellerPhone.isNotEmpty()) {
+                                val intent = Intent(Intent.ACTION_DIAL).apply {
+                                    data = Uri.parse("tel:${listing.sellerPhone}")
+                                }
+                                context.startActivity(intent)
+                            }
+                        },
+                        onSendMessage = onSendMessage
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Header component - 72dp Rice background
+ */
+@Composable
+private fun DetailHeader(
+    backText: String,
+    categoryName: String,
+    onBackClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp)
+            .background(HumanIndustrial.Rice)
+            .padding(horizontal = Spacing.lg.dp, vertical = Spacing.md.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .height(48.dp)
+                .industrialClickable(onClick = onBackClick),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = backText,
+                style = HumanIndustrialType.sectionLabel,
+                color = HumanIndustrial.Earth
+            )
+        }
+
+        Text(
+            text = categoryName,
+            style = HumanIndustrialType.screenTitle,
+            color = HumanIndustrial.Ink,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
+    }
+}
+
+/**
+ * 4dp Earth divider
+ */
+@Composable
+private fun EarthDivider() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(BorderWidth.Thick)
+            .background(HumanIndustrial.Earth)
+    )
+}
+
+/**
+ * Product section - name, price, unit
+ */
+@Composable
+private fun ProductSection(listing: ListingDetail) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Spacing.lg.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
+    ) {
+        Text(
+            text = listing.productName,
+            style = HumanIndustrialType.screenTitle,
+            color = HumanIndustrial.Ink
+        )
+        Text(
+            text = "රු ${listing.price.toInt()}",
+            style = HumanIndustrialType.price,
+            color = HumanIndustrial.Gold
+        )
+        Text(
+            text = "1 ${listing.unit}",
+            style = HumanIndustrialType.body,
+            color = HumanIndustrial.Ink
+        )
+    }
+}
+
+/**
+ * Availability section - available dates and pickup location
+ */
+@Composable
+private fun AvailabilitySection(
+    listing: ListingDetail,
+    language: AppLanguage
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Spacing.lg.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md.dp)
+    ) {
+        // Available dates
+        if (listing.availableFrom != null || listing.availableUntil != null) {
+            LabelValuePair(
+                label = when (language) {
+                    AppLanguage.SINHALA -> "ලබා ගත හැකි කාලය"
+                    AppLanguage.TAMIL -> "கிடைக்கும் நேரம்"
+                    AppLanguage.ENGLISH -> "AVAILABLE"
+                },
+                value = buildString {
+                    listing.availableFrom?.let { append(it) }
+                    if (listing.availableFrom != null && listing.availableUntil != null) {
+                        append(" - ")
+                    }
+                    listing.availableUntil?.let { append(it) }
+                }
+            )
+        }
+
+        // Pickup location
+        LabelValuePair(
+            label = when (language) {
+                AppLanguage.SINHALA -> "රැගෙන යන ස්ථානය"
+                AppLanguage.TAMIL -> "எடுக்கும் இடம்"
+                AppLanguage.ENGLISH -> "PICKUP"
+            },
+            value = listing.pickupLocation
+        )
+    }
+}
+
+/**
+ * Seller section - name, district, posted time
+ */
+@Composable
+private fun SellerSection(
+    listing: ListingDetail,
+    language: AppLanguage
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Spacing.lg.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md.dp)
+    ) {
+        // Section label
+        Text(
+            text = when (language) {
+                AppLanguage.SINHALA -> "විකුණන්නා"
+                AppLanguage.TAMIL -> "விற்பவர்"
+                AppLanguage.ENGLISH -> "SELLER"
+            },
+            style = HumanIndustrialType.sectionLabel,
+            color = HumanIndustrial.Stone
+        )
+
+        // Seller name - with fallback for empty name
+        Text(
+            text = listing.sellerName.ifEmpty {
+                when (language) {
+                    AppLanguage.SINHALA -> "නම නොදනී"
+                    AppLanguage.TAMIL -> "பெயர் தெரியாது"
+                    AppLanguage.ENGLISH -> "NAME UNAVAILABLE"
+                }
+            },
+            style = HumanIndustrialType.productName,
+            color = HumanIndustrial.Ink
+        )
+
+        // District
+        Text(
+            text = listing.sellerDistrict,
+            style = HumanIndustrialType.body,
+            color = HumanIndustrial.Ink
+        )
+
+        // Posted time
+        Text(
+            text = listing.postedTime,
+            style = HumanIndustrialType.body,
+            color = HumanIndustrial.Stone
+        )
+    }
+}
+
+/**
+ * Action buttons section - Call and Send Message
+ */
+@Composable
+private fun ActionButtonsSection(
+    language: AppLanguage,
+    phoneAvailable: Boolean,
+    onCallSeller: () -> Unit,
+    onSendMessage: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Spacing.lg.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md.dp)
+    ) {
+        // Primary: Call - disabled if phone not available
+        if (phoneAvailable) {
+            PrimaryButton(
+                text = when (language) {
+                    AppLanguage.SINHALA -> "ඇමතුමක් ගන්න"
+                    AppLanguage.TAMIL -> "அழைக்கவும்"
+                    AppLanguage.ENGLISH -> "CALL"
+                },
+                onClick = onCallSeller,
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            // Show unavailable message when phone is missing
+            SecondaryButton(
+                text = when (language) {
+                    AppLanguage.SINHALA -> "දුරකතන අංකය නොමැත"
+                    AppLanguage.TAMIL -> "தொலைபேசி இல்லை"
+                    AppLanguage.ENGLISH -> "PHONE UNAVAILABLE"
+                },
+                onClick = { /* No action - informational only */ },
+                enabled = false,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Secondary: Send Message
+        SecondaryButton(
+            text = when (language) {
+                AppLanguage.SINHALA -> "පණිවිඩයක් යවන්න"
+                AppLanguage.TAMIL -> "செய்தி அனுப்பவும்"
+                AppLanguage.ENGLISH -> "SEND MESSAGE"
+            },
+            onClick = onSendMessage,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+/**
+ * Label-value pair component
+ */
+@Composable
+private fun LabelValuePair(
+    label: String,
+    value: String
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
+    ) {
+        Text(
+            text = label,
+            style = HumanIndustrialType.sectionLabel,
+            color = HumanIndustrial.Stone
+        )
+        Text(
+            text = value,
+            style = HumanIndustrialType.productName,
+            color = HumanIndustrial.Ink
+        )
+    }
+}
+
+// ============================================================================
+// BACKWARD COMPATIBILITY - Keep old function signature
+// ============================================================================
+
+/**
+ * Legacy function signature for backward compatibility
+ */
 @Composable
 fun IndustrialListingDetailScreen(
     productName: String,
@@ -84,209 +475,91 @@ fun IndustrialListingDetailScreen(
     onEdit: () -> Unit = {},
     onDelete: () -> Unit = {}
 ) {
-    var showDeleteConfirmation by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
+    val listing = ListingDetail(
+        id = "",
+        productName = productName,
+        price = price,
+        unit = unit,
+        categoryName = "",
+        pickupLocation = location,
+        sellerName = sellerName,
+        sellerDistrict = location,
+        sellerPhone = "",
+        postedTime = ""
+    )
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = AgrimarketWhite,
-        topBar = {
-            // Top bar with back button
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .background(AgrimarketWhite)
-                    .border(
-                        width = BorderWidth.Thin,
-                        color = AgrimarketBlack,
-                        shape = RectangleShape
-                    )
-            ) {
-                IconButton(
-                    onClick = onNavigateBack,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = AgrimarketBlack
-                    )
-                }
-            }
-        },
-        bottomBar = {
-            // Action buttons
-            if (isOwnListing) {
-                // EDIT and DELETE buttons for own listing
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(AgrimarketWhite)
-                        .padding(Spacing.Base),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.Base)
-                ) {
-                    SecondaryButton(
-                        text = "EDIT",
-                        onClick = onEdit,
-                        modifier = Modifier.weight(1f)
-                    )
-                    DangerButton(
-                        text = "DELETE",
-                        onClick = { showDeleteConfirmation = true },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            } else {
-                // CALL SELLER button for other listings
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(AgrimarketWhite)
-                        .padding(Spacing.Base)
-                ) {
-                    PrimaryButton(
-                        text = "CALL SELLER",
-                        onClick = onCallSeller,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Image (if available)
-            imageUrl?.let { url ->
-                item {
-                    AsyncImage(
-                        model = url,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 320.dp)
-                            .background(AgrimarketBlack),
-                        contentScale = ContentScale.FillWidth
-                    )
-                }
-            }
+    IndustrialListingDetailScreen(
+        listing = listing,
+        language = AppLanguage.ENGLISH,
+        onNavigateBack = onNavigateBack,
+        onCallSeller = onCallSeller,
+        onSendMessage = {}
+    )
+}
 
-            // Product title
-            item {
-                Text(
-                    text = productName.uppercase(),
-                    style = TextStyle(
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Black,
-                        color = AgrimarketBlack,
-                        letterSpacing = 0.sp
-                    ),
-                    modifier = Modifier.padding(horizontal = Spacing.Base, vertical = Spacing.Base)
-                )
-            }
+// ============================================================================
+// PREVIEWS
+// ============================================================================
 
-            // Price (huge)
-            item {
-                Text(
-                    text = price.toString(),
-                    style = TextStyle(
-                        fontSize = 56.sp,
-                        fontWeight = FontWeight.Black,
-                        color = AgrimarketBlack,
-                        lineHeight = 56.sp,
-                        letterSpacing = 0.sp
-                    ),
-                    modifier = Modifier.padding(horizontal = Spacing.Base)
-                )
-            }
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun ListingDetailPreview() {
+    val sampleListing = ListingDetail(
+        id = "1",
+        productName = "තක්කාලි",
+        price = 280.0,
+        unit = "kg",
+        categoryName = "එළවළු",
+        availableFrom = "ජනවාරි 15",
+        availableUntil = "ජනවාරි 20",
+        pickupLocation = "නුවර පොළ අසල",
+        sellerName = "සුනිල් මහතා",
+        sellerDistrict = "නුවර",
+        sellerPhone = "+94771234567",
+        postedTime = "පැය 3කට පෙර"
+    )
 
-            // Unit
-            item {
-                Text(
-                    text = "PER ${unit.uppercase()}",
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = AgrimarketGray,
-                        letterSpacing = 0.sp
-                    ),
-                    modifier = Modifier.padding(horizontal = Spacing.Base, vertical = 4.dp)
-                )
-            }
+    IndustrialListingDetailScreen(
+        listing = sampleListing,
+        language = AppLanguage.SINHALA,
+        onNavigateBack = {},
+        onSendMessage = {}
+    )
+}
 
-            // Spacer before metadata
-            item {
-                Spacer(modifier = Modifier.height(Spacing.Base))
-            }
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun ListingDetailEnglishPreview() {
+    val sampleListing = ListingDetail(
+        id = "1",
+        productName = "Tomatoes",
+        price = 280.0,
+        unit = "kg",
+        categoryName = "VEGETABLES",
+        availableFrom = "January 15",
+        availableUntil = "January 20",
+        pickupLocation = "Near Kandy Market",
+        sellerName = "Mr. Sunil",
+        sellerDistrict = "Kandy",
+        sellerPhone = "+94771234567",
+        postedTime = "3 hours ago"
+    )
 
-            // Metadata stack
-            item {
-                Column(
-                    modifier = Modifier.padding(horizontal = Spacing.Base),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "QUANTITY: $quantity ${unit.uppercase()}",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = AgrimarketBlack,
-                            letterSpacing = 0.sp
-                        )
-                    )
-                    Text(
-                        text = "LOCATION: ${location.uppercase()}",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = AgrimarketBlack,
-                            letterSpacing = 0.sp
-                        )
-                    )
-                    Text(
-                        text = "SELLER: ${sellerName.uppercase()}",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = AgrimarketBlack,
-                            letterSpacing = 0.sp
-                        )
-                    )
-                }
-            }
+    IndustrialListingDetailScreen(
+        listing = sampleListing,
+        language = AppLanguage.ENGLISH,
+        onNavigateBack = {},
+        onSendMessage = {}
+    )
+}
 
-            // Bottom spacer to ensure content doesn't overlap bottom bar
-            item {
-                Spacer(modifier = Modifier.height(Spacing.Base))
-            }
-        }
-    }
-
-    // Delete confirmation bottom sheet
-    if (showDeleteConfirmation) {
-        IndustrialConfirmationBottomSheet(
-            title = "DELETE LISTING?",
-            confirmText = "DELETE",
-            cancelText = "CANCEL",
-            onConfirm = {
-                scope.launch {
-                    sheetState.hide()
-                    showDeleteConfirmation = false
-                    onDelete()
-                }
-            },
-            onCancel = {
-                scope.launch {
-                    sheetState.hide()
-                    showDeleteConfirmation = false
-                }
-            },
-            isDangerous = true,
-            sheetState = sheetState
-        )
-    }
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun ListingDetailLoadingPreview() {
+    IndustrialListingDetailScreen(
+        listing = null,
+        language = AppLanguage.ENGLISH,
+        onNavigateBack = {},
+        isLoading = true
+    )
 }

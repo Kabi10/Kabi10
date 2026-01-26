@@ -196,11 +196,11 @@ fun IndustrialPhoneInputScreen(
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            // Error message (if any)
+            // Error message (if any) - display as-is from backend (no uppercase transformation)
             if (uiState.error != null) {
                 Spacer(modifier = Modifier.height(Spacing.Base))
                 Text(
-                    text = uiState.error!!.uppercase(),
+                    text = uiState.error!!,
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,

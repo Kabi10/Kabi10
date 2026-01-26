@@ -29,19 +29,24 @@ import com.senthapps.slagrimarket.ui.profile.ProfileScreen
 import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
 import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.search.SearchScreen
+import com.senthapps.slagrimarket.ui.settings.IndustrialSettingsScreen
 import com.senthapps.slagrimarket.ui.sync.SyncSettingsScreen
 import com.senthapps.slagrimarket.ui.home.IndustrialHomeScreen
 import com.senthapps.slagrimarket.ui.home.IndustrialMarketPricesScreen
+import com.senthapps.slagrimarket.ui.listings.CreateListingSuccessScreen
 import com.senthapps.slagrimarket.ui.listings.CreateListingViewModel
 import com.senthapps.slagrimarket.ui.listings.IndustrialCategorySelectionScreen
 import com.senthapps.slagrimarket.ui.listings.IndustrialCreateListingScreen
 import com.senthapps.slagrimarket.ui.listings.IndustrialListingDetailScreen
 import com.senthapps.slagrimarket.ui.listings.IndustrialListingsListScreen
+import com.senthapps.slagrimarket.ui.listings.ListingDetail
 import com.senthapps.slagrimarket.ui.listings.ListingPreview
 import com.senthapps.slagrimarket.ui.listings.ListingsScreen
 import com.senthapps.slagrimarket.ui.transactions.CreateTransactionScreen
 import com.senthapps.slagrimarket.ui.transactions.IndustrialTransactionDetailScreen
 import com.senthapps.slagrimarket.ui.transactions.IndustrialTransactionsScreen
+import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.theme.LocalAppLanguage
 
 @Composable
 fun JaffnaMarketplaceNavigation(
@@ -98,6 +103,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToOrders = {
                     navController.navigate(Screen.Transactions.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -116,6 +124,9 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToOrders = {
                     navController.navigate(Screen.Transactions.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -196,10 +207,12 @@ fun JaffnaMarketplaceNavigation(
             val viewModel: CreateListingViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 
-            // Navigate back when listing is successfully created
+            // Navigate to success screen when listing is successfully created
             LaunchedEffect(uiState.isSuccess) {
                 if (uiState.isSuccess) {
-                    navController.popBackStack()
+                    navController.navigate(Screen.CreateListingSuccess.route) {
+                        popUpTo(Screen.CreateListing.route) { inclusive = true }
+                    }
                 }
             }
 
@@ -219,6 +232,17 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        // Create Listing Success Screen (Industrial UI)
+        composable(Screen.CreateListingSuccess.route) {
+            CreateListingSuccessScreen(
+                onDone = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
                 }
             )
         }
@@ -244,32 +268,38 @@ fun JaffnaMarketplaceNavigation(
                 viewModel.loadListing(listingId)
             }
 
-            // Display industrial listing detail screen
-            uiState.listing?.let { listing ->
-                IndustrialListingDetailScreen(
+            // Convert Listing to ListingDetail data class
+            val listingDetail = uiState.listing?.let { listing ->
+                ListingDetail(
+                    id = listing.id,
                     productName = listing.cropNameEnglish.ifEmpty { listing.cropType },
                     price = listing.pricePerUnit,
                     unit = listing.unit,
-                    quantity = listing.quantity,
-                    location = listing.location,
-                    sellerName = listing.farmerName ?: listing.farmerId,
-                    imageUrl = null, // TODO: listing.imageUrls when available
-                    isOwnListing = false, // TODO: Check if current user owns this listing
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    onCallSeller = {
-                        // TODO: Open phone dialer or messaging app
-                    },
-                    onEdit = {
-                        // TODO: Navigate to edit listing screen
-                    },
-                    onDelete = {
-                        // TODO: Delete listing via ViewModel
-                        navController.popBackStack()
-                    }
+                    categoryName = listing.cropType,
+                    availableFrom = listing.availableFrom,
+                    availableUntil = listing.availableUntil,
+                    pickupLocation = listing.location,
+                    sellerName = listing.farmerName ?: "",
+                    sellerDistrict = listing.location,
+                    sellerPhone = listing.farmerPhone,
+                    postedTime = listing.createdAt
                 )
             }
+
+            // Display industrial listing detail screen with proper data class
+            IndustrialListingDetailScreen(
+                listing = listingDetail,
+                language = com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onSendMessage = {
+                    // TODO: Navigate to chat
+                },
+                isLoading = uiState.isLoading,
+                isError = uiState.error != null,
+                onRetry = { viewModel.loadListing(listingId) }
+            )
         }
 
         composable(Screen.Transactions.route) {
@@ -414,6 +444,30 @@ fun JaffnaMarketplaceNavigation(
             )
         }
 
+        // Industrial Settings (Language Selection)
+        composable(Screen.Settings.route) {
+            val languageViewModel: LanguageToggleViewModel = hiltViewModel()
+            val currentLanguage = LocalAppLanguage.current
+
+            IndustrialSettingsScreen(
+                currentLanguage = currentLanguage,
+                onLanguageSelected = { language ->
+                    // Convert AppLanguage to string code and persist
+                    val languageCode = when (language) {
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH -> "en"
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.SINHALA -> "si"
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.TAMIL -> "ta"
+                    }
+                    languageViewModel.setLanguage(languageCode)
+                    // Navigate back - UI will update reactively via CompositionLocal
+                    navController.popBackStack()
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(Screen.Favorites.route) {
             FavoritesScreen(
                 onNavigateToDetail = { listingId ->
@@ -517,6 +571,7 @@ sealed class Screen(val route: String) {
     }
     object Profile : Screen("profile")
     object CreateListing : Screen("create_listing")
+    object CreateListingSuccess : Screen("create_listing_success") // Industrial UI - Success confirmation
     object Search : Screen("search")
     object MarketPrices : Screen("market_prices")
     object ListingDetail : Screen("listing_detail/{listingId}") {
@@ -551,4 +606,5 @@ sealed class Screen(val route: String) {
     object ListingsMap : Screen("listings_map")
     object Help : Screen("help")
     object FAQ : Screen("faq")
+    object Settings : Screen("settings") // Industrial UI - Language settings
 }

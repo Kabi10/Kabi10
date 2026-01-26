@@ -281,11 +281,11 @@ fun IndustrialOtpVerificationScreen(
                     )
                 }
 
-                // Error message
+                // Error message - display as-is from backend (no uppercase transformation)
                 if (uiState.error != null) {
                     Spacer(modifier = Modifier.height(Spacing.Base))
                     Text(
-                        text = uiState.error!!.uppercase(),
+                        text = uiState.error!!,
                         style = TextStyle(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,

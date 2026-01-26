@@ -88,12 +88,17 @@ router.get('/', async (req, res) => {
     const countResult = await db.query(countQuery, queryParams.slice(0, -2));
     const total = parseInt(countResult.rows[0].total);
 
-    // Transform data
+    // Transform data - includes flat fields for Android compatibility
     const transactions = result.rows.map((row) => ({
       id: row.id,
       listingId: row.listing_id,
       farmerId: row.farmer_id,
       buyerId: row.buyer_id,
+      // Flat name/phone fields for Android Transaction model
+      sellerName: row.farmer_name || '',
+      buyerName: row.buyer_name || '',
+      sellerPhone: row.farmer_contact || '',
+      buyerPhone: row.buyer_contact || '',
       quantity: parseFloat(row.quantity),
       totalAmount: parseFloat(row.total_amount),
       pickupLocation: row.pickup_location,
@@ -189,6 +194,11 @@ router.get('/:id', async (req, res) => {
         listingId: transaction.listing_id,
         farmerId: transaction.farmer_id,
         buyerId: transaction.buyer_id,
+        // Flat name/phone fields for Android Transaction model
+        sellerName: transaction.farmer_name || '',
+        buyerName: transaction.buyer_name || '',
+        sellerPhone: transaction.farmer_contact || '',
+        buyerPhone: transaction.buyer_contact || '',
         quantity: parseFloat(transaction.quantity),
         totalAmount: parseFloat(transaction.total_amount),
         pickupLocation: transaction.pickup_location,

@@ -181,6 +181,8 @@ router.get('/', async (req, res) => {
       updatedAt: row.updated_at,
       farmerName: row.farmer_name,
       farmerContact: row.farmer_contact,
+      // Flat field for Android Listing model
+      farmerPhone: row.farmer_contact || '',
       // Storytelling fields
       story: row.story || '',
       farmingMethods: row.farming_methods || [],
@@ -267,6 +269,9 @@ router.get('/:id', async (req, res) => {
         createdAt: listing.created_at,
         updatedAt: listing.updated_at,
         viewCount: listing.view_count,
+        // Flat fields for Android Listing model
+        farmerName: listing.farmer_name || '',
+        farmerPhone: listing.farmer_contact || '',
         farmer: {
           name: listing.farmer_name,
           contact: listing.farmer_contact,
