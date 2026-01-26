@@ -278,7 +278,12 @@ private fun PriceRow(
         AppLanguage.TAMIL -> price.productNameTamil
         AppLanguage.ENGLISH -> price.productName
     }
-    val priceText = "රු ${price.price.toInt()}/${price.unit}"
+    val currencySymbol = when (language) {
+        AppLanguage.SINHALA -> "රු"
+        AppLanguage.TAMIL -> "ரூ"
+        AppLanguage.ENGLISH -> "Rs"
+    }
+    val priceText = "$currencySymbol ${price.price.toInt()}/${price.unit}"
 
     Row(
         modifier = Modifier

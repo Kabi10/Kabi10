@@ -18,9 +18,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -113,7 +110,7 @@ fun IndustrialOtpVerificationScreen(
                 )
                 .background(AgrimarketWhite)
         ) {
-            // Header with back button
+            // Header with back button - Industrial Design (no icons)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,17 +125,23 @@ fun IndustrialOtpVerificationScreen(
             ) {
                 Box(
                     modifier = Modifier
+                        .height(56.dp)
                         .clickable(
                             onClick = onNavigateBack,
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
                         )
-                        .padding(end = Spacing.Base)
+                        .padding(end = Spacing.Base),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "BACK",
-                        tint = AgrimarketBlack
+                    Text(
+                        text = "BACK",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AgrimarketBlack,
+                            letterSpacing = 0.5.sp
+                        )
                     )
                 }
                 Text(
