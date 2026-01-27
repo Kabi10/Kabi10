@@ -129,7 +129,7 @@ router.get('/', async (req, res) => {
     // Response matches Android TransactionsResponse DTO
     res.json({
       success: true,
-      transactions: transactions,  // Android expects 'transactions' not 'data'
+      transactions, // Android expects 'transactions' not 'data'
       totalCount: total,
       page: parseInt(page),
       totalPages: Math.ceil(total / parseInt(limit)),
@@ -302,7 +302,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
 
       // Calculate total amount
       const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
-      
+
       // Allow 1 cent difference for floating point errors
       if (Math.abs(totalAmount - expectedAmount) > 0.01) {
         throw new Error('Total amount does not match expected calculation');
@@ -335,7 +335,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
     logger.info('Transaction created', {
       transactionId: transaction.id,
       buyerId: req.user.userId,
-      farmerId: listingData.farmer_id,
+      farmerId: transaction.farmer_id,
       listingId,
       quantity,
       totalAmount,

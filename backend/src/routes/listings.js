@@ -194,7 +194,7 @@ router.get('/', async (req, res) => {
     // Response matches Android ListingsResponse DTO
     res.json({
       success: true,
-      listings: listings,  // Android expects 'listings' not 'data'
+      listings, // Android expects 'listings' not 'data'
       totalCount: total,
       page: parseInt(page),
       totalPages: Math.ceil(total / parseInt(limit)),

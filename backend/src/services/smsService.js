@@ -230,12 +230,12 @@ class SMSService {
     const extractedOtp = otp || this.extractOtpFromMessage(message);
 
     // Log clearly to console for testing
-    console.log('\n' + '='.repeat(60));
+    console.log(`\n${'='.repeat(60)}`);
     console.log('📱 MOCK SMS - OTP CODE (NOT SENT)');
     console.log('='.repeat(60));
     console.log(`Phone: ${phoneNumber}`);
     console.log(`OTP:   ${extractedOtp || 'N/A'}`);
-    console.log('='.repeat(60) + '\n');
+    console.log(`${'='.repeat(60)}\n`);
 
     logger.info('Mock SMS generated (not sent)', {
       to: this.maskPhoneNumber(phoneNumber),
@@ -286,7 +286,7 @@ class SMSService {
    */
   getCostEstimate(mode = this.mode) {
     const costs = {
-      mock: 0.00,   // Free - no SMS sent
+      mock: 0.00, // Free - no SMS sent
       dialog: 0.50, // ~0.50 LKR per SMS
       mobitel: 0.45, // ~0.45 LKR per SMS
       twilio: 2.50, // ~2.50 LKR per SMS (international rates)

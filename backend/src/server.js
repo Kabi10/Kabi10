@@ -142,7 +142,7 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       auth: `/api/${API_VERSION}/auth`,
-      marketPrices: `/api/market-prices`,
+      marketPrices: '/api/market-prices',
       users: `/api/${API_VERSION}/users`,
       listings: `/api/${API_VERSION}/listings`,
       transactions: `/api/${API_VERSION}/transactions`,

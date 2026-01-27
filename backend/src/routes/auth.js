@@ -101,7 +101,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
       const response = {
         success: true,
         message: 'OTP sent successfully',
-        otpId: otpId, // Android needs this for verify-otp
+        otpId, // Android needs this for verify-otp
       };
 
       // In mock mode, also return OTP for testing convenience

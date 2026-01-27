@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
-const logger = require('../utils/logger');
 const crypto = require('crypto');
+const logger = require('../utils/logger');
 
 // Check if mock mode is enabled
 const MOCK_DB = process.env.MOCK_DB === 'true';
@@ -26,8 +26,8 @@ const mockDb = {
       // Check recent OTP (rate limiting)
       const phoneNumber = params[0];
       const recent = mockStorage.otpVerifications.find(
-        o => o.phone_number === phoneNumber &&
-        Date.now() - new Date(o.created_at).getTime() < 60000
+        (o) => o.phone_number === phoneNumber
+        && Date.now() - new Date(o.created_at).getTime() < 60000,
       );
       return { rows: recent ? [recent] : [], rowCount: recent ? 1 : 0 };
     }
@@ -48,23 +48,23 @@ const mockDb = {
     }
 
     if (text.includes('FROM otp_verifications') && text.includes('expires_at > NOW()')) {
-      const phoneNumber = params.find(p => typeof p === 'string' && p.startsWith('+94'));
+      const phoneNumber = params.find((p) => typeof p === 'string' && p.startsWith('+94'));
       const otp = mockStorage.otpVerifications.find(
-        o => o.phone_number === phoneNumber && !o.verified && new Date(o.expires_at) > new Date()
+        (o) => o.phone_number === phoneNumber && !o.verified && new Date(o.expires_at) > new Date(),
       );
       return { rows: otp ? [otp] : [], rowCount: otp ? 1 : 0 };
     }
 
     if (text.includes('UPDATE otp_verifications SET verified')) {
       const id = params[params.length - 1];
-      const otp = mockStorage.otpVerifications.find(o => o.id === id);
+      const otp = mockStorage.otpVerifications.find((o) => o.id === id);
       if (otp) otp.verified = true;
       return { rows: [], rowCount: 1 };
     }
 
     if (text.includes('UPDATE otp_verifications SET attempts')) {
       const id = params[1];
-      const otp = mockStorage.otpVerifications.find(o => o.id === id);
+      const otp = mockStorage.otpVerifications.find((o) => o.id === id);
       if (otp) otp.attempts = params[0];
       return { rows: [], rowCount: 1 };
     }
@@ -72,7 +72,7 @@ const mockDb = {
     if (text.includes('DELETE FROM otp_verifications')) {
       const phoneNumber = params[0];
       mockStorage.otpVerifications = mockStorage.otpVerifications.filter(
-        o => o.phone_number !== phoneNumber
+        (o) => o.phone_number !== phoneNumber,
       );
       return { rows: [], rowCount: 1 };
     }
@@ -80,13 +80,13 @@ const mockDb = {
     // Handle user queries
     if (text.includes('FROM users WHERE phone_number')) {
       const phoneNumber = params[0];
-      const user = mockStorage.users.find(u => u.phone_number === phoneNumber);
+      const user = mockStorage.users.find((u) => u.phone_number === phoneNumber);
       return { rows: user ? [user] : [], rowCount: user ? 1 : 0 };
     }
 
     if (text.includes('FROM users WHERE id')) {
       const userId = params[0];
-      const user = mockStorage.users.find(u => u.id === userId);
+      const user = mockStorage.users.find((u) => u.id === userId);
       // Add can_sell field for listing creation check
       if (user) {
         user.can_sell = true;
@@ -118,14 +118,14 @@ const mockDb = {
     // Handle listings queries
     if (text.includes('FROM listings') && !text.includes('INSERT') && !text.includes('COUNT(*)')) {
       // Return listings with mock farmer data joined
-      const listings = mockStorage.listings.map(l => ({
+      const listings = mockStorage.listings.map((l) => ({
         ...l,
         farmer_name: 'Mock Farmer',
         farmer_contact: '+94771234567',
       }));
       return {
         rows: listings,
-        rowCount: listings.length
+        rowCount: listings.length,
       };
     }
 
@@ -173,7 +173,7 @@ const mockDb = {
     if (text.includes('FROM transactions') && !text.includes('INSERT') && !text.includes('COUNT(*)')) {
       return {
         rows: mockStorage.transactions,
-        rowCount: mockStorage.transactions.length
+        rowCount: mockStorage.transactions.length,
       };
     }
 
@@ -195,7 +195,7 @@ const mockDb = {
 
   async transaction(callback) {
     const client = await this.getClient();
-    return await callback(client);
+    return callback(client);
   },
 
   async healthCheck() {

@@ -111,12 +111,12 @@ router.post('/operations', async (req, res) => {
  */
 router.get('/data', async (req, res) => {
   try {
-    const { 
+    const {
       lastSyncAt,
       listingPage,
       listingLimit,
       transactionPage,
-      transactionLimit
+      transactionLimit,
     } = req.query;
 
     const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId, {
