@@ -78,20 +78,149 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 & $env:ADB shell settings put secure accessibility_enabled 0
 ```
 
-### 10-Point Verification Checklist
+### 12-Point Verification Checklist
 
 | # | Item | Command/Action | ✓ |
 |---|------|----------------|---|
-| 1 | API Health | `Invoke-RestMethod "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/health"` | [ ] |
-| 2 | Auth Flow | Manual login with OTP | [ ] |
-| 3 | Sync Test | Toggle airplane mode | [ ] |
-| 4 | Offline Data | View cached listings offline | [ ] |
-| 5 | Create Listing | Add new listing, check logcat | [ ] |
-| 6 | Unit Tests | `.\gradlew test` | [ ] |
-| 7 | UI Tests | `.\gradlew connectedAndroidTest` | [ ] |
-| 8 | Tamil UI | Language toggle | [ ] |
-| 9 | Dark Mode | Theme consistency | [ ] |
-| 10 | TalkBack | Accessibility | [ ] |
+| 1 | **Release Build** | `.\gradlew assembleRelease` (must succeed) | [ ] |
+| 2 | **Debug Bypass OFF** | Verify `BuildConfig.DEBUG=false` in release APK | [ ] |
+| 3 | API Health | `Invoke-RestMethod "https://backend-psi-tan-18.vercel.app/api/health"` | [ ] |
+| 4 | Auth Flow | Manual login with OTP (no debug bypass) | [ ] |
+| 5 | Sync Test | Toggle airplane mode | [ ] |
+| 6 | Offline Data | View cached listings offline | [ ] |
+| 7 | Create Listing | Add new listing, check logcat | [ ] |
+| 8 | Unit Tests | `.\gradlew test` | [ ] |
+| 9 | UI Tests | `.\gradlew connectedAndroidTest` | [ ] |
+| 10 | Tamil UI | Language toggle | [ ] |
+| 11 | Dark Mode | Theme consistency | [ ] |
+| 12 | TalkBack | Accessibility | [ ] |
+
+---
+
+## 🚨 PRODUCTION BUILD VERIFICATION (Run First!)
+
+> **CRITICAL:** These steps verify that debug code is disabled and the release build is production-ready. Run these BEFORE testing app functionality.
+
+### PB-1. Build Release APK
+
+```powershell
+# Clean and build release
+.\gradlew clean assembleRelease
+
+# Verify APK was created
+Get-ChildItem ".\app\build\outputs\apk\release\*.apk" | Select-Object Name, @{N='SizeMB';E={[math]::Round($_.Length/1MB,2)}}
+# Expected: app-release-unsigned.apk, Size < 25MB
+```
+
+### PB-2. Verify BuildConfig Values in Release APK
+
+```powershell
+# Extract BuildConfig from release APK to verify DEBUG=false
+$APK = Get-ChildItem ".\app\build\outputs\apk\release\*.apk" | Select-Object -First 1
+$AAPT = "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\aapt2.exe"
+
+# Check if APK contains debug flag (should NOT find "DEBUG:true")
+& $AAPT dump badging $APK.FullName | Select-String "debug"
+
+# Verify via decompiled BuildConfig (requires apktool or jadx)
+# The release APK should have: BuildConfig.DEBUG = false
+```
+
+### PB-3. Verify Debug Bypass is Disabled
+
+The `AuthRepository.kt` uses `BuildConfig.DEBUG` to enable/disable debug bypass:
+```kotlin
+private val isDebugMode: Boolean = BuildConfig.DEBUG
+```
+
+**Verification Steps:**
+```powershell
+# 1. Install RELEASE APK (not debug)
+& $env:ADB install -r ".\app\build\outputs\apk\release\app-release.apk"
+
+# 2. Clear app data for fresh start
+& $env:ADB shell pm clear com.senthapps.slagrimarket
+
+# 3. Launch app and monitor logs
+& $env:ADB logcat -c
+& $env:ADB shell am start -n com.senthapps.slagrimarket/.MainActivity
+& $env:ADB logcat -v time | Select-String "(DEBUG|debug_user|bypass|fake)"
+
+# Expected: NO logs containing "DEBUG:", "debug_user_123", "bypass auth", or "fake"
+# The app MUST show the login screen, NOT auto-login with debug user
+```
+
+**Pass Criteria:**
+- [ ] Release APK builds successfully
+- [ ] App shows login screen on fresh install (NOT home screen)
+- [ ] No "debug_user_123" or "Debug Farmer" visible
+- [ ] Logcat shows NO debug bypass messages
+- [ ] Real OTP authentication is required
+
+### PB-4. Verify Production API URL
+
+```powershell
+# Check release build config has production URL
+Select-String -Path ".\app\build.gradle.kts" -Pattern 'release\s*\{' -Context 0,10 |
+    Select-String "BASE_URL"
+# Expected: "https://backend-psi-tan-18.vercel.app/api/"
+
+# Verify API calls go to production (not localhost)
+& $env:ADB logcat -v time | Select-String "OkHttp" | Select-String "backend-psi-tan-18"
+# Should see requests to production URL, NOT 10.0.2.2:3000
+```
+
+### PB-5. Verify ProGuard/R8 Obfuscation
+
+```powershell
+# Check ProGuard is enabled
+Select-String -Path ".\app\build.gradle.kts" -Pattern "isMinifyEnabled|isShrinkResources"
+# Expected: isMinifyEnabled = true, isShrinkResources = true
+
+# Verify mapping file was generated (indicates obfuscation ran)
+Test-Path ".\app\build\outputs\mapping\release\mapping.txt"
+# Expected: True
+
+# Check mapping file size (should be substantial if obfuscation worked)
+Get-ChildItem ".\app\build\outputs\mapping\release\mapping.txt" | Select-Object Length
+# Expected: > 100KB
+```
+
+### PB-6. Verify APK Signing (for Play Store)
+
+```powershell
+# Check if APK is signed
+$APKSIGNER = "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\apksigner.bat"
+$APK = Get-ChildItem ".\app\build\outputs\apk\release\*.apk" | Select-Object -First 1
+
+# Verify signature
+& $APKSIGNER verify --verbose $APK.FullName
+
+# For unsigned APK, you'll need to sign it:
+# & $APKSIGNER sign --ks release-keystore.jks --out app-release-signed.apk $APK.FullName
+```
+
+### PB-7. Release Build Size Check
+
+```powershell
+# APK size analysis
+$APK = Get-ChildItem ".\app\build\outputs\apk\release\*.apk" | Select-Object -First 1
+$SizeMB = [math]::Round($APK.Length/1MB, 2)
+
+Write-Host "Release APK Size: $SizeMB MB"
+# Target: < 25MB for base APK
+# Warning: > 30MB may indicate missing shrinkResources or large assets
+```
+
+**Production Build Summary:**
+| Check | Command | Expected | ✓ |
+|-------|---------|----------|---|
+| Build succeeds | `.\gradlew assembleRelease` | Exit code 0 | [ ] |
+| Debug bypass OFF | Install + launch release APK | Shows login screen | [ ] |
+| Production URL | Check logcat for API calls | `backend-psi-tan-18.vercel.app` | [ ] |
+| ProGuard enabled | Check mapping.txt exists | File > 100KB | [ ] |
+| APK size | Check file size | < 25MB | [ ] |
+| No debug logs | Monitor logcat | No DEBUG/bypass messages | [ ] |
 
 ---
 
@@ -961,11 +1090,20 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk|compileS
 
 | Category | Total Items | Status |
 |----------|-------------|--------|
+| 🚨 PRODUCTION BUILD (PB-1 to PB-7) | 7 | [ ] |
 | 🔴 CRITICAL (1-7) | 7 | [ ] |
 | 🟡 HIGH (8-12) | 5 | [ ] |
 | 🟠 MEDIUM (13-18) | 6 | [ ] |
 | 🟢 STANDARD (19-25) | 7 | [ ] |
-| **TOTAL** | **25** | [ ] |
+| **TOTAL** | **32** | [ ] |
+
+### ⚡ Priority Order for Launch
+
+1. **Production Build Verification (PB-1 to PB-7)** - Must pass before any other testing
+2. **Critical (1-7)** - Core functionality verification
+3. **High (8-12)** - User experience essentials
+4. **Medium (13-18)** - Quality assurance
+5. **Standard (19-25)** - Play Store requirements
 
 ---
 
