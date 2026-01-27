@@ -11,6 +11,7 @@ jest.mock('../src/database/connection', () => ({
 
 jest.mock('../src/services/smsService', () => ({
   sendSMS: jest.fn(),
+  isMockMode: jest.fn().mockReturnValue(true),
 }));
 
 // Mock logger to keep test output clean
@@ -50,10 +51,10 @@ describe('API Endpoints', () => {
 
     it('should send OTP for valid number', async () => {
       // Mock DB response for rate limiting (no recent OTPs)
-      db.query.mockResolvedValueOnce({ rows: [] }); 
-      // Mock DB insert
       db.query.mockResolvedValueOnce({ rows: [] });
-      
+      // Mock DB insert - must return the OTP id
+      db.query.mockResolvedValueOnce({ rows: [{ id: 'test-otp-123' }] });
+
       // Mock SMS success
       smsService.sendSMS.mockResolvedValue(true);
 
