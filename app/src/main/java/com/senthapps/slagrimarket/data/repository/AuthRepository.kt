@@ -22,10 +22,12 @@ class AuthRepository @Inject constructor(
     private val authPreferences: AuthPreferences,
     private val userDao: UserDao
 ) {
+    // Debug mode uses BuildConfig.DEBUG directly
+    private val isDebugMode: Boolean = BuildConfig.DEBUG
 
     // Production: Use AuthPreferences for consistent authentication state
     // DEBUG BYPASS: Return fake user flow in debug builds
-    val currentUser: Flow<User?> = if (BuildConfig.DEBUG) {
+    val currentUser: Flow<User?> = if (isDebugMode) {
         kotlinx.coroutines.flow.flowOf(
             User(
                 id = "debug_user_123",
@@ -41,7 +43,7 @@ class AuthRepository @Inject constructor(
         authPreferences.currentUser
     }
 
-    val isLoggedIn: Flow<Boolean> = if (BuildConfig.DEBUG) {
+    val isLoggedIn: Flow<Boolean> = if (isDebugMode) {
         kotlinx.coroutines.flow.flowOf(true)
     } else {
         authPreferences.isLoggedIn
@@ -49,7 +51,7 @@ class AuthRepository @Inject constructor(
 
     init {
         // DEBUG: Persist fake user to database to satisfy FK constraints
-        if (BuildConfig.DEBUG) {
+        if (isDebugMode) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val debugUser = User(
@@ -178,7 +180,7 @@ class AuthRepository @Inject constructor(
     
     suspend fun getCurrentUser(): User? {
         // DEBUG BYPASS: Return fake authenticated user to skip auth flow
-        if (BuildConfig.DEBUG) {
+        if (isDebugMode) {
             Timber.d("🔧 DEBUG: Returning fake authenticated user to bypass auth")
             return User(
                 id = "debug_user_123",
