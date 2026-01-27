@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"gradlew.bat :app:assembleDebug --no-daemon\")",
+      "Bash(gradlew.bat:*)",
+      "Bash(./gradlew.bat :app:compileDebugKotlin --console=plain)",
+      "Bash(./gradlew.bat :app:testDebugUnitTest:*)",
+      "Bash(./gradlew.bat:*)",
+      "Skill(android-architecture)",
+      "Skill(tdd-feature-workflow)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(cat:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel env:*)",
+      "Bash(curl:*)",
+      "Bash(vercel domains:*)",
+      "Bash(npx supabase status)",
+      "Bash(npx supabase projects list)",
+      "Bash(npx supabase:*)",
+      "Bash(printf:*)",
+      "Bash(vercel:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

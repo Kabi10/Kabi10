@@ -66,7 +66,7 @@ if (process.env.NODE_ENV === 'production' && !isVercel) {
   if (!fs.existsSync(logsDir)) {
     try {
       fs.mkdirSync(logsDir, { recursive: true });
-      
+
       // Error log file
       transports.push(
         new winston.transports.File({

@@ -1,5 +1,6 @@
 package com.senthapps.slagrimarket.data.repository
 
+import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.MarketPriceApiService
 import com.senthapps.slagrimarket.data.dao.MarketPriceDao
 import com.senthapps.slagrimarket.data.model.MarketPrice
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -64,15 +66,37 @@ class MarketPriceRepository @Inject constructor(
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to refresh market prices from network")
-                    // Network failed, but we have cached data
-                    if (cachedPrices.isEmpty()) {
+                    // DEBUG: Provide sample market prices when network fails and no cache
+                    if (cachedPrices.isEmpty() && BuildConfig.DEBUG) {
+                        try {
+                            val samplePrices = createSampleMarketPrices()
+                            marketPriceDao.insertMarketPrices(samplePrices)
+                            emit(Resource.Success(samplePrices))
+                            Timber.d("🔧 DEBUG: Provided sample market prices as fallback")
+                        } catch (dbError: Exception) {
+                            Timber.e(dbError, "Failed to insert sample market prices")
+                            emit(Resource.Error("No internet connection", e))
+                        }
+                    } else if (cachedPrices.isEmpty()) {
                         emit(Resource.Error("No internet connection", e))
                     }
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting market prices")
-            emit(Resource.Error("Failed to load market prices", e))
+            // DEBUG: Last resort - provide sample data
+            if (BuildConfig.DEBUG) {
+                try {
+                    val samplePrices = createSampleMarketPrices()
+                    marketPriceDao.insertMarketPrices(samplePrices)
+                    emit(Resource.Success(samplePrices))
+                    Timber.d("🔧 DEBUG: Provided sample market prices as last resort")
+                } catch (dbError: Exception) {
+                    emit(Resource.Error("Failed to load market prices", e))
+                }
+            } else {
+                emit(Resource.Error("Failed to load market prices", e))
+            }
         }
     }
     
@@ -295,5 +319,12 @@ class MarketPriceRepository @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Error clearing stale market price data")
         }
+    }
+
+    /**
+     * DEBUG-only: Create sample market prices for testing when backend is unavailable
+     */
+    private fun createSampleMarketPrices(): List<MarketPrice> {
+        return com.senthapps.slagrimarket.data.model.SampleMarketPrices.SAMPLE_PRICES
     }
 }

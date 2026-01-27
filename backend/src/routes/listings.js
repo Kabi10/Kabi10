@@ -6,6 +6,45 @@ const { validateUUID } = require('../utils/helpers');
 
 const router = express.Router();
 
+/**
+ * Middleware to apply safe defaults for listing creation
+ * Makes the API backward-compatible with simpler Android clients
+ */
+const applyListingDefaults = (req, res, next) => {
+  const body = req.body;
+
+  // Default availableFrom to today if not provided
+  if (!body.availableFrom) {
+    body.availableFrom = new Date().toISOString().split('T')[0];
+  }
+
+  // Default availableUntil to 30 days from today if not provided
+  if (!body.availableUntil) {
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+    body.availableUntil = thirtyDaysFromNow.toISOString().split('T')[0];
+  }
+
+  // Default pickupLocations to [location] if location is provided but pickupLocations is not
+  if (!body.pickupLocations || !Array.isArray(body.pickupLocations) || body.pickupLocations.length === 0) {
+    if (body.location) {
+      body.pickupLocations = [body.location];
+    }
+  }
+
+  // Default quality to 'B' (standard) if not provided
+  if (!body.quality) {
+    body.quality = 'B';
+  }
+
+  // Default unit to 'kg' if not provided
+  if (!body.unit) {
+    body.unit = 'kg';
+  }
+
+  next();
+};
+
 // Validation schemas
 const createListingValidation = [
   body('cropType').isIn([
@@ -142,6 +181,8 @@ router.get('/', async (req, res) => {
       updatedAt: row.updated_at,
       farmerName: row.farmer_name,
       farmerContact: row.farmer_contact,
+      // Flat field for Android Listing model
+      farmerPhone: row.farmer_contact || '',
       // Storytelling fields
       story: row.story || '',
       farmingMethods: row.farming_methods || [],
@@ -150,15 +191,16 @@ router.get('/', async (req, res) => {
       sustainabilityPractices: row.sustainability_practices || [],
     }));
 
+    // Response matches Android ListingsResponse DTO
     res.json({
       success: true,
-      data: listings,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages: Math.ceil(total / parseInt(limit)),
-      },
+      listings, // Android expects 'listings' not 'data'
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+      lastUpdated: new Date().toISOString(),
     });
   } catch (error) {
     logger.error('Get listings error:', error);
@@ -227,6 +269,9 @@ router.get('/:id', async (req, res) => {
         createdAt: listing.created_at,
         updatedAt: listing.updated_at,
         viewCount: listing.view_count,
+        // Flat fields for Android Listing model
+        farmerName: listing.farmer_name || '',
+        farmerPhone: listing.farmer_contact || '',
         farmer: {
           name: listing.farmer_name,
           contact: listing.farmer_contact,
@@ -254,7 +299,7 @@ router.get('/:id', async (req, res) => {
  * Create new listing
  * Matches Android CreateListingRequest
  */
-router.post('/', createListingValidation, async (req, res) => {
+router.post('/', applyListingDefaults, createListingValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

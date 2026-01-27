@@ -203,3 +203,102 @@ fun EmptySearchState(
     )
 }
 
+/**
+ * Error banner component for displaying errors with retry action
+ * Includes accessibility support and follows Material Design 3 guidelines
+ */
+@Composable
+fun ErrorBanner(
+    errorMessage: String,
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { contentDescription = "Error: $errorMessage" },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer
+        ),
+        shape = RoundedCornerShape(CornerRadius.Medium)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.Medium),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.Medium),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Error icon
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.size(24.dp)
+            )
+
+            // Error message
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Retry button
+            if (onRetry != null) {
+                TextButton(onClick = onRetry) {
+                    Text(
+                        text = "Retry",
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+
+            // Dismiss button
+            if (onDismiss != null) {
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Dismiss error",
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Centered error state for when errors occur on full screens
+ */
+@Composable
+fun ErrorState(
+    errorMessage: String,
+    currentLanguage: String,
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null
+) {
+    EmptyState(
+        icon = Icons.Default.Warning,
+        title = when (currentLanguage) {
+            "en" -> "Something went wrong"
+            "ta" -> "ஏதோ தவறு நடந்துவிட்டது"
+            "si" -> "යමක් වැරදී ඇත"
+            else -> "Something went wrong"
+        },
+        description = errorMessage,
+        modifier = modifier,
+        actionText = if (onRetry != null) {
+            when (currentLanguage) {
+                "en" -> "Try Again"
+                "ta" -> "மீண்டும் முயற்சிக்கவும்"
+                "si" -> "නැවත උත්සාහ කරන්න"
+                else -> "Try Again"
+            }
+        } else null,
+        onAction = onRetry
+    )
+}
+

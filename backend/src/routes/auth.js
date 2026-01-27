@@ -53,18 +53,21 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
       });
     }
 
-    // Check for recent OTP requests (rate limiting)
+    // Check for recent OTP requests (rate limiting - 60 second cooldown)
     const recentOTP = await db.query(
-      `SELECT * FROM otp_verifications 
+      `SELECT id, created_at FROM otp_verifications
        WHERE phone_number = $1 AND created_at > NOW() - INTERVAL '1 minute'
        ORDER BY created_at DESC LIMIT 1`,
       [phoneNumber],
     );
 
     if (recentOTP.rows.length > 0) {
+      const createdAt = new Date(recentOTP.rows[0].created_at);
+      const waitSeconds = 60 - Math.floor((Date.now() - createdAt.getTime()) / 1000);
       return res.status(429).json({
         success: false,
-        message: 'Please wait before requesting another OTP',
+        message: `Please wait ${waitSeconds} seconds before requesting another OTP`,
+        retryAfterSeconds: waitSeconds,
       });
     }
 
@@ -72,40 +75,51 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     const otpCode = generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // Store OTP in database
-    await db.query(
-      `INSERT INTO otp_verifications (phone_number, otp_code, expires_at)
-       VALUES ($1, $2, $3)`,
+    // Store OTP in database and get the ID
+    const otpResult = await db.query(
+      `INSERT INTO otp_verifications (phone_number, otp_code, expires_at, attempts)
+       VALUES ($1, $2, $3, 0)
+       RETURNING id`,
       [phoneNumber, otpCode, expiresAt],
     );
 
-    // Send SMS
+    const otpId = otpResult.rows[0].id;
+
+    // Send SMS (or mock)
+    const message = `Your Jaffna Marketplace verification code is: ${otpCode}. Valid for 5 minutes. Do not share this code.`;
+
     try {
-      const message = `Your Jaffna Marketplace verification code is: ${otpCode}. Valid for 5 minutes. Do not share this code.`;
-      await smsService.sendSMS(phoneNumber, message);
+      const smsResult = await smsService.sendSMS(phoneNumber, message, otpCode);
 
-      logger.info('OTP sent successfully', { phoneNumber, masked: true });
+      logger.info('OTP generated', {
+        phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, '$1****$2'),
+        otpId,
+        mockMode: smsService.isMockMode(),
+      });
 
-      res.json({
+      // Response for Android
+      const response = {
         success: true,
         message: 'OTP sent successfully',
-      });
+        otpId, // Android needs this for verify-otp
+      };
+
+      // In mock mode, also return OTP for testing convenience
+      if (smsService.isMockMode()) {
+        response.otp = otpCode;
+      }
+
+      res.json(response);
     } catch (smsError) {
       logger.error('Failed to send SMS:', smsError);
 
-      // In development, return the OTP for testing
-      if (process.env.NODE_ENV === 'development' || process.env.MOCK_SMS === 'true') {
-        res.json({
-          success: true,
-          message: 'OTP sent successfully',
-          otp: otpCode, // Only in development
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          message: 'Failed to send OTP. Please try again.',
-        });
-      }
+      // Delete the OTP record since SMS failed
+      await db.query('DELETE FROM otp_verifications WHERE id = $1', [otpId]);
+
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send OTP. Please try again.',
+      });
     }
   } catch (error) {
     logger.error('Send OTP error:', error);
@@ -120,63 +134,98 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
  * POST /api/v1/auth/verify-otp
  * Verify OTP and login/register user
  * Matches Android LoginRequest/Response
+ *
+ * Accepts both `phone` and `phoneNumber` for compatibility
+ * Max 3 attempts per OTP, then must request new OTP
  */
-router.post('/verify-otp', validateOTP, async (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   try {
-    // Check validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    // Accept both phone and phoneNumber for Android compatibility
+    const phoneNumber = req.body.phoneNumber || req.body.phone;
+    const { otp, otpId } = req.body;
+
+    // Validate inputs
+    if (!phoneNumber || !/^\+94[0-9]{9}$/.test(phoneNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid input',
-        errors: errors.array(),
+        message: 'Invalid phone number format. Use +94XXXXXXXXX',
       });
     }
 
-    const { phoneNumber, otp } = req.body;
-
-    let otpRecord;
-    
-    // MASTER OTP BYPASS for development/testing
-    if (otp === '123456') {
-      logger.info('🔓 DEBUG - Master OTP used, bypassing database check');
-      // Create a mock OTP record that satisfies the verification flow
-      otpRecord = { 
-        rows: [{ 
-          id: 'master-otp-id', 
-          phone_number: phoneNumber,
-          verified: false 
-        }] 
-      };
-    } else {
-      // Verify OTP from database
-      otpRecord = await db.query(
-        `SELECT * FROM otp_verifications 
-         WHERE phone_number = $1 AND otp_code = $2 AND expires_at > NOW() AND verified = false
-         ORDER BY created_at DESC LIMIT 1`,
-        [phoneNumber, otp],
-      );
+    if (!otp || !/^[0-9]{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP must be 6 digits',
+      });
     }
 
-    if (otpRecord.rows.length === 0) {
-      // Increment attempts for existing OTP
+    // Find the OTP record (optionally by ID if provided)
+    let otpQuery = `
+      SELECT id, otp_code, attempts, verified
+      FROM otp_verifications
+      WHERE phone_number = $1 AND expires_at > NOW() AND verified = false
+      ORDER BY created_at DESC LIMIT 1`;
+    let otpParams = [phoneNumber];
+
+    if (otpId) {
+      otpQuery = `
+        SELECT id, otp_code, attempts, verified
+        FROM otp_verifications
+        WHERE id = $1 AND phone_number = $2 AND expires_at > NOW() AND verified = false`;
+      otpParams = [otpId, phoneNumber];
+    }
+
+    const existingOtp = await db.query(otpQuery, otpParams);
+
+    if (existingOtp.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP expired or not found. Please request a new OTP.',
+      });
+    }
+
+    const otpRecord = existingOtp.rows[0];
+    const MAX_ATTEMPTS = 3;
+
+    // Check attempt limit FIRST
+    if (otpRecord.attempts >= MAX_ATTEMPTS) {
+      // Mark OTP as used/invalid
       await db.query(
-        `UPDATE otp_verifications 
-         SET attempts = attempts + 1 
-         WHERE phone_number = $1 AND expires_at > NOW()`,
-        [phoneNumber],
+        'UPDATE otp_verifications SET verified = true WHERE id = $1',
+        [otpRecord.id],
       );
 
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired OTP',
+        message: 'Too many attempts. Please request a new OTP.',
+        attemptsExceeded: true,
       });
     }
 
-    // Mark OTP as verified
+    // Verify OTP code
+    if (otpRecord.otp_code !== otp) {
+      // Increment attempts
+      const newAttempts = otpRecord.attempts + 1;
+      await db.query(
+        'UPDATE otp_verifications SET attempts = $1 WHERE id = $2',
+        [newAttempts, otpRecord.id],
+      );
+
+      const remainingAttempts = MAX_ATTEMPTS - newAttempts;
+
+      return res.status(400).json({
+        success: false,
+        message: remainingAttempts > 0
+          ? `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining.`
+          : 'Invalid OTP. No attempts remaining. Please request a new OTP.',
+        remainingAttempts,
+      });
+    }
+
+    // OTP is valid - mark as verified
     await db.query(
       'UPDATE otp_verifications SET verified = true WHERE id = $1',
-      [otpRecord.rows[0].id],
+      [otpRecord.id],
     );
 
     // Check if user exists
@@ -221,7 +270,7 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
       { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' },
     );
 
-    // Clean up old OTPs
+    // Clean up all OTPs for this phone number
     await db.query(
       'DELETE FROM otp_verifications WHERE phone_number = $1',
       [phoneNumber],
@@ -229,7 +278,7 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
 
     logger.info('User authenticated successfully', {
       userId: userData.id,
-      phoneNumber: userData.phone_number,
+      phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, '$1****$2'),
     });
 
     // Response matches Android LoginResponse

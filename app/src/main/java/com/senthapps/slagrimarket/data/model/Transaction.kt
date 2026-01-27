@@ -64,6 +64,19 @@ data class Transaction(
     @Json(name = "buyerId")
     val buyerId: String,
 
+    // Name/phone fields populated by backend via JOIN with users table
+    @Json(name = "sellerName")
+    val sellerName: String = "",
+
+    @Json(name = "buyerName")
+    val buyerName: String = "",
+
+    @Json(name = "sellerPhone")
+    val sellerPhone: String = "",
+
+    @Json(name = "buyerPhone")
+    val buyerPhone: String = "",
+
     @Json(name = "quantity")
     val quantity: Double,
 

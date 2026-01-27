@@ -4,23 +4,51 @@ const logger = require('../utils/logger');
 /**
  * SMS Service for Sri Lankan providers
  * Supports Dialog Ideamart, Mobitel mSpace, and Twilio fallback
+ *
+ * SMS_MODE environment variable controls behavior:
+ * - mock: Log OTP to console, store in DB, DO NOT send SMS (for development/testing)
+ * - dialog: Send via Dialog Ideamart API
+ * - mobitel: Send via Mobitel mSpace API
+ * - twilio: Send via Twilio API (international fallback)
  */
 class SMSService {
   constructor() {
-    this.provider = process.env.SMS_PROVIDER || 'dialog';
-    this.mockMode = process.env.MOCK_SMS === 'true' || process.env.NODE_ENV === 'development';
+    // SMS_MODE takes precedence over legacy MOCK_SMS and SMS_PROVIDER
+    this.mode = process.env.SMS_MODE || process.env.SMS_PROVIDER || 'mock';
+
+    // Legacy support: MOCK_SMS=true forces mock mode
+    if (process.env.MOCK_SMS === 'true') {
+      this.mode = 'mock';
+    }
+
+    // Validate mode
+    const validModes = ['mock', 'dialog', 'mobitel', 'twilio'];
+    if (!validModes.includes(this.mode)) {
+      logger.warn(`Invalid SMS_MODE "${this.mode}", defaulting to mock`);
+      this.mode = 'mock';
+    }
+
+    logger.info(`SMS Service initialized with mode: ${this.mode}`);
+  }
+
+  /**
+   * Check if running in mock mode
+   */
+  isMockMode() {
+    return this.mode === 'mock';
   }
 
   /**
    * Send SMS using configured provider
+   * Returns: { success, provider, messageId, otp? (only in mock mode) }
    */
-  async sendSMS(phoneNumber, message) {
-    if (this.mockMode) {
-      return this.mockSend(phoneNumber, message);
+  async sendSMS(phoneNumber, message, otp = null) {
+    if (this.mode === 'mock') {
+      return this.mockSend(phoneNumber, message, otp);
     }
 
     try {
-      switch (this.provider) {
+      switch (this.mode) {
         case 'dialog':
           return await this.sendViaDialog(phoneNumber, message);
         case 'mobitel':
@@ -28,13 +56,13 @@ class SMSService {
         case 'twilio':
           return await this.sendViaTwilio(phoneNumber, message);
         default:
-          throw new Error(`Unknown SMS provider: ${this.provider}`);
+          throw new Error(`Unknown SMS mode: ${this.mode}`);
       }
     } catch (error) {
-      logger.error('SMS sending failed:', { provider: this.provider, error: error.message });
+      logger.error('SMS sending failed:', { mode: this.mode, error: error.message });
 
-      // Try fallback provider if primary fails
-      if (this.provider !== 'twilio') {
+      // Try fallback provider if primary fails (only for real providers)
+      if (this.mode !== 'twilio' && process.env.TWILIO_ACCOUNT_SID) {
         logger.info('Attempting SMS fallback to Twilio');
         try {
           return await this.sendViaTwilio(phoneNumber, message);
@@ -195,21 +223,42 @@ class SMSService {
 
   /**
    * Mock SMS sending for development/testing
+   * IMPORTANT: Logs OTP to console for testing, does NOT send actual SMS
    */
-  async mockSend(phoneNumber, message) {
-    logger.info('Mock SMS sent', {
+  async mockSend(phoneNumber, message, otp = null) {
+    // Extract OTP from message if not provided directly
+    const extractedOtp = otp || this.extractOtpFromMessage(message);
+
+    // Log clearly to console for testing
+    console.log(`\n${'='.repeat(60)}`);
+    console.log('📱 MOCK SMS - OTP CODE (NOT SENT)');
+    console.log('='.repeat(60));
+    console.log(`Phone: ${phoneNumber}`);
+    console.log(`OTP:   ${extractedOtp || 'N/A'}`);
+    console.log(`${'='.repeat(60)}\n`);
+
+    logger.info('Mock SMS generated (not sent)', {
       to: this.maskPhoneNumber(phoneNumber),
-      message: `${message.substring(0, 50)}...`,
+      otp: extractedOtp,
     });
 
     // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     return {
       success: true,
       provider: 'mock',
       messageId: `mock_${Date.now()}`,
+      otp: extractedOtp, // Return OTP for testing convenience
     };
+  }
+
+  /**
+   * Extract OTP code from message text
+   */
+  extractOtpFromMessage(message) {
+    const match = message.match(/\b(\d{6})\b/);
+    return match ? match[1] : null;
   }
 
   /**
@@ -235,14 +284,15 @@ class SMSService {
   /**
    * Get SMS cost estimate (in LKR)
    */
-  getCostEstimate(provider = this.provider) {
+  getCostEstimate(mode = this.mode) {
     const costs = {
+      mock: 0.00, // Free - no SMS sent
       dialog: 0.50, // ~0.50 LKR per SMS
       mobitel: 0.45, // ~0.45 LKR per SMS
       twilio: 2.50, // ~2.50 LKR per SMS (international rates)
     };
 
-    return costs[provider] || 1.00;
+    return costs[mode] || 1.00;
   }
 
   /**
@@ -250,9 +300,16 @@ class SMSService {
    */
   getProviderInfo() {
     return {
-      current: this.provider,
-      mockMode: this.mockMode,
+      currentMode: this.mode,
+      isMock: this.isMockMode(),
       available: {
+        mock: {
+          name: 'Mock (Development)',
+          configured: true,
+          costPerSMS: 0.00,
+          coverage: 'None - logs only',
+          recommended: process.env.NODE_ENV !== 'production',
+        },
         dialog: {
           name: 'Dialog Ideamart',
           configured: !!(process.env.DIALOG_API_KEY && process.env.DIALOG_API_SECRET),

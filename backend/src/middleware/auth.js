@@ -3,6 +3,9 @@ const { supabaseAdmin } = require('../config/supabase');
 const db = require('../database/connection');
 const logger = require('../utils/logger');
 
+// Check if we're in mock DB mode
+const MOCK_DB = process.env.MOCK_DB === 'true';
+
 /**
  * JWT Authentication Middleware for Serverless Functions
  * Validates JWT tokens and attaches user info to request
@@ -23,14 +26,30 @@ const authenticateToken = async (req, res, next) => {
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Get user from Supabase to ensure they still exist and are active
-    const { data: userData, error } = await supabaseAdmin
-      .from('users')
-      .select('id, phone_number, user_type, is_active, verified')
-      .eq('id', decoded.userId)
-      .single();
+    let userData;
 
-    if (error || !userData) {
+    if (MOCK_DB || !supabaseAdmin) {
+      // Use mock DB or PostgreSQL connection
+      const result = await db.query(
+        'SELECT id, phone_number, user_type, is_active, verified FROM users WHERE id = $1',
+        [decoded.userId],
+      );
+      userData = result.rows[0];
+    } else {
+      // Get user from Supabase to ensure they still exist and are active
+      const { data, error } = await supabaseAdmin
+        .from('users')
+        .select('id, phone_number, user_type, is_active, verified')
+        .eq('id', decoded.userId)
+        .single();
+
+      if (error) {
+        logger.error('Supabase user lookup error:', error);
+      }
+      userData = data;
+    }
+
+    if (!userData) {
       return res.status(401).json({
         success: false,
         message: 'User not found',

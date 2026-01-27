@@ -6,6 +6,12 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// CRITICAL: Prevent MOCK_DB in production
+if (process.env.NODE_ENV === 'production' && process.env.MOCK_DB === 'true') {
+  console.error('FATAL: MOCK_DB cannot be enabled in production.');
+  process.exit(1);
+}
+
 const logger = require('./utils/logger');
 const database = require('./database/connection');
 const { errorHandler } = require('./middleware/errorHandler');
@@ -18,6 +24,7 @@ const listingRoutes = require('./routes/listings');
 const transactionRoutes = require('./routes/transactions');
 const syncRoutes = require('./routes/sync');
 const healthRoutes = require('./routes/health');
+const marketPricesRoutes = require('./routes/market-prices');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -62,6 +69,19 @@ if (process.env.NODE_ENV !== 'test') {
   }));
 }
 
+// Dev-only request logging for Android verification
+// Logs: [REQ] METHOD /path user=<userId>
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    // Skip health checks to reduce noise
+    if (req.path === '/health') return next();
+
+    const userId = req.user?.userId || 'anon';
+    logger.info(`[REQ] ${req.method} ${req.path} user=${userId}`);
+    next();
+  });
+}
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
@@ -97,6 +117,7 @@ apiRouter.use('/health', healthRoutes);
 
 // Public routes (no authentication required)
 apiRouter.use('/auth', otpLimiter, authRoutes);
+apiRouter.use('/market-prices', marketPricesRoutes); // Public market data
 
 // Protected routes (authentication required)
 apiRouter.use('/users', authenticateToken, userRoutes);
@@ -121,6 +142,7 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       auth: `/api/${API_VERSION}/auth`,
+      marketPrices: '/api/market-prices',
       users: `/api/${API_VERSION}/users`,
       listings: `/api/${API_VERSION}/listings`,
       transactions: `/api/${API_VERSION}/transactions`,

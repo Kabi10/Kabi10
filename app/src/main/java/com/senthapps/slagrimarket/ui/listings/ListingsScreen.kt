@@ -22,6 +22,7 @@ import com.senthapps.slagrimarket.data.model.Units
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
 import com.senthapps.slagrimarket.ui.components.EnhancedListingCard
 import com.senthapps.slagrimarket.ui.components.EmptyListingsState
+import com.senthapps.slagrimarket.ui.components.ErrorState
 import com.senthapps.slagrimarket.ui.components.ListingCardSkeleton
 import com.senthapps.slagrimarket.ui.theme.Spacing
 import com.senthapps.slagrimarket.util.TranslationUtil
@@ -81,7 +82,24 @@ fun ListingsScreen(
             )
         }
     ) { paddingValues ->
+        val errorMessage = uiState.error
         when {
+            // Error state
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorState(
+                        errorMessage = errorMessage,
+                        currentLanguage = currentLanguage,
+                        onRetry = viewModel::refreshListings
+                    )
+                }
+            }
+
             // Loading state with shimmer skeletons
             uiState.isLoading -> {
                 LazyColumn(

@@ -25,6 +25,7 @@ import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.PickupLocations
 import com.senthapps.slagrimarket.util.TranslationUtil
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.ErrorBanner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,9 +128,20 @@ fun SearchScreen(
                 onClearFilters = viewModel::clearFilters,
                 currentLanguage = currentLanguage
             )
-            
+
             Divider()
-            
+
+            // Error banner
+            val errorMessage = uiState.error
+            if (errorMessage != null) {
+                ErrorBanner(
+                    errorMessage = errorMessage,
+                    onRetry = viewModel::performSearch,
+                    onDismiss = viewModel::clearError,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
             // Results section
             if (uiState.isLoading) {
                 Box(
@@ -364,10 +376,49 @@ private fun ListingCard(
     onClick: () -> Unit,
     currentLanguage: String
 ) {
-    val cropName = CropTypes.getCropName(listing.cropType, currentLanguage)
-    val locationName = TranslationUtil.getLocationName(listing.location, currentLanguage)
-    val unitName = com.senthapps.slagrimarket.data.model.Units.getUnitName(listing.unit, currentLanguage)
-    val qualityGrade = listing.quality.getDisplayString(currentLanguage)
+    // Safe fallbacks for all displayed fields to prevent crashes
+    val unknownText = when (currentLanguage) {
+        "en" -> "Unknown"
+        "ta" -> "தெரியவில்லை"
+        "si" -> "නොදනී"
+        else -> "Unknown"
+    }
+
+    val cropName = try {
+        CropTypes.getCropName(listing.cropType, currentLanguage).takeIf { it.isNotBlank() } ?: unknownText
+    } catch (e: Exception) {
+        unknownText
+    }
+
+    val locationName = try {
+        TranslationUtil.getLocationName(listing.location, currentLanguage).takeIf { it.isNotBlank() } ?: unknownText
+    } catch (e: Exception) {
+        unknownText
+    }
+
+    val unitName = try {
+        com.senthapps.slagrimarket.data.model.Units.getUnitName(listing.unit, currentLanguage).takeIf { it.isNotBlank() } ?: "unit"
+    } catch (e: Exception) {
+        "unit"
+    }
+
+    val qualityGrade = try {
+        listing.quality.getDisplayString(currentLanguage).takeIf { it.isNotBlank() } ?: unknownText
+    } catch (e: Exception) {
+        unknownText
+    }
+
+    val pricePerUnit = try {
+        if (listing.pricePerUnit >= 0) listing.pricePerUnit else 0.0
+    } catch (e: Exception) {
+        0.0
+    }
+
+    val quantity = try {
+        if (listing.quantity >= 0) listing.quantity else 0.0
+    } catch (e: Exception) {
+        0.0
+    }
 
     Card(
         onClick = onClick,
@@ -396,7 +447,7 @@ private fun ListingCard(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "LKR ${listing.pricePerUnit}",
+                        text = "LKR ${String.format("%.2f", pricePerUnit)}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -422,10 +473,10 @@ private fun ListingCard(
             ) {
                 Text(
                     text = when (currentLanguage) {
-                        "en" -> "Quantity: ${listing.quantity} $unitName"
-                        "ta" -> "அளவு: ${listing.quantity} $unitName"
-                        "si" -> "ප්‍රමාණය: ${listing.quantity} $unitName"
-                        else -> "Quantity: ${listing.quantity} $unitName"
+                        "en" -> "Quantity: ${String.format("%.1f", quantity)} $unitName"
+                        "ta" -> "அளவு: ${String.format("%.1f", quantity)} $unitName"
+                        "si" -> "ප්‍රමාණය: ${String.format("%.1f", quantity)} $unitName"
+                        else -> "Quantity: ${String.format("%.1f", quantity)} $unitName"
                     },
                     style = MaterialTheme.typography.bodyMedium
                 )

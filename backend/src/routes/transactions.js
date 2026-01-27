@@ -88,12 +88,17 @@ router.get('/', async (req, res) => {
     const countResult = await db.query(countQuery, queryParams.slice(0, -2));
     const total = parseInt(countResult.rows[0].total);
 
-    // Transform data
+    // Transform data - includes flat fields for Android compatibility
     const transactions = result.rows.map((row) => ({
       id: row.id,
       listingId: row.listing_id,
       farmerId: row.farmer_id,
       buyerId: row.buyer_id,
+      // Flat name/phone fields for Android Transaction model
+      sellerName: row.farmer_name || '',
+      buyerName: row.buyer_name || '',
+      sellerPhone: row.farmer_contact || '',
+      buyerPhone: row.buyer_contact || '',
       quantity: parseFloat(row.quantity),
       totalAmount: parseFloat(row.total_amount),
       pickupLocation: row.pickup_location,
@@ -121,15 +126,13 @@ router.get('/', async (req, res) => {
       },
     }));
 
+    // Response matches Android TransactionsResponse DTO
     res.json({
       success: true,
-      data: transactions,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages: Math.ceil(total / parseInt(limit)),
-      },
+      transactions, // Android expects 'transactions' not 'data'
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
     logger.error('Get transactions error:', error);
@@ -191,6 +194,11 @@ router.get('/:id', async (req, res) => {
         listingId: transaction.listing_id,
         farmerId: transaction.farmer_id,
         buyerId: transaction.buyer_id,
+        // Flat name/phone fields for Android Transaction model
+        sellerName: transaction.farmer_name || '',
+        buyerName: transaction.buyer_name || '',
+        sellerPhone: transaction.farmer_contact || '',
+        buyerPhone: transaction.buyer_contact || '',
         quantity: parseFloat(transaction.quantity),
         totalAmount: parseFloat(transaction.total_amount),
         pickupLocation: transaction.pickup_location,
@@ -294,7 +302,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
 
       // Calculate total amount
       const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
-      
+
       // Allow 1 cent difference for floating point errors
       if (Math.abs(totalAmount - expectedAmount) > 0.01) {
         throw new Error('Total amount does not match expected calculation');
@@ -327,7 +335,7 @@ router.post('/', createTransactionValidation, async (req, res) => {
     logger.info('Transaction created', {
       transactionId: transaction.id,
       buyerId: req.user.userId,
-      farmerId: listingData.farmer_id,
+      farmerId: transaction.farmer_id,
       listingId,
       quantity,
       totalAmount,

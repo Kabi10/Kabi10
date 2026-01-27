@@ -41,3 +41,6 @@ jobs:
 
       - name: Run Tests
         run: npm test
+        env:
+          MOCK_DB: 'true'
+          NODE_ENV: 'test'
