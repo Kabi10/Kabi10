@@ -19,8 +19,11 @@ import com.senthapps.slagrimarket.ui.auth.IndustrialPhoneInputScreen
 import com.senthapps.slagrimarket.ui.chat.ChatScreen
 import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
 import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
+import com.senthapps.slagrimarket.ui.help.ContactScreen
 import com.senthapps.slagrimarket.ui.help.FAQScreen
 import com.senthapps.slagrimarket.ui.help.HelpScreen
+import com.senthapps.slagrimarket.ui.help.PrivacyScreen
+import com.senthapps.slagrimarket.ui.help.TermsScreen
 import com.senthapps.slagrimarket.ui.map.ListingsMapScreen
 import com.senthapps.slagrimarket.ui.map.LocationMapScreen
 import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
@@ -534,19 +537,43 @@ fun JaffnaMarketplaceNavigation(
                     navController.navigate(Screen.FAQ.route)
                 },
                 onNavigateToContact = {
-                    // TODO: Implement contact screen
+                    navController.navigate(Screen.Contact.route)
                 },
                 onNavigateToTerms = {
-                    // TODO: Implement terms screen
+                    navController.navigate(Screen.Terms.route)
                 },
                 onNavigateToPrivacy = {
-                    // TODO: Implement privacy screen
+                    navController.navigate(Screen.Privacy.route)
                 }
             )
         }
 
         composable(Screen.FAQ.route) {
             FAQScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Contact.route) {
+            ContactScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Terms.route) {
+            TermsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Privacy.route) {
+            PrivacyScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
@@ -606,5 +633,8 @@ sealed class Screen(val route: String) {
     object ListingsMap : Screen("listings_map")
     object Help : Screen("help")
     object FAQ : Screen("faq")
+    object Contact : Screen("contact")
+    object Terms : Screen("terms")
+    object Privacy : Screen("privacy")
     object Settings : Screen("settings") // Industrial UI - Language settings
 }
