@@ -411,9 +411,28 @@ class ListingRepository @Inject constructor(
      * Check if listings need refresh (older than 10 minutes)
      */
     private suspend fun shouldRefreshListings(): Boolean {
-        // For now, always refresh if forced or if no cached data
-        // TODO: Implement proper timestamp checking when DAO method is available
-        return true
+        val lastUpdateTime = listingDao.getLastUpdateTime()
+        if (lastUpdateTime == null) return true
+
+        return try {
+            // Try to parse the timestamp - handle both ISO format and SQLite datetime format
+            val lastUpdated = try {
+                Instant.parse(lastUpdateTime)
+            } catch (e: Exception) {
+                // If ISO parsing fails, try SQLite datetime format: "2025-10-02 19:36:33"
+                // Convert to ISO format by replacing space with 'T' and adding 'Z'
+                val isoFormat = lastUpdateTime.replace(" ", "T") + "Z"
+                Instant.parse(isoFormat)
+            }
+
+            val now = Instant.now()
+            val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+
+            minutesSinceUpdate >= 10 // Refresh if older than 10 minutes
+        } catch (e: Exception) {
+            // If parsing fails, assume we need to refresh
+            true
+        }
     }
 
     /**

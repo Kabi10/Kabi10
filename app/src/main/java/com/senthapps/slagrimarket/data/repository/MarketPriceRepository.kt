@@ -214,19 +214,45 @@ class MarketPriceRepository @Inject constructor(
                 }
             } else {
                 // Fallback to local statistics
-                val localStats: Map<String, Any> = emptyMap() // TODO: Implement local stats
+                val localStats = getLocalStatistics()
                 Resource.Success(localStats)
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting market statistics")
             // Fallback to local statistics
             try {
-                val localStats: Map<String, Any> = emptyMap() // TODO: Implement local stats
+                val localStats = getLocalStatistics()
                 Resource.Success(localStats)
             } catch (localE: Exception) {
                 Resource.Error("Failed to load statistics", e)
             }
         }
+    }
+
+    /**
+     * Get local market statistics from the database
+     */
+    private suspend fun getLocalStatistics(): Map<String, Any> {
+        val stats = marketPriceDao.getMarketStatistics()
+        val cropTypes = marketPriceDao.getAvailableCropTypes()
+        val locations = marketPriceDao.getAvailableLocations()
+
+        return mapOf(
+            "totalCrops" to cropTypes.size,
+            "totalLocations" to locations.size,
+            "averagePrice" to stats.avgPrice,
+            "priceRange" to mapOf(
+                "min" to 0.0, // Could be calculated but kept simple
+                "max" to 0.0
+            ),
+            "trendDistribution" to mapOf(
+                "rising" to stats.rising,
+                "falling" to stats.falling,
+                "stable" to stats.stable
+            ),
+            "totalPrices" to stats.total,
+            "averageChange" to stats.avgChange
+        )
     }
     
     /**

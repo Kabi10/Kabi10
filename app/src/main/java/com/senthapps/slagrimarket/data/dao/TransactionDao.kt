@@ -276,6 +276,9 @@ interface TransactionDao {
 
     @Query("UPDATE transactions SET id = :serverId WHERE id = :localId")
     suspend fun updateTransactionServerId(localId: String, serverId: String)
+
+    @Query("SELECT MAX(datetime(createdAt)) FROM transactions WHERE farmerId = :userId OR buyerId = :userId")
+    suspend fun getLastUpdateTimeForUser(userId: String): String?
 }
 
 /**
