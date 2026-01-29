@@ -2,9 +2,9 @@
 ## Srilanka Farmers Marketplace Android Application
 
 **Assessment Date:** November 26, 2025
-**Assessment Version:** 1.3
+**Assessment Version:** 1.4
 **Target Scale:** 10,000+ Users
-**Last Updated:** December 21, 2025
+**Last Updated:** January 29, 2026
 
 ---
 

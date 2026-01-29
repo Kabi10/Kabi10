@@ -29,7 +29,7 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 
 ### Automated Tests
 ```powershell
-.\gradlew test                     # Unit tests (48)
+.\gradlew test                     # Unit tests (142)
 .\gradlew lint                     # Lint checks
 .\gradlew connectedAndroidTest     # UI tests (27)
 .\gradlew assembleRelease          # Release build
@@ -655,7 +655,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\component
 
 | Test Type | Tests | Files | Description |
 |-----------|-------|-------|-------------|
-| **Unit Tests** | 48 | 7 | ViewModels, Repositories |
+| **Unit Tests** | 142 | 12 | ViewModels, Repositories |
 | **UI Automation** | 27 | 5 | Screen tests, Navigation |
 | **Total** | **75** | **12** | Full test suite |
 
@@ -729,7 +729,7 @@ Start-Sleep -Seconds 5
 ```
 
 **Pass Criteria:**
-- [ ] All 48 unit tests pass (`.\gradlew test`)
+- [ ] All 142 unit tests pass (`.\gradlew test`)
 - [ ] All 27 UI tests pass (`.\gradlew connectedAndroidTest`)
 - [ ] Lint check passes with no errors (`.\gradlew lint`)
 - [ ] Test coverage ≥50% for critical code

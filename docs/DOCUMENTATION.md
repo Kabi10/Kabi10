@@ -192,7 +192,7 @@ fun ListingCard(viewModel: ViewModel)
 ```
 
 ### Test Coverage
-- **Unit tests:** 48 tests (ViewModels, Repositories)
+- **Unit tests:** 142 tests (ViewModels, Repositories)
 - **UI tests:** 27 tests (critical flows)
 - Target: >70% coverage for new code
 
