@@ -327,18 +327,34 @@ class MarketPriceRepositoryTest {
     }
 
     @Test
-    fun `getMarketStatistics should return empty stats when API fails`() = runTest {
-        // Given: API fails
+    fun `getMarketStatistics should return error when API fails and local stats fail`() = runTest {
+        // Given: API fails and local DAO also fails
         coEvery { marketPriceApiService.getMarketStatistics() } throws RuntimeException("Network error")
+        coEvery { marketPriceDao.getMarketStatistics() } throws RuntimeException("Database error")
 
         // When: Get statistics
         val result = repository.getMarketStatistics()
 
-        // Then: Should return empty stats (current implementation returns empty map on failure)
-        // Note: Local stats fallback is marked as TODO in the repository
+        // Then: Should return error since both API and local fallback failed
+        assertTrue(result is Resource.Error)
+    }
+
+    @Test
+    fun `getMarketStatistics should return local stats when API fails but DAO succeeds`() = runTest {
+        // Given: API fails but local DAO has data
+        coEvery { marketPriceApiService.getMarketStatistics() } throws RuntimeException("Network error")
+        coEvery { marketPriceDao.getMarketStatistics() } returns mockStatistics
+        coEvery { marketPriceDao.getAvailableCropTypes() } returns listOf("tomato", "rice")
+        coEvery { marketPriceDao.getAvailableLocations() } returns listOf("jaffna", "colombo")
+
+        // When: Get statistics
+        val result = repository.getMarketStatistics()
+
+        // Then: Should return local statistics as fallback
         assertTrue(result is Resource.Success)
         val stats = (result as Resource.Success).data!!
-        assertTrue(stats.isEmpty())
+        assertEquals(2, stats["totalCrops"])
+        assertEquals(2, stats["totalLocations"])
     }
 
     // ==========================================================================
