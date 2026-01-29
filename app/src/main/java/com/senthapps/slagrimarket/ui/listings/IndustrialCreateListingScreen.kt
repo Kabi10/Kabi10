@@ -1,5 +1,6 @@
 package com.senthapps.slagrimarket.ui.listings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,6 +61,8 @@ fun IndustrialCreateListingScreen(
     ) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     // Form state (in production, move to ViewModel)
     var productName by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
@@ -274,7 +278,10 @@ fun IndustrialCreateListingScreen(
                     )
                     SecondaryButton(
                         text = "ADD PHOTO",
-                        onClick = { /* TODO: implement image picker */ },
+                        onClick = {
+                            // Image upload functionality coming in a future update
+                            Toast.makeText(context, "Image upload coming soon", Toast.LENGTH_SHORT).show()
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

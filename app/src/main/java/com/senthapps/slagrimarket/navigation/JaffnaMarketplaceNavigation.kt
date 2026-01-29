@@ -1,11 +1,15 @@
 package com.senthapps.slagrimarket.navigation
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -13,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.senthapps.slagrimarket.util.RelativeTimeUtil
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.IndustrialOtpVerificationScreen
 import com.senthapps.slagrimarket.ui.auth.IndustrialPhoneInputScreen
@@ -56,6 +61,7 @@ fun JaffnaMarketplaceNavigation(
     navController: NavHostController = rememberNavController(),
     startWithAuth: Boolean = false // Set to true to enable auth flow
 ) {
+    val context = LocalContext.current
     // Choose start destination based on auth requirement
     val startDestination = if (startWithAuth) Screen.PhoneInput.route else "home_direct"
 
@@ -297,7 +303,8 @@ fun JaffnaMarketplaceNavigation(
                     navController.popBackStack()
                 },
                 onSendMessage = {
-                    // TODO: Navigate to chat
+                    // Chat functionality is not yet implemented - show placeholder message
+                    Toast.makeText(context, "Chat coming soon", Toast.LENGTH_SHORT).show()
                 },
                 isLoading = uiState.isLoading,
                 isError = uiState.error != null,
@@ -338,8 +345,16 @@ fun JaffnaMarketplaceNavigation(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onContactUser = { userId ->
-                    // TODO: Implement contact user functionality
+                onContactUser = { phoneNumber ->
+                    // Open phone dialer with the user's phone number
+                    if (phoneNumber.isNotEmpty()) {
+                        val intent = Intent(Intent.ACTION_DIAL).apply {
+                            data = Uri.parse("tel:$phoneNumber")
+                        }
+                        context.startActivity(intent)
+                    } else {
+                        Toast.makeText(context, "Phone number not available", Toast.LENGTH_SHORT).show()
+                    }
                 }
             )
         }
@@ -348,12 +363,19 @@ fun JaffnaMarketplaceNavigation(
             val viewModel: com.senthapps.slagrimarket.ui.home.HomeViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsState()
 
+            // Calculate relative time for the market prices update
+            val lastUpdatedText = if (uiState.lastPricesUpdated > 0) {
+                RelativeTimeUtil.getUpdatedTimeString(uiState.lastPricesUpdated, "en")
+            } else {
+                "UPDATED: JUST NOW"
+            }
+
             IndustrialMarketPricesScreen(
                 marketPrices = uiState.marketPrices,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                lastUpdatedText = "UPDATED: JUST NOW", // TODO: Calculate actual time since last update
+                lastUpdatedText = lastUpdatedText,
                 isLoading = uiState.isLoadingPrices,
                 isError = uiState.error != null && uiState.marketPrices.isEmpty(),
                 onRetry = { viewModel.refreshData() }
@@ -377,6 +399,14 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToListingDetail = { listingId ->
                     navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                },
+                onNavigateToHelp = {
+                    navController.navigate(Screen.Help.route)
+                },
+                onNavigateToAbout = {
+                    // Show app version info via a toast for MVP
+                    // AboutScreen route exists but navigates to Help for now
+                    navController.navigate(Screen.Help.route)
                 }
             )
         }

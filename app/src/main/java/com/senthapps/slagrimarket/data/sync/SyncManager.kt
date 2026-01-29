@@ -198,9 +198,23 @@ class SyncManager @Inject constructor(
     
     private suspend fun syncDataFromServer() {
         try {
-            // For now, skip server data sync as it's not critical for local operations
-            // TODO: Implement proper sync data fetching when needed
-            Timber.d("Server data sync skipped")
+            // Fetch latest listings from server
+            val listingsResponse = listingApiService.getListings()
+            if (listingsResponse.isSuccessful && listingsResponse.body() != null) {
+                val serverListings = listingsResponse.body()!!.listings
+                // Insert or update listings from server
+                // Note: Room's REPLACE strategy handles conflicts appropriately
+                listingDao.insertListings(serverListings)
+                Timber.d("Synced ${serverListings.size} listings from server")
+            }
+
+            // Fetch latest transactions from server
+            val transactionsResponse = transactionApiService.getTransactions()
+            if (transactionsResponse.isSuccessful && transactionsResponse.body() != null) {
+                val serverTransactions = transactionsResponse.body()!!.transactions
+                transactionDao.insertTransactions(serverTransactions)
+                Timber.d("Synced ${serverTransactions.size} transactions from server")
+            }
         } catch (e: Exception) {
             Timber.e(e, "Failed to sync data from server")
             // Don't throw here as this is not critical for local operations

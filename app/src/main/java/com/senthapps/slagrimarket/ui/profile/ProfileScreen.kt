@@ -40,6 +40,8 @@ fun ProfileScreen(
     onNavigateToEditProfile: () -> Unit = {},
     onNavigateToSyncSettings: () -> Unit = {},
     onNavigateToListingDetail: (String) -> Unit = {},
+    onNavigateToHelp: () -> Unit = {},
+    onNavigateToAbout: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -125,7 +127,9 @@ fun ProfileScreen(
             // Settings/Preferences Section
             SettingsPreferencesSection(
                 currentLanguage = currentLanguage,
-                onNavigateToSyncSettings = onNavigateToSyncSettings
+                onNavigateToSyncSettings = onNavigateToSyncSettings,
+                onNavigateToHelp = onNavigateToHelp,
+                onNavigateToAbout = onNavigateToAbout
             )
 
             // Logout Button
@@ -761,7 +765,9 @@ private fun getSampleListings(): List<SampleListing> {
 @Composable
 private fun SettingsPreferencesSection(
     currentLanguage: String,
-    onNavigateToSyncSettings: () -> Unit = {}
+    onNavigateToSyncSettings: () -> Unit = {},
+    onNavigateToHelp: () -> Unit = {},
+    onNavigateToAbout: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -846,7 +852,7 @@ private fun SettingsPreferencesSection(
                     "si" -> "උදව් ලබා ගන්න සහ සහාය අමතන්න"
                     else -> "Get help and contact support"
                 },
-                onClick = { /* TODO: Navigate to help screen */ }
+                onClick = onNavigateToHelp
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
@@ -866,7 +872,7 @@ private fun SettingsPreferencesSection(
                     "si" -> "යෙදුම් අනුවාදය සහ තොරතුරු"
                     else -> "App version and information"
                 },
-                onClick = { /* TODO: Navigate to about screen */ }
+                onClick = onNavigateToAbout
             )
         }
     }

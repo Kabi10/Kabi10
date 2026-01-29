@@ -1,5 +1,6 @@
 package com.senthapps.slagrimarket.ui.listings
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -46,12 +47,33 @@ fun ListingDetailScreen(
     viewModel: ListingDetailViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState(initial = null)
 
     LaunchedEffect(listingId) {
         viewModel.loadListing(listingId)
+    }
+
+    // Share listing function
+    fun shareListing(listing: Listing) {
+        val cropName = CropTypes.getCropName(listing.cropType, currentLanguage)
+        val shareText = buildString {
+            append("Check out this listing on Agrimarket!\n\n")
+            append("$cropName\n")
+            append("Price: LKR ${String.format("%.2f", listing.pricePerUnit)} per ${listing.unit}\n")
+            append("Quantity: ${listing.quantity} ${listing.unit}\n")
+            append("Location: ${listing.location}\n")
+            append("Quality: Grade ${listing.quality.name}\n")
+        }
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, "Share listing via")
+        context.startActivity(shareIntent)
     }
 
     Scaffold(
@@ -85,7 +107,11 @@ fun ListingDetailScreen(
                             tint = if (uiState.isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    IconButton(onClick = { /* TODO: Share listing */ }) {
+                    IconButton(onClick = {
+                        uiState.listing?.let { listing ->
+                            shareListing(listing)
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Share"

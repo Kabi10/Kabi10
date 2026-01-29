@@ -30,6 +30,7 @@ import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.Spacing
 import com.senthapps.slagrimarket.ui.theme.industrialClickable
+import com.senthapps.slagrimarket.util.RelativeTimeUtil
 
 // ============================================================================
 // HUMAN INDUSTRIAL TRANSACTIONS/ORDERS SCREEN v2.0
@@ -363,7 +364,7 @@ fun IndustrialTransactionsScreen(
                 com.senthapps.slagrimarket.data.model.TransactionStatus.COMPLETED -> OrderStatus.COMPLETED
                 com.senthapps.slagrimarket.data.model.TransactionStatus.CANCELLED -> OrderStatus.PROBLEM
             },
-            timeText = "Just now" // TODO: Calculate relative time
+            timeText = RelativeTimeUtil.getRelativeTimeString(tx.createdAt, "en")
         )
     }
 

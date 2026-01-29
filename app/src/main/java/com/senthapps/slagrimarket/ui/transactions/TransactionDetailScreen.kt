@@ -1,5 +1,6 @@
 package com.senthapps.slagrimarket.ui.transactions
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,12 +39,34 @@ fun TransactionDetailScreen(
     viewModel: TransactionDetailViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState(initial = null)
 
     LaunchedEffect(transactionId) {
         viewModel.loadTransaction(transactionId)
+    }
+
+    // Share transaction function
+    fun shareTransaction(transaction: Transaction) {
+        val statusText = getStatusText(transaction.status, currentLanguage)
+        val shareText = buildString {
+            append("Agrimarket Order Details\n\n")
+            append("Order ID: #${transaction.id.take(8)}\n")
+            append("Status: $statusText\n")
+            append("Quantity: ${transaction.quantity} ${transaction.unit}\n")
+            append("Total Amount: LKR ${String.format("%.2f", transaction.totalAmount)}\n")
+            append("Pickup Location: ${transaction.pickupLocation}\n")
+            append("Pickup Date: ${formatDate(transaction.pickupDate)}\n")
+        }
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, "Share order via")
+        context.startActivity(shareIntent)
     }
 
     Scaffold(
@@ -69,7 +93,11 @@ fun TransactionDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Share transaction */ }) {
+                    IconButton(onClick = {
+                        uiState.transaction?.let { transaction ->
+                            shareTransaction(transaction)
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Share"

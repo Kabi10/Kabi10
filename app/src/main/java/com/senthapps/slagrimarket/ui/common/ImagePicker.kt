@@ -21,8 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import java.io.File
 
 /**
  * Image picker component with camera and gallery support
@@ -37,7 +39,9 @@ fun ImagePicker(
     currentLanguage: String = "en",
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var showImageSourceDialog by remember { mutableStateOf(false) }
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -51,8 +55,31 @@ fun ImagePicker(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            // Image saved to the URI provided
+        if (success && tempCameraUri != null) {
+            // Image was captured successfully, add it to the list
+            val newImages = (images + tempCameraUri!!).take(maxImages)
+            onImagesSelected(newImages)
+        }
+    }
+
+    // Function to create a temp file and get URI for camera
+    fun createTempImageUri(): Uri? {
+        return try {
+            val tempFile = File.createTempFile(
+                "camera_photo_${System.currentTimeMillis()}",
+                ".jpg",
+                context.cacheDir
+            ).apply {
+                createNewFile()
+                deleteOnExit()
+            }
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                tempFile
+            )
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -134,9 +161,15 @@ fun ImagePicker(
             onDismiss = { showImageSourceDialog = false },
             onCameraClick = {
                 showImageSourceDialog = false
-                // TODO: Create temp file and launch camera
-                // For now, just use gallery
-                galleryLauncher.launch("image/*")
+                // Create temp file and launch camera
+                val uri = createTempImageUri()
+                if (uri != null) {
+                    tempCameraUri = uri
+                    cameraLauncher.launch(uri)
+                } else {
+                    // If camera file creation fails, fallback to gallery
+                    galleryLauncher.launch("image/*")
+                }
             },
             onGalleryClick = {
                 showImageSourceDialog = false

@@ -1,5 +1,6 @@
 package com.senthapps.slagrimarket.ui.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -269,6 +271,8 @@ fun EditProfileScreen(
 private fun ProfilePhotoSection(
     currentLanguage: String
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -290,7 +294,10 @@ private fun ProfilePhotoSection(
         }
 
         TextButton(
-            onClick = { /* TODO: Implement photo upload */ }
+            onClick = {
+                // Photo upload functionality coming in a future update
+                Toast.makeText(context, "Photo upload coming soon", Toast.LENGTH_SHORT).show()
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.Edit,

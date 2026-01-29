@@ -1,5 +1,7 @@
 package com.senthapps.slagrimarket.ui.map
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -7,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
@@ -24,11 +27,30 @@ fun LocationMapScreen(
     onNavigateBack: () -> Unit,
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     val location = LatLng(latitude, longitude)
-    
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(location, 15f)
+    }
+
+    // Function to open location in Google Maps
+    fun openInGoogleMaps() {
+        // Create a geo URI that Google Maps can handle
+        val geoUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude(${Uri.encode(locationName)})")
+        val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+
+        // Check if Google Maps is installed
+        if (mapIntent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(mapIntent)
+        } else {
+            // Fallback to browser if Google Maps not installed
+            val browserUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$latitude,$longitude")
+            val browserIntent = Intent(Intent.ACTION_VIEW, browserUri)
+            context.startActivity(browserIntent)
+        }
     }
 
     Scaffold(
@@ -51,7 +73,7 @@ fun LocationMapScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Open in Google Maps */ }) {
+                    IconButton(onClick = { openInGoogleMaps() }) {
                         Icon(Icons.Default.Place, "Directions")
                     }
                 }

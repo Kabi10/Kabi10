@@ -98,7 +98,8 @@ class HomeViewModel @Inject constructor(
                                 _uiState.update {
                                     it.copy(
                                         marketPrices = resource.data ?: emptyList(),
-                                        isLoadingPrices = false
+                                        isLoadingPrices = false,
+                                        lastPricesUpdated = System.currentTimeMillis()
                                     )
                                 }
                             }
@@ -274,5 +275,6 @@ data class HomeUiState(
     val recentActivities: List<Activity> = emptyList(),
     val todayOrders: Int = 0,
     val todayRevenue: Double = 0.0,
-    val error: String? = null
+    val error: String? = null,
+    val lastPricesUpdated: Long = 0L
 )
