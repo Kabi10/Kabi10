@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.senthapps.slagrimarket.data.model.Message
 import com.senthapps.slagrimarket.data.repository.AuthRepository
 import com.senthapps.slagrimarket.data.repository.MessageRepository
+import com.senthapps.slagrimarket.data.sync.ChatRealtimeService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val chatRealtimeService: ChatRealtimeService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -26,7 +28,7 @@ class ChatViewModel @Inject constructor(
 
     fun loadConversation(conversationId: String) {
         currentConversationId = conversationId
-        
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
@@ -42,12 +44,26 @@ class ChatViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(currentUserId = currentUser.id)
 
+                // Refresh messages from API
+                messageRepository.refreshMessages(conversationId, currentUser.id)
+
+                // Subscribe to real-time updates
+                chatRealtimeService.subscribeToConversation(conversationId)
+
+                // Collect real-time messages in background
+                launch {
+                    chatRealtimeService.newMessages.collect { _ ->
+                        // Room Flow will automatically update UI
+                        Timber.d("Real-time message received, Room will update")
+                    }
+                }
+
                 messageRepository.getMessagesForConversation(conversationId).collect { messages ->
                     _uiState.value = _uiState.value.copy(
                         messages = messages,
                         isLoading = false
                     )
-                    
+
                     messageRepository.markMessagesAsRead(conversationId, currentUser.id)
                 }
             } catch (e: Exception) {
@@ -128,6 +144,11 @@ class ChatViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        chatRealtimeService.unsubscribe()
     }
 }
 

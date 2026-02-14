@@ -57,5 +57,11 @@ enum class NotificationType {
     PRICE_ALERT,
     
     @Json(name = "SYSTEM")
-    SYSTEM
+    SYSTEM,
+
+    @Json(name = "NEW_MESSAGE")
+    NEW_MESSAGE,
+
+    @Json(name = "NEW_REVIEW")
+    NEW_REVIEW
 }

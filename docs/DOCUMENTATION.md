@@ -1,6 +1,6 @@
 # Agrimarket Documentation
 
-**Last Updated:** December 21, 2025  
+**Last Updated:** February 14, 2026
 **Version:** 1.0
 
 This is the comprehensive documentation for the Agrimarket (Sri Lanka Farmers Marketplace) Android application.
@@ -122,8 +122,9 @@ The app follows **Clean Architecture** with **MVVM** pattern and **offline-first
 | ViewModel | `ui/*/ViewModel.kt` | State management |
 | Repository | `data/repository/` | Data coordination |
 | Local DB | `data/dao/` | Room DAOs |
-| Remote API | `data/api/` | Retrofit services |
-| DI | `di/` | Hilt modules |
+| Remote API | `data/api/` | Retrofit services (11 services) |
+| Real-time | `data/sync/` | Supabase Realtime for chat |
+| DI | `di/` | Hilt modules (Network, Database, Supabase, Firebase) |
 
 ## 2.3 Offline-First Pattern
 
@@ -192,8 +193,8 @@ fun ListingCard(viewModel: ViewModel)
 ```
 
 ### Test Coverage
-- **Unit tests:** 142 tests (ViewModels, Repositories)
-- **UI tests:** 27 tests (critical flows)
+- **Unit tests:** 143 tests across 11 test files (ViewModels, Repositories, Converters)
+- **UI tests:** 27 tests across 5 test files (critical flows)
 - Target: >70% coverage for new code
 
 ## 3.3 Contributing

@@ -7,7 +7,9 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  // throw new Error('Missing Supabase environment variables');
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Missing Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) in production');
+  }
   console.warn('Missing Supabase environment variables (BYPASSED - Using Mocks)');
 }
 

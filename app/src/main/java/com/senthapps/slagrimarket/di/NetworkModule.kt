@@ -3,10 +3,15 @@ package com.senthapps.slagrimarket.di
 import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.ActivityApiService
 import com.senthapps.slagrimarket.data.api.AuthApiService
+import com.senthapps.slagrimarket.data.api.FavoriteApiService
 import com.senthapps.slagrimarket.data.api.ListingApiService
 import com.senthapps.slagrimarket.data.api.MarketPriceApiService
+import com.senthapps.slagrimarket.data.api.MessageApiService
+import com.senthapps.slagrimarket.data.api.NotificationApiService
+import com.senthapps.slagrimarket.data.api.ReviewApiService
 import com.senthapps.slagrimarket.data.api.SyncApiService
 import com.senthapps.slagrimarket.data.api.TransactionApiService
+import com.senthapps.slagrimarket.data.api.UserApiService
 import com.senthapps.slagrimarket.data.network.AuthInterceptor
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -111,5 +116,35 @@ object NetworkModule {
     @Singleton
     fun provideActivityApiService(retrofit: Retrofit): ActivityApiService {
         return retrofit.create(ActivityApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMessageApiService(retrofit: Retrofit): MessageApiService {
+        return retrofit.create(MessageApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteApiService(retrofit: Retrofit): FavoriteApiService {
+        return retrofit.create(FavoriteApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReviewApiService(retrofit: Retrofit): ReviewApiService {
+        return retrofit.create(ReviewApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationApiService(retrofit: Retrofit): NotificationApiService {
+        return retrofit.create(NotificationApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApiService(retrofit: Retrofit): UserApiService {
+        return retrofit.create(UserApiService::class.java)
     }
 }

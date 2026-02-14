@@ -28,9 +28,14 @@ router.get('/', async (req, res) => {
       role, // 'farmer' or 'buyer'
       page = 1,
       limit = 20,
-      sortBy = 'created_at',
-      sortOrder = 'DESC',
+      sortBy: rawSortBy = 'created_at',
+      sortOrder: rawSortOrder = 'DESC',
     } = req.query;
+
+    // Whitelist sort columns to prevent SQL injection
+    const allowedSortColumns = ['created_at', 'total_amount', 'quantity', 'pickup_date', 'updated_at', 'status'];
+    const sortBy = allowedSortColumns.includes(rawSortBy) ? rawSortBy : 'created_at';
+    const sortOrder = rawSortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     // Build dynamic query based on user role
     const whereConditions = [];

@@ -151,6 +151,47 @@ Content-Type: application/json
 | POST | `/api/v1/transactions` | Create transaction |
 | POST | `/api/v1/sync/operations` | Sync offline operations |
 
+### Messaging (Auth Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/messages/conversations` | List user's conversations |
+| GET | `/api/v1/messages/conversations/:id` | Get conversation detail |
+| POST | `/api/v1/messages/conversations` | Create/get conversation |
+| GET | `/api/v1/messages/conversations/:id/messages` | Get messages in conversation |
+| POST | `/api/v1/messages/conversations/:id/messages` | Send a message |
+| PATCH | `/api/v1/messages/conversations/:id/read` | Mark messages as read |
+| GET | `/api/v1/messages/unread-count` | Get unread count |
+
+### Favorites (Auth Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/favorites` | List user's favorites |
+| POST | `/api/v1/favorites` | Add listing to favorites |
+| DELETE | `/api/v1/favorites/:listingId` | Remove from favorites |
+| GET | `/api/v1/favorites/check/:listingId` | Check if favorited |
+
+### Reviews (Auth Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/reviews/user/:userId` | Get reviews for user |
+| GET | `/api/v1/reviews/user/:userId/summary` | Get rating summary |
+| POST | `/api/v1/reviews` | Create review |
+| PUT | `/api/v1/reviews/:id` | Update own review |
+| DELETE | `/api/v1/reviews/:id` | Delete own review |
+
+### Notifications (Auth Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/notifications` | List user notifications |
+| GET | `/api/v1/notifications/unread-count` | Get unread count |
+| PATCH | `/api/v1/notifications/:id/read` | Mark as read |
+| PATCH | `/api/v1/notifications/read-all` | Mark all as read |
+| DELETE | `/api/v1/notifications/:id` | Delete notification |
+
 ### Health Checks
 
 | Method | Endpoint | Description |

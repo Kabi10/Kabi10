@@ -22,9 +22,12 @@ data class User(
     @Json(name = "userType")
     val userType: UserType? = UserType.BUYER,
     
+    @Json(name = "location")
+    val location: String? = null,
+
     @Json(name = "verified")
     val verified: Boolean = false,
-    
+
     @Json(name = "language")
     val language: String = "ta", // Tamil by default
     

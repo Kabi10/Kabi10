@@ -155,6 +155,22 @@
 }
 
 # =====================================================
+# Supabase
+# =====================================================
+-keep class io.github.jan.supabase.** { *; }
+-dontwarn io.github.jan.supabase.**
+-keep class io.github.jan_tennert.supabase.** { *; }
+-dontwarn io.github.jan_tennert.supabase.**
+
+# =====================================================
+# Ktor Client
+# =====================================================
+-keep class io.ktor.** { *; }
+-dontwarn io.ktor.**
+-keep class kotlinx.serialization.** { *; }
+-dontwarn kotlinx.serialization.**
+
+# =====================================================
 # General Android
 # =====================================================
 -keep public class * extends android.app.Activity

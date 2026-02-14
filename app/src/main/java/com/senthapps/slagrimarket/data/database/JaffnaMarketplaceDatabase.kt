@@ -189,6 +189,130 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
         }
 
         /**
+         * Migration from version 2 to 3
+         * Adds notifications table
+         */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `notifications` (
+                        `id` TEXT NOT NULL,
+                        `userId` TEXT NOT NULL,
+                        `type` TEXT NOT NULL,
+                        `title` TEXT NOT NULL,
+                        `message` TEXT NOT NULL,
+                        `relatedId` TEXT NOT NULL,
+                        `isRead` INTEGER NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_notifications_userId` ON `notifications` (`userId`)")
+            }
+        }
+
+        /**
+         * Migration from version 3 to 4
+         * Adds reviews table
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `reviews` (
+                        `id` TEXT NOT NULL,
+                        `transactionId` TEXT NOT NULL,
+                        `reviewerId` TEXT NOT NULL,
+                        `reviewerName` TEXT NOT NULL,
+                        `revieweeId` TEXT NOT NULL,
+                        `rating` INTEGER NOT NULL,
+                        `comment` TEXT NOT NULL,
+                        `reviewType` TEXT NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_reviews_revieweeId` ON `reviews` (`revieweeId`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_reviews_transactionId` ON `reviews` (`transactionId`)")
+            }
+        }
+
+        /**
+         * Migration from version 4 to 6
+         * Adds messages, conversations, favorites tables
+         * Adds new columns to users, listings, transactions, activities
+         */
+        private val MIGRATION_4_6 = object : Migration(4, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create messages table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `messages` (
+                        `id` TEXT NOT NULL,
+                        `conversationId` TEXT NOT NULL,
+                        `senderId` TEXT NOT NULL,
+                        `senderName` TEXT NOT NULL,
+                        `receiverId` TEXT NOT NULL,
+                        `content` TEXT NOT NULL,
+                        `messageType` TEXT NOT NULL,
+                        `isRead` INTEGER NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_messages_conversationId` ON `messages` (`conversationId`)")
+
+                // Create conversations table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `conversations` (
+                        `id` TEXT NOT NULL,
+                        `listingId` TEXT,
+                        `participant1Id` TEXT NOT NULL,
+                        `participant1Name` TEXT NOT NULL,
+                        `participant2Id` TEXT NOT NULL,
+                        `participant2Name` TEXT NOT NULL,
+                        `lastMessage` TEXT,
+                        `lastMessageTime` TEXT,
+                        `unreadCount` INTEGER NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        `updatedAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_conversations_participant1Id` ON `conversations` (`participant1Id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_conversations_participant2Id` ON `conversations` (`participant2Id`)")
+
+                // Create favorites table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `favorites` (
+                        `id` TEXT NOT NULL,
+                        `userId` TEXT NOT NULL,
+                        `listingId` TEXT NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_favorites_userId` ON `favorites` (`userId`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_favorites_listingId` ON `favorites` (`listingId`)")
+
+                // Add location column to users (nullable)
+                try { database.execSQL("ALTER TABLE `users` ADD COLUMN `location` TEXT") } catch (_: Exception) {}
+
+                // Add new columns to listings
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `farmerPhone` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `story` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `farmingMethods` TEXT NOT NULL DEFAULT '[]'") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `certifications` TEXT NOT NULL DEFAULT '[]'") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `harvestedAt` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `sustainabilityPractices` TEXT NOT NULL DEFAULT '[]'") } catch (_: Exception) {}
+
+                // Add new columns to transactions
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `sellerName` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `buyerName` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `sellerPhone` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `buyerPhone` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+            }
+        }
+
+        /**
          * Database callback for prepopulating data
          */
         private val databaseCallback = object : RoomDatabase.Callback() {
@@ -228,7 +352,8 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
                     JaffnaMarketplaceDatabase::class.java,
                     DATABASE_NAME
                 )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_6)
+                .fallbackToDestructiveMigration()
                 .addCallback(databaseCallback)
                 .build()
                 INSTANCE = instance

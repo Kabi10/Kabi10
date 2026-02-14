@@ -14,7 +14,7 @@ firebaseBom = "33.7.0"
 googleServices = "4.4.2"
 
 # Architecture Components
-room = "2.6.1"
+room = "2.7.0"
 lifecycle = "2.9.2"
 navigation = "2.8.5"
 hilt = "2.52"
@@ -44,6 +44,10 @@ leakcanary = "2.14"
 
 # Security
 security = "1.1.0-alpha06"
+
+# Supabase
+supabase = "3.1.4"
+ktor = "3.1.1"
 
 # Other
 timber = "5.0.1"
@@ -127,6 +131,11 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
+
+# Supabase
+supabase-realtime = { group = "io.github.jan-tennert.supabase", name = "realtime-kt", version.ref = "supabase" }
+supabase-postgrest = { group = "io.github.jan-tennert.supabase", name = "postgrest-kt", version.ref = "supabase" }
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 
 # Debug Tools
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }

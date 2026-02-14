@@ -290,6 +290,8 @@ private fun getNotificationIcon(type: NotificationType): ImageVector {
         NotificationType.LISTING_VIEWED -> Icons.Default.Star
         NotificationType.PRICE_ALERT -> Icons.Default.Info
         NotificationType.SYSTEM -> Icons.Default.Notifications
+        NotificationType.NEW_MESSAGE -> Icons.Default.Email
+        NotificationType.NEW_REVIEW -> Icons.Default.Star
     }
 }
 
@@ -303,6 +305,8 @@ private fun getNotificationColor(type: NotificationType): Color {
         NotificationType.LISTING_VIEWED -> Color(0xFFFF9800)
         NotificationType.PRICE_ALERT -> Color(0xFFFF5722)
         NotificationType.SYSTEM -> Color(0xFF607D8B)
+        NotificationType.NEW_MESSAGE -> Color(0xFF2196F3)
+        NotificationType.NEW_REVIEW -> Color(0xFFFF9800)
     }
 }
 

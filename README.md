@@ -28,7 +28,7 @@ An offline-first agricultural marketplace for Sri Lankan farmers, supporting Tam
 | Metric | Status |
 |--------|--------|
 | **Build Status** | ✅ Passing |
-| **Test Coverage** | ✅ 169 tests (142 unit + 27 UI automation) |
+| **Test Coverage** | ✅ 143 unit tests + 27 UI automation tests |
 | **Security** | ✅ ProGuard, rate limiting, request signing |
 | **CI/CD** | ✅ GitHub Actions + CodeQL scanning |
 | **Accessibility** | ✅ TalkBack support with trilingual descriptions |
@@ -245,12 +245,17 @@ npx supabase db push --linked
 - **Market Prices**: Real-time commodity pricing information
 - **Transaction Management**: Complete transaction lifecycle tracking
 - **User Profiles**: Farmer and buyer profile management
+- **Real-time Chat**: Direct messaging between buyers and farmers (Supabase Realtime)
+- **Favorites**: Save and manage favorite listings
+- **Reviews & Ratings**: Rate transactions and build trust
+- **Notifications**: Order updates, new messages, and price alerts
 
 ### Technical Features
 - **Trilingual Support**: English, Tamil (தமிழ்), and Sinhala (සිංහල) interfaces
 - **OTP Authentication**: Secure phone number verification for Sri Lankan numbers
 - **Offline-First Architecture**: Full app functionality without internet connection
 - **Real-time Sync**: Automatic data synchronization when connectivity is restored
+- **Real-time Chat**: Supabase Realtime for instant messaging on serverless backend
 - **Conflict Resolution**: Smart handling of offline data conflicts
 - **Dark Theme**: Material Design 3 dark theme support
 - **Responsive Design**: Optimized for various screen sizes and orientations
@@ -283,22 +288,32 @@ npx supabase db push --linked
 - **Transactions**: Order tracking and payment status
 - **Activities**: User activity feed and notifications
 - **Market Prices**: Real-time commodity pricing data
+- **Conversations & Messages**: Real-time chat between buyers and farmers
+- **Favorites**: Saved listings for quick access
+- **Reviews**: Buyer-farmer transaction reviews and ratings
+- **Notifications**: System and user notifications
 
 ## ✅ Verification & Testing
 
 ### Test Coverage
 
-| **Unit Tests** | 48 | 7 test files |
+| Category | Tests | Files |
+|----------|-------|-------|
+| **Unit Tests** | 143 | 11 test files |
 | **UI Automation Tests** | 27 | 5 test files |
-| **Total** | 75 | 12 test files |
+| **Total** | 170 | 16 test files |
 
 **Unit Test Files:**
 - `AuthRepositoryTest.kt` - Authentication repository tests
 - `ListingRepositoryTest.kt` - Listing repository tests
+- `MarketPriceRepositoryTest.kt` - Market price repository tests (47 tests)
 - `AuthViewModelTest.kt` - Auth ViewModel tests
 - `HomeViewModelTest.kt` - Home ViewModel tests
 - `ListingsViewModelTest.kt` - Listings ViewModel tests
 - `TransactionsViewModelTest.kt` - Transactions ViewModel tests
+- `CreateListingViewModelTest.kt` - Create listing flow tests
+- `CreateTransactionViewModelTest.kt` - Create transaction flow tests
+- `ListingConvertersTest.kt` - Data converter tests
 
 **UI Automation Test Files:**
 - `HomeScreenTest.kt` - Home screen UI tests

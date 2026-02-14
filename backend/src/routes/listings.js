@@ -86,9 +86,14 @@ router.get('/', async (req, res) => {
       farmerId,
       page = 1,
       limit = 20,
-      sortBy = 'created_at',
-      sortOrder = 'DESC',
+      sortBy: rawSortBy = 'created_at',
+      sortOrder: rawSortOrder = 'DESC',
     } = req.query;
+
+    // Whitelist allowed sort columns to prevent SQL injection
+    const allowedSortColumns = ['created_at', 'price_per_unit', 'quantity', 'updated_at', 'view_count'];
+    const sortBy = allowedSortColumns.includes(rawSortBy) ? rawSortBy : 'created_at';
+    const sortOrder = rawSortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     // Build dynamic query
     const whereConditions = ['l.is_active = true', 'l.available_until >= CURRENT_DATE', 'l.deleted_at IS NULL'];

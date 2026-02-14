@@ -40,9 +40,15 @@ data class Review(
 enum class ReviewType {
     @Json(name = "FARMER")
     FARMER, // Review of farmer by buyer
-    
+
     @Json(name = "BUYER")
-    BUYER // Review of buyer by farmer
+    BUYER, // Review of buyer by farmer
+
+    @Json(name = "BUYER_TO_FARMER")
+    BUYER_TO_FARMER,
+
+    @Json(name = "FARMER_TO_BUYER")
+    FARMER_TO_BUYER
 }
 
 data class UserRating(

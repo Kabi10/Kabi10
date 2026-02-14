@@ -4,13 +4,14 @@ const crypto = require('crypto');
  * Generate random OTP code
  */
 function generateOTP(length = 6) {
-  const digits = '0123456789';
-  let otp = '';
-
-  for (let i = 0; i < length; i++) {
-    otp += digits[Math.floor(Math.random() * digits.length)];
+  if (length === 6) {
+    return crypto.randomInt(100000, 999999).toString();
   }
-
+  // For non-standard lengths, generate digit by digit using crypto
+  let otp = '';
+  for (let i = 0; i < length; i++) {
+    otp += crypto.randomInt(0, 10).toString();
+  }
   return otp;
 }
 

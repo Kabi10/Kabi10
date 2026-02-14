@@ -31,6 +31,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "keystore/release.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("KEY_ALIAS") ?: "agrimarket"
+            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+        }
+    }
+
     buildTypes {
         debug {
             isDebuggable = true
@@ -43,6 +52,8 @@ android {
             // "https://backend-psi-tan-18.vercel.app/api/"
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "true")
+            buildConfigField("String", "SUPABASE_URL", "\"\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"\"")
         }
 
         release {
@@ -54,8 +65,11 @@ android {
             )
 
             // API Configuration for release builds
+            signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "BASE_URL", "\"https://backend-psi-tan-18.vercel.app/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "false")
+            buildConfigField("String", "SUPABASE_URL", "\"\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"\"")
         }
     }
     compileOptions {
@@ -144,6 +158,11 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.perf)
+
+    // Supabase Realtime (for chat)
+    implementation(libs.supabase.realtime)
+    implementation(libs.supabase.postgrest)
+    implementation(libs.ktor.client.android)
 
     // DataStore for preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")

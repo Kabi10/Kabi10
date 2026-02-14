@@ -25,6 +25,10 @@ const transactionRoutes = require('./routes/transactions');
 const syncRoutes = require('./routes/sync');
 const healthRoutes = require('./routes/health');
 const marketPricesRoutes = require('./routes/market-prices');
+const messagesRoutes = require('./routes/messages');
+const favoritesRoutes = require('./routes/favorites');
+const reviewsRoutes = require('./routes/reviews');
+const notificationsRoutes = require('./routes/notifications');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -124,6 +128,10 @@ apiRouter.use('/users', authenticateToken, userRoutes);
 apiRouter.use('/listings', authenticateToken, listingRoutes);
 apiRouter.use('/transactions', authenticateToken, transactionRoutes);
 apiRouter.use('/sync', authenticateToken, syncRoutes);
+apiRouter.use('/messages', authenticateToken, messagesRoutes);
+apiRouter.use('/favorites', authenticateToken, favoritesRoutes);
+apiRouter.use('/reviews', authenticateToken, reviewsRoutes);
+apiRouter.use('/notifications', authenticateToken, notificationsRoutes);
 
 // Mount API router
 app.use(`/api/${API_VERSION}`, apiRouter);
@@ -147,6 +155,10 @@ app.get('/', (req, res) => {
       listings: `/api/${API_VERSION}/listings`,
       transactions: `/api/${API_VERSION}/transactions`,
       sync: `/api/${API_VERSION}/sync`,
+      messages: `/api/${API_VERSION}/messages`,
+      favorites: `/api/${API_VERSION}/favorites`,
+      reviews: `/api/${API_VERSION}/reviews`,
+      notifications: `/api/${API_VERSION}/notifications`,
     },
   });
 });
@@ -188,9 +200,13 @@ const startServer = async () => {
   try {
     console.log('Starting server...');
     // Test database connection
-    // await database.query('SELECT NOW()');
-    console.log('DB Check bypassed');
-    logger.info('Database connection established (BYPASSED)');
+    try {
+      await database.query('SELECT NOW()');
+      logger.info('Database connection established');
+    } catch (dbError) {
+      logger.warn('Database connection check failed (may recover on first request):', dbError.message);
+      // Don't crash on Vercel cold starts — the connection pool will retry on first real query
+    }
 
     const server = app.listen(PORT, () => {
       console.log('Server is listening!');

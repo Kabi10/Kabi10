@@ -1,6 +1,7 @@
 package com.senthapps.slagrimarket.data.repository
 
 import com.senthapps.slagrimarket.data.api.AuthApiService
+import com.senthapps.slagrimarket.data.api.UserApiService
 import com.senthapps.slagrimarket.data.api.SendOtpResponse
 import com.senthapps.slagrimarket.data.api.VerifyOtpResponse
 import com.senthapps.slagrimarket.data.dao.UserDao
@@ -22,6 +23,7 @@ import retrofit2.Response
 class AuthRepositoryTest {
 
     private lateinit var authApiService: AuthApiService
+    private lateinit var userApiService: UserApiService
     private lateinit var authPreferences: AuthPreferences
     private lateinit var userDao: UserDao
     private lateinit var repository: AuthRepository
@@ -46,12 +48,13 @@ class AuthRepositoryTest {
         )
 
         authApiService = mockk(relaxed = true)
+        userApiService = mockk(relaxed = true)
         userDao = mockk(relaxed = true)
 
         // Use relaxed mock for AuthPreferences
         authPreferences = mockk(relaxed = true, relaxUnitFun = true)
 
-        repository = AuthRepository(authApiService, authPreferences, userDao)
+        repository = AuthRepository(authApiService, userApiService, authPreferences, userDao)
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.senthapps.slagrimarket.data.repository
 import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.AuthApiService
 import com.senthapps.slagrimarket.data.api.SendOtpRequest
+import com.senthapps.slagrimarket.data.api.UpdateProfileRequest
+import com.senthapps.slagrimarket.data.api.UserApiService
 import com.senthapps.slagrimarket.data.api.VerifyOtpRequest
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.User
@@ -19,6 +21,7 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepository @Inject constructor(
     private val authApiService: AuthApiService,
+    private val userApiService: UserApiService,
     private val authPreferences: AuthPreferences,
     private val userDao: UserDao
 ) {
@@ -243,13 +246,26 @@ class AuthRepository @Inject constructor(
                 return Result.failure(Exception("User not found"))
             }
 
+            // Update via API first
+            try {
+                val response = userApiService.updateProfile(
+                    UpdateProfileRequest(name = name, location = location)
+                )
+                if (response.isSuccessful && response.body()?.success == true) {
+                    Timber.d("Profile updated on server: $name, $location")
+                }
+            } catch (e: Exception) {
+                Timber.w(e, "Failed to update profile on API, updating locally")
+            }
+
             val updatedUser = currentUser.copy(
-                name = name
+                name = name,
+                location = location
             )
 
             // Update in local database
             userDao.updateUser(updatedUser)
-            
+
             // Update in preferences
             authPreferences.saveUser(updatedUser)
 
