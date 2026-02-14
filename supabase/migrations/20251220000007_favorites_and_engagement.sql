@@ -20,10 +20,12 @@ CREATE INDEX IF NOT EXISTS idx_favorites_listing_id ON favorites(listing_id);
 ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
 
 -- Users can manage their own favorites
+DROP POLICY IF EXISTS "Users manage own favorites" ON favorites;
 CREATE POLICY "Users manage own favorites" ON favorites
     FOR ALL USING (auth.uid()::text = user_id::text);
 
 -- Service role full access
+DROP POLICY IF EXISTS "Service role manages favorites" ON favorites;
 CREATE POLICY "Service role manages favorites" ON favorites
     FOR ALL USING (auth.role() = 'service_role');
 

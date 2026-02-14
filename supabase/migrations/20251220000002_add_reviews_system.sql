@@ -25,11 +25,13 @@ ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 -- 4. RLS Policies
 -- Anyone can view reviews (public trust signals)
+DROP POLICY IF EXISTS "Anyone can view reviews" ON reviews;
 CREATE POLICY "Anyone can view reviews" ON reviews
     FOR SELECT USING (true);
 
 -- Authenticated users can insert reviews for transactions they are part of
 -- Note: In a production environment, we'd also check if the transaction is COMPLETED.
+DROP POLICY IF EXISTS "Users can review their own transactions" ON reviews;
 CREATE POLICY "Users can review their own transactions" ON reviews
     FOR INSERT 
     WITH CHECK (
@@ -43,12 +45,14 @@ CREATE POLICY "Users can review their own transactions" ON reviews
     );
 
 -- Users can update/delete their own reviews
+DROP POLICY IF EXISTS "Users can manage own reviews" ON reviews;
 CREATE POLICY "Users can manage own reviews" ON reviews
     FOR ALL
     USING (auth.uid()::text = reviewer_id::text);
 
 -- 5. Trigger for updated_at
-CREATE TRIGGER update_reviews_updated_at 
-    BEFORE UPDATE ON reviews 
-    FOR EACH ROW 
+DROP TRIGGER IF EXISTS update_reviews_updated_at ON reviews;
+CREATE TRIGGER update_reviews_updated_at
+    BEFORE UPDATE ON reviews
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

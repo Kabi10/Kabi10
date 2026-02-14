@@ -21,8 +21,10 @@ CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id) WH
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- 4. RLS Policies
+DROP POLICY IF EXISTS "Users can manage own notifications" ON notifications;
 CREATE POLICY "Users can manage own notifications" ON notifications
     FOR ALL USING (auth.uid()::text = user_id::text);
 
+DROP POLICY IF EXISTS "Service role can manage notifications" ON notifications;
 CREATE POLICY "Service role can manage notifications" ON notifications
     FOR ALL USING (auth.role() = 'service_role');

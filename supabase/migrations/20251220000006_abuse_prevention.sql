@@ -48,14 +48,17 @@ CREATE INDEX IF NOT EXISTS idx_users_trust_level ON users(trust_level);
 ALTER TABLE user_verifications ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own verification status
+DROP POLICY IF EXISTS "Users can view own verifications" ON user_verifications;
 CREATE POLICY "Users can view own verifications" ON user_verifications
     FOR SELECT USING (auth.uid()::text = user_id::text);
 
 -- Users can submit verification requests
+DROP POLICY IF EXISTS "Users can submit verifications" ON user_verifications;
 CREATE POLICY "Users can submit verifications" ON user_verifications
     FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
 
 -- Service role can manage all verifications (for admin review)
+DROP POLICY IF EXISTS "Service role manages verifications" ON user_verifications;
 CREATE POLICY "Service role manages verifications" ON user_verifications
     FOR ALL USING (auth.role() = 'service_role');
 

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS crops (
 ALTER TABLE crops ENABLE ROW LEVEL SECURITY;
 
 -- 3. Public read access policy
+DROP POLICY IF EXISTS "Anyone can view active crops" ON crops;
 CREATE POLICY "Anyone can view active crops" ON crops
     FOR SELECT USING (is_active = true);
 
