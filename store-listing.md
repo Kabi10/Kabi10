@@ -46,7 +46,10 @@ Everyone
 admin@agrimarket.lk
 
 ## Privacy Policy URL
-https://agrimarket.lk/privacy.html
+https://agrimarket-landing.vercel.app/privacy.html
+
+## Terms of Service URL
+https://agrimarket-landing.vercel.app/terms.html
 
 ## Keywords
 farming, agriculture, marketplace, Sri Lanka, fresh produce, farmers market, crops, buy, sell, Tamil, Sinhala
