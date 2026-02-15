@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.core.DataStore
+import com.senthapps.slagrimarket.data.preferences.AccessibilityPreferences
 import com.senthapps.slagrimarket.data.preferences.LanguagePreferences
 import dagger.Module
 import dagger.Provides
@@ -29,5 +30,11 @@ object PreferencesModule {
     @Singleton
     fun provideLanguagePreferences(dataStore: DataStore<Preferences>): LanguagePreferences {
         return LanguagePreferences(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAccessibilityPreferences(dataStore: DataStore<Preferences>): AccessibilityPreferences {
+        return AccessibilityPreferences(dataStore)
     }
 }

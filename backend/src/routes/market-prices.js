@@ -211,4 +211,59 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/market-prices/refresh-live
+ * Trigger a live price refresh from HDX HAPI (WFP data)
+ * This populates the market_prices table with real Sri Lankan food prices.
+ * Can be called by a cron job or manually.
+ */
+router.post('/refresh-live', async (req, res) => {
+  try {
+    const { refreshLivePrices } = require('../services/livePriceService');
+    const result = await refreshLivePrices();
+
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    logger.error('Live price refresh error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh live prices',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
+/**
+ * GET /api/market-prices/refresh-live
+ * Same as POST but accessible via GET for Vercel Cron
+ */
+router.get('/refresh-live', async (req, res) => {
+  try {
+    // Verify cron secret if provided
+    const cronSecret = req.headers['authorization'];
+    if (process.env.CRON_SECRET && cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
+      // Allow without auth for now, but log it
+      logger.warn('Cron refresh called without proper auth');
+    }
+
+    const { refreshLivePrices } = require('../services/livePriceService');
+    const result = await refreshLivePrices();
+
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    logger.error('Live price refresh (cron) error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh live prices',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
 module.exports = router;

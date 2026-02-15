@@ -22,6 +22,7 @@ import com.senthapps.slagrimarket.ui.components.SecondaryButton
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
+import com.senthapps.slagrimarket.ui.theme.LocalTextScale
 import com.senthapps.slagrimarket.ui.theme.Spacing
 import com.senthapps.slagrimarket.ui.theme.industrialClickable
 
@@ -273,6 +274,7 @@ private fun PriceRow(
     useAlternateBackground: Boolean
 ) {
     val backgroundColor = if (useAlternateBackground) HumanIndustrial.Dust else HumanIndustrial.Rice
+    val textScale = LocalTextScale.current
     val productName = when (language) {
         AppLanguage.SINHALA -> price.productNameSinhala
         AppLanguage.TAMIL -> price.productNameTamil
@@ -284,11 +286,15 @@ private fun PriceRow(
         AppLanguage.ENGLISH -> "Rs"
     }
     val priceText = "$currencySymbol ${price.price.toInt()}/${price.unit}"
+    val scaledStyle = HumanIndustrialType.productName.copy(
+        fontSize = HumanIndustrialType.productName.fontSize * textScale
+    )
+    val rowHeight = (72 * textScale).dp
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)
+            .height(rowHeight)
             .background(backgroundColor)
             .padding(horizontal = Spacing.lg.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -296,12 +302,12 @@ private fun PriceRow(
     ) {
         Text(
             text = productName,
-            style = HumanIndustrialType.productName,
+            style = scaledStyle,
             color = HumanIndustrial.Ink
         )
         Text(
             text = priceText,
-            style = HumanIndustrialType.productName,
+            style = scaledStyle,
             color = HumanIndustrial.Gold
         )
     }

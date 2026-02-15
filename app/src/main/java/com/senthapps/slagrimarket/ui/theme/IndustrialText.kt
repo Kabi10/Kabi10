@@ -24,6 +24,16 @@ import com.senthapps.slagrimarket.ui.home.AppLanguage
 val LocalAppLanguage = compositionLocalOf { AppLanguage.TAMIL }
 
 /**
+ * CompositionLocal for text scale factor (accessibility).
+ * Default: 1.0f (normal). Large text mode: 1.35f
+ *
+ * Usage in composables:
+ *   val scale = LocalTextScale.current
+ *   Text(fontSize = (16 * scale).sp)
+ */
+val LocalTextScale = compositionLocalOf { 1.0f }
+
+/**
  * Convert language code string to AppLanguage enum.
  * Maps DataStore string codes to UI enum.
  *

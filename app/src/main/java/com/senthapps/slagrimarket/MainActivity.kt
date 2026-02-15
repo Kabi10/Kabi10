@@ -11,9 +11,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.senthapps.slagrimarket.data.preferences.AccessibilityPreferences
 import com.senthapps.slagrimarket.data.preferences.LanguagePreferences
 import com.senthapps.slagrimarket.navigation.JaffnaMarketplaceNavigation
 import com.senthapps.slagrimarket.ui.theme.LocalAppLanguage
+import com.senthapps.slagrimarket.ui.theme.LocalTextScale
 import com.senthapps.slagrimarket.ui.theme.SLAgrimarketTheme
 import com.senthapps.slagrimarket.ui.theme.languageCodeToAppLanguage
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +27,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var languagePreferences: LanguagePreferences
+
+    @Inject
+    lateinit var accessibilityPreferences: AccessibilityPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +45,15 @@ class MainActivity : ComponentActivity() {
                 .collectAsState(initial = LanguagePreferences.DEFAULT_LANGUAGE)
             val appLanguage = languageCodeToAppLanguage(languageCode)
 
-            // Provide language globally via CompositionLocal
-            CompositionLocalProvider(LocalAppLanguage provides appLanguage) {
+            // Collect accessibility preferences
+            val textScale by accessibilityPreferences.getTextScale()
+                .collectAsState(initial = AccessibilityPreferences.DEFAULT_SCALE)
+
+            // Provide language and text scale globally via CompositionLocal
+            CompositionLocalProvider(
+                LocalAppLanguage provides appLanguage,
+                LocalTextScale provides textScale
+            ) {
                 SLAgrimarketTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),

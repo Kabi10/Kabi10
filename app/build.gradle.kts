@@ -10,6 +10,15 @@ plugins {
     jacoco
 }
 
+// Load local.properties for secrets
+import java.io.FileInputStream
+import java.util.Properties
+val localProperties = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    FileInputStream(localPropsFile).use { localProperties.load(it) }
+}
+
 android {
     namespace = "com.senthapps.slagrimarket"
     compileSdk = 36
@@ -52,8 +61,8 @@ android {
             // "https://backend-psi-tan-18.vercel.app/api/"
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "true")
-            buildConfigField("String", "SUPABASE_URL", "\"https://lxsbdluguyaaxzaeovwx.supabase.co\"")
-            buildConfigField("String", "SUPABASE_ANON_KEY", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4c2JkbHVndXlhYXh6YWVvdnd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMzY0ODcsImV4cCI6MjA3NDYxMjQ4N30.j-BuYSFnzd0o-tcdwW6pEiT3QI8D_scvIXAtfFOxc3c\"")
+            buildConfigField("String", "SUPABASE_URL", "\"${localProperties.getProperty("SUPABASE_URL", "")}\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProperties.getProperty("SUPABASE_ANON_KEY", "")}\"")
         }
 
         release {
@@ -68,8 +77,8 @@ android {
             signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "BASE_URL", "\"https://backend-psi-tan-18.vercel.app/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "false")
-            buildConfigField("String", "SUPABASE_URL", "\"https://lxsbdluguyaaxzaeovwx.supabase.co\"")
-            buildConfigField("String", "SUPABASE_ANON_KEY", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4c2JkbHVndXlhYXh6YWVvdnd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMzY0ODcsImV4cCI6MjA3NDYxMjQ4N30.j-BuYSFnzd0o-tcdwW6pEiT3QI8D_scvIXAtfFOxc3c\"")
+            buildConfigField("String", "SUPABASE_URL", "\"${localProperties.getProperty("SUPABASE_URL", "")}\"")
+            buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProperties.getProperty("SUPABASE_ANON_KEY", "")}\"")
         }
     }
     compileOptions {

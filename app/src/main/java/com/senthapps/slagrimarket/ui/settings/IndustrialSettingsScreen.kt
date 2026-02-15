@@ -52,7 +52,11 @@ import com.senthapps.slagrimarket.ui.theme.industrialClickable
 fun IndustrialSettingsScreen(
     currentLanguage: AppLanguage = AppLanguage.SINHALA,
     onLanguageSelected: (AppLanguage) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    isLargeTextEnabled: Boolean = false,
+    isHighContrastEnabled: Boolean = false,
+    onLargeTextToggle: (Boolean) -> Unit = {},
+    onHighContrastToggle: (Boolean) -> Unit = {}
 ) {
     var showConfirmDialog by remember { mutableStateOf(false) }
     var pendingLanguage by remember { mutableStateOf<AppLanguage?>(null) }
@@ -70,9 +74,9 @@ fun IndustrialSettingsScreen(
                 AppLanguage.ENGLISH -> "BACK"
             },
             title = when (currentLanguage) {
-                AppLanguage.SINHALA -> "භාෂාව"
-                AppLanguage.TAMIL -> "மொழி"
-                AppLanguage.ENGLISH -> "LANGUAGE"
+                AppLanguage.SINHALA -> "සැකසුම්"
+                AppLanguage.TAMIL -> "அமைப்புகள்"
+                AppLanguage.ENGLISH -> "SETTINGS"
             },
             onBackClick = onNavigateBack
         )
@@ -83,6 +87,15 @@ fun IndustrialSettingsScreen(
                 .fillMaxWidth()
                 .height(BorderWidth.Thick)
                 .background(HumanIndustrial.Earth)
+        )
+
+        // Section label: Language
+        SectionLabel(
+            text = when (currentLanguage) {
+                AppLanguage.SINHALA -> "භාෂාව"
+                AppLanguage.TAMIL -> "மொழி"
+                AppLanguage.ENGLISH -> "LANGUAGE"
+            }
         )
 
         // Language options - always shown in native script
@@ -123,6 +136,47 @@ fun IndustrialSettingsScreen(
                     showConfirmDialog = true
                 }
             }
+        )
+
+        // 4dp Earth divider
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(BorderWidth.Thick)
+                .background(HumanIndustrial.Earth)
+        )
+
+        // Section label: Accessibility
+        SectionLabel(
+            text = when (currentLanguage) {
+                AppLanguage.SINHALA -> "ප්‍රවේශ්‍යතාව"
+                AppLanguage.TAMIL -> "அணுகல்"
+                AppLanguage.ENGLISH -> "ACCESSIBILITY"
+            }
+        )
+
+        // Large Text toggle
+        ToggleRow(
+            text = when (currentLanguage) {
+                AppLanguage.SINHALA -> "විශාල අකුරු"
+                AppLanguage.TAMIL -> "பெரிய எழுத்து"
+                AppLanguage.ENGLISH -> "LARGE TEXT"
+            },
+            isEnabled = isLargeTextEnabled,
+            useAlternateBackground = false,
+            onToggle = onLargeTextToggle
+        )
+
+        // High Contrast toggle
+        ToggleRow(
+            text = when (currentLanguage) {
+                AppLanguage.SINHALA -> "ඉහළ වෙනස"
+                AppLanguage.TAMIL -> "உயர் மாறுபாடு"
+                AppLanguage.ENGLISH -> "HIGH CONTRAST"
+            },
+            isEnabled = isHighContrastEnabled,
+            useAlternateBackground = true,
+            onToggle = onHighContrastToggle
         )
     }
 
@@ -258,6 +312,62 @@ private fun LanguageChangeDialog(
             )
         }
     )
+}
+
+/**
+ * Section label - 48dp Dust background
+ */
+@Composable
+private fun SectionLabel(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .background(HumanIndustrial.Dust)
+            .padding(horizontal = Spacing.lg.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(
+            text = text,
+            style = HumanIndustrialType.sectionLabel,
+            color = HumanIndustrial.Stone
+        )
+    }
+}
+
+/**
+ * Toggle row - 72dp height with label and ON/OFF indicator
+ */
+@Composable
+private fun ToggleRow(
+    text: String,
+    isEnabled: Boolean,
+    useAlternateBackground: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    val backgroundColor = if (useAlternateBackground) HumanIndustrial.Dust else HumanIndustrial.Rice
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp)
+            .background(backgroundColor)
+            .industrialClickable(onClick = { onToggle(!isEnabled) })
+            .padding(horizontal = Spacing.lg.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = text,
+            style = HumanIndustrialType.productName,
+            color = HumanIndustrial.Ink
+        )
+        Text(
+            text = if (isEnabled) "ON" else "OFF",
+            style = HumanIndustrialType.productName,
+            color = if (isEnabled) HumanIndustrial.Green else HumanIndustrial.Stone
+        )
+    }
 }
 
 // ============================================================================

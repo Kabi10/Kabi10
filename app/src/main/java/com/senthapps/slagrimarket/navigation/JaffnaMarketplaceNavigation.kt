@@ -24,6 +24,7 @@ import com.senthapps.slagrimarket.ui.auth.IndustrialPhoneInputScreen
 import com.senthapps.slagrimarket.ui.chat.ChatScreen
 import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
 import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
+import com.senthapps.slagrimarket.ui.listings.QuickListingScreen
 import com.senthapps.slagrimarket.ui.help.ContactScreen
 import com.senthapps.slagrimarket.ui.help.FAQScreen
 import com.senthapps.slagrimarket.ui.help.HelpScreen
@@ -102,7 +103,7 @@ fun JaffnaMarketplaceNavigation(
         composable("home_direct") {
             IndustrialHomeScreen(
                 onNavigateToSell = {
-                    navController.navigate(Screen.CreateListing.route)
+                    navController.navigate(Screen.QuickListing.route)
                 },
                 onNavigateToBuy = {
                     navController.navigate(Screen.Categories.route)
@@ -123,7 +124,7 @@ fun JaffnaMarketplaceNavigation(
         composable(Screen.Home.route) {
             IndustrialHomeScreen(
                 onNavigateToSell = {
-                    navController.navigate(Screen.CreateListing.route)
+                    navController.navigate(Screen.QuickListing.route)
                 },
                 onNavigateToBuy = {
                     navController.navigate(Screen.Categories.route)
@@ -251,6 +252,20 @@ fun JaffnaMarketplaceNavigation(
                 onDone = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // Quick Listing - Photo-first sell flow
+        composable(Screen.QuickListing.route) {
+            QuickListingScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onListingCreated = {
+                    navController.navigate(Screen.CreateListingSuccess.route) {
+                        popUpTo(Screen.QuickListing.route) { inclusive = true }
                     }
                 }
             )
@@ -477,10 +492,13 @@ fun JaffnaMarketplaceNavigation(
             )
         }
 
-        // Industrial Settings (Language Selection)
+        // Industrial Settings (Language + Accessibility)
         composable(Screen.Settings.route) {
             val languageViewModel: LanguageToggleViewModel = hiltViewModel()
+            val accessibilityViewModel: com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel = hiltViewModel()
             val currentLanguage = LocalAppLanguage.current
+            val isLargeText by accessibilityViewModel.isLargeTextEnabled.collectAsState()
+            val isHighContrast by accessibilityViewModel.isHighContrastEnabled.collectAsState()
 
             IndustrialSettingsScreen(
                 currentLanguage = currentLanguage,
@@ -497,7 +515,11 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                isLargeTextEnabled = isLargeText,
+                isHighContrastEnabled = isHighContrast,
+                onLargeTextToggle = accessibilityViewModel::toggleLargeText,
+                onHighContrastToggle = accessibilityViewModel::toggleHighContrast
             )
         }
 
@@ -666,5 +688,6 @@ sealed class Screen(val route: String) {
     object Contact : Screen("contact")
     object Terms : Screen("terms")
     object Privacy : Screen("privacy")
-    object Settings : Screen("settings") // Industrial UI - Language settings
+    object Settings : Screen("settings") // Industrial UI - Language + Accessibility settings
+    object QuickListing : Screen("quick_listing") // Photo-first quick sell flow
 }
