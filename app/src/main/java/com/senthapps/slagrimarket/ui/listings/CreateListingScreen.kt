@@ -44,6 +44,20 @@ fun CreateListingScreen(
     var showUnitDropdown by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
+    // Quick Mode toggle (for elderly farmers)
+    var isQuickMode by remember { mutableStateOf(true) } // Default to quick mode
+
+    // Apply smart defaults when Quick Mode is enabled
+    LaunchedEffect(isQuickMode) {
+        if (isQuickMode && uiState.quality.isEmpty()) {
+            // Auto-fill with smart defaults
+            viewModel.updateQuality("B") // Standard quality (Grade B)
+            if (uiState.harvestDate.isEmpty()) {
+                viewModel.updateHarvestDate(viewModel.getTodayDate()) // Today
+            }
+        }
+    }
+
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
             onListingCreated()
@@ -89,6 +103,53 @@ fun CreateListingScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Quick Mode Toggle Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isQuickMode)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = when (currentLanguage) {
+                                    "en" -> "⚡ Quick Mode"
+                                    "ta" -> "⚡ விரைவு முறை"
+                                    "si" -> "⚡ ඉක්මන් මාදිලිය"
+                                    else -> "⚡ Quick Mode"
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Text(
+                            text = when (currentLanguage) {
+                                "en" -> if (isQuickMode) "Only 3 fields needed!" else "All options available"
+                                "ta" -> if (isQuickMode) "3 புலங்கள் மட்டுமே தேவை!" else "அனைத்து விருப்பங்களும் கிடைக்கின்றன"
+                                "si" -> if (isQuickMode) "ක්ෂේත්‍ර 3ක් පමණක් අවශ්‍යයි!" else "සියලුම විකල්ප තිබේ"
+                                else -> if (isQuickMode) "Only 3 fields needed!" else "All options available"
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = isQuickMode,
+                        onCheckedChange = { isQuickMode = it }
+                    )
+                }
+            }
+
             // Crop Type
             Column {
                 ExposedDropdownMenuBox(
@@ -268,8 +329,8 @@ fun CreateListingScreen(
                     )
                 }
             }
-            
-            // Quality Grade - Toggle Buttons
+
+            // Quality Grade - Toggle Buttons (auto-filled in Quick Mode)
             Column {
                 Text(
                     text = when (currentLanguage) {
