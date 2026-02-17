@@ -180,6 +180,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.1.0")
 
+    // Accompanist (Google Compose utilities)
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)

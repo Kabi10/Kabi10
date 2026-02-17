@@ -11,6 +11,7 @@ import com.senthapps.slagrimarket.data.api.NotificationApiService
 import com.senthapps.slagrimarket.data.api.ReviewApiService
 import com.senthapps.slagrimarket.data.api.SyncApiService
 import com.senthapps.slagrimarket.data.api.TransactionApiService
+import com.senthapps.slagrimarket.data.api.StorageApiService
 import com.senthapps.slagrimarket.data.api.UserApiService
 import com.senthapps.slagrimarket.data.network.AuthInterceptor
 import com.squareup.moshi.Moshi
@@ -146,5 +147,11 @@ object NetworkModule {
     @Singleton
     fun provideUserApiService(retrofit: Retrofit): UserApiService {
         return retrofit.create(UserApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStorageApiService(retrofit: Retrofit): StorageApiService {
+        return retrofit.create(StorageApiService::class.java)
     }
 }

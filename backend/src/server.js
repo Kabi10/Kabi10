@@ -30,6 +30,7 @@ const favoritesRoutes = require('./routes/favorites');
 const reviewsRoutes = require('./routes/reviews');
 const notificationsRoutes = require('./routes/notifications');
 const activitiesRoutes = require('./routes/activities');
+const storageRoutes = require('./routes/storage');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -134,6 +135,7 @@ apiRouter.use('/favorites', authenticateToken, favoritesRoutes);
 apiRouter.use('/reviews', authenticateToken, reviewsRoutes);
 apiRouter.use('/notifications', authenticateToken, notificationsRoutes);
 apiRouter.use('/activities', authenticateToken, activitiesRoutes);
+apiRouter.use('/storage', authenticateToken, storageRoutes);
 
 // Mount API router
 app.use(`/api/${API_VERSION}`, apiRouter);
@@ -162,6 +164,7 @@ app.get('/', (req, res) => {
       reviews: `/api/${API_VERSION}/reviews`,
       notifications: `/api/${API_VERSION}/notifications`,
       activities: `/api/${API_VERSION}/activities`,
+      storage: `/api/${API_VERSION}/storage`,
     },
   });
 });

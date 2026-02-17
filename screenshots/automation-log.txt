@@ -1,0 +1,6 @@
+🤖 Automated Screenshot Capture
+==================================
+
+⏳ Waiting for emulator to be ready...
+............................................................
+❌ Emulator didn't start in time

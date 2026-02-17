@@ -1,0 +1,5824 @@
+
+========================================
+FILE: backend/src/server.js
+========================================
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const compression = require('compression');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
+// CRITICAL: Prevent MOCK_DB in production
+if (process.env.NODE_ENV === 'production' && process.env.MOCK_DB === 'true') {
+  console.error('FATAL: MOCK_DB cannot be enabled in production.');
+  process.exit(1);
+}
+
+const logger = require('./utils/logger');
+const database = require('./database/connection');
+const { errorHandler } = require('./middleware/errorHandler');
+const { authenticateToken } = require('./middleware/auth');
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const listingRoutes = require('./routes/listings');
+const transactionRoutes = require('./routes/transactions');
+const syncRoutes = require('./routes/sync');
+const healthRoutes = require('./routes/health');
+const marketPricesRoutes = require('./routes/market-prices');
+const messagesRoutes = require('./routes/messages');
+const favoritesRoutes = require('./routes/favorites');
+const reviewsRoutes = require('./routes/reviews');
+const notificationsRoutes = require('./routes/notifications');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const API_VERSION = process.env.API_VERSION || 'v1';
+
+// Trust Vercel's proxy for rate limiting (X-Forwarded-For)
+app.set('trust proxy', 1);
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+  credentials: process.env.CORS_CREDENTIALS === 'true',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+app.use(cors(corsOptions));
+
+// Compression and parsing middleware
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Logging middleware
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('combined', {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  }));
+}
+
+// Dev-only request logging for Android verification
+// Logs: [REQ] METHOD /path user=<userId>
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    // Skip health checks to reduce noise
+    if (req.path === '/health') return next();
+
+    const userId = req.user?.userId || 'anon';
+    logger.info(`[REQ] ${req.method} ${req.path} user=${userId}`);
+    next();
+  });
+}
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    code: 'RATE_LIMIT_EXCEEDED',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter);
+
+// Special rate limiting for OTP endpoints
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_OTP_MAX) || 5,
+  message: {
+    error: 'Too many OTP requests, please try again later.',
+    code: 'OTP_RATE_LIMIT_EXCEEDED',
+  },
+  keyGenerator: (req) => req.body.phoneNumber || req.ip,
+});
+
+// Health check endpoint (no rate limiting)
+app.use('/health', healthRoutes);
+
+// API routes
+const apiRouter = express.Router();
+
+// Health check endpoint (also available under /api/health)
+apiRouter.use('/health', healthRoutes);
+
+// Public routes (no authentication required)
+apiRouter.use('/auth', otpLimiter, authRoutes);
+apiRouter.use('/market-prices', marketPricesRoutes); // Public market data
+
+// Protected routes (authentication required)
+apiRouter.use('/users', authenticateToken, userRoutes);
+apiRouter.use('/listings', authenticateToken, listingRoutes);
+apiRouter.use('/transactions', authenticateToken, transactionRoutes);
+apiRouter.use('/sync', authenticateToken, syncRoutes);
+apiRouter.use('/messages', authenticateToken, messagesRoutes);
+apiRouter.use('/favorites', authenticateToken, favoritesRoutes);
+apiRouter.use('/reviews', authenticateToken, reviewsRoutes);
+apiRouter.use('/notifications', authenticateToken, notificationsRoutes);
+
+// Mount API router
+app.use(`/api/${API_VERSION}`, apiRouter);
+app.use('/api', apiRouter); // Support paths without version prefix (e.g., /api/auth/...)
+
+// Static file serving for uploads
+app.use('/uploads', express.static('uploads'));
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Jaffna Farmers Marketplace API',
+    version: API_VERSION,
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      auth: `/api/${API_VERSION}/auth`,
+      marketPrices: '/api/market-prices',
+      users: `/api/${API_VERSION}/users`,
+      listings: `/api/${API_VERSION}/listings`,
+      transactions: `/api/${API_VERSION}/transactions`,
+      sync: `/api/${API_VERSION}/sync`,
+      messages: `/api/${API_VERSION}/messages`,
+      favorites: `/api/${API_VERSION}/favorites`,
+      reviews: `/api/${API_VERSION}/reviews`,
+      notifications: `/api/${API_VERSION}/notifications`,
+    },
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    error: 'Endpoint not found',
+    code: 'NOT_FOUND',
+    path: req.originalUrl,
+    method: req.method,
+  });
+});
+
+// Global error handler
+app.use(errorHandler);
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+
+  // Close database connections
+  await database.end();
+
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+
+  // Close database connections
+  await database.end();
+
+  process.exit(0);
+});
+
+// Start server
+const startServer = async () => {
+  try {
+    console.log('Starting server...');
+    // Test database connection
+    try {
+      await database.query('SELECT NOW()');
+      logger.info('Database connection established');
+    } catch (dbError) {
+      logger.warn('Database connection check failed (may recover on first request):', dbError.message);
+      // Don't crash on Vercel cold starts — the connection pool will retry on first real query
+    }
+
+    const server = app.listen(PORT, () => {
+      console.log('Server is listening!');
+      logger.info(`Jaffna Marketplace API server running on port ${PORT}`);
+      logger.info(`Environment: ${process.env.NODE_ENV}`);
+      logger.info(`API Version: ${API_VERSION}`);
+
+      if (process.env.NODE_ENV === 'development') {
+        logger.info(`API Documentation: http://localhost:${PORT}/api/${API_VERSION}`);
+        logger.info(`Health Check: http://localhost:${PORT}/health`);
+      }
+    });
+
+    server.on('error', (e) => {
+      console.error('Server error:', e);
+    });
+  } catch (error) {
+    console.error('Startup error:', error);
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+if (require.main === module) {
+  console.log('Main module execution');
+  startServer();
+}
+
+module.exports = app;
+
+
+
+========================================
+FILE: backend/src/config/supabase.js
+========================================
+const { createClient } = require('@supabase/supabase-js');
+
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseReadReplicaUrl = process.env.SUPABASE_READ_REPLICA_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Missing Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) in production');
+  }
+  console.warn('Missing Supabase environment variables (BYPASSED - Using Mocks)');
+}
+
+const finalSupabaseUrl = supabaseUrl || 'https://example.supabase.co';
+const finalSupabaseAnonKey = supabaseAnonKey || 'mock-key';
+
+/**
+ * Supabase Client Configuration for Vercel Serverless
+ *
+ * Connection Pooling (PERF-01 optimization):
+ * - Supabase automatically uses Supavisor (PgBouncer) for connection pooling
+ * - For serverless environments, the JS client manages connections efficiently
+ * - Direct PostgreSQL connections should use the pooler URL (port 6543) instead of direct (port 5432)
+ *
+ * Read Replica Support (INFRA-02 - Supabase Pro):
+ * - Read replica client routes GET/SELECT queries to the replica
+ * - Reduces load on primary database
+ * - Improves read latency for global users
+ *
+ * Performance optimizations:
+ * - persistSession: false (serverless functions don't maintain state)
+ * - autoRefreshToken: false for admin client (uses service key, no refresh needed)
+ * - Supabase JS client uses HTTP connection reuse by default
+ */
+
+// Client for public operations (with RLS)
+const supabase = createClient(finalSupabaseUrl, finalSupabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: false, // Serverless optimization
+    detectSessionInUrl: false,
+  },
+  global: {
+    headers: {
+      'x-application-name': 'agrimarket-mobile', // Helps identify traffic in Supabase dashboard
+    },
+  },
+  db: {
+    schema: 'public',
+  },
+});
+
+// Admin client for server-side operations (bypasses RLS)
+// Used for backend operations that need full database access
+const supabaseAdmin = supabaseServiceKey
+  ? createClient(finalSupabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false, // Service key doesn't need refresh
+      persistSession: false, // Serverless optimization
+      detectSessionInUrl: false,
+    },
+    global: {
+      headers: {
+        'x-application-name': 'agrimarket-backend', // Helps identify traffic in Supabase dashboard
+      },
+    },
+    db: {
+      schema: 'public',
+    },
+  })
+  : null;
+
+/**
+ * Read Replica Client (Supabase Pro Feature - INFRA-02)
+ *
+ * Used for read-only operations to reduce load on the primary database.
+ * Configure SUPABASE_READ_REPLICA_URL in Vercel environment variables
+ * after deploying a read replica in Supabase Dashboard.
+ *
+ * Benefits:
+ * - Reduces primary database load by ~60-80% for read-heavy workloads
+ * - Improves latency for users closer to the replica region
+ * - Enables horizontal scaling of read capacity
+ *
+ * Note: Replication is asynchronous, so there may be slight delay
+ * (typically <1 second) for data to appear on replicas.
+ */
+const supabaseReadReplica = supabaseReadReplicaUrl && supabaseServiceKey
+  ? createClient(supabaseReadReplicaUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+    global: {
+      headers: {
+        'x-application-name': 'agrimarket-read-replica',
+      },
+    },
+    db: {
+      schema: 'public',
+    },
+  })
+  : null;
+
+/**
+ * Get the appropriate client for read operations.
+ * Uses read replica if available, otherwise falls back to admin client.
+ * @returns {import('@supabase/supabase-js').SupabaseClient}
+ */
+const getReadClient = () => supabaseReadReplica || supabaseAdmin;
+
+module.exports = {
+  supabase,
+  supabaseAdmin,
+  supabaseReadReplica,
+  getReadClient,
+};
+
+
+
+========================================
+FILE: backend/src/middleware/auth.js
+========================================
+const jwt = require('jsonwebtoken');
+const { supabaseAdmin } = require('../config/supabase');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+
+// Check if we're in mock DB mode
+const MOCK_DB = process.env.MOCK_DB === 'true';
+
+/**
+ * JWT Authentication Middleware for Serverless Functions
+ * Validates JWT tokens and attaches user info to request
+ */
+const authenticateToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Access token required',
+        code: 'TOKEN_MISSING',
+      });
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    let userData;
+
+    if (MOCK_DB || !supabaseAdmin) {
+      // Use mock DB or PostgreSQL connection
+      const result = await db.query(
+        'SELECT id, phone_number, user_type, is_active, verified FROM users WHERE id = $1',
+        [decoded.userId],
+      );
+      userData = result.rows[0];
+    } else {
+      // Get user from Supabase to ensure they still exist and are active
+      const { data, error } = await supabaseAdmin
+        .from('users')
+        .select('id, phone_number, user_type, is_active, verified')
+        .eq('id', decoded.userId)
+        .single();
+
+      if (error) {
+        logger.error('Supabase user lookup error:', error);
+      }
+      userData = data;
+    }
+
+    if (!userData) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+        code: 'USER_NOT_FOUND',
+      });
+    }
+
+    if (!userData.is_active) {
+      return res.status(403).json({
+        success: false,
+        message: 'Account is deactivated',
+        code: 'ACCOUNT_DEACTIVATED',
+      });
+    }
+
+    if (!userData.verified) {
+      return res.status(403).json({
+        success: false,
+        message: 'Account not verified',
+        code: 'ACCOUNT_NOT_VERIFIED',
+      });
+    }
+
+    // Attach user info to request
+    req.user = {
+      userId: userData.id,
+      phoneNumber: userData.phone_number,
+      userType: userData.user_type,
+      isActive: userData.is_active,
+      verified: userData.verified,
+    };
+
+    next();
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token',
+        code: 'TOKEN_INVALID',
+      });
+    }
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired',
+        code: 'TOKEN_EXPIRED',
+      });
+    }
+
+    logger.error('Authentication error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication failed',
+      code: 'AUTH_ERROR',
+    });
+  }
+};
+
+/**
+ * Role-based authorization middleware
+ * Ensures user has required role(s)
+ */
+const requireRole = (roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication required',
+      code: 'AUTH_REQUIRED',
+    });
+  }
+
+  const userRole = req.user.userType;
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
+
+  if (!allowedRoles.includes(userRole)) {
+    return res.status(403).json({
+      success: false,
+      message: `Access denied. Required role: ${allowedRoles.join(' or ')}`,
+      code: 'INSUFFICIENT_PERMISSIONS',
+    });
+  }
+
+  next();
+};
+
+/**
+ * Farmer-only middleware
+ */
+const requireFarmer = requireRole('FARMER');
+
+/**
+ * Buyer-only middleware
+ */
+const requireBuyer = requireRole('BUYER');
+
+/**
+ * Optional authentication middleware
+ * Attaches user info if token is present, but doesn't require it
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      return next(); // No token, continue without user info
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await db.query(
+      'SELECT id, phone_number, user_type, is_active, verified FROM users WHERE id = $1',
+      [decoded.userId],
+    );
+
+    if (user.rows.length > 0 && user.rows[0].is_active && user.rows[0].verified) {
+      const userData = user.rows[0];
+      req.user = {
+        userId: userData.id,
+        phoneNumber: userData.phone_number,
+        userType: userData.user_type,
+        isActive: userData.is_active,
+        verified: userData.verified,
+      };
+    }
+
+    next();
+  } catch (error) {
+    // Ignore token errors for optional auth
+    next();
+  }
+};
+
+/**
+ * Resource ownership middleware
+ * Ensures user can only access their own resources
+ */
+const requireOwnership = (resourceType, idParam = 'id') => async (req, res, next) => {
+  try {
+    const resourceId = req.params[idParam];
+    const userId = req.user.userId;
+
+    let query;
+    const params = [resourceId];
+
+    switch (resourceType) {
+      case 'listing':
+        query = 'SELECT farmer_id FROM listings WHERE id = $1';
+        break;
+      case 'transaction':
+        query = 'SELECT farmer_id, buyer_id FROM transactions WHERE id = $1';
+        break;
+      case 'user':
+        // For user resources, just check if the ID matches
+        if (resourceId !== userId) {
+          return res.status(403).json({
+            success: false,
+            message: 'Access denied',
+            code: 'RESOURCE_ACCESS_DENIED',
+          });
+        }
+        return next();
+      default:
+        return res.status(500).json({
+          success: false,
+          message: 'Unknown resource type',
+          code: 'UNKNOWN_RESOURCE_TYPE',
+        });
+    }
+
+    const result = await db.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resource not found',
+        code: 'RESOURCE_NOT_FOUND',
+      });
+    }
+
+    const resource = result.rows[0];
+    let hasAccess = false;
+
+    switch (resourceType) {
+      case 'listing':
+        hasAccess = resource.farmer_id === userId;
+        break;
+      case 'transaction':
+        hasAccess = resource.farmer_id === userId || resource.buyer_id === userId;
+        break;
+    }
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied',
+        code: 'RESOURCE_ACCESS_DENIED',
+      });
+    }
+
+    next();
+  } catch (error) {
+    logger.error('Ownership check error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Access check failed',
+      code: 'ACCESS_CHECK_ERROR',
+    });
+  }
+};
+
+/**
+ * API key authentication for internal services
+ */
+const authenticateApiKey = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  const validApiKey = process.env.INTERNAL_API_KEY;
+
+  if (!validApiKey) {
+    return res.status(500).json({
+      success: false,
+      message: 'API key authentication not configured',
+      code: 'API_KEY_NOT_CONFIGURED',
+    });
+  }
+
+  if (!apiKey || apiKey !== validApiKey) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid API key',
+      code: 'INVALID_API_KEY',
+    });
+  }
+
+  next();
+};
+
+module.exports = {
+  authenticateToken,
+  requireRole,
+  requireFarmer,
+  requireBuyer,
+  optionalAuth,
+  requireOwnership,
+  authenticateApiKey,
+};
+
+
+
+========================================
+FILE: backend/src/utils/helpers.js
+========================================
+const crypto = require('crypto');
+
+/**
+ * Generate random OTP code
+ */
+function generateOTP(length = 6) {
+  if (length === 6) {
+    return crypto.randomInt(100000, 999999).toString();
+  }
+  // For non-standard lengths, generate digit by digit using crypto
+  let otp = '';
+  for (let i = 0; i < length; i++) {
+    otp += crypto.randomInt(0, 10).toString();
+  }
+  return otp;
+}
+
+/**
+ * Validate Sri Lankan phone number format
+ */
+function isValidSriLankanPhone(phoneNumber) {
+  // Sri Lankan mobile numbers: +94 followed by 9 digits
+  // Valid prefixes: 70, 71, 72, 74, 75, 76, 77, 78
+  const regex = /^\+94(70|71|72|74|75|76|77|78)[0-9]{7}$/;
+  return regex.test(phoneNumber);
+}
+
+/**
+ * Validate UUID format
+ */
+function validateUUID(uuid) {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+/**
+ * Format phone number for display
+ */
+function formatPhoneNumber(phoneNumber) {
+  if (!phoneNumber) return '';
+
+  // Convert +94XXXXXXXXX to +94 XX XXX XXXX
+  if (phoneNumber.startsWith('+94') && phoneNumber.length === 12) {
+    return `+94 ${phoneNumber.slice(3, 5)} ${phoneNumber.slice(5, 8)} ${phoneNumber.slice(8)}`;
+  }
+
+  return phoneNumber;
+}
+
+/**
+ * Mask sensitive data for logging
+ */
+function maskSensitiveData(data, fields = ['password', 'token', 'otp', 'phoneNumber']) {
+  if (typeof data !== 'object' || data === null) {
+    return data;
+  }
+
+  const masked = { ...data };
+
+  fields.forEach((field) => {
+    if (masked[field]) {
+      if (field === 'phoneNumber') {
+        masked[field] = maskPhoneNumber(masked[field]);
+      } else {
+        masked[field] = '***masked***';
+      }
+    }
+  });
+
+  return masked;
+}
+
+/**
+ * Mask phone number for privacy
+ */
+function maskPhoneNumber(phoneNumber) {
+  if (!phoneNumber || phoneNumber.length <= 4) return phoneNumber;
+
+  const start = phoneNumber.substring(0, 3);
+  const end = phoneNumber.substring(phoneNumber.length - 2);
+  const middle = '*'.repeat(phoneNumber.length - 5);
+
+  return `${start}${middle}${end}`;
+}
+
+/**
+ * Generate secure random string
+ */
+function generateSecureToken(length = 32) {
+  return crypto.randomBytes(length).toString('hex');
+}
+
+/**
+ * Hash password using crypto
+ */
+function hashPassword(password, salt = null) {
+  if (!salt) {
+    salt = crypto.randomBytes(16).toString('hex');
+  }
+
+  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  return { hash, salt };
+}
+
+/**
+ * Verify password against hash
+ */
+function verifyPassword(password, hash, salt) {
+  const verifyHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  return hash === verifyHash;
+}
+
+/**
+ * Calculate distance between two coordinates (Haversine formula)
+ */
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2))
+    * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+
+  return distance;
+}
+
+/**
+ * Convert degrees to radians
+ */
+function toRadians(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+/**
+ * Validate email format
+ */
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Sanitize string for database storage
+ */
+function sanitizeString(str) {
+  if (typeof str !== 'string') return str;
+
+  return str
+    .trim()
+    .replace(/[<>]/g, '') // Remove potential HTML tags
+    .substring(0, 1000); // Limit length
+}
+
+/**
+ * Format currency for Sri Lankan Rupees
+ */
+function formatCurrency(amount, currency = 'LKR') {
+  if (typeof amount !== 'number') return amount;
+
+  return new Intl.NumberFormat('en-LK', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
+
+/**
+ * Parse and validate date
+ */
+function parseDate(dateString) {
+  if (!dateString) return null;
+
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date format');
+  }
+
+  return date;
+}
+
+/**
+ * Check if date is in the future
+ */
+function isFutureDate(date) {
+  const now = new Date();
+  const checkDate = typeof date === 'string' ? new Date(date) : date;
+
+  return checkDate > now;
+}
+
+/**
+ * Get date range for queries
+ */
+function getDateRange(period = '7d') {
+  const now = new Date();
+  const start = new Date();
+
+  switch (period) {
+    case '1d':
+      start.setDate(now.getDate() - 1);
+      break;
+    case '7d':
+      start.setDate(now.getDate() - 7);
+      break;
+    case '30d':
+      start.setDate(now.getDate() - 30);
+      break;
+    case '90d':
+      start.setDate(now.getDate() - 90);
+      break;
+    default:
+      start.setDate(now.getDate() - 7);
+  }
+
+  return { start, end: now };
+}
+
+/**
+ * Paginate array
+ */
+function paginate(array, page = 1, limit = 10) {
+  const offset = (page - 1) * limit;
+  const paginatedItems = array.slice(offset, offset + limit);
+
+  return {
+    data: paginatedItems,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total: array.length,
+      totalPages: Math.ceil(array.length / limit),
+    },
+  };
+}
+
+/**
+ * Debounce function
+ */
+function debounce(func, wait) {
+  let timeout;
+
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Retry function with exponential backoff
+ */
+async function retry(fn, maxAttempts = 3, baseDelay = 1000) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === maxAttempts) {
+        throw lastError;
+      }
+
+      const delay = baseDelay * 2 ** (attempt - 1);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
+/**
+ * Deep clone object
+ */
+function deepClone(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj instanceof Date) return new Date(obj.getTime());
+  if (obj instanceof Array) return obj.map((item) => deepClone(item));
+  if (typeof obj === 'object') {
+    const cloned = {};
+    Object.keys(obj).forEach((key) => {
+      cloned[key] = deepClone(obj[key]);
+    });
+    return cloned;
+  }
+}
+
+/**
+ * Check if object is empty
+ */
+function isEmpty(obj) {
+  if (obj === null || obj === undefined) return true;
+  if (Array.isArray(obj)) return obj.length === 0;
+  if (typeof obj === 'object') return Object.keys(obj).length === 0;
+  if (typeof obj === 'string') return obj.trim().length === 0;
+  return false;
+}
+
+module.exports = {
+  generateOTP,
+  isValidSriLankanPhone,
+  validateUUID,
+  formatPhoneNumber,
+  maskSensitiveData,
+  maskPhoneNumber,
+  generateSecureToken,
+  hashPassword,
+  verifyPassword,
+  calculateDistance,
+  toRadians,
+  isValidEmail,
+  sanitizeString,
+  formatCurrency,
+  parseDate,
+  isFutureDate,
+  getDateRange,
+  paginate,
+  debounce,
+  retry,
+  deepClone,
+  isEmpty,
+};
+
+
+
+========================================
+FILE: backend/src/services/livePriceService.js
+========================================
+/**
+ * Live Market Price Service
+ * Fetches real food prices from HDX HAPI (Humanitarian Data Exchange API)
+ * for Sri Lanka and populates the market_prices table in Supabase.
+ *
+ * Data source: WFP (World Food Programme) via HDX HAPI
+ * Endpoint: https://hapi.humdata.org/api/v2/food-security-nutrition-poverty/food-prices-market-monitor
+ * Requires an encoded app_identifier (base64 of "app:email").
+ *
+ * Tested: Returns 38 commodity types from 2 Sri Lankan markets (Polonnaruwa, Monaragala)
+ * with latest data from Sep 2025. All prices in LKR.
+ */
+
+const logger = require('../utils/logger');
+const { supabaseAdmin } = require('../config/supabase');
+
+const HDX_HAPI_BASE = 'https://hapi.humdata.org/api/v2';
+// Encoded app identifier: base64("agrimarket:admin@agrimarket.lk")
+const HDX_APP_ID = 'YWdyaW1hcmtldDphZG1pbkBhZ3JpbWFya2V0Lmxr';
+const SRI_LANKA_CODE = 'LKA';
+
+// Commodity name → trilingual mapping for Sri Lankan crops
+// Based on actual HDX HAPI response for LKA
+const COMMODITY_MAP = {
+  // Grains & staples
+  'rice (white)': { type: 'RICE_WHITE', en: 'Rice (White)', ta: 'அரிசி (வெள்ளை)', si: 'සහල් (සුදු)' },
+  'rice (medium grain)': { type: 'RICE_MEDIUM', en: 'Rice (Medium)', ta: 'அரிசி (நடுத்தர)', si: 'සහල් (මධ්‍යම)' },
+  'rice (long grain)': { type: 'RICE_LONG', en: 'Rice (Long Grain)', ta: 'அரிசி (நீள்)', si: 'සහල් (දිග ඇට)' },
+  'wheat flour': { type: 'WHEAT_FLOUR', en: 'Wheat Flour', ta: 'கோதுமை மாவு', si: 'ගෝධුම්බ පිටි' },
+
+  // Vegetables
+  'tomatoes': { type: 'TOMATO', en: 'Tomatoes', ta: 'தக்காளி', si: 'තක්කාලි' },
+  'potatoes (local)': { type: 'POTATO_LOCAL', en: 'Potatoes (Local)', ta: 'உருளைக்கிழங்கு (உள்ளூர்)', si: 'අල (දේශීය)' },
+  'potatoes (imported)': { type: 'POTATO_IMPORTED', en: 'Potatoes (Imported)', ta: 'உருளைக்கிழங்கு (இறக்குமதி)', si: 'අල (ආනයන)' },
+  'onions (red, local)': { type: 'ONION_LOCAL', en: 'Red Onion (Local)', ta: 'சிவப்பு வெங்காயம் (உள்ளூர்)', si: 'රතු ළූණු (දේශීය)' },
+  'onions (red, imported)': { type: 'ONION_IMPORTED', en: 'Red Onion (Imported)', ta: 'சிவப்பு வெங்காயம் (இறக்குமதி)', si: 'රතු ළූණු (ආනයන)' },
+  'onions (imported)': { type: 'ONION_IMPORTED', en: 'Onion (Imported)', ta: 'வெங்காயம் (இறக்குமதி)', si: 'ළූණු (ආනයන)' },
+  'onions (red)': { type: 'RED_ONION', en: 'Red Onion', ta: 'சிவப்பு வெங்காயம்', si: 'රතු ළූණු' },
+  'beans': { type: 'BEANS', en: 'Beans', ta: 'பீன்ஸ்', si: 'බෝංචි' },
+  'beans (mung)': { type: 'MUNG_BEANS', en: 'Mung Beans', ta: 'பச்சைப் பயிறு', si: 'මුං ඇට' },
+  'lentils': { type: 'LENTILS', en: 'Lentils (Dhal)', ta: 'பருப்பு', si: 'පරිප්පු' },
+  'cabbage': { type: 'CABBAGE', en: 'Cabbage', ta: 'முட்டைக்கோஸ்', si: 'ගෝවා' },
+  'carrots': { type: 'CARROT', en: 'Carrots', ta: 'கேரட்', si: 'කැරට්' },
+  'eggplants': { type: 'BRINJAL', en: 'Eggplant (Brinjal)', ta: 'கத்தரிக்காய்', si: 'වම්බටු' },
+  'pumpkin': { type: 'PUMPKIN', en: 'Pumpkin', ta: 'பூசணி', si: 'වට්ටක්කා' },
+  'snake gourd': { type: 'SNAKE_GOURD', en: 'Snake Gourd', ta: 'புடலங்காய்', si: 'පතෝල' },
+  'chili (red, dry raw)': { type: 'CHILI', en: 'Chili (Dried)', ta: 'மிளகாய் (உலர்)', si: 'මිරිස් (වියළි)' },
+
+  // Fruits
+  'bananas': { type: 'BANANA', en: 'Bananas', ta: 'வாழைப்பழம்', si: 'කෙසෙල්' },
+  'papaya': { type: 'PAPAYA', en: 'Papaya', ta: 'பப்பாளி', si: 'පැපොල්' },
+  'pineapples': { type: 'PINEAPPLE', en: 'Pineapple', ta: 'அன்னாசி', si: 'අන්නාසි' },
+  'coconut': { type: 'COCONUT', en: 'Coconut', ta: 'தேங்காய்', si: 'පොල්' },
+
+  // Protein
+  'meat (chicken, broiler)': { type: 'CHICKEN', en: 'Chicken', ta: 'கோழி', si: 'කුකුළු මස්' },
+  'eggs': { type: 'EGGS', en: 'Eggs', ta: 'முட்டை', si: 'බිත්තර' },
+  'fish (jack)': { type: 'FISH_JACK', en: 'Jack Fish', ta: 'பாரை மீன்', si: 'පරව් මාළු' },
+  'fish (skipjack tuna)': { type: 'FISH_TUNA', en: 'Skipjack Tuna', ta: 'சூரை மீன்', si: 'බලයා මාළු' },
+  'fish (goldstripe sardinella)': { type: 'FISH_SARDINE', en: 'Sardine', ta: 'நெத்தலி மீன்', si: 'සාලයා මාළු' },
+  'fish (sail fish)': { type: 'FISH_SAIL', en: 'Sail Fish', ta: 'கொம்பன் மீன்', si: 'තලපත් මාළු' },
+  'fish (yellowfin tuna)': { type: 'FISH_YELLOWFIN', en: 'Yellowfin Tuna', ta: 'மஞ்சள் சூரை', si: 'කෙලවල්ලා මාළු' },
+  'fish (trenched sardinella)': { type: 'FISH_SARDINELLA', en: 'Sardinella', ta: 'சாளை மீன்', si: 'හුරුල්ලා මාළු' },
+  'fish (dry, katta)': { type: 'FISH_DRY_KATTA', en: 'Dried Fish (Katta)', ta: 'கருவாடு (கட்டா)', si: 'කරවල (කට්ටා)' },
+  'fish (dry, sprats)': { type: 'FISH_DRY_SPRATS', en: 'Dried Sprats', ta: 'நெத்திலி கருவாடு', si: 'හාල් මැස්සෝ' },
+
+  // Other
+  'sugar': { type: 'SUGAR', en: 'Sugar', ta: 'சர்க்கரை', si: 'සීනි' },
+  'cowpeas (whole, average)': { type: 'COWPEAS', en: 'Cowpeas', ta: 'தட்டைப் பயிறு', si: 'කව්පි' },
+};
+
+// Market name → trilingual mapping
+const MARKET_MAP = {
+  'colombo': { en: 'Colombo', ta: 'கொழும்பு', si: 'කොළඹ' },
+  'kandy': { en: 'Kandy', ta: 'கண்டி', si: 'මහනුවර' },
+  'jaffna': { en: 'Jaffna', ta: 'யாழ்ப்பாணம்', si: 'යාපනය' },
+  'galle': { en: 'Galle', ta: 'காலி', si: 'ගාල්ල' },
+  'kurunegala': { en: 'Kurunegala', ta: 'குருநாகல்', si: 'කුරුණෑගල' },
+  'anuradhapura': { en: 'Anuradhapura', ta: 'அனுராதபுரம்', si: 'අනුරාධපුරය' },
+  'polonnaruwa': { en: 'Polonnaruwa', ta: 'பொலன்னறுவை', si: 'පොළොන්නරුව' },
+  'monaragala': { en: 'Monaragala', ta: 'மொனராகலை', si: 'මොනරාගල' },
+  'batticaloa': { en: 'Batticaloa', ta: 'மட்டக்களப்பு', si: 'මඩකලපුව' },
+  'trincomalee': { en: 'Trincomalee', ta: 'திருகோணமலை', si: 'ත්‍රිකුණාමලය' },
+  'matara': { en: 'Matara', ta: 'மாத்தறை', si: 'මාතර' },
+  'ratnapura': { en: 'Ratnapura', ta: 'இரத்தினபுரி', si: 'රත්නපුර' },
+  'badulla': { en: 'Badulla', ta: 'பதுளை', si: 'බදුල්ල' },
+};
+
+/**
+ * Find the best matching commodity mapping
+ */
+function findCommodityMapping(commodityName) {
+  if (!commodityName) return null;
+  const lower = commodityName.toLowerCase().trim();
+
+  // Exact match first
+  if (COMMODITY_MAP[lower]) return COMMODITY_MAP[lower];
+
+  // Partial match - check if commodity name contains a key or vice versa
+  for (const [key, value] of Object.entries(COMMODITY_MAP)) {
+    if (lower.includes(key) || key.includes(lower)) return value;
+  }
+
+  return null;
+}
+
+/**
+ * Find the best matching market mapping
+ */
+function findMarketMapping(marketName) {
+  if (!marketName) return null;
+  const lower = marketName.toLowerCase().trim();
+
+  for (const [key, value] of Object.entries(MARKET_MAP)) {
+    if (lower.includes(key) || key.includes(lower)) return value;
+  }
+
+  // Return as-is with all languages set to the original name
+  return { en: marketName, ta: marketName, si: marketName };
+}
+
+/**
+ * Fetch live prices from HDX HAPI for Sri Lanka
+ */
+async function fetchHDXPrices() {
+  const url = new URL(`${HDX_HAPI_BASE}/food-security-nutrition-poverty/food-prices-market-monitor`);
+  url.searchParams.set('location_code', SRI_LANKA_CODE);
+  url.searchParams.set('output_format', 'json');
+  url.searchParams.set('app_identifier', HDX_APP_ID);
+  url.searchParams.set('limit', '10000');
+
+  logger.info('Fetching live prices from HDX HAPI', { url: url.toString() });
+
+  const response = await fetch(url.toString(), {
+    headers: { 'Accept': 'application/json' },
+    signal: AbortSignal.timeout(30000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HDX HAPI responded with ${response.status}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.data || [];
+}
+
+/**
+ * Transform HDX HAPI price records into our market_prices table format.
+ * Groups by commodity+market, keeping the latest price and the second-latest for trend.
+ */
+function transformPrices(hdxRecords) {
+  // Group all records by commodity+market
+  const groupedByKey = new Map();
+
+  for (const record of hdxRecords) {
+    const commodity = findCommodityMapping(record.commodity_name);
+    if (!commodity) continue; // Skip unmapped commodities
+
+    const market = findMarketMapping(record.market_name || record.admin1_name);
+    const key = `${commodity.type}_${market.en}`;
+    const date = record.reference_period_start || '';
+
+    if (!groupedByKey.has(key)) {
+      groupedByKey.set(key, { records: [], commodity, market });
+    }
+    groupedByKey.get(key).records.push({ ...record, _date: date });
+  }
+
+  const results = [];
+
+  for (const [key, { records, commodity, market }] of groupedByKey) {
+    // Sort by date descending to get latest and previous
+    records.sort((a, b) => (b._date || '').localeCompare(a._date || ''));
+
+    const latest = records[0];
+    const previous = records.length > 1 ? records[1] : null;
+
+    const currentPrice = parseFloat(latest.price) || 0;
+    if (currentPrice <= 0) continue;
+
+    const previousPrice = previous ? (parseFloat(previous.price) || currentPrice) : currentPrice;
+    const changeAmount = currentPrice - previousPrice;
+    const changePercentage = previousPrice > 0 ? (changeAmount / previousPrice) * 100 : 0;
+
+    let trend = 'STABLE';
+    if (changePercentage > 1.0) trend = 'UP';
+    else if (changePercentage < -1.0) trend = 'DOWN';
+
+    const rawUnit = (latest.unit || 'KG').toUpperCase();
+    const unit = rawUnit === 'KG' ? 'kg' : rawUnit === 'UNIT' ? 'piece' : rawUnit.toLowerCase();
+
+    results.push({
+      crop_type: commodity.type,
+      crop_name_english: commodity.en,
+      crop_name_tamil: commodity.ta,
+      crop_name_sinhala: commodity.si,
+      current_price: Math.round(currentPrice * 100) / 100,
+      previous_price: Math.round(previousPrice * 100) / 100,
+      unit,
+      trend,
+      change_percentage: Math.round(changePercentage * 100) / 100,
+      change_amount: Math.round(changeAmount * 100) / 100,
+      location: market.en,
+      location_tamil: market.ta,
+      location_sinhala: market.si,
+      last_updated: latest._date || new Date().toISOString(),
+      is_active: true,
+      source: 'HDX_HAPI_WFP',
+      reliability: 0.85,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Upsert transformed prices into the market_prices Supabase table.
+ * Uses a single delete+insert approach for speed (avoids N+1 queries).
+ */
+async function upsertPrices(prices) {
+  if (!prices.length) {
+    logger.warn('No prices to upsert');
+    return { inserted: 0, updated: 0 };
+  }
+
+  // Delete all existing HDX prices and re-insert fresh data (fast batch approach)
+  const { error: deleteError } = await supabaseAdmin
+    .from('market_prices')
+    .delete()
+    .eq('source', 'HDX_HAPI_WFP');
+
+  if (deleteError) {
+    logger.error('Failed to delete old HDX prices', { error: deleteError.message });
+  }
+
+  // Batch insert all prices at once
+  const { error: insertError, data } = await supabaseAdmin
+    .from('market_prices')
+    .insert(prices);
+
+  if (insertError) {
+    logger.error('Failed to batch insert market prices', { error: insertError.message });
+    return { inserted: 0, updated: 0, error: insertError.message };
+  }
+
+  logger.info('Market prices replaced', { count: prices.length });
+  return { inserted: prices.length, updated: 0 };
+}
+
+/**
+ * Main function: fetch, transform, and store live prices
+ */
+async function refreshLivePrices() {
+  const startTime = Date.now();
+
+  try {
+    // 1. Fetch from HDX HAPI
+    const hdxRecords = await fetchHDXPrices();
+    logger.info(`Fetched ${hdxRecords.length} records from HDX HAPI`);
+
+    if (hdxRecords.length === 0) {
+      return {
+        success: true,
+        message: 'No price data available from HDX HAPI for Sri Lanka',
+        duration: Date.now() - startTime,
+      };
+    }
+
+    // 2. Transform to our format
+    const prices = transformPrices(hdxRecords);
+    logger.info(`Transformed ${prices.length} unique commodity-market prices`);
+
+    // 3. Upsert into Supabase
+    const result = await upsertPrices(prices);
+
+    return {
+      success: true,
+      message: `Refreshed ${prices.length} live prices (${result.inserted} new, ${result.updated} updated)`,
+      fetchedRecords: hdxRecords.length,
+      transformedPrices: prices.length,
+      ...result,
+      duration: Date.now() - startTime,
+    };
+  } catch (error) {
+    logger.error('Failed to refresh live prices', { error: error.message });
+    throw error;
+  }
+}
+
+module.exports = {
+  refreshLivePrices,
+  fetchHDXPrices,
+  transformPrices,
+};
+
+
+
+========================================
+FILE: backend/src/services/smsService.js
+========================================
+const axios = require('axios');
+const logger = require('../utils/logger');
+
+/**
+ * SMS Service for Sri Lankan providers
+ * Supports Dialog Ideamart, Mobitel mSpace, and Twilio fallback
+ *
+ * SMS_MODE environment variable controls behavior:
+ * - mock: Log OTP to console, store in DB, DO NOT send SMS (for development/testing)
+ * - dialog: Send via Dialog Ideamart API
+ * - mobitel: Send via Mobitel mSpace API
+ * - twilio: Send via Twilio API (international fallback)
+ */
+class SMSService {
+  constructor() {
+    // SMS_MODE takes precedence over legacy MOCK_SMS and SMS_PROVIDER
+    this.mode = process.env.SMS_MODE || process.env.SMS_PROVIDER || 'mock';
+
+    // Legacy support: MOCK_SMS=true forces mock mode
+    if (process.env.MOCK_SMS === 'true') {
+      this.mode = 'mock';
+    }
+
+    // Validate mode
+    const validModes = ['mock', 'dialog', 'mobitel', 'twilio'];
+    if (!validModes.includes(this.mode)) {
+      logger.warn(`Invalid SMS_MODE "${this.mode}", defaulting to mock`);
+      this.mode = 'mock';
+    }
+
+    logger.info(`SMS Service initialized with mode: ${this.mode}`);
+  }
+
+  /**
+   * Check if running in mock mode
+   */
+  isMockMode() {
+    return this.mode === 'mock';
+  }
+
+  /**
+   * Send SMS using configured provider
+   * Returns: { success, provider, messageId, otp? (only in mock mode) }
+   */
+  async sendSMS(phoneNumber, message, otp = null) {
+    if (this.mode === 'mock') {
+      return this.mockSend(phoneNumber, message, otp);
+    }
+
+    try {
+      switch (this.mode) {
+        case 'dialog':
+          return await this.sendViaDialog(phoneNumber, message);
+        case 'mobitel':
+          return await this.sendViaMobitel(phoneNumber, message);
+        case 'twilio':
+          return await this.sendViaTwilio(phoneNumber, message);
+        default:
+          throw new Error(`Unknown SMS mode: ${this.mode}`);
+      }
+    } catch (error) {
+      logger.error('SMS sending failed:', { mode: this.mode, error: error.message });
+
+      // Try fallback provider if primary fails (only for real providers)
+      if (this.mode !== 'twilio' && process.env.TWILIO_ACCOUNT_SID) {
+        logger.info('Attempting SMS fallback to Twilio');
+        try {
+          return await this.sendViaTwilio(phoneNumber, message);
+        } catch (fallbackError) {
+          logger.error('SMS fallback also failed:', fallbackError);
+          throw fallbackError;
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  /**
+   * Send SMS via Dialog Ideamart (Primary Sri Lankan provider)
+   */
+  async sendViaDialog(phoneNumber, message) {
+    const apiUrl = process.env.DIALOG_API_URL || 'https://api.dialog.lk/sms/send';
+    const apiKey = process.env.DIALOG_API_KEY;
+    const apiSecret = process.env.DIALOG_API_SECRET;
+    const senderId = process.env.DIALOG_SENDER_ID || 'JaffnaFarm';
+
+    if (!apiKey || !apiSecret) {
+      throw new Error('Dialog API credentials not configured');
+    }
+
+    // Format phone number for Dialog (remove +94, add 0)
+    const formattedNumber = phoneNumber.replace('+94', '0');
+
+    const payload = {
+      to: formattedNumber,
+      message,
+      sender: senderId,
+    };
+
+    const config = {
+      method: 'POST',
+      url: apiUrl,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      data: payload,
+      timeout: 10000,
+    };
+
+    const response = await axios(config);
+
+    if (response.data.status === 'success' || response.status === 200) {
+      logger.info('SMS sent via Dialog', {
+        to: this.maskPhoneNumber(phoneNumber),
+        messageId: response.data.messageId,
+      });
+      return {
+        success: true,
+        provider: 'dialog',
+        messageId: response.data.messageId,
+      };
+    }
+    throw new Error(`Dialog API error: ${response.data.message || 'Unknown error'}`);
+  }
+
+  /**
+   * Send SMS via Mobitel mSpace (Alternative Sri Lankan provider)
+   */
+  async sendViaMobitel(phoneNumber, message) {
+    const apiUrl = process.env.MOBITEL_API_URL || 'https://api.mobitel.lk/sms';
+    const username = process.env.MOBITEL_USERNAME;
+    const password = process.env.MOBITEL_PASSWORD;
+
+    if (!username || !password) {
+      throw new Error('Mobitel API credentials not configured');
+    }
+
+    // Format phone number for Mobitel
+    const formattedNumber = phoneNumber.replace('+94', '94');
+
+    const payload = {
+      username,
+      password,
+      to: formattedNumber,
+      message,
+      from: 'JaffnaFarm',
+    };
+
+    const config = {
+      method: 'POST',
+      url: `${apiUrl}/send`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: payload,
+      timeout: 10000,
+    };
+
+    const response = await axios(config);
+
+    if (response.data.status === 'OK' || response.status === 200) {
+      logger.info('SMS sent via Mobitel', {
+        to: this.maskPhoneNumber(phoneNumber),
+        messageId: response.data.messageId,
+      });
+      return {
+        success: true,
+        provider: 'mobitel',
+        messageId: response.data.messageId,
+      };
+    }
+    throw new Error(`Mobitel API error: ${response.data.message || 'Unknown error'}`);
+  }
+
+  /**
+   * Send SMS via Twilio (International fallback)
+   */
+  async sendViaTwilio(phoneNumber, message) {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+
+    if (!accountSid || !authToken || !fromNumber) {
+      throw new Error('Twilio credentials not configured');
+    }
+
+    const apiUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+    const payload = new URLSearchParams({
+      To: phoneNumber,
+      From: fromNumber,
+      Body: message,
+    });
+
+    const config = {
+      method: 'POST',
+      url: apiUrl,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      data: payload,
+      timeout: 10000,
+    };
+
+    const response = await axios(config);
+
+    if (response.status === 201) {
+      logger.info('SMS sent via Twilio', {
+        to: this.maskPhoneNumber(phoneNumber),
+        sid: response.data.sid,
+      });
+      return {
+        success: true,
+        provider: 'twilio',
+        messageId: response.data.sid,
+      };
+    }
+    throw new Error(`Twilio API error: ${response.data.message || 'Unknown error'}`);
+  }
+
+  /**
+   * Mock SMS sending for development/testing
+   * IMPORTANT: Logs OTP to console for testing, does NOT send actual SMS
+   */
+  async mockSend(phoneNumber, message, otp = null) {
+    // Extract OTP from message if not provided directly
+    const extractedOtp = otp || this.extractOtpFromMessage(message);
+
+    // Log clearly to console for testing
+    console.log(`\n${'='.repeat(60)}`);
+    console.log('📱 MOCK SMS - OTP CODE (NOT SENT)');
+    console.log('='.repeat(60));
+    console.log(`Phone: ${phoneNumber}`);
+    console.log(`OTP:   ${extractedOtp || 'N/A'}`);
+    console.log(`${'='.repeat(60)}\n`);
+
+    logger.info('Mock SMS generated (not sent)', {
+      to: this.maskPhoneNumber(phoneNumber),
+      otp: extractedOtp,
+    });
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    return {
+      success: true,
+      provider: 'mock',
+      messageId: `mock_${Date.now()}`,
+      otp: extractedOtp, // Return OTP for testing convenience
+    };
+  }
+
+  /**
+   * Extract OTP code from message text
+   */
+  extractOtpFromMessage(message) {
+    const match = message.match(/\b(\d{6})\b/);
+    return match ? match[1] : null;
+  }
+
+  /**
+   * Mask phone number for logging (privacy)
+   */
+  maskPhoneNumber(phoneNumber) {
+    if (phoneNumber.length <= 4) return phoneNumber;
+    const start = phoneNumber.substring(0, 3);
+    const end = phoneNumber.substring(phoneNumber.length - 2);
+    const middle = '*'.repeat(phoneNumber.length - 5);
+    return `${start}${middle}${end}`;
+  }
+
+  /**
+   * Validate phone number format
+   */
+  isValidPhoneNumber(phoneNumber) {
+    // Sri Lankan phone number format: +94XXXXXXXXX
+    const sriLankanRegex = /^\+94[0-9]{9}$/;
+    return sriLankanRegex.test(phoneNumber);
+  }
+
+  /**
+   * Get SMS cost estimate (in LKR)
+   */
+  getCostEstimate(mode = this.mode) {
+    const costs = {
+      mock: 0.00, // Free - no SMS sent
+      dialog: 0.50, // ~0.50 LKR per SMS
+      mobitel: 0.45, // ~0.45 LKR per SMS
+      twilio: 2.50, // ~2.50 LKR per SMS (international rates)
+    };
+
+    return costs[mode] || 1.00;
+  }
+
+  /**
+   * Get provider status and capabilities
+   */
+  getProviderInfo() {
+    return {
+      currentMode: this.mode,
+      isMock: this.isMockMode(),
+      available: {
+        mock: {
+          name: 'Mock (Development)',
+          configured: true,
+          costPerSMS: 0.00,
+          coverage: 'None - logs only',
+          recommended: process.env.NODE_ENV !== 'production',
+        },
+        dialog: {
+          name: 'Dialog Ideamart',
+          configured: !!(process.env.DIALOG_API_KEY && process.env.DIALOG_API_SECRET),
+          costPerSMS: 0.50,
+          coverage: 'Sri Lanka',
+          recommended: true,
+        },
+        mobitel: {
+          name: 'Mobitel mSpace',
+          configured: !!(process.env.MOBITEL_USERNAME && process.env.MOBITEL_PASSWORD),
+          costPerSMS: 0.45,
+          coverage: 'Sri Lanka',
+          recommended: true,
+        },
+        twilio: {
+          name: 'Twilio',
+          configured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+          costPerSMS: 2.50,
+          coverage: 'International',
+          recommended: false,
+        },
+      },
+    };
+  }
+}
+
+// Export singleton instance
+module.exports = new SMSService();
+
+
+
+========================================
+FILE: backend/src/database/schema.sql
+========================================
+-- Jaffna Farmers Marketplace Database Schema
+-- Mirrors the Android Room database structure exactly
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Enable case-insensitive text search
+CREATE EXTENSION IF NOT EXISTS "unaccent";
+
+-- Users table (mirrors Android User entity)
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    phone_number VARCHAR(20) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    user_type VARCHAR(20) NOT NULL CHECK (user_type IN ('FARMER', 'BUYER')),
+    location VARCHAR(255),
+    verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Additional fields for backend
+    last_login_at TIMESTAMP WITH TIME ZONE,
+    is_active BOOLEAN DEFAULT TRUE,
+    profile_image_url TEXT,
+    can_sell BOOLEAN DEFAULT FALSE, -- Non-farmer users allowed to sell
+
+    -- Indexes
+    CONSTRAINT valid_phone_format CHECK (phone_number ~ '^\+94[0-9]{9}$')
+);
+
+-- Listings table (mirrors Android Listing entity)
+CREATE TABLE listings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    farmer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    crop_type VARCHAR(100) NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL CHECK (quantity > 0),
+    unit VARCHAR(20) NOT NULL,
+    price_per_unit DECIMAL(10,2) NOT NULL CHECK (price_per_unit > 0),
+    quality VARCHAR(20) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    pickup_locations TEXT[], -- Array of pickup locations
+    available_from DATE NOT NULL,
+    available_until DATE NOT NULL,
+    description TEXT,
+    images TEXT[], -- Array of image URLs
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Extended listing details
+    story TEXT,
+    farming_methods TEXT[], -- Array of farming methods
+    certifications JSONB DEFAULT '[]'::jsonb,
+    harvested_at DATE,
+    sustainability_practices TEXT[], -- Array of sustainability practices
+    deleted_at TIMESTAMP WITH TIME ZONE, -- Soft delete
+
+    -- Additional fields for backend
+    view_count INTEGER DEFAULT 0,
+    inquiry_count INTEGER DEFAULT 0,
+    client_id UUID, -- For sync purposes
+
+    -- Constraints
+    CONSTRAINT valid_date_range CHECK (available_until >= available_from),
+    CONSTRAINT valid_crop_type CHECK (crop_type IN (
+        'rice', 'coconut', 'banana', 'mango', 'papaya', 'pineapple',
+        'tomato', 'onion', 'potato', 'carrot', 'cabbage', 'beans',
+        'okra', 'eggplant', 'chili', 'curry_leaves', 'coriander',
+        'mint', 'lemongrass', 'ginger', 'turmeric', 'other'
+    )),
+    CONSTRAINT valid_quality CHECK (quality IN ('A', 'B', 'C')),
+    CONSTRAINT valid_unit CHECK (unit IN ('kg', 'g', 'lb', 'piece', 'bunch', 'bag'))
+);
+
+-- Transactions table (mirrors Android Transaction entity)
+CREATE TABLE transactions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    buyer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    quantity DECIMAL(10,2) NOT NULL CHECK (quantity > 0),
+    total_amount DECIMAL(10,2) NOT NULL CHECK (total_amount > 0),
+    pickup_location VARCHAR(255) NOT NULL,
+    pickup_date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    payment_method VARCHAR(20) DEFAULT 'CASH',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Additional fields for backend
+    buyer_contact VARCHAR(20),
+    farmer_contact VARCHAR(20),
+    notes TEXT,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    cancelled_at TIMESTAMP WITH TIME ZONE,
+    cancellation_reason TEXT,
+    client_id UUID, -- For sync purposes
+    
+    -- Constraints
+    CONSTRAINT valid_status CHECK (status IN ('PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')),
+    CONSTRAINT valid_payment_method CHECK (payment_method IN ('CASH', 'BANK_TRANSFER', 'MOBILE_PAYMENT')),
+    CONSTRAINT valid_pickup_date CHECK (pickup_date >= CURRENT_DATE)
+);
+
+-- Local operations table (mirrors Android LocalOp entity)
+CREATE TABLE local_ops (
+    op_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,
+    payload JSONB NOT NULL,
+    client_ts TIMESTAMP WITH TIME ZONE NOT NULL,
+    server_ts TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    synced BOOLEAN DEFAULT FALSE,
+    attempts INTEGER DEFAULT 0,
+    last_attempt_at TIMESTAMP WITH TIME ZONE,
+    error_message TEXT,
+    client_id UUID,
+    entity_id UUID,
+    
+    -- Constraints
+    CONSTRAINT valid_op_type CHECK (type IN (
+        'CREATE_LISTING', 'UPDATE_LISTING', 'DELETE_LISTING',
+        'CREATE_TRANSACTION', 'UPDATE_TRANSACTION', 'UPDATE_USER'
+    )),
+    CONSTRAINT max_attempts CHECK (attempts <= 5)
+);
+
+-- OTP verification table
+CREATE TABLE otp_verifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    phone_number VARCHAR(20) NOT NULL,
+    otp_code VARCHAR(10) NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    verified BOOLEAN DEFAULT FALSE,
+    attempts INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Constraints
+    CONSTRAINT valid_phone_format CHECK (phone_number ~ '^\+94[0-9]{9}$'),
+    CONSTRAINT max_otp_attempts CHECK (attempts <= 3)
+);
+
+-- Sync metadata table
+CREATE TABLE sync_metadata (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id UUID NOT NULL,
+    last_sync_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    version INTEGER DEFAULT 1,
+    checksum VARCHAR(64),
+    
+    UNIQUE(user_id, entity_type, entity_id)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_users_phone_number ON users(phone_number);
+CREATE INDEX idx_users_user_type ON users(user_type);
+CREATE INDEX idx_users_location ON users(location);
+
+CREATE INDEX idx_listings_farmer_id ON listings(farmer_id);
+CREATE INDEX idx_listings_crop_type ON listings(crop_type);
+CREATE INDEX idx_listings_location ON listings(location);
+CREATE INDEX idx_listings_active ON listings(is_active);
+CREATE INDEX idx_listings_available_dates ON listings(available_from, available_until);
+CREATE INDEX idx_listings_created_at ON listings(created_at DESC);
+CREATE INDEX idx_listings_deleted_at ON listings(deleted_at) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_transactions_listing_id ON transactions(listing_id);
+CREATE INDEX idx_transactions_farmer_id ON transactions(farmer_id);
+CREATE INDEX idx_transactions_buyer_id ON transactions(buyer_id);
+CREATE INDEX idx_transactions_status ON transactions(status);
+CREATE INDEX idx_transactions_pickup_date ON transactions(pickup_date);
+
+CREATE INDEX idx_local_ops_user_id ON local_ops(user_id);
+CREATE INDEX idx_local_ops_synced ON local_ops(synced);
+CREATE INDEX idx_local_ops_type ON local_ops(type);
+CREATE INDEX idx_local_ops_client_ts ON local_ops(client_ts);
+
+CREATE INDEX idx_otp_phone_number ON otp_verifications(phone_number);
+CREATE INDEX idx_otp_expires_at ON otp_verifications(expires_at);
+
+CREATE INDEX idx_sync_metadata_user_entity ON sync_metadata(user_id, entity_type, entity_id);
+
+-- Full-text search indexes
+CREATE INDEX idx_listings_search ON listings USING gin(to_tsvector('english', crop_type || ' ' || location || ' ' || COALESCE(description, '')));
+
+-- Triggers for updated_at timestamps
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_listings_updated_at BEFORE UPDATE ON listings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_transactions_updated_at BEFORE UPDATE ON transactions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to clean up expired OTPs
+CREATE OR REPLACE FUNCTION cleanup_expired_otps()
+RETURNS void AS $$
+BEGIN
+    DELETE FROM otp_verifications WHERE expires_at < NOW();
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to update listing view count
+CREATE OR REPLACE FUNCTION increment_listing_views(listing_uuid UUID)
+RETURNS void AS $$
+BEGIN
+    UPDATE listings SET view_count = view_count + 1 WHERE id = listing_uuid;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- PHASE 2: New tables for chat, favorites, reviews, notifications, market prices
+-- ============================================================================
+
+-- Conversations table (for chat/messaging)
+CREATE TABLE conversations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    participant_1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    participant_2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id UUID REFERENCES listings(id) ON DELETE SET NULL,
+    last_message_text TEXT,
+    last_message_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT ordered_participants CHECK (participant_1_id < participant_2_id),
+    CONSTRAINT unique_conversation UNIQUE (participant_1_id, participant_2_id)
+);
+
+-- Messages table
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    message_type VARCHAR(20) DEFAULT 'TEXT' CHECK (message_type IN ('TEXT', 'IMAGE', 'SYSTEM')),
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Favorites table
+CREATE TABLE favorites (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT unique_favorite UNIQUE (user_id, listing_id)
+);
+
+-- Reviews table
+CREATE TABLE reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    transaction_id UUID NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+    reviewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reviewee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    review_type VARCHAR(20) NOT NULL CHECK (review_type IN ('BUYER_TO_FARMER', 'FARMER_TO_BUYER')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT unique_review UNIQUE (transaction_id, reviewer_id)
+);
+
+-- Notifications table
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    related_id UUID,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Market prices table (currently queried by route but missing from schema)
+CREATE TABLE market_prices (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    crop_type VARCHAR(100) NOT NULL,
+    crop_name_tamil VARCHAR(255),
+    crop_name_english VARCHAR(255),
+    crop_name_sinhala VARCHAR(255),
+    current_price DECIMAL(10,2),
+    previous_price DECIMAL(10,2),
+    unit VARCHAR(20) DEFAULT 'kg',
+    trend VARCHAR(20),
+    change_percentage DECIMAL(10,2),
+    change_amount DECIMAL(10,2),
+    location VARCHAR(255),
+    location_tamil VARCHAR(255),
+    location_sinhala VARCHAR(255),
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_active BOOLEAN DEFAULT TRUE,
+    source VARCHAR(50) DEFAULT 'MARKET',
+    reliability DECIMAL(3,2) DEFAULT 0.80
+);
+
+-- Indexes for new tables
+CREATE INDEX idx_conversations_participant_1 ON conversations(participant_1_id);
+CREATE INDEX idx_conversations_participant_2 ON conversations(participant_2_id);
+CREATE INDEX idx_conversations_last_message ON conversations(last_message_at DESC);
+
+CREATE INDEX idx_messages_conversation ON messages(conversation_id);
+CREATE INDEX idx_messages_sender ON messages(sender_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX idx_messages_unread ON messages(conversation_id, is_read) WHERE is_read = FALSE;
+
+CREATE INDEX idx_favorites_user ON favorites(user_id);
+CREATE INDEX idx_favorites_listing ON favorites(listing_id);
+
+CREATE INDEX idx_reviews_reviewee ON reviews(reviewee_id);
+CREATE INDEX idx_reviews_reviewer ON reviews(reviewer_id);
+CREATE INDEX idx_reviews_transaction ON reviews(transaction_id);
+
+CREATE INDEX idx_notifications_user ON notifications(user_id);
+CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC);
+
+CREATE INDEX idx_market_prices_crop ON market_prices(crop_type);
+CREATE INDEX idx_market_prices_location ON market_prices(location);
+CREATE INDEX idx_market_prices_active ON market_prices(is_active);
+
+-- Triggers for new tables with updated_at
+CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+
+
+========================================
+FILE: backend/src/routes/auth.js
+========================================
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const smsService = require('../services/smsService');
+const logger = require('../utils/logger');
+const { generateOTP, isValidSriLankanPhone } = require('../utils/helpers');
+
+const router = express.Router();
+
+// Validation middleware
+const validatePhoneNumber = [
+  body('phoneNumber')
+    .matches(/^\+94[0-9]{9}$/)
+    .withMessage('Invalid Sri Lankan phone number format. Use +94XXXXXXXXX'),
+];
+
+const validateOTP = [
+  body('phoneNumber')
+    .matches(/^\+94[0-9]{9}$/)
+    .withMessage('Invalid phone number format'),
+  body('otp')
+    .isLength({ min: 6, max: 6 })
+    .isNumeric()
+    .withMessage('OTP must be 6 digits'),
+];
+
+/**
+ * POST /api/v1/auth/send-otp
+ * Send OTP to phone number
+ * Matches Android SendOtpRequest/Response
+ */
+router.post('/send-otp', validatePhoneNumber, async (req, res) => {
+  try {
+    // Check validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number format',
+        errors: errors.array(),
+      });
+    }
+
+    const { phoneNumber } = req.body;
+
+    // Additional phone number validation
+    if (!isValidSriLankanPhone(phoneNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Sri Lankan phone number',
+      });
+    }
+
+    // Check for recent OTP requests (rate limiting - 60 second cooldown)
+    const recentOTP = await db.query(
+      `SELECT id, created_at FROM otp_verifications
+       WHERE phone_number = $1 AND created_at > NOW() - INTERVAL '1 minute'
+       ORDER BY created_at DESC LIMIT 1`,
+      [phoneNumber],
+    );
+
+    if (recentOTP.rows.length > 0) {
+      const createdAt = new Date(recentOTP.rows[0].created_at);
+      const waitSeconds = 60 - Math.floor((Date.now() - createdAt.getTime()) / 1000);
+      return res.status(429).json({
+        success: false,
+        message: `Please wait ${waitSeconds} seconds before requesting another OTP`,
+        retryAfterSeconds: waitSeconds,
+      });
+    }
+
+    // Generate OTP
+    const otpCode = generateOTP();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    // Store OTP in database and get the ID
+    const otpResult = await db.query(
+      `INSERT INTO otp_verifications (phone_number, otp_code, expires_at, attempts)
+       VALUES ($1, $2, $3, 0)
+       RETURNING id`,
+      [phoneNumber, otpCode, expiresAt],
+    );
+
+    const otpId = otpResult.rows[0].id;
+
+    // Send SMS (or mock)
+    const message = `Your Jaffna Marketplace verification code is: ${otpCode}. Valid for 5 minutes. Do not share this code.`;
+
+    try {
+      const smsResult = await smsService.sendSMS(phoneNumber, message, otpCode);
+
+      logger.info('OTP generated', {
+        phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, '$1****$2'),
+        otpId,
+        mockMode: smsService.isMockMode(),
+      });
+
+      // Response for Android
+      const response = {
+        success: true,
+        message: 'OTP sent successfully',
+        otpId, // Android needs this for verify-otp
+      };
+
+      // In mock mode, also return OTP for testing convenience
+      if (smsService.isMockMode()) {
+        response.otp = otpCode;
+      }
+
+      res.json(response);
+    } catch (smsError) {
+      logger.error('Failed to send SMS:', smsError);
+
+      // Delete the OTP record since SMS failed
+      await db.query('DELETE FROM otp_verifications WHERE id = $1', [otpId]);
+
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send OTP. Please try again.',
+      });
+    }
+  } catch (error) {
+    logger.error('Send OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/auth/verify-otp
+ * Verify OTP and login/register user
+ * Matches Android LoginRequest/Response
+ *
+ * Accepts both `phone` and `phoneNumber` for compatibility
+ * Max 3 attempts per OTP, then must request new OTP
+ */
+router.post('/verify-otp', async (req, res) => {
+  try {
+    // Accept both phone and phoneNumber for Android compatibility
+    const phoneNumber = req.body.phoneNumber || req.body.phone;
+    const { otp, otpId } = req.body;
+
+    // Validate inputs
+    if (!phoneNumber || !/^\+94[0-9]{9}$/.test(phoneNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid phone number format. Use +94XXXXXXXXX',
+      });
+    }
+
+    if (!otp || !/^[0-9]{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP must be 6 digits',
+      });
+    }
+
+    // Find the OTP record (optionally by ID if provided)
+    let otpQuery = `
+      SELECT id, otp_code, attempts, verified
+      FROM otp_verifications
+      WHERE phone_number = $1 AND expires_at > NOW() AND verified = false
+      ORDER BY created_at DESC LIMIT 1`;
+    let otpParams = [phoneNumber];
+
+    if (otpId) {
+      otpQuery = `
+        SELECT id, otp_code, attempts, verified
+        FROM otp_verifications
+        WHERE id = $1 AND phone_number = $2 AND expires_at > NOW() AND verified = false`;
+      otpParams = [otpId, phoneNumber];
+    }
+
+    const existingOtp = await db.query(otpQuery, otpParams);
+
+    if (existingOtp.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP expired or not found. Please request a new OTP.',
+      });
+    }
+
+    const otpRecord = existingOtp.rows[0];
+    const MAX_ATTEMPTS = 3;
+
+    // Check attempt limit FIRST
+    if (otpRecord.attempts >= MAX_ATTEMPTS) {
+      // Mark OTP as used/invalid
+      await db.query(
+        'UPDATE otp_verifications SET verified = true WHERE id = $1',
+        [otpRecord.id],
+      );
+
+      return res.status(400).json({
+        success: false,
+        message: 'Too many attempts. Please request a new OTP.',
+        attemptsExceeded: true,
+      });
+    }
+
+    // Verify OTP code
+    if (otpRecord.otp_code !== otp) {
+      // Increment attempts
+      const newAttempts = otpRecord.attempts + 1;
+      await db.query(
+        'UPDATE otp_verifications SET attempts = $1 WHERE id = $2',
+        [newAttempts, otpRecord.id],
+      );
+
+      const remainingAttempts = MAX_ATTEMPTS - newAttempts;
+
+      return res.status(400).json({
+        success: false,
+        message: remainingAttempts > 0
+          ? `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining.`
+          : 'Invalid OTP. No attempts remaining. Please request a new OTP.',
+        remainingAttempts,
+      });
+    }
+
+    // OTP is valid - mark as verified
+    await db.query(
+      'UPDATE otp_verifications SET verified = true WHERE id = $1',
+      [otpRecord.id],
+    );
+
+    // Check if user exists
+    let user = await db.query(
+      'SELECT * FROM users WHERE phone_number = $1',
+      [phoneNumber],
+    );
+
+    if (user.rows.length === 0) {
+      // Create new user
+      const newUser = await db.query(
+        `INSERT INTO users (phone_number, verified, user_type)
+         VALUES ($1, true, 'BUYER')
+         RETURNING *`,
+        [phoneNumber],
+      );
+      user = newUser;
+    } else {
+      // Update existing user
+      await db.query(
+        'UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1',
+        [user.rows[0].id],
+      );
+    }
+
+    const userData = user.rows[0];
+
+    // Generate JWT tokens
+    const accessToken = jwt.sign(
+      {
+        userId: userData.id,
+        phoneNumber: userData.phone_number,
+        userType: userData.user_type,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: userData.id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' },
+    );
+
+    // Clean up all OTPs for this phone number
+    await db.query(
+      'DELETE FROM otp_verifications WHERE phone_number = $1',
+      [phoneNumber],
+    );
+
+    logger.info('User authenticated successfully', {
+      userId: userData.id,
+      phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, '$1****$2'),
+    });
+
+    // Response matches Android LoginResponse
+    res.json({
+      success: true,
+      token: accessToken,
+      refreshToken,
+      user: {
+        id: userData.id,
+        phoneNumber: userData.phone_number,
+        name: userData.name,
+        userType: userData.user_type,
+        location: userData.location,
+        verified: userData.verified,
+        createdAt: userData.created_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Verify OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/auth/refresh-token
+ * Refresh access token using refresh token
+ */
+router.post('/refresh-token', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required',
+      });
+    }
+
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // Get user data
+    const user = await db.query(
+      'SELECT * FROM users WHERE id = $1 AND is_active = true',
+      [decoded.userId],
+    );
+
+    if (user.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid refresh token',
+      });
+    }
+
+    const userData = user.rows[0];
+
+    // Generate new access token
+    const accessToken = jwt.sign(
+      {
+        userId: userData.id,
+        phoneNumber: userData.phone_number,
+        userType: userData.user_type,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
+    );
+
+    res.json({
+      success: true,
+      token: accessToken,
+    });
+  } catch (error) {
+    logger.error('Refresh token error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Invalid refresh token',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/auth/logout
+ * Logout user (invalidate tokens on client side)
+ */
+router.post('/logout', async (req, res) => {
+  // In a more sophisticated setup, you might maintain a blacklist of tokens
+  // For now, we rely on client-side token removal
+  res.json({
+    success: true,
+    message: 'Logged out successfully',
+  });
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/listings.js
+========================================
+const express = require('express');
+const { body, query, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID } = require('../utils/helpers');
+
+const router = express.Router();
+
+/**
+ * Middleware to apply safe defaults for listing creation
+ * Makes the API backward-compatible with simpler Android clients
+ */
+const applyListingDefaults = (req, res, next) => {
+  const body = req.body;
+
+  // Default availableFrom to today if not provided
+  if (!body.availableFrom) {
+    body.availableFrom = new Date().toISOString().split('T')[0];
+  }
+
+  // Default availableUntil to 30 days from today if not provided
+  if (!body.availableUntil) {
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+    body.availableUntil = thirtyDaysFromNow.toISOString().split('T')[0];
+  }
+
+  // Default pickupLocations to [location] if location is provided but pickupLocations is not
+  if (!body.pickupLocations || !Array.isArray(body.pickupLocations) || body.pickupLocations.length === 0) {
+    if (body.location) {
+      body.pickupLocations = [body.location];
+    }
+  }
+
+  // Default quality to 'B' (standard) if not provided
+  if (!body.quality) {
+    body.quality = 'B';
+  }
+
+  // Default unit to 'kg' if not provided
+  if (!body.unit) {
+    body.unit = 'kg';
+  }
+
+  next();
+};
+
+// Validation schemas
+const createListingValidation = [
+  body('cropType').isIn([
+    'rice', 'coconut', 'banana', 'mango', 'papaya', 'pineapple',
+    'tomato', 'onion', 'potato', 'carrot', 'cabbage', 'beans',
+    'okra', 'eggplant', 'chili', 'curry_leaves', 'coriander',
+    'mint', 'lemongrass', 'ginger', 'turmeric', 'other',
+  ]).withMessage('Invalid crop type'),
+  body('quantity').isFloat({ min: 0.1 }).withMessage('Quantity must be greater than 0'),
+  body('unit').isIn(['kg', 'g', 'lb', 'piece', 'bunch', 'bag']).withMessage('Invalid unit'),
+  body('pricePerUnit').isFloat({ min: 0.01 }).withMessage('Price must be greater than 0'),
+  body('quality').isIn(['A', 'B', 'C']).withMessage('Quality must be A, B, or C'),
+  body('location').isLength({ min: 1, max: 255 }).withMessage('Location is required'),
+  body('availableFrom').isISO8601().withMessage('Invalid date format'),
+  body('availableUntil').isISO8601().withMessage('Invalid date format'),
+  body('pickupLocations').isArray({ min: 1 }).withMessage('At least one pickup location required'),
+  body('description').optional().isLength({ max: 1000 }).withMessage('Description too long'),
+  // Storytelling fields
+  body('story').optional().isString(),
+  body('farmingMethods').optional().isArray(),
+  body('certifications').optional().isArray(),
+  body('harvestedAt').optional().isISO8601().withMessage('Invalid harvest date format'),
+  body('sustainabilityPractices').optional().isArray(),
+];
+
+/**
+ * GET /api/v1/listings
+ * Get all active listings with optional filtering
+ * Matches Android ListingApiService.getListings()
+ */
+router.get('/', async (req, res) => {
+  try {
+    const {
+      cropType,
+      location,
+      minPrice,
+      maxPrice,
+      quality,
+      farmerId,
+      page = 1,
+      limit = 20,
+      sortBy: rawSortBy = 'created_at',
+      sortOrder: rawSortOrder = 'DESC',
+    } = req.query;
+
+    // Whitelist allowed sort columns to prevent SQL injection
+    const allowedSortColumns = ['created_at', 'price_per_unit', 'quantity', 'updated_at', 'view_count'];
+    const sortBy = allowedSortColumns.includes(rawSortBy) ? rawSortBy : 'created_at';
+    const sortOrder = rawSortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    // Build dynamic query
+    const whereConditions = ['l.is_active = true', 'l.available_until >= CURRENT_DATE', 'l.deleted_at IS NULL'];
+    const queryParams = [];
+    let paramIndex = 1;
+
+    if (cropType) {
+      whereConditions.push(`l.crop_type = $${paramIndex}`);
+      queryParams.push(cropType);
+      paramIndex++;
+    }
+
+    if (location) {
+      whereConditions.push(`l.location ILIKE $${paramIndex}`);
+      queryParams.push(`%${location}%`);
+      paramIndex++;
+    }
+
+    if (minPrice) {
+      whereConditions.push(`l.price_per_unit >= $${paramIndex}`);
+      queryParams.push(parseFloat(minPrice));
+      paramIndex++;
+    }
+
+    if (maxPrice) {
+      whereConditions.push(`l.price_per_unit <= $${paramIndex}`);
+      queryParams.push(parseFloat(maxPrice));
+      paramIndex++;
+    }
+
+    if (quality) {
+      whereConditions.push(`l.quality = $${paramIndex}`);
+      queryParams.push(quality);
+      paramIndex++;
+    }
+
+    if (farmerId) {
+      whereConditions.push(`l.farmer_id = $${paramIndex}`);
+      queryParams.push(farmerId);
+      paramIndex++;
+    }
+
+    // Calculate offset
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    // Main query
+    const query = `
+      SELECT 
+        l.*,
+        u.name as farmer_name,
+        u.phone_number as farmer_contact
+      FROM listings l
+      JOIN users u ON l.farmer_id = u.id
+      WHERE ${whereConditions.join(' AND ')}
+      ORDER BY l.${sortBy} ${sortOrder}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+
+    queryParams.push(parseInt(limit), offset);
+
+    const result = await db.query(query, queryParams);
+
+    // Get total count for pagination
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM listings l
+      WHERE ${whereConditions.join(' AND ')}
+    `;
+
+    const countResult = await db.query(countQuery, queryParams.slice(0, -2));
+    const total = parseInt(countResult.rows[0].total);
+
+    // Transform data to match Android model
+    const listings = result.rows.map((row) => ({
+      id: row.id,
+      farmerId: row.farmer_id,
+      cropType: row.crop_type,
+      quantity: parseFloat(row.quantity),
+      unit: row.unit,
+      pricePerUnit: parseFloat(row.price_per_unit),
+      quality: row.quality,
+      location: row.location,
+      pickupLocations: row.pickup_locations || [],
+      availableFrom: row.available_from,
+      availableUntil: row.available_until,
+      description: row.description,
+      images: row.images || [],
+      isActive: row.is_active,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      farmerName: row.farmer_name,
+      farmerContact: row.farmer_contact,
+      // Flat field for Android Listing model
+      farmerPhone: row.farmer_contact || '',
+      // Storytelling fields
+      story: row.story || '',
+      farmingMethods: row.farming_methods || [],
+      certifications: row.certifications || [],
+      harvestedAt: row.harvested_at ? row.harvested_at.toISOString().split('T')[0] : '',
+      sustainabilityPractices: row.sustainability_practices || [],
+    }));
+
+    // Response matches Android ListingsResponse DTO
+    res.json({
+      success: true,
+      listings, // Android expects 'listings' not 'data'
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error('Get listings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch listings',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/listings/:id
+ * Get specific listing by ID
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid listing ID',
+      });
+    }
+
+    // Increment view count
+    await db.query('SELECT increment_listing_views($1)', [id]);
+
+    const result = await db.query(`
+      SELECT 
+        l.*,
+        u.name as farmer_name,
+        u.phone_number as farmer_contact,
+        u.location as farmer_location
+      FROM listings l
+      JOIN users u ON l.farmer_id = u.id
+      WHERE l.id = $1 AND l.is_active = true AND l.deleted_at IS NULL
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Listing not found',
+      });
+    }
+
+    const listing = result.rows[0];
+
+    res.json({
+      success: true,
+      data: {
+        id: listing.id,
+        farmerId: listing.farmer_id,
+        cropType: listing.crop_type,
+        quantity: parseFloat(listing.quantity),
+        unit: listing.unit,
+        pricePerUnit: parseFloat(listing.price_per_unit),
+        quality: listing.quality,
+        location: listing.location,
+        pickupLocations: listing.pickup_locations || [],
+        availableFrom: listing.available_from,
+        availableUntil: listing.available_until,
+        description: listing.description,
+        images: listing.images || [],
+        isActive: listing.is_active,
+        createdAt: listing.created_at,
+        updatedAt: listing.updated_at,
+        viewCount: listing.view_count,
+        // Flat fields for Android Listing model
+        farmerName: listing.farmer_name || '',
+        farmerPhone: listing.farmer_contact || '',
+        farmer: {
+          name: listing.farmer_name,
+          contact: listing.farmer_contact,
+          location: listing.farmer_location,
+        },
+        // Storytelling fields
+        story: listing.story || '',
+        farmingMethods: listing.farming_methods || [],
+        certifications: listing.certifications || [],
+        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : '',
+        sustainabilityPractices: listing.sustainability_practices || [],
+      },
+    });
+  } catch (error) {
+    logger.error('Get listing error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch listing',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/listings
+ * Create new listing
+ * Matches Android CreateListingRequest
+ */
+router.post('/', applyListingDefaults, createListingValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array(),
+      });
+    }
+
+    const {
+      cropType,
+      quantity,
+      unit,
+      pricePerUnit,
+      quality,
+      location,
+      pickupLocations,
+      availableFrom,
+      availableUntil,
+      description,
+      images = [],
+      // Storytelling fields
+      story,
+      farmingMethods = [],
+      certifications = [],
+      harvestedAt,
+      sustainabilityPractices = [],
+    } = req.body;
+
+    // Validate date range
+    if (new Date(availableUntil) <= new Date(availableFrom)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Available until date must be after available from date',
+      });
+    }
+
+    // Check if user is a farmer
+    const user = await db.query(
+      'SELECT user_type, can_sell FROM users WHERE id = $1',
+      [req.user.userId],
+    );
+
+    // Allow if user is FARMER OR can_sell is TRUE
+    if (user.rows.length === 0 || (user.rows[0].user_type !== 'FARMER' && !user.rows[0].can_sell)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only farmers or approved sellers can create listings',
+      });
+    }
+
+    const result = await db.query(`
+      INSERT INTO listings (
+        farmer_id, crop_type, quantity, unit, price_per_unit,
+        quality, location, pickup_locations, available_from,
+        available_until, description, images,
+        story, farming_methods, certifications, harvested_at, sustainability_practices
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      RETURNING *
+    `, [
+      req.user.userId,
+      cropType,
+      quantity,
+      unit,
+      pricePerUnit,
+      quality,
+      location,
+      pickupLocations,
+      availableFrom,
+      availableUntil,
+      description,
+      images,
+      story,
+      farmingMethods,
+      JSON.stringify(certifications), // Store JSONB as string if needed, or pass object if pg driver handles it. pg usually handles objects for JSONB.
+      harvestedAt,
+      sustainabilityPractices,
+    ]);
+
+    const listing = result.rows[0];
+
+    logger.info('Listing created', {
+      listingId: listing.id,
+      farmerId: req.user.userId,
+      cropType,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: listing.id,
+        farmerId: listing.farmer_id,
+        cropType: listing.crop_type,
+        quantity: parseFloat(listing.quantity),
+        unit: listing.unit,
+        pricePerUnit: parseFloat(listing.price_per_unit),
+        quality: listing.quality,
+        location: listing.location,
+        pickupLocations: listing.pickup_locations || [],
+        availableFrom: listing.available_from,
+        availableUntil: listing.available_until,
+        description: listing.description,
+        images: listing.images || [],
+        isActive: listing.is_active,
+        createdAt: listing.created_at,
+        updatedAt: listing.updated_at,
+        // Storytelling fields
+        story: listing.story || '',
+        farmingMethods: listing.farming_methods || [],
+        certifications: listing.certifications || [],
+        harvestedAt: listing.harvested_at ? listing.harvested_at.toISOString().split('T')[0] : '',
+        sustainabilityPractices: listing.sustainability_practices || [],
+      },
+    });
+  } catch (error) {
+    logger.error('Create listing error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create listing',
+    });
+  }
+});
+
+/**
+ * PUT /api/v1/listings/:id
+ * Update existing listing
+ */
+router.put('/:id', createListingValidation, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const errors = validationResult(req);
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid listing ID',
+      });
+    }
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array(),
+      });
+    }
+
+    // Check if listing exists and belongs to user
+    const existingListing = await db.query(
+      'SELECT farmer_id FROM listings WHERE id = $1 AND deleted_at IS NULL',
+      [id],
+    );
+
+    if (existingListing.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Listing not found',
+      });
+    }
+
+    if (existingListing.rows[0].farmer_id !== req.user.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only update your own listings',
+      });
+    }
+
+    const {
+      cropType,
+      quantity,
+      unit,
+      pricePerUnit,
+      quality,
+      location,
+      pickupLocations,
+      availableFrom,
+      availableUntil,
+      description,
+      images = [],
+      // Storytelling fields
+      story,
+      farmingMethods = [],
+      certifications = [],
+      harvestedAt,
+      sustainabilityPractices = [],
+    } = req.body;
+
+    const result = await db.query(`
+      UPDATE listings SET
+        crop_type = $2,
+        quantity = $3,
+        unit = $4,
+        price_per_unit = $5,
+        quality = $6,
+        location = $7,
+        pickup_locations = $8,
+        available_from = $9,
+        available_until = $10,
+        description = $11,
+        images = $12,
+        story = $13,
+        farming_methods = $14,
+        certifications = $15,
+        harvested_at = $16,
+        sustainability_practices = $17,
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `, [
+      id, cropType, quantity, unit, pricePerUnit,
+      quality, location, pickupLocations, availableFrom,
+      availableUntil, description, images,
+      story, farmingMethods, JSON.stringify(certifications), harvestedAt, sustainabilityPractices,
+    ]);
+
+    const listing = result.rows[0];
+
+    logger.info('Listing updated', {
+      listingId: id,
+      farmerId: req.user.userId,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        id: listing.id,
+        farmerId: listing.farmer_id,
+        cropType: listing.crop_type,
+        quantity: parseFloat(listing.quantity),
+        unit: listing.unit,
+        pricePerUnit: parseFloat(listing.price_per_unit),
+        quality: listing.quality,
+        location: listing.location,
+        pickupLocations: listing.pickup_locations || [],
+        availableFrom: listing.available_from,
+        availableUntil: listing.available_until,
+        description: listing.description,
+        images: listing.images || [],
+        isActive: listing.is_active,
+        createdAt: listing.created_at,
+        updatedAt: listing.updated_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Update listing error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update listing',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/listings/:id/images
+ * Upload images for a listing
+ */
+router.post('/:id/images', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { images } = req.body; // Array of base64 or URLs
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid listing ID',
+      });
+    }
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No images provided',
+      });
+    }
+
+    if (images.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum 5 images allowed',
+      });
+    }
+
+    // Check if listing exists and belongs to user
+    const existingListing = await db.query(
+      'SELECT farmer_id, images FROM listings WHERE id = $1',
+      [id],
+    );
+
+    if (existingListing.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Listing not found',
+      });
+    }
+
+    if (existingListing.rows[0].farmer_id !== req.user.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only upload images to your own listings',
+      });
+    }
+
+    // For now, just store the URLs directly
+    // In production, you would upload to Supabase Storage here
+    const currentImages = existingListing.rows[0].images || [];
+    const updatedImages = [...currentImages, ...images].slice(0, 5);
+
+    await db.query(
+      'UPDATE listings SET images = $1, updated_at = NOW() WHERE id = $2',
+      [updatedImages, id],
+    );
+
+    logger.info('Images uploaded to listing', {
+      listingId: id,
+      imageCount: images.length,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        images: updatedImages,
+      },
+    });
+  } catch (error) {
+    logger.error('Upload images error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload images',
+    });
+  }
+});
+
+/**
+ * DELETE /api/v1/listings/:id
+ * Delete (deactivate) listing
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid listing ID',
+      });
+    }
+
+    // Check if listing exists and belongs to user
+    const existingListing = await db.query(
+      'SELECT farmer_id FROM listings WHERE id = $1',
+      [id],
+    );
+
+    if (existingListing.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Listing not found',
+      });
+    }
+
+    if (existingListing.rows[0].farmer_id !== req.user.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only delete your own listings',
+      });
+    }
+
+    // Soft delete by setting is_active to false
+    await db.query(
+      'UPDATE listings SET is_active = false, updated_at = NOW() WHERE id = $1',
+      [id],
+    );
+
+    logger.info('Listing deleted', {
+      listingId: id,
+      farmerId: req.user.userId,
+    });
+
+    res.json({
+      success: true,
+      message: 'Listing deleted successfully',
+    });
+  } catch (error) {
+    logger.error('Delete listing error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete listing',
+    });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/transactions.js
+========================================
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID, parseDate, isFutureDate } = require('../utils/helpers');
+
+const router = express.Router();
+
+// Validation schemas
+const createTransactionValidation = [
+  body('listingId').isUUID().withMessage('Invalid listing ID'),
+  body('quantity').isFloat({ min: 0.1 }).withMessage('Quantity must be greater than 0'),
+  body('totalAmount').isFloat({ min: 0.01 }).withMessage('Total amount must be greater than 0'),
+  body('pickupLocation').isLength({ min: 1, max: 255 }).withMessage('Pickup location is required'),
+  body('pickupDate').isISO8601().withMessage('Invalid pickup date format'),
+  body('buyerContact').optional().isLength({ max: 20 }).withMessage('Buyer contact too long'),
+  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long'),
+];
+
+/**
+ * GET /api/v1/transactions
+ * Get user's transactions with filtering
+ */
+router.get('/', async (req, res) => {
+  try {
+    const {
+      status,
+      role, // 'farmer' or 'buyer'
+      page = 1,
+      limit = 20,
+      sortBy: rawSortBy = 'created_at',
+      sortOrder: rawSortOrder = 'DESC',
+    } = req.query;
+
+    // Whitelist sort columns to prevent SQL injection
+    const allowedSortColumns = ['created_at', 'total_amount', 'quantity', 'pickup_date', 'updated_at', 'status'];
+    const sortBy = allowedSortColumns.includes(rawSortBy) ? rawSortBy : 'created_at';
+    const sortOrder = rawSortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    // Build dynamic query based on user role
+    const whereConditions = [];
+    const queryParams = [req.user.userId];
+    let paramIndex = 2;
+
+    // Role-based filtering
+    if (role === 'farmer') {
+      whereConditions.push('t.farmer_id = $1');
+    } else if (role === 'buyer') {
+      whereConditions.push('t.buyer_id = $1');
+    } else {
+      // Default: show all user's transactions
+      whereConditions.push('(t.farmer_id = $1 OR t.buyer_id = $1)');
+    }
+
+    if (status) {
+      whereConditions.push(`t.status = $${paramIndex}`);
+      queryParams.push(status);
+      paramIndex++;
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const query = `
+      SELECT 
+        t.*,
+        l.crop_type,
+        l.unit,
+        l.price_per_unit,
+        farmer.name as farmer_name,
+        farmer.phone_number as farmer_contact,
+        buyer.name as buyer_name,
+        buyer.phone_number as buyer_contact
+      FROM transactions t
+      JOIN listings l ON t.listing_id = l.id
+      JOIN users farmer ON t.farmer_id = farmer.id
+      JOIN users buyer ON t.buyer_id = buyer.id
+      WHERE ${whereConditions.join(' AND ')}
+      ORDER BY t.${sortBy} ${sortOrder}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+
+    queryParams.push(parseInt(limit), offset);
+
+    const result = await db.query(query, queryParams);
+
+    // Get total count
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM transactions t
+      WHERE ${whereConditions.join(' AND ')}
+    `;
+
+    const countResult = await db.query(countQuery, queryParams.slice(0, -2));
+    const total = parseInt(countResult.rows[0].total);
+
+    // Transform data - includes flat fields for Android compatibility
+    const transactions = result.rows.map((row) => ({
+      id: row.id,
+      listingId: row.listing_id,
+      farmerId: row.farmer_id,
+      buyerId: row.buyer_id,
+      // Flat name/phone fields for Android Transaction model
+      sellerName: row.farmer_name || '',
+      buyerName: row.buyer_name || '',
+      sellerPhone: row.farmer_contact || '',
+      buyerPhone: row.buyer_contact || '',
+      quantity: parseFloat(row.quantity),
+      totalAmount: parseFloat(row.total_amount),
+      pickupLocation: row.pickup_location,
+      pickupDate: row.pickup_date,
+      status: row.status,
+      paymentMethod: row.payment_method,
+      notes: row.notes,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      completedAt: row.completed_at,
+      cancelledAt: row.cancelled_at,
+      cancellationReason: row.cancellation_reason,
+      listing: {
+        cropType: row.crop_type,
+        unit: row.unit,
+        pricePerUnit: parseFloat(row.price_per_unit),
+      },
+      farmer: {
+        name: row.farmer_name,
+        contact: row.farmer_contact,
+      },
+      buyer: {
+        name: row.buyer_name,
+        contact: row.buyer_contact,
+      },
+    }));
+
+    // Response matches Android TransactionsResponse DTO
+    res.json({
+      success: true,
+      transactions, // Android expects 'transactions' not 'data'
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+    });
+  } catch (error) {
+    logger.error('Get transactions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch transactions',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/transactions/:id
+ * Get specific transaction details
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid transaction ID',
+      });
+    }
+
+    const result = await db.query(`
+      SELECT 
+        t.*,
+        l.crop_type,
+        l.unit,
+        l.price_per_unit,
+        l.quality,
+        l.description as listing_description,
+        farmer.name as farmer_name,
+        farmer.phone_number as farmer_contact,
+        farmer.location as farmer_location,
+        buyer.name as buyer_name,
+        buyer.phone_number as buyer_contact
+      FROM transactions t
+      JOIN listings l ON t.listing_id = l.id
+      JOIN users farmer ON t.farmer_id = farmer.id
+      JOIN users buyer ON t.buyer_id = buyer.id
+      WHERE t.id = $1 AND (t.farmer_id = $2 OR t.buyer_id = $2)
+    `, [id, req.user.userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Transaction not found',
+      });
+    }
+
+    const transaction = result.rows[0];
+
+    res.json({
+      success: true,
+      data: {
+        id: transaction.id,
+        listingId: transaction.listing_id,
+        farmerId: transaction.farmer_id,
+        buyerId: transaction.buyer_id,
+        // Flat name/phone fields for Android Transaction model
+        sellerName: transaction.farmer_name || '',
+        buyerName: transaction.buyer_name || '',
+        sellerPhone: transaction.farmer_contact || '',
+        buyerPhone: transaction.buyer_contact || '',
+        quantity: parseFloat(transaction.quantity),
+        totalAmount: parseFloat(transaction.total_amount),
+        pickupLocation: transaction.pickup_location,
+        pickupDate: transaction.pickup_date,
+        status: transaction.status,
+        paymentMethod: transaction.payment_method,
+        notes: transaction.notes,
+        createdAt: transaction.created_at,
+        updatedAt: transaction.updated_at,
+        completedAt: transaction.completed_at,
+        cancelledAt: transaction.cancelled_at,
+        cancellationReason: transaction.cancellation_reason,
+        listing: {
+          cropType: transaction.crop_type,
+          unit: transaction.unit,
+          pricePerUnit: parseFloat(transaction.price_per_unit),
+          quality: transaction.quality,
+          description: transaction.listing_description,
+        },
+        farmer: {
+          name: transaction.farmer_name,
+          contact: transaction.farmer_contact,
+          location: transaction.farmer_location,
+        },
+        buyer: {
+          name: transaction.buyer_name,
+          contact: transaction.buyer_contact,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error('Get transaction error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch transaction',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/transactions
+ * Create new transaction (place order)
+ */
+router.post('/', createTransactionValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array(),
+      });
+    }
+
+    const {
+      listingId,
+      quantity,
+      totalAmount,
+      pickupLocation,
+      pickupDate,
+      buyerContact,
+      notes,
+    } = req.body;
+
+    // Validate pickup date is in the future
+    if (!isFutureDate(pickupDate)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pickup date must be in the future',
+      });
+    }
+
+    // Validate listing exists and is available with locking inside a transaction
+    const result = await db.transaction(async (client) => {
+      const listing = await client.query(
+        'SELECT farmer_id, quantity, price_per_unit, is_active, available_until FROM listings WHERE id = $1 FOR UPDATE',
+        [listingId],
+      );
+
+      if (listing.rows.length === 0) {
+        throw new Error('Listing not found');
+      }
+
+      const listingData = listing.rows[0];
+
+      if (!listingData.is_active) {
+        throw new Error('Listing is not active');
+      }
+
+      if (new Date(listingData.available_until) < new Date()) {
+        throw new Error('Listing is no longer available');
+      }
+
+      if (listingData.farmer_id === req.user.userId) {
+        throw new Error('Cannot create transaction for your own listing');
+      }
+
+      if (quantity > parseFloat(listingData.quantity)) {
+        throw new Error('Requested quantity exceeds available quantity');
+      }
+
+      // Calculate total amount
+      const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
+
+      // Allow 1 cent difference for floating point errors
+      if (Math.abs(totalAmount - expectedAmount) > 0.01) {
+        throw new Error('Total amount does not match expected calculation');
+      }
+
+      // Create transaction
+      const insertResult = await client.query(`
+        INSERT INTO transactions (
+          listing_id, farmer_id, buyer_id, quantity, total_amount,
+          pickup_location, pickup_date, buyer_contact, notes
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING *
+      `, [
+        listingId,
+        listingData.farmer_id,
+        req.user.userId,
+        quantity,
+        totalAmount,
+        pickupLocation,
+        pickupDate,
+        buyerContact || req.user.phoneNumber,
+        notes,
+      ]);
+
+      return insertResult.rows[0];
+    });
+
+    const transaction = result;
+
+    logger.info('Transaction created', {
+      transactionId: transaction.id,
+      buyerId: req.user.userId,
+      farmerId: transaction.farmer_id,
+      listingId,
+      quantity,
+      totalAmount,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: transaction.id,
+        listingId: transaction.listing_id,
+        farmerId: transaction.farmer_id,
+        buyerId: transaction.buyer_id,
+        quantity: parseFloat(transaction.quantity),
+        totalAmount: parseFloat(transaction.total_amount),
+        pickupLocation: transaction.pickup_location,
+        pickupDate: transaction.pickup_date,
+        status: transaction.status,
+        paymentMethod: transaction.payment_method,
+        notes: transaction.notes,
+        createdAt: transaction.created_at,
+        updatedAt: transaction.updated_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Create transaction error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create transaction',
+    });
+  }
+});
+
+/**
+ * PATCH /api/v1/transactions/:id/status
+ * Update transaction status
+ */
+router.patch('/:id/status', [
+  body('status').isIn(['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])
+    .withMessage('Invalid status'),
+  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long'),
+], async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array(),
+      });
+    }
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid transaction ID',
+      });
+    }
+
+    // Get current transaction
+    const current = await db.query(
+      'SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1',
+      [id],
+    );
+
+    if (current.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Transaction not found',
+      });
+    }
+
+    const transaction = current.rows[0];
+    const isFarmer = transaction.farmer_id === req.user.userId;
+    const isBuyer = transaction.buyer_id === req.user.userId;
+
+    if (!isFarmer && !isBuyer) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied',
+      });
+    }
+
+    // Validate status transitions
+    const validTransitions = {
+      PENDING: ['CONFIRMED', 'CANCELLED'],
+      CONFIRMED: ['IN_PROGRESS', 'CANCELLED'],
+      IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+      COMPLETED: [],
+      CANCELLED: [],
+    };
+
+    if (!validTransitions[transaction.status].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot change status from ${transaction.status} to ${status}`,
+      });
+    }
+
+    // Update transaction
+    const updateFields = ['status = $2', 'updated_at = NOW()'];
+    const updateValues = [id, status];
+    let paramIndex = 3;
+
+    if (status === 'COMPLETED') {
+      updateFields.push('completed_at = NOW()');
+    } else if (status === 'CANCELLED') {
+      updateFields.push('cancelled_at = NOW()');
+      if (notes) {
+        updateFields.push(`cancellation_reason = $${paramIndex}`);
+        updateValues.push(notes);
+        paramIndex++;
+      }
+    }
+
+    if (notes && status !== 'CANCELLED') {
+      updateFields.push(`notes = $${paramIndex}`);
+      updateValues.push(notes);
+    }
+
+    const result = await db.query(`
+      UPDATE transactions SET ${updateFields.join(', ')}
+      WHERE id = $1
+      RETURNING *
+    `, updateValues);
+
+    const updatedTransaction = result.rows[0];
+
+    logger.info('Transaction status updated', {
+      transactionId: id,
+      userId: req.user.userId,
+      oldStatus: transaction.status,
+      newStatus: status,
+    });
+
+    res.json({
+      success: true,
+      data: {
+        id: updatedTransaction.id,
+        status: updatedTransaction.status,
+        updatedAt: updatedTransaction.updated_at,
+        completedAt: updatedTransaction.completed_at,
+        cancelledAt: updatedTransaction.cancelled_at,
+        cancellationReason: updatedTransaction.cancellation_reason,
+        notes: updatedTransaction.notes,
+      },
+    });
+  } catch (error) {
+    logger.error('Update transaction status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update transaction status',
+    });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/market-prices.js
+========================================
+const express = require('express');
+const { query, validationResult } = require('express-validator');
+const { supabase } = require('../config/supabase');
+const logger = require('../utils/logger');
+
+const router = express.Router();
+
+/**
+ * GET /api/market-prices
+ * Get all active market prices with optional filtering
+ * Matches Android MarketPriceApiService.getMarketPrices()
+ *
+ * Query Parameters:
+ * - cropType: Filter by specific crop type (e.g., "RED_ONION", "TOMATO")
+ * - location: Filter by location (partial match, case-insensitive)
+ * - trend: Filter by price trend ("UP", "DOWN", "STABLE")
+ * - limit: Number of results per page (default: 20, max: 100)
+ * - page: Page number for pagination (default: 1)
+ * - sortBy: Sort field (default: "last_updated")
+ * - sortOrder: Sort direction ("asc" or "desc", default: "desc")
+ */
+router.get('/', async (req, res) => {
+  try {
+    const {
+      cropType,
+      location,
+      trend,
+      minPrice,
+      maxPrice,
+      page = 1,
+      limit = 20,
+      sortBy = 'last_updated',
+      sortOrder = 'desc',
+    } = req.query;
+
+    // Validate and sanitize inputs
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 20));
+    const offset = (pageNum - 1) * limitNum;
+
+    // Validate sortOrder
+    const order = sortOrder.toLowerCase() === 'asc' ? 'asc' : 'desc';
+
+    // Validate sortBy to prevent SQL injection
+    const allowedSortFields = ['last_updated', 'current_price', 'crop_type', 'location', 'created_at'];
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'last_updated';
+
+    // Build query with filters
+    let query = supabase
+      .from('market_prices')
+      .select('*', { count: 'exact' })
+      .eq('is_active', true);
+
+    // Apply filters
+    if (cropType) {
+      query = query.eq('crop_type', cropType.toUpperCase());
+    }
+
+    if (location) {
+      query = query.ilike('location', `%${location}%`);
+    }
+
+    if (trend) {
+      const trendUpper = trend.toUpperCase();
+      if (['UP', 'DOWN', 'STABLE'].includes(trendUpper)) {
+        query = query.eq('trend', trendUpper);
+      }
+    }
+
+    if (minPrice) {
+      const minPriceNum = parseFloat(minPrice);
+      if (!isNaN(minPriceNum)) {
+        query = query.gte('current_price', minPriceNum);
+      }
+    }
+
+    if (maxPrice) {
+      const maxPriceNum = parseFloat(maxPrice);
+      if (!isNaN(maxPriceNum)) {
+        query = query.lte('current_price', maxPriceNum);
+      }
+    }
+
+    // Apply sorting and pagination
+    query = query
+      .order(sortField, { ascending: order === 'asc' })
+      .range(offset, offset + limitNum - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      logger.error('Supabase query error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch market prices',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+
+    // Transform snake_case to camelCase for Android compatibility
+    const prices = (data || []).map((row) => ({
+      id: row.id,
+      cropType: row.crop_type,
+      cropNameTamil: row.crop_name_tamil || '',
+      cropNameEnglish: row.crop_name_english || '',
+      cropNameSinhala: row.crop_name_sinhala || '',
+      currentPrice: parseFloat(row.current_price),
+      previousPrice: parseFloat(row.previous_price || row.current_price),
+      unit: row.unit,
+      trend: row.trend,
+      changePercentage: parseFloat(row.change_percentage || 0),
+      changeAmount: parseFloat(row.change_amount || 0),
+      location: row.location,
+      locationTamil: row.location_tamil || '',
+      locationSinhala: row.location_sinhala || '',
+      lastUpdated: row.last_updated,
+      isActive: row.is_active,
+      source: row.source || 'MARKET',
+      reliability: parseFloat(row.reliability || 0.8),
+    }));
+
+    const totalCount = count || 0;
+    const totalPages = Math.ceil(totalCount / limitNum);
+
+    // Android MarketPricesResponse format
+    res.json({
+      prices,
+      totalCount,
+      page: pageNum,
+      totalPages,
+      hasNext: pageNum < totalPages,
+      hasPrevious: pageNum > 1,
+      lastUpdated: new Date().toISOString(),
+    });
+
+    logger.info('Market prices fetched', {
+      count: prices.length,
+      page: pageNum,
+      filters: { cropType, location, trend },
+    });
+  } catch (error) {
+    logger.error('Get market prices error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch market prices',
+    });
+  }
+});
+
+/**
+ * GET /api/market-prices/:id
+ * Get specific market price by ID
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Simple UUID validation
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid market price ID format',
+      });
+    }
+
+    const { data, error } = await supabase
+      .from('market_prices')
+      .select('*')
+      .eq('id', id)
+      .eq('is_active', true)
+      .single();
+
+    if (error || !data) {
+      logger.warn('Market price not found:', { id, error });
+      return res.status(404).json({
+        success: false,
+        message: 'Market price not found',
+      });
+    }
+
+    // Transform to camelCase
+    const price = {
+      id: data.id,
+      cropType: data.crop_type,
+      cropNameTamil: data.crop_name_tamil || '',
+      cropNameEnglish: data.crop_name_english || '',
+      cropNameSinhala: data.crop_name_sinhala || '',
+      currentPrice: parseFloat(data.current_price),
+      previousPrice: parseFloat(data.previous_price || data.current_price),
+      unit: data.unit,
+      trend: data.trend,
+      changePercentage: parseFloat(data.change_percentage || 0),
+      changeAmount: parseFloat(data.change_amount || 0),
+      location: data.location,
+      locationTamil: data.location_tamil || '',
+      locationSinhala: data.location_sinhala || '',
+      lastUpdated: data.last_updated,
+      isActive: data.is_active,
+      source: data.source || 'MARKET',
+      reliability: parseFloat(data.reliability || 0.8),
+    };
+
+    res.json(price);
+  } catch (error) {
+    logger.error('Get market price by ID error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch market price',
+    });
+  }
+});
+
+/**
+ * POST /api/market-prices/refresh-live
+ * Trigger a live price refresh from HDX HAPI (WFP data)
+ * This populates the market_prices table with real Sri Lankan food prices.
+ * Can be called by a cron job or manually.
+ */
+router.post('/refresh-live', async (req, res) => {
+  try {
+    const { refreshLivePrices } = require('../services/livePriceService');
+    const result = await refreshLivePrices();
+
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    logger.error('Live price refresh error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh live prices',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
+/**
+ * GET /api/market-prices/refresh-live
+ * Same as POST but accessible via GET for Vercel Cron
+ */
+router.get('/refresh-live', async (req, res) => {
+  try {
+    // Verify cron secret if provided
+    const cronSecret = req.headers['authorization'];
+    if (process.env.CRON_SECRET && cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
+      // Allow without auth for now, but log it
+      logger.warn('Cron refresh called without proper auth');
+    }
+
+    const { refreshLivePrices } = require('../services/livePriceService');
+    const result = await refreshLivePrices();
+
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    logger.error('Live price refresh (cron) error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh live prices',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/messages.js
+========================================
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID } = require('../utils/helpers');
+const { createNotification } = require('../utils/notifications');
+
+const router = express.Router();
+
+/**
+ * GET /api/v1/messages/conversations
+ * List user's conversations (paginated, ordered by last_message_at)
+ */
+router.get('/conversations', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const userId = req.user.userId;
+
+    const result = await db.query(`
+      SELECT
+        c.*,
+        u1.name as participant_1_name,
+        u1.phone_number as participant_1_phone,
+        u2.name as participant_2_name,
+        u2.phone_number as participant_2_phone,
+        l.crop_type as listing_crop_type,
+        l.id as listing_id_ref,
+        (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.is_read = FALSE AND m.sender_id != $1) as unread_count
+      FROM conversations c
+      JOIN users u1 ON c.participant_1_id = u1.id
+      JOIN users u2 ON c.participant_2_id = u2.id
+      LEFT JOIN listings l ON c.listing_id = l.id
+      WHERE c.participant_1_id = $1 OR c.participant_2_id = $1
+      ORDER BY c.last_message_at DESC NULLS LAST
+      LIMIT $2 OFFSET $3
+    `, [userId, parseInt(limit), offset]);
+
+    const countResult = await db.query(
+      `SELECT COUNT(*) as total FROM conversations
+       WHERE participant_1_id = $1 OR participant_2_id = $1`,
+      [userId]
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    const conversations = result.rows.map((row) => {
+      const isParticipant1 = row.participant_1_id === userId;
+      return {
+        id: row.id,
+        otherParticipant: {
+          id: isParticipant1 ? row.participant_2_id : row.participant_1_id,
+          name: isParticipant1 ? row.participant_2_name : row.participant_1_name,
+          phone: isParticipant1 ? row.participant_2_phone : row.participant_1_phone,
+        },
+        listingId: row.listing_id,
+        listingCropType: row.listing_crop_type,
+        lastMessageText: row.last_message_text,
+        lastMessageAt: row.last_message_at,
+        unreadCount: parseInt(row.unread_count),
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      };
+    });
+
+    res.json({
+      success: true,
+      conversations,
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+    });
+  } catch (error) {
+    logger.error('Get conversations error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch conversations' });
+  }
+});
+
+/**
+ * GET /api/v1/messages/conversations/:id
+ * Get conversation detail
+ */
+router.get('/conversations/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!validateUUID(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+    }
+
+    const result = await db.query(`
+      SELECT
+        c.*,
+        u1.name as participant_1_name,
+        u1.phone_number as participant_1_phone,
+        u2.name as participant_2_name,
+        u2.phone_number as participant_2_phone,
+        l.crop_type as listing_crop_type
+      FROM conversations c
+      JOIN users u1 ON c.participant_1_id = u1.id
+      JOIN users u2 ON c.participant_2_id = u2.id
+      LEFT JOIN listings l ON c.listing_id = l.id
+      WHERE c.id = $1 AND (c.participant_1_id = $2 OR c.participant_2_id = $2)
+    `, [id, req.user.userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Conversation not found' });
+    }
+
+    const row = result.rows[0];
+    const userId = req.user.userId;
+    const isParticipant1 = row.participant_1_id === userId;
+
+    res.json({
+      success: true,
+      data: {
+        id: row.id,
+        otherParticipant: {
+          id: isParticipant1 ? row.participant_2_id : row.participant_1_id,
+          name: isParticipant1 ? row.participant_2_name : row.participant_1_name,
+          phone: isParticipant1 ? row.participant_2_phone : row.participant_1_phone,
+        },
+        listingId: row.listing_id,
+        listingCropType: row.listing_crop_type,
+        lastMessageText: row.last_message_text,
+        lastMessageAt: row.last_message_at,
+        createdAt: row.created_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Get conversation error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch conversation' });
+  }
+});
+
+/**
+ * POST /api/v1/messages/conversations
+ * Create or get existing conversation
+ */
+router.post('/conversations',
+  [body('participantId').isUUID().withMessage('Invalid participant ID')],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+      }
+
+      const { participantId, listingId } = req.body;
+      const userId = req.user.userId;
+
+      if (userId === participantId) {
+        return res.status(400).json({ success: false, message: 'Cannot start conversation with yourself' });
+      }
+
+      // Ensure ordered participants for unique constraint
+      const p1 = userId < participantId ? userId : participantId;
+      const p2 = userId < participantId ? participantId : userId;
+
+      // Try to find existing conversation
+      let result = await db.query(
+        `SELECT id FROM conversations WHERE participant_1_id = $1 AND participant_2_id = $2`,
+        [p1, p2]
+      );
+
+      if (result.rows.length > 0) {
+        return res.json({ success: true, data: { id: result.rows[0].id, created: false } });
+      }
+
+      // Create new conversation
+      result = await db.query(
+        `INSERT INTO conversations (participant_1_id, participant_2_id, listing_id)
+         VALUES ($1, $2, $3) RETURNING id, created_at`,
+        [p1, p2, listingId || null]
+      );
+
+      res.status(201).json({
+        success: true,
+        data: { id: result.rows[0].id, created: true, createdAt: result.rows[0].created_at },
+      });
+    } catch (error) {
+      logger.error('Create conversation error:', error);
+      res.status(500).json({ success: false, message: 'Failed to create conversation' });
+    }
+  }
+);
+
+/**
+ * GET /api/v1/messages/conversations/:id/messages
+ * Get messages in conversation (paginated, newest first)
+ */
+router.get('/conversations/:id/messages', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { page = 1, limit = 50 } = req.query;
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+    }
+
+    // Verify user is participant
+    const conv = await db.query(
+      `SELECT id FROM conversations WHERE id = $1 AND (participant_1_id = $2 OR participant_2_id = $2)`,
+      [id, req.user.userId]
+    );
+    if (conv.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Conversation not found' });
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const result = await db.query(`
+      SELECT m.*, u.name as sender_name
+      FROM messages m
+      JOIN users u ON m.sender_id = u.id
+      WHERE m.conversation_id = $1
+      ORDER BY m.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [id, parseInt(limit), offset]);
+
+    const countResult = await db.query(
+      'SELECT COUNT(*) as total FROM messages WHERE conversation_id = $1',
+      [id]
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    const messages = result.rows.map((row) => ({
+      id: row.id,
+      conversationId: row.conversation_id,
+      senderId: row.sender_id,
+      senderName: row.sender_name,
+      content: row.content,
+      messageType: row.message_type,
+      isRead: row.is_read,
+      createdAt: row.created_at,
+    }));
+
+    res.json({
+      success: true,
+      messages,
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+    });
+  } catch (error) {
+    logger.error('Get messages error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch messages' });
+  }
+});
+
+/**
+ * POST /api/v1/messages/conversations/:id/messages
+ * Send a message
+ */
+router.post('/conversations/:id/messages',
+  [body('content').isLength({ min: 1, max: 2000 }).withMessage('Message content required (max 2000 chars)')],
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+      }
+
+      if (!validateUUID(id)) {
+        return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+      }
+
+      const userId = req.user.userId;
+      const { content, messageType = 'TEXT' } = req.body;
+
+      // Verify user is participant and get other participant
+      const conv = await db.query(
+        `SELECT participant_1_id, participant_2_id FROM conversations
+         WHERE id = $1 AND (participant_1_id = $2 OR participant_2_id = $2)`,
+        [id, userId]
+      );
+      if (conv.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Conversation not found' });
+      }
+
+      const otherUserId = conv.rows[0].participant_1_id === userId
+        ? conv.rows[0].participant_2_id
+        : conv.rows[0].participant_1_id;
+
+      // Insert message
+      const result = await db.query(
+        `INSERT INTO messages (conversation_id, sender_id, content, message_type)
+         VALUES ($1, $2, $3, $4) RETURNING *`,
+        [id, userId, content, messageType]
+      );
+
+      // Update conversation's last message
+      await db.query(
+        `UPDATE conversations SET last_message_text = $1, last_message_at = NOW() WHERE id = $2`,
+        [content.substring(0, 100), id]
+      );
+
+      // Create notification for recipient
+      const senderName = await db.query('SELECT name FROM users WHERE id = $1', [userId]);
+      const name = senderName.rows[0]?.name || 'Someone';
+      await createNotification(
+        otherUserId,
+        'NEW_MESSAGE',
+        `New message from ${name}`,
+        content.substring(0, 100),
+        id
+      );
+
+      const msg = result.rows[0];
+      res.status(201).json({
+        success: true,
+        data: {
+          id: msg.id,
+          conversationId: msg.conversation_id,
+          senderId: msg.sender_id,
+          content: msg.content,
+          messageType: msg.message_type,
+          isRead: msg.is_read,
+          createdAt: msg.created_at,
+        },
+      });
+    } catch (error) {
+      logger.error('Send message error:', error);
+      res.status(500).json({ success: false, message: 'Failed to send message' });
+    }
+  }
+);
+
+/**
+ * PATCH /api/v1/messages/conversations/:id/read
+ * Mark all messages in conversation as read
+ */
+router.patch('/conversations/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!validateUUID(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+    }
+
+    const result = await db.query(
+      `UPDATE messages SET is_read = TRUE
+       WHERE conversation_id = $1 AND sender_id != $2 AND is_read = FALSE`,
+      [id, req.user.userId]
+    );
+
+    res.json({ success: true, markedCount: result.rowCount });
+  } catch (error) {
+    logger.error('Mark messages read error:', error);
+    res.status(500).json({ success: false, message: 'Failed to mark messages as read' });
+  }
+});
+
+/**
+ * GET /api/v1/messages/unread-count
+ * Get total unread message count for user
+ */
+router.get('/unread-count', async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const result = await db.query(`
+      SELECT COUNT(*) as count
+      FROM messages m
+      JOIN conversations c ON m.conversation_id = c.id
+      WHERE (c.participant_1_id = $1 OR c.participant_2_id = $1)
+        AND m.sender_id != $1
+        AND m.is_read = FALSE
+    `, [userId]);
+
+    res.json({ success: true, count: parseInt(result.rows[0].count) });
+  } catch (error) {
+    logger.error('Get unread count error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get unread count' });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/favorites.js
+========================================
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID } = require('../utils/helpers');
+
+const router = express.Router();
+
+/**
+ * GET /api/v1/favorites
+ * List user's favorited listings (paginated)
+ */
+router.get('/', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const userId = req.user.userId;
+
+    const result = await db.query(`
+      SELECT
+        f.id as favorite_id,
+        f.created_at as favorited_at,
+        l.*,
+        u.name as farmer_name,
+        u.phone_number as farmer_contact
+      FROM favorites f
+      JOIN listings l ON f.listing_id = l.id
+      JOIN users u ON l.farmer_id = u.id
+      WHERE f.user_id = $1 AND l.deleted_at IS NULL
+      ORDER BY f.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [userId, parseInt(limit), offset]);
+
+    const countResult = await db.query(
+      `SELECT COUNT(*) as total FROM favorites f
+       JOIN listings l ON f.listing_id = l.id
+       WHERE f.user_id = $1 AND l.deleted_at IS NULL`,
+      [userId]
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    const favorites = result.rows.map((row) => ({
+      favoriteId: row.favorite_id,
+      favoritedAt: row.favorited_at,
+      listing: {
+        id: row.id,
+        farmerId: row.farmer_id,
+        cropType: row.crop_type,
+        quantity: parseFloat(row.quantity),
+        unit: row.unit,
+        pricePerUnit: parseFloat(row.price_per_unit),
+        quality: row.quality,
+        location: row.location,
+        description: row.description,
+        images: row.images || [],
+        isActive: row.is_active,
+        createdAt: row.created_at,
+        farmerName: row.farmer_name,
+        farmerPhone: row.farmer_contact || '',
+      },
+    }));
+
+    res.json({
+      success: true,
+      favorites,
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+    });
+  } catch (error) {
+    logger.error('Get favorites error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch favorites' });
+  }
+});
+
+/**
+ * POST /api/v1/favorites
+ * Add listing to favorites
+ */
+router.post('/',
+  [body('listingId').isUUID().withMessage('Invalid listing ID')],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+      }
+
+      const { listingId } = req.body;
+      const userId = req.user.userId;
+
+      // Check listing exists
+      const listing = await db.query('SELECT id FROM listings WHERE id = $1 AND deleted_at IS NULL', [listingId]);
+      if (listing.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Listing not found' });
+      }
+
+      const result = await db.query(
+        `INSERT INTO favorites (user_id, listing_id)
+         VALUES ($1, $2)
+         ON CONFLICT (user_id, listing_id) DO NOTHING
+         RETURNING *`,
+        [userId, listingId]
+      );
+
+      res.status(201).json({
+        success: true,
+        data: result.rows[0] ? {
+          id: result.rows[0].id,
+          userId: result.rows[0].user_id,
+          listingId: result.rows[0].listing_id,
+          createdAt: result.rows[0].created_at,
+        } : { message: 'Already favorited' },
+      });
+    } catch (error) {
+      logger.error('Add favorite error:', error);
+      res.status(500).json({ success: false, message: 'Failed to add favorite' });
+    }
+  }
+);
+
+/**
+ * DELETE /api/v1/favorites/:listingId
+ * Remove listing from favorites
+ */
+router.delete('/:listingId', async (req, res) => {
+  try {
+    const { listingId } = req.params;
+    if (!validateUUID(listingId)) {
+      return res.status(400).json({ success: false, message: 'Invalid listing ID' });
+    }
+
+    await db.query(
+      'DELETE FROM favorites WHERE user_id = $1 AND listing_id = $2',
+      [req.user.userId, listingId]
+    );
+
+    res.json({ success: true, message: 'Favorite removed' });
+  } catch (error) {
+    logger.error('Remove favorite error:', error);
+    res.status(500).json({ success: false, message: 'Failed to remove favorite' });
+  }
+});
+
+/**
+ * GET /api/v1/favorites/check/:listingId
+ * Check if listing is favorited
+ */
+router.get('/check/:listingId', async (req, res) => {
+  try {
+    const { listingId } = req.params;
+    if (!validateUUID(listingId)) {
+      return res.status(400).json({ success: false, message: 'Invalid listing ID' });
+    }
+
+    const result = await db.query(
+      'SELECT id FROM favorites WHERE user_id = $1 AND listing_id = $2',
+      [req.user.userId, listingId]
+    );
+
+    res.json({
+      success: true,
+      isFavorited: result.rows.length > 0,
+    });
+  } catch (error) {
+    logger.error('Check favorite error:', error);
+    res.status(500).json({ success: false, message: 'Failed to check favorite' });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/reviews.js
+========================================
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID } = require('../utils/helpers');
+const { createNotification } = require('../utils/notifications');
+
+const router = express.Router();
+
+/**
+ * GET /api/v1/reviews/user/:userId
+ * Get reviews for a user (paginated)
+ */
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { page = 1, limit = 20 } = req.query;
+
+    if (!validateUUID(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const result = await db.query(`
+      SELECT r.*, u.name as reviewer_name
+      FROM reviews r
+      JOIN users u ON r.reviewer_id = u.id
+      WHERE r.reviewee_id = $1
+      ORDER BY r.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [userId, parseInt(limit), offset]);
+
+    const countResult = await db.query(
+      'SELECT COUNT(*) as total FROM reviews WHERE reviewee_id = $1',
+      [userId]
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    const reviews = result.rows.map((row) => ({
+      id: row.id,
+      transactionId: row.transaction_id,
+      reviewerId: row.reviewer_id,
+      reviewerName: row.reviewer_name,
+      revieweeId: row.reviewee_id,
+      rating: row.rating,
+      comment: row.comment,
+      reviewType: row.review_type,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+
+    res.json({
+      success: true,
+      reviews,
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+    });
+  } catch (error) {
+    logger.error('Get reviews error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch reviews' });
+  }
+});
+
+/**
+ * GET /api/v1/reviews/user/:userId/summary
+ * Get average rating + count + distribution
+ */
+router.get('/user/:userId/summary', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!validateUUID(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+
+    const result = await db.query(`
+      SELECT
+        COUNT(*) as total_reviews,
+        COALESCE(AVG(rating), 0) as average_rating,
+        COUNT(*) FILTER (WHERE rating = 1) as rating_1,
+        COUNT(*) FILTER (WHERE rating = 2) as rating_2,
+        COUNT(*) FILTER (WHERE rating = 3) as rating_3,
+        COUNT(*) FILTER (WHERE rating = 4) as rating_4,
+        COUNT(*) FILTER (WHERE rating = 5) as rating_5
+      FROM reviews WHERE reviewee_id = $1
+    `, [userId]);
+
+    const row = result.rows[0];
+    res.json({
+      success: true,
+      data: {
+        totalReviews: parseInt(row.total_reviews),
+        averageRating: parseFloat(parseFloat(row.average_rating).toFixed(1)),
+        distribution: {
+          1: parseInt(row.rating_1),
+          2: parseInt(row.rating_2),
+          3: parseInt(row.rating_3),
+          4: parseInt(row.rating_4),
+          5: parseInt(row.rating_5),
+        },
+      },
+    });
+  } catch (error) {
+    logger.error('Get review summary error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch review summary' });
+  }
+});
+
+/**
+ * POST /api/v1/reviews
+ * Create review (validates transaction exists and is COMPLETED)
+ */
+router.post('/',
+  [
+    body('transactionId').isUUID().withMessage('Invalid transaction ID'),
+    body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be 1-5'),
+    body('comment').optional().isLength({ max: 1000 }).withMessage('Comment too long'),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+      }
+
+      const { transactionId, rating, comment } = req.body;
+      const reviewerId = req.user.userId;
+
+      // Verify transaction exists, is COMPLETED, and reviewer is participant
+      const transaction = await db.query(
+        `SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1`,
+        [transactionId]
+      );
+
+      if (transaction.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Transaction not found' });
+      }
+
+      const tx = transaction.rows[0];
+      if (tx.status !== 'COMPLETED') {
+        return res.status(400).json({ success: false, message: 'Can only review completed transactions' });
+      }
+
+      if (tx.farmer_id !== reviewerId && tx.buyer_id !== reviewerId) {
+        return res.status(403).json({ success: false, message: 'You are not a participant in this transaction' });
+      }
+
+      // Determine review type and reviewee
+      const isBuyer = tx.buyer_id === reviewerId;
+      const reviewType = isBuyer ? 'BUYER_TO_FARMER' : 'FARMER_TO_BUYER';
+      const revieweeId = isBuyer ? tx.farmer_id : tx.buyer_id;
+
+      const result = await db.query(
+        `INSERT INTO reviews (transaction_id, reviewer_id, reviewee_id, rating, comment, review_type)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+        [transactionId, reviewerId, revieweeId, rating, comment, reviewType]
+      );
+
+      // Notify reviewee
+      const reviewerName = await db.query('SELECT name FROM users WHERE id = $1', [reviewerId]);
+      const name = reviewerName.rows[0]?.name || 'Someone';
+      await createNotification(
+        revieweeId,
+        'NEW_REVIEW',
+        `${name} left you a ${rating}-star review`,
+        comment ? comment.substring(0, 100) : '',
+        result.rows[0].id
+      );
+
+      const review = result.rows[0];
+      res.status(201).json({
+        success: true,
+        data: {
+          id: review.id,
+          transactionId: review.transaction_id,
+          reviewerId: review.reviewer_id,
+          revieweeId: review.reviewee_id,
+          rating: review.rating,
+          comment: review.comment,
+          reviewType: review.review_type,
+          createdAt: review.created_at,
+        },
+      });
+    } catch (error) {
+      if (error.code === '23505') { // unique_violation
+        return res.status(409).json({ success: false, message: 'You have already reviewed this transaction' });
+      }
+      logger.error('Create review error:', error);
+      res.status(500).json({ success: false, message: 'Failed to create review' });
+    }
+  }
+);
+
+/**
+ * PUT /api/v1/reviews/:id
+ * Update own review
+ */
+router.put('/:id',
+  [
+    body('rating').optional().isInt({ min: 1, max: 5 }).withMessage('Rating must be 1-5'),
+    body('comment').optional().isLength({ max: 1000 }).withMessage('Comment too long'),
+  ],
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!validateUUID(id)) {
+        return res.status(400).json({ success: false, message: 'Invalid review ID' });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+      }
+
+      const existing = await db.query('SELECT reviewer_id FROM reviews WHERE id = $1', [id]);
+      if (existing.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Review not found' });
+      }
+      if (existing.rows[0].reviewer_id !== req.user.userId) {
+        return res.status(403).json({ success: false, message: 'You can only update your own reviews' });
+      }
+
+      const { rating, comment } = req.body;
+      const updates = [];
+      const params = [id];
+      let idx = 2;
+
+      if (rating !== undefined) {
+        updates.push(`rating = $${idx}`);
+        params.push(rating);
+        idx++;
+      }
+      if (comment !== undefined) {
+        updates.push(`comment = $${idx}`);
+        params.push(comment);
+        idx++;
+      }
+
+      if (updates.length === 0) {
+        return res.status(400).json({ success: false, message: 'Nothing to update' });
+      }
+
+      const result = await db.query(
+        `UPDATE reviews SET ${updates.join(', ')}, updated_at = NOW() WHERE id = $1 RETURNING *`,
+        params
+      );
+
+      const review = result.rows[0];
+      res.json({
+        success: true,
+        data: {
+          id: review.id,
+          transactionId: review.transaction_id,
+          reviewerId: review.reviewer_id,
+          revieweeId: review.reviewee_id,
+          rating: review.rating,
+          comment: review.comment,
+          reviewType: review.review_type,
+          createdAt: review.created_at,
+          updatedAt: review.updated_at,
+        },
+      });
+    } catch (error) {
+      logger.error('Update review error:', error);
+      res.status(500).json({ success: false, message: 'Failed to update review' });
+    }
+  }
+);
+
+/**
+ * DELETE /api/v1/reviews/:id
+ * Delete own review
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!validateUUID(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid review ID' });
+    }
+
+    const existing = await db.query('SELECT reviewer_id FROM reviews WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Review not found' });
+    }
+    if (existing.rows[0].reviewer_id !== req.user.userId) {
+      return res.status(403).json({ success: false, message: 'You can only delete your own reviews' });
+    }
+
+    await db.query('DELETE FROM reviews WHERE id = $1', [id]);
+    res.json({ success: true, message: 'Review deleted' });
+  } catch (error) {
+    logger.error('Delete review error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete review' });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/notifications.js
+========================================
+const express = require('express');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID } = require('../utils/helpers');
+
+const router = express.Router();
+
+/**
+ * GET /api/v1/notifications
+ * List user's notifications (paginated, newest first)
+ */
+router.get('/', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const userId = req.user.userId;
+
+    const result = await db.query(`
+      SELECT * FROM notifications
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [userId, parseInt(limit), offset]);
+
+    const countResult = await db.query(
+      'SELECT COUNT(*) as total FROM notifications WHERE user_id = $1',
+      [userId]
+    );
+    const total = parseInt(countResult.rows[0].total);
+
+    const notifications = result.rows.map((row) => ({
+      id: row.id,
+      userId: row.user_id,
+      type: row.type,
+      title: row.title,
+      message: row.message,
+      relatedId: row.related_id,
+      isRead: row.is_read,
+      createdAt: row.created_at,
+    }));
+
+    res.json({
+      success: true,
+      notifications,
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+      hasNext: parseInt(page) < Math.ceil(total / parseInt(limit)),
+      hasPrevious: parseInt(page) > 1,
+    });
+  } catch (error) {
+    logger.error('Get notifications error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch notifications' });
+  }
+});
+
+/**
+ * GET /api/v1/notifications/unread-count
+ * Get unread notification count
+ */
+router.get('/unread-count', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT COUNT(*) as count FROM notifications WHERE user_id = $1 AND is_read = FALSE',
+      [req.user.userId]
+    );
+
+    res.json({ success: true, count: parseInt(result.rows[0].count) });
+  } catch (error) {
+    logger.error('Get unread count error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get unread count' });
+  }
+});
+
+/**
+ * PATCH /api/v1/notifications/:id/read
+ * Mark single notification as read
+ */
+router.patch('/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!validateUUID(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid notification ID' });
+    }
+
+    const result = await db.query(
+      'UPDATE notifications SET is_read = TRUE WHERE id = $1 AND user_id = $2 RETURNING id',
+      [id, req.user.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Mark notification read error:', error);
+    res.status(500).json({ success: false, message: 'Failed to mark notification as read' });
+  }
+});
+
+/**
+ * PATCH /api/v1/notifications/read-all
+ * Mark all notifications as read
+ */
+router.patch('/read-all', async (req, res) => {
+  try {
+    const result = await db.query(
+      'UPDATE notifications SET is_read = TRUE WHERE user_id = $1 AND is_read = FALSE',
+      [req.user.userId]
+    );
+
+    res.json({ success: true, markedCount: result.rowCount });
+  } catch (error) {
+    logger.error('Mark all read error:', error);
+    res.status(500).json({ success: false, message: 'Failed to mark all as read' });
+  }
+});
+
+/**
+ * DELETE /api/v1/notifications/:id
+ * Delete notification
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!validateUUID(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid notification ID' });
+    }
+
+    const result = await db.query(
+      'DELETE FROM notifications WHERE id = $1 AND user_id = $2 RETURNING id',
+      [id, req.user.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+
+    res.json({ success: true, message: 'Notification deleted' });
+  } catch (error) {
+    logger.error('Delete notification error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete notification' });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/users.js
+========================================
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID, sanitizeString } = require('../utils/helpers');
+
+const router = express.Router();
+
+/**
+ * GET /api/v1/users/profile
+ * Get current user profile
+ */
+router.get('/profile', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, phone_number, name, user_type, location, verified, created_at, updated_at FROM users WHERE id = $1',
+      [req.user.userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const user = result.rows[0];
+
+    res.json({
+      success: true,
+      data: {
+        id: user.id,
+        phoneNumber: user.phone_number,
+        name: user.name,
+        userType: user.user_type,
+        location: user.location,
+        verified: user.verified,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Get user profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user profile',
+    });
+  }
+});
+
+/**
+ * PUT /api/v1/users/profile
+ * Update current user profile
+ */
+router.put('/profile', [
+  body('name').optional().isLength({ min: 1, max: 255 }).withMessage('Name must be 1-255 characters'),
+  body('location').optional().isLength({ min: 1, max: 255 }).withMessage('Location must be 1-255 characters'),
+  body('userType').optional().isIn(['FARMER', 'BUYER']).withMessage('User type must be FARMER or BUYER'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array(),
+      });
+    }
+
+    const { name, location, userType } = req.body;
+
+    // Build dynamic update query
+    const updateFields = [];
+    const updateValues = [req.user.userId];
+    let paramIndex = 2;
+
+    if (name !== undefined) {
+      updateFields.push(`name = $${paramIndex}`);
+      updateValues.push(sanitizeString(name));
+      paramIndex++;
+    }
+
+    if (location !== undefined) {
+      updateFields.push(`location = $${paramIndex}`);
+      updateValues.push(sanitizeString(location));
+      paramIndex++;
+    }
+
+    if (userType !== undefined) {
+      updateFields.push(`user_type = $${paramIndex}`);
+      updateValues.push(userType);
+      paramIndex++;
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No fields to update',
+      });
+    }
+
+    updateFields.push('updated_at = NOW()');
+
+    const query = `
+      UPDATE users SET ${updateFields.join(', ')}
+      WHERE id = $1
+      RETURNING id, phone_number, name, user_type, location, verified, created_at, updated_at
+    `;
+
+    const result = await db.query(query, updateValues);
+    const user = result.rows[0];
+
+    logger.info('User profile updated', { userId: req.user.userId });
+
+    res.json({
+      success: true,
+      data: {
+        id: user.id,
+        phoneNumber: user.phone_number,
+        name: user.name,
+        userType: user.user_type,
+        location: user.location,
+        verified: user.verified,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Update user profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update user profile',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/users/:id
+ * Get public user profile (limited info)
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID',
+      });
+    }
+
+    const result = await db.query(
+      'SELECT id, name, user_type, location, created_at FROM users WHERE id = $1 AND is_active = true',
+      [id],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const user = result.rows[0];
+
+    res.json({
+      success: true,
+      data: {
+        id: user.id,
+        name: user.name,
+        userType: user.user_type,
+        location: user.location,
+        memberSince: user.created_at,
+      },
+    });
+  } catch (error) {
+    logger.error('Get user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/users/stats/dashboard
+ * Get user dashboard statistics
+ */
+router.get('/stats/dashboard', async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const userType = req.user.userType;
+
+    let stats = {};
+
+    if (userType === 'FARMER') {
+      // Farmer statistics
+      const listingsResult = await db.query(`
+        SELECT 
+          COUNT(*) as total_listings,
+          COUNT(*) FILTER (WHERE is_active = true) as active_listings,
+          COUNT(*) FILTER (WHERE available_until >= CURRENT_DATE) as available_listings
+        FROM listings 
+        WHERE farmer_id = $1
+      `, [userId]);
+
+      const transactionsResult = await db.query(`
+        SELECT 
+          COUNT(*) as total_transactions,
+          COUNT(*) FILTER (WHERE status = 'PENDING') as pending_transactions,
+          COUNT(*) FILTER (WHERE status = 'COMPLETED') as completed_transactions,
+          COALESCE(SUM(total_amount) FILTER (WHERE status = 'COMPLETED'), 0) as total_earnings
+        FROM transactions 
+        WHERE farmer_id = $1
+      `, [userId]);
+
+      stats = {
+        listings: listingsResult.rows[0],
+        transactions: transactionsResult.rows[0],
+      };
+    } else {
+      // Buyer statistics
+      const transactionsResult = await db.query(`
+        SELECT 
+          COUNT(*) as total_purchases,
+          COUNT(*) FILTER (WHERE status = 'PENDING') as pending_purchases,
+          COUNT(*) FILTER (WHERE status = 'COMPLETED') as completed_purchases,
+          COALESCE(SUM(total_amount) FILTER (WHERE status = 'COMPLETED'), 0) as total_spent
+        FROM transactions 
+        WHERE buyer_id = $1
+      `, [userId]);
+
+      stats = {
+        purchases: transactionsResult.rows[0],
+      };
+    }
+
+    res.json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    logger.error('Get user stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user statistics',
+    });
+  }
+});
+
+/**
+ * DELETE /api/v1/users/account
+ * Deactivate user account
+ */
+router.delete('/account', async (req, res) => {
+  try {
+    // Soft delete by setting is_active to false
+    await db.query(
+      'UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1',
+      [req.user.userId],
+    );
+
+    // Also deactivate user's listings
+    await db.query(
+      'UPDATE listings SET is_active = false, updated_at = NOW() WHERE farmer_id = $1',
+      [req.user.userId],
+    );
+
+    logger.info('User account deactivated', { userId: req.user.userId });
+
+    res.json({
+      success: true,
+      message: 'Account deactivated successfully',
+    });
+  } catch (error) {
+    logger.error('Deactivate account error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to deactivate account',
+    });
+  }
+});
+
+module.exports = router;
+
+
+
+========================================
+FILE: backend/src/routes/sync.js
+========================================
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const db = require('../database/connection');
+const logger = require('../utils/logger');
+const { validateUUID } = require('../utils/helpers');
+
+const router = express.Router();
+
+/**
+ * POST /api/v1/sync/operations
+ * Process batch of local operations from client
+ * Matches Android SyncApiService.syncOperations()
+ */
+router.post('/operations', async (req, res) => {
+  try {
+    const { operations, lastSyncAt } = req.body;
+
+    if (!Array.isArray(operations)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Operations must be an array',
+      });
+    }
+
+    const results = {
+      appliedOps: [],
+      conflicts: [],
+      errors: [],
+    };
+
+    // Process each operation in a transaction
+    for (const op of operations) {
+      try {
+        await db.transaction(async (client) => {
+          const result = await processOperation(client, op, req.user.userId);
+
+          if (result.success) {
+            results.appliedOps.push(op.opId);
+
+            // Store the operation in local_ops table for tracking
+            await client.query(`
+              INSERT INTO local_ops (
+                op_id, user_id, type, payload, client_ts, 
+                synced, client_id, entity_id
+              ) VALUES ($1, $2, $3, $4, $5, true, $6, $7)
+              ON CONFLICT (op_id) DO UPDATE SET
+                synced = true,
+                server_ts = NOW()
+            `, [
+              op.opId,
+              req.user.userId,
+              op.type,
+              JSON.stringify(op.payload),
+              op.clientTs,
+              op.clientId,
+              result.entityId,
+            ]);
+          } else if (result.conflict) {
+            results.conflicts.push({
+              opId: op.opId,
+              reason: result.reason,
+              serverObject: result.serverObject,
+            });
+          } else {
+            results.errors.push({
+              opId: op.opId,
+              error: result.error,
+            });
+          }
+        });
+      } catch (error) {
+        logger.error('Operation processing error:', { opId: op.opId, error });
+        results.errors.push({
+          opId: op.opId,
+          error: error.message,
+        });
+      }
+    }
+
+    // Get updated data since last sync
+    const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId);
+
+    logger.info('Sync operations processed', {
+      userId: req.user.userId,
+      totalOps: operations.length,
+      applied: results.appliedOps.length,
+      conflicts: results.conflicts.length,
+      errors: results.errors.length,
+    });
+
+    res.json({
+      success: true,
+      appliedOps: results.appliedOps,
+      conflicts: results.conflicts,
+      errors: results.errors,
+      serverData: updatedData,
+      serverTimestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error('Sync operations error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sync failed',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/sync/data
+ * Get updated data since last sync timestamp
+ */
+router.get('/data', async (req, res) => {
+  try {
+    const {
+      lastSyncAt,
+      listingPage,
+      listingLimit,
+      transactionPage,
+      transactionLimit,
+    } = req.query;
+
+    const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId, {
+      listingPage: parseInt(listingPage) || 1,
+      listingLimit: parseInt(listingLimit) || 50,
+      transactionPage: parseInt(transactionPage) || 1,
+      transactionLimit: parseInt(transactionLimit) || 50,
+    });
+
+    res.json({
+      success: true,
+      data: updatedData,
+      serverTimestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error('Get sync data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get sync data',
+    });
+  }
+});
+
+/**
+ * Process individual operation based on type
+ */
+async function processOperation(client, operation, userId) {
+  const {
+    type, payload, opId, clientId,
+  } = operation;
+
+  try {
+    switch (type) {
+      case 'CREATE_LISTING':
+        return await processCreateListing(client, payload, userId, clientId);
+
+      case 'UPDATE_LISTING':
+        return await processUpdateListing(client, payload, userId);
+
+      case 'DELETE_LISTING':
+        return await processDeleteListing(client, payload, userId);
+
+      case 'CREATE_TRANSACTION':
+        return await processCreateTransaction(client, payload, userId, clientId);
+
+      case 'UPDATE_TRANSACTION':
+        return await processUpdateTransaction(client, payload, userId);
+
+      case 'UPDATE_USER':
+        return await processUpdateUser(client, payload, userId);
+
+      default:
+        return {
+          success: false,
+          error: `Unknown operation type: ${type}`,
+        };
+    }
+  } catch (error) {
+    logger.error('Operation processing error:', { type, opId, error });
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Process CREATE_LISTING operation
+ */
+async function processCreateListing(client, payload, userId, clientId) {
+  // Check if listing already exists (conflict resolution)
+  if (clientId) {
+    const existing = await client.query(
+      'SELECT id FROM listings WHERE client_id = $1',
+      [clientId],
+    );
+
+    if (existing.rows.length > 0) {
+      return {
+        success: true,
+        entityId: existing.rows[0].id,
+      };
+    }
+  }
+
+  // Validate user is a farmer
+  const user = await client.query(
+    'SELECT user_type FROM users WHERE id = $1',
+    [userId],
+  );
+
+  if (user.rows.length === 0 || user.rows[0].user_type !== 'FARMER') {
+    return {
+      success: false,
+      error: 'Only farmers can create listings',
+    };
+  }
+
+  // Create listing
+  const result = await client.query(`
+    INSERT INTO listings (
+      farmer_id, crop_type, quantity, unit, price_per_unit,
+      quality, location, pickup_locations, available_from,
+      available_until, description, images, client_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+    RETURNING id
+  `, [
+    userId,
+    payload.cropType,
+    payload.quantity,
+    payload.unit,
+    payload.pricePerUnit,
+    payload.quality,
+    payload.location,
+    payload.pickupLocations || [],
+    payload.availableFrom,
+    payload.availableUntil,
+    payload.description,
+    payload.images || [],
+    clientId,
+  ]);
+
+  return {
+    success: true,
+    entityId: result.rows[0].id,
+  };
+}
+
+/**
+ * Process UPDATE_LISTING operation
+ */
+async function processUpdateListing(client, payload, userId) {
+  const { listingId, ...updateData } = payload;
+
+  // Check if listing exists and belongs to user
+  const existing = await client.query(
+    'SELECT farmer_id, updated_at FROM listings WHERE id = $1',
+    [listingId],
+  );
+
+  if (existing.rows.length === 0) {
+    return {
+      success: false,
+      error: 'Listing not found',
+    };
+  }
+
+  if (existing.rows[0].farmer_id !== userId) {
+    return {
+      success: false,
+      error: 'You can only update your own listings',
+    };
+  }
+
+  // Check for conflicts (server version newer than client)
+  if (payload.lastUpdated && existing.rows[0].updated_at > new Date(payload.lastUpdated)) {
+    const serverListing = await client.query(
+      'SELECT * FROM listings WHERE id = $1',
+      [listingId],
+    );
+
+    return {
+      success: false,
+      conflict: true,
+      reason: 'Server version is newer',
+      serverObject: JSON.stringify(serverListing.rows[0]),
+    };
+  }
+
+  // Update listing
+  await client.query(`
+    UPDATE listings SET
+      crop_type = COALESCE($2, crop_type),
+      quantity = COALESCE($3, quantity),
+      unit = COALESCE($4, unit),
+      price_per_unit = COALESCE($5, price_per_unit),
+      quality = COALESCE($6, quality),
+      location = COALESCE($7, location),
+      pickup_locations = COALESCE($8, pickup_locations),
+      available_from = COALESCE($9, available_from),
+      available_until = COALESCE($10, available_until),
+      description = COALESCE($11, description),
+      images = COALESCE($12, images),
+      updated_at = NOW()
+    WHERE id = $1
+  `, [
+    listingId,
+    updateData.cropType,
+    updateData.quantity,
+    updateData.unit,
+    updateData.pricePerUnit,
+    updateData.quality,
+    updateData.location,
+    updateData.pickupLocations,
+    updateData.availableFrom,
+    updateData.availableUntil,
+    updateData.description,
+    updateData.images,
+  ]);
+
+  return {
+    success: true,
+    entityId: listingId,
+  };
+}
+
+/**
+ * Process DELETE_LISTING operation
+ */
+async function processDeleteListing(client, payload, userId) {
+  const { listingId } = payload;
+
+  // Check if listing exists and belongs to user
+  const existing = await client.query(
+    'SELECT farmer_id FROM listings WHERE id = $1',
+    [listingId],
+  );
+
+  if (existing.rows.length === 0) {
+    return {
+      success: false,
+      error: 'Listing not found',
+    };
+  }
+
+  if (existing.rows[0].farmer_id !== userId) {
+    return {
+      success: false,
+      error: 'You can only delete your own listings',
+    };
+  }
+
+  // Soft delete
+  await client.query(
+    'UPDATE listings SET is_active = false, updated_at = NOW() WHERE id = $1',
+    [listingId],
+  );
+
+  return {
+    success: true,
+    entityId: listingId,
+  };
+}
+
+/**
+ * Process CREATE_TRANSACTION operation
+ */
+async function processCreateTransaction(client, payload, userId, clientId) {
+  // Check if transaction already exists
+  if (clientId) {
+    const existing = await client.query(
+      'SELECT id FROM transactions WHERE client_id = $1',
+      [clientId],
+    );
+
+    if (existing.rows.length > 0) {
+      return {
+        success: true,
+        entityId: existing.rows[0].id,
+      };
+    }
+  }
+
+  // Validate listing exists and is available with locking
+  const listing = await client.query(
+    'SELECT farmer_id, quantity, is_active FROM listings WHERE id = $1 FOR UPDATE',
+    [payload.listingId],
+  );
+
+  if (listing.rows.length === 0 || !listing.rows[0].is_active) {
+    return {
+      success: false,
+      error: 'Listing not found or not available',
+    };
+  }
+
+  // Check quantity availability
+  if (payload.quantity > listing.rows[0].quantity) {
+    return {
+      success: false,
+      error: 'Requested quantity exceeds available quantity',
+    };
+  }
+
+  // Create transaction
+  const result = await client.query(`
+    INSERT INTO transactions (
+      listing_id, farmer_id, buyer_id, quantity, total_amount,
+      pickup_location, pickup_date, buyer_contact, notes, client_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    RETURNING id
+  `, [
+    payload.listingId,
+    listing.rows[0].farmer_id,
+    userId,
+    payload.quantity,
+    payload.totalAmount,
+    payload.pickupLocation,
+    payload.pickupDate,
+    payload.buyerContact,
+    payload.notes,
+    clientId,
+  ]);
+
+  return {
+    success: true,
+    entityId: result.rows[0].id,
+  };
+}
+
+/**
+ * Process UPDATE_TRANSACTION operation
+ */
+async function processUpdateTransaction(client, payload, userId) {
+  const { transactionId, status, notes } = payload;
+
+  // Check if transaction exists and user has permission
+  const existing = await client.query(
+    'SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1',
+    [transactionId],
+  );
+
+  if (existing.rows.length === 0) {
+    return {
+      success: false,
+      error: 'Transaction not found',
+    };
+  }
+
+  const transaction = existing.rows[0];
+  const isFarmer = transaction.farmer_id === userId;
+  const isBuyer = transaction.buyer_id === userId;
+
+  if (!isFarmer && !isBuyer) {
+    return {
+      success: false,
+      error: 'You can only update your own transactions',
+    };
+  }
+
+  // Validate status transition
+  const validTransitions = {
+    PENDING: ['CONFIRMED', 'CANCELLED'],
+    CONFIRMED: ['IN_PROGRESS', 'CANCELLED'],
+    IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+    COMPLETED: [],
+    CANCELLED: [],
+  };
+
+  if (status && !validTransitions[transaction.status].includes(status)) {
+    return {
+      success: false,
+      error: `Invalid status transition from ${transaction.status} to ${status}`,
+    };
+  }
+
+  // Update transaction
+  const updateFields = [];
+  const updateValues = [transactionId];
+  let paramIndex = 2;
+
+  if (status) {
+    updateFields.push(`status = $${paramIndex}`);
+    updateValues.push(status);
+    paramIndex++;
+
+    if (status === 'COMPLETED') {
+      updateFields.push('completed_at = NOW()');
+    } else if (status === 'CANCELLED') {
+      updateFields.push('cancelled_at = NOW()');
+      if (notes) {
+        updateFields.push(`cancellation_reason = $${paramIndex}`);
+        updateValues.push(notes);
+        paramIndex++;
+      }
+    }
+  }
+
+  if (notes && status !== 'CANCELLED') {
+    updateFields.push(`notes = $${paramIndex}`);
+    updateValues.push(notes);
+    paramIndex++;
+  }
+
+  updateFields.push('updated_at = NOW()');
+
+  await client.query(`
+    UPDATE transactions SET ${updateFields.join(', ')}
+    WHERE id = $1
+  `, updateValues);
+
+  return {
+    success: true,
+    entityId: transactionId,
+  };
+}
+
+/**
+ * Process UPDATE_USER operation
+ */
+async function processUpdateUser(client, payload, userId) {
+  const { name, location, userType } = payload;
+
+  const updateFields = [];
+  const updateValues = [userId];
+  let paramIndex = 2;
+
+  if (name) {
+    updateFields.push(`name = $${paramIndex}`);
+    updateValues.push(name);
+    paramIndex++;
+  }
+
+  if (location) {
+    updateFields.push(`location = $${paramIndex}`);
+    updateValues.push(location);
+    paramIndex++;
+  }
+
+  if (userType) {
+    updateFields.push(`user_type = $${paramIndex}`);
+    updateValues.push(userType);
+    paramIndex++;
+  }
+
+  updateFields.push('updated_at = NOW()');
+
+  await client.query(`
+    UPDATE users SET ${updateFields.join(', ')}
+    WHERE id = $1
+  `, updateValues);
+
+  return {
+    success: true,
+    entityId: userId,
+  };
+}
+
+/**
+ * Get updated data since last sync timestamp with pagination
+ */
+async function getUpdatedDataSince(lastSyncAt, userId, options = {}) {
+  const {
+    listingPage = 1,
+    listingLimit = 50,
+    transactionPage = 1,
+    transactionLimit = 50,
+  } = options;
+
+  const data = {
+    users: [],
+    listings: { data: [], total: 0 },
+    transactions: { data: [], total: 0 },
+  };
+
+  const syncTimestamp = lastSyncAt ? new Date(lastSyncAt) : new Date(0);
+
+  // 1. Get updated users (only current user - no pagination needed for 1 record)
+  const users = await db.query(
+    'SELECT * FROM users WHERE id = $1 AND updated_at > $2',
+    [userId, syncTimestamp],
+  );
+  data.users = users.rows;
+
+  // 2. Get updated listings (paginated)
+  const listingOffset = (listingPage - 1) * listingLimit;
+  const listingsResult = await db.query(`
+    SELECT l.*, u.name as farmer_name 
+    FROM listings l
+    JOIN users u ON l.farmer_id = u.id
+    WHERE (l.farmer_id = $1 OR l.is_active = true) 
+    AND l.updated_at > $2
+    ORDER BY l.updated_at DESC
+    LIMIT $3 OFFSET $4
+  `, [userId, syncTimestamp, listingLimit, listingOffset]);
+
+  const listingsCount = await db.query(`
+    SELECT COUNT(*) as total FROM listings 
+    WHERE (farmer_id = $1 OR is_active = true) AND updated_at > $2
+  `, [userId, syncTimestamp]);
+
+  data.listings = {
+    data: listingsResult.rows,
+    total: parseInt(listingsCount.rows[0].total),
+    page: parseInt(listingPage),
+    limit: parseInt(listingLimit),
+  };
+
+  // 3. Get updated transactions (paginated)
+  const transactionOffset = (transactionPage - 1) * transactionLimit;
+  const transactionsResult = await db.query(`
+    SELECT * FROM transactions 
+    WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2
+    ORDER BY updated_at DESC
+    LIMIT $3 OFFSET $4
+  `, [userId, syncTimestamp, transactionLimit, transactionOffset]);
+
+  const transactionsCount = await db.query(`
+    SELECT COUNT(*) as total FROM transactions 
+    WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2
+  `, [userId, syncTimestamp]);
+
+  data.transactions = {
+    data: transactionsResult.rows,
+    total: parseInt(transactionsCount.rows[0].total),
+    page: parseInt(transactionPage),
+    limit: parseInt(transactionLimit),
+  };
+
+  return data;
+}
+
+module.exports = router;
+
+
+

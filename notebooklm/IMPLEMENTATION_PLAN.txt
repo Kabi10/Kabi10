@@ -1,0 +1,363 @@
+# SL Agrimarket — Full Integration & Play Store Ship Plan
+
+## Context
+
+Audit revealed that while builds pass and core commerce flows (listings, transactions) have backend integration, **5 features are UI shells with no backend**:
+- Chat/Messaging (Room-only, no backend endpoints exist)
+- Favorites (Room-only)
+- Reviews (Room-only)
+- Notifications (Room-only, no FCM)
+- Profile editing (local-only, backend endpoint exists but app never calls it)
+
+Additionally, there are **critical backend security issues** (SQL injection, insecure OTP generation, mock SMS) that must be fixed before shipping.
+
+This plan covers: backend fixes → new backend endpoints → Android wiring → real-time chat → Play Store prep.
+
+---
+
+## PHASE 1: Backend Security Fixes (Critical)
+
+### 1A. Fix SQL injection in listings route
+**File:** `backend/src/routes/listings.js` (~line 146)
+- `sortBy` parameter is interpolated directly into SQL: `ORDER BY l.${sortBy}`
+- Fix: whitelist allowed sort columns (`created_at`, `price_per_unit`, `quantity`, `updated_at`, `view_count`)
+- Default to `created_at` if invalid value
+
+### 1B. Fix insecure OTP generation
+**File:** `backend/src/utils/helpers.js` (~line 8)
+- Replace `Math.random()` with `crypto.randomInt(100000, 999999)`
+- Import `crypto` from Node.js built-in
+
+### 1C. Uncomment DB health check
+**File:** `backend/src/server.js` (~lines 191-193)
+- Uncomment `await database.query('SELECT NOW()')`
+- Add try/catch with graceful fallback (log warning but don't crash — for Vercel cold starts)
+
+### 1D. Configure Twilio SMS
+**File:** `backend/.env` (production env vars on Vercel)
+- Set `SMS_MODE=twilio`
+- Set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
+- The Twilio implementation already exists in `backend/src/services/smsService.js`
+- User provides Twilio credentials; we configure the env vars on Vercel
+
+### 1E. Fix Supabase silent fallback
+**File:** `backend/src/config/supabase.js` (~lines 14-15)
+- In production (`NODE_ENV=production`), throw error instead of falling back to `https://example.supabase.co`
+
+---
+
+## PHASE 2: Database Schema Updates
+
+**File:** `backend/src/database/schema.sql` — add new tables:
+
+### 2A. `conversations` table
+```sql
+- id UUID PK
+- participant_1_id UUID FK -> users(id)
+- participant_2_id UUID FK -> users(id)
+- listing_id UUID FK -> listings(id) (nullable, context for conversation)
+- last_message_text TEXT
+- last_message_at TIMESTAMPTZ
+- created_at, updated_at TIMESTAMPTZ
+- UNIQUE(participant_1_id, participant_2_id) with ordered check
+```
+
+### 2B. `messages` table
+```sql
+- id UUID PK
+- conversation_id UUID FK -> conversations(id)
+- sender_id UUID FK -> users(id)
+- content TEXT NOT NULL
+- message_type VARCHAR(20) DEFAULT 'TEXT'
+- is_read BOOLEAN DEFAULT FALSE
+- created_at TIMESTAMPTZ
+```
+
+### 2C. `favorites` table
+```sql
+- id UUID PK
+- user_id UUID FK -> users(id)
+- listing_id UUID FK -> listings(id)
+- created_at TIMESTAMPTZ
+- UNIQUE(user_id, listing_id)
+```
+
+### 2D. `reviews` table
+```sql
+- id UUID PK
+- transaction_id UUID FK -> transactions(id)
+- reviewer_id UUID FK -> users(id)
+- reviewee_id UUID FK -> users(id)
+- rating INTEGER CHECK 1-5
+- comment TEXT
+- review_type VARCHAR(20) CHECK IN ('BUYER_TO_FARMER', 'FARMER_TO_BUYER')
+- created_at, updated_at TIMESTAMPTZ
+- UNIQUE(transaction_id, reviewer_id)
+```
+
+### 2E. `notifications` table
+```sql
+- id UUID PK
+- user_id UUID FK -> users(id)
+- type VARCHAR(50) NOT NULL
+- title VARCHAR(255) NOT NULL
+- message TEXT
+- related_id UUID (nullable, polymorphic ref to listing/transaction/message)
+- is_read BOOLEAN DEFAULT FALSE
+- created_at TIMESTAMPTZ
+```
+
+### 2F. `market_prices` table (currently missing from schema but queried by route)
+```sql
+- id UUID PK
+- crop_type VARCHAR(100)
+- crop_name_tamil, crop_name_english, crop_name_sinhala VARCHAR(255)
+- current_price, previous_price DECIMAL(10,2)
+- unit VARCHAR(20)
+- trend VARCHAR(20)
+- change_percentage, change_amount DECIMAL(10,2)
+- location, location_tamil, location_sinhala VARCHAR(255)
+- last_updated TIMESTAMPTZ
+- is_active BOOLEAN DEFAULT TRUE
+- source VARCHAR(50) DEFAULT 'MARKET'
+- reliability DECIMAL(3,2) DEFAULT 0.80
+```
+
+---
+
+## PHASE 3: New Backend Routes
+
+Follow existing patterns: `db.query()` via `connection.js`, express-validator, camelCase responses, standard pagination.
+
+### 3A. Messages routes — `backend/src/routes/messages.js`
+Mount: `apiRouter.use('/messages', authenticateToken, messagesRoutes)`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/conversations` | List user's conversations (paginated, ordered by last_message_at) |
+| GET | `/conversations/:id` | Get conversation detail with participant info |
+| POST | `/conversations` | Create or get existing conversation (by participant pair + optional listing) |
+| GET | `/conversations/:id/messages` | Get messages in conversation (paginated, ordered by created_at desc) |
+| POST | `/conversations/:id/messages` | Send a message (creates notification for recipient) |
+| PATCH | `/conversations/:id/read` | Mark all messages in conversation as read |
+| GET | `/unread-count` | Get total unread message count for user |
+
+### 3B. Favorites routes — `backend/src/routes/favorites.js`
+Mount: `apiRouter.use('/favorites', authenticateToken, favoritesRoutes)`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/` | List user's favorites (paginated, JOINed with listings) |
+| POST | `/` | Add listing to favorites (body: { listingId }) |
+| DELETE | `/:listingId` | Remove listing from favorites |
+| GET | `/check/:listingId` | Check if listing is favorited |
+
+### 3C. Reviews routes — `backend/src/routes/reviews.js`
+Mount: `apiRouter.use('/reviews', authenticateToken, reviewsRoutes)`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/user/:userId` | Get reviews for a user (paginated) |
+| GET | `/user/:userId/summary` | Get average rating + count + distribution |
+| POST | `/` | Create review (validates transaction exists and is COMPLETED, reviewer is participant) |
+| PUT | `/:id` | Update own review |
+| DELETE | `/:id` | Delete own review |
+
+### 3D. Notifications routes — `backend/src/routes/notifications.js`
+Mount: `apiRouter.use('/notifications', authenticateToken, notificationsRoutes)`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/` | List user's notifications (paginated, newest first) |
+| GET | `/unread-count` | Get unread count |
+| PATCH | `/:id/read` | Mark as read |
+| PATCH | `/read-all` | Mark all as read |
+| DELETE | `/:id` | Delete notification |
+
+### 3E. Helper: Notification creation utility
+**File:** `backend/src/utils/notifications.js`
+- `createNotification(userId, type, title, message, relatedId)` — inserts into notifications table
+- Called from: messages route (new message), transactions route (status change), reviews route (new review)
+
+---
+
+## PHASE 4: Android — New API Services & Repository Wiring
+
+### 4A. Create `MessageApiService.kt`
+**File:** `app/src/main/java/.../data/api/MessageApiService.kt`
+- Retrofit interface matching Phase 3A endpoints
+- Register in `NetworkModule.kt`
+
+### 4B. Create `FavoriteApiService.kt`
+**File:** `app/src/main/java/.../data/api/FavoriteApiService.kt`
+- Retrofit interface matching Phase 3B endpoints
+- Register in `NetworkModule.kt`
+
+### 4C. Create `ReviewApiService.kt`
+**File:** `app/src/main/java/.../data/api/ReviewApiService.kt`
+- Retrofit interface matching Phase 3C endpoints
+- Register in `NetworkModule.kt`
+
+### 4D. Create `NotificationApiService.kt`
+**File:** `app/src/main/java/.../data/api/NotificationApiService.kt`
+- Retrofit interface matching Phase 3D endpoints
+- Register in `NetworkModule.kt`
+
+### 4E. Create `UserApiService.kt`
+**File:** `app/src/main/java/.../data/api/UserApiService.kt`
+- `PUT /v1/users/profile` — update profile
+- `GET /v1/users/profile` — get own profile
+- Register in `NetworkModule.kt`
+
+### 4F. Wire `FavoriteRepository` to API
+**File:** `app/src/main/java/.../data/repository/FavoriteRepository.kt`
+- Inject `FavoriteApiService`
+- `toggleFavorite()` → API call + local Room update
+- `getFavoriteListingsForUser()` → fetch from API, cache in Room, return Flow
+- Pattern: match existing `ListingRepository` offline-first approach
+
+### 4G. Wire `MessageRepository` to API
+**File:** `app/src/main/java/.../data/repository/MessageRepository.kt`
+- Inject `MessageApiService`
+- `sendMessage()` → POST to API + insert locally
+- `getConversationsForUser()` → fetch from API, cache in Room
+- `getMessagesForConversation()` → fetch from API, cache in Room
+- `markMessagesAsRead()` → PATCH API + local update
+
+### 4H. Wire `ReviewRepository` to API
+**File:** `app/src/main/java/.../data/repository/ReviewRepository.kt`
+- Inject `ReviewApiService`
+- `createReview()` → POST to API + insert locally
+- `getReviewsForUser()` → fetch from API, cache in Room
+
+### 4I. Wire `NotificationRepository` to API
+**File:** `app/src/main/java/.../data/repository/NotificationRepository.kt`
+- Inject `NotificationApiService`
+- `getNotificationsByUser()` → fetch from API, cache in Room
+- `markAsRead()` → PATCH API + local update
+- `getUnreadCount()` → API call
+
+### 4J. Wire `AuthRepository.updateUserProfile()` to API
+**File:** `app/src/main/java/.../data/repository/AuthRepository.kt`
+- Inject `UserApiService`
+- `updateUserProfile()` → PUT to API + update local Room/DataStore
+- Also persist `location` field (currently silently dropped)
+
+---
+
+## PHASE 5: Real-Time Chat
+
+Since Vercel serverless doesn't support WebSockets, use **Supabase Realtime** for message subscriptions. The Supabase infrastructure already exists.
+
+### 5A. Add Supabase Kotlin SDK dependency
+**File:** `app/build.gradle.kts` + `libs.versions.toml`
+- Add `io.github.jan-tennert.supabase:realtime-kt` and `io.github.jan-tennert.supabase:postgrest-kt`
+- Add Ktor client engine for Android
+
+### 5B. Create `SupabaseModule.kt` in Hilt DI
+**File:** `app/src/main/java/.../di/SupabaseModule.kt`
+- Provide Supabase client configured with project URL and anon key
+- Enable Realtime plugin
+
+### 5C. Create `ChatRealtimeService.kt`
+**File:** `app/src/main/java/.../data/sync/ChatRealtimeService.kt`
+- Subscribe to `postgres_changes` on `messages` table filtered by conversation_id
+- Emit new messages as Flow to the ChatViewModel
+- Handle connection lifecycle (connect on chat screen open, disconnect on leave)
+
+### 5D. Update `ChatViewModel` to use real-time
+**File:** `app/src/main/java/.../ui/chat/ChatViewModel.kt`
+- On screen open: load history from API, then subscribe to real-time
+- On new message received: insert into Room + update UI
+- On send: POST to backend API (which inserts into DB, triggering Supabase Realtime)
+
+---
+
+## PHASE 6: Play Store Preparation (from original plan)
+
+### 6A. Configure release signing in `app/build.gradle.kts`
+### 6B. Remove `usesCleartextTraffic="true"` from AndroidManifest.xml
+### 6C. Create `web/privacy.html` and `web/terms.html`
+### 6D. Update footer links in `web/index.html`
+### 6E. Create `store-listing.md` with trilingual content
+### 6F. Build signed AAB with `./gradlew bundleRelease`
+
+---
+
+## Files Summary
+
+### Backend — Modified
+| File | Change |
+|------|--------|
+| `backend/src/routes/listings.js` | Fix SQL injection in sortBy |
+| `backend/src/utils/helpers.js` | Fix OTP randomness |
+| `backend/src/server.js` | Uncomment DB check, mount new routes |
+| `backend/src/config/supabase.js` | Fail in production if no credentials |
+| `backend/src/database/schema.sql` | Add 6 new tables |
+
+### Backend — New
+| File | Description |
+|------|-------------|
+| `backend/src/routes/messages.js` | Chat/messaging endpoints |
+| `backend/src/routes/favorites.js` | Favorites CRUD |
+| `backend/src/routes/reviews.js` | Reviews CRUD |
+| `backend/src/routes/notifications.js` | Notifications CRUD |
+| `backend/src/utils/notifications.js` | Notification creation helper |
+
+### Android — Modified
+| File | Change |
+|------|--------|
+| `app/build.gradle.kts` | Add Supabase SDK, signing config |
+| `di/NetworkModule.kt` | Register 4 new API services |
+| `data/repository/FavoriteRepository.kt` | Wire to API |
+| `data/repository/MessageRepository.kt` | Wire to API + real-time |
+| `data/repository/ReviewRepository.kt` | Wire to API |
+| `data/repository/NotificationRepository.kt` | Wire to API |
+| `data/repository/AuthRepository.kt` | Wire profile update to API |
+| `ui/chat/ChatViewModel.kt` | Use real-time subscription |
+| `AndroidManifest.xml` | Remove usesCleartextTraffic |
+
+### Android — New
+| File | Description |
+|------|-------------|
+| `data/api/MessageApiService.kt` | Chat API interface |
+| `data/api/FavoriteApiService.kt` | Favorites API interface |
+| `data/api/ReviewApiService.kt` | Reviews API interface |
+| `data/api/NotificationApiService.kt` | Notifications API interface |
+| `data/api/UserApiService.kt` | User profile API interface |
+| `di/SupabaseModule.kt` | Supabase Hilt module |
+| `data/sync/ChatRealtimeService.kt` | Supabase Realtime wrapper |
+
+### Web — New/Modified
+| File | Change |
+|------|--------|
+| `web/privacy.html` | New privacy policy page |
+| `web/terms.html` | New terms page |
+| `web/index.html` | Update footer links |
+| `store-listing.md` | Play Store listing content |
+
+---
+
+## Verification
+
+1. **Backend**: Deploy to Vercel, hit each new endpoint via curl/Postman
+2. **Security**: Verify sortBy injection is blocked, OTP uses crypto
+3. **Android**: Build passes (`./gradlew assembleRelease`)
+4. **Unit tests**: Existing tests still pass (`./gradlew testDebugUnitTest`)
+5. **Chat**: Two emulator instances can exchange messages in real-time
+6. **Favorites/Reviews/Notifications**: Create via app, verify persisted in DB
+7. **Profile**: Edit profile, verify changes reflected on backend
+8. **AAB**: `./gradlew bundleRelease` produces signed AAB
+
+---
+
+## Execution Order
+
+Phases 1-2 first (backend fixes + schema), then Phase 3 (new routes), then Phase 4 (Android wiring), then Phase 5 (real-time chat), then Phase 6 (Play Store prep). Each phase is independently verifiable.
+
+## User Setup Required
+
+- Twilio account with SID, auth token, and phone number
+- Supabase project URL and anon key (for Android Realtime SDK)
+- Keystore password for release signing
+- Run schema migrations on the production Supabase database

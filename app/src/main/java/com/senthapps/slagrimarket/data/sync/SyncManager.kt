@@ -80,46 +80,36 @@ class SyncManager @Inject constructor(
     suspend fun performSync(): Result<Unit> {
         return try {
             _syncState.value = _syncState.value.copy(isSyncing = true, error = null)
-            
-            // Step 1: Process pending local operations
-            val pendingOps = localOpDao.getPendingOps()
-            var successCount = 0
-            var failureCount = 0
-            
-            for (op in pendingOps) {
-                try {
-                    when (op.type) {
-                        OpType.CREATE_LISTING -> processCreateListing(op)
-                        OpType.UPDATE_LISTING -> processUpdateListing(op)
-                        OpType.DELETE_LISTING -> processDeleteListing(op)
-                        OpType.CREATE_TRANSACTION -> processCreateTransaction(op)
-                        OpType.UPDATE_TRANSACTION -> processUpdateTransaction(op)
-                        OpType.UPDATE_USER -> processUpdateUser(op)
-                    }
-                    
-                    // Mark operation as synced
-                    localOpDao.markOpAsSynced(op.opId)
-                    successCount++
-                } catch (e: Exception) {
-                    Timber.e(e, "Failed to sync operation ${op.opId}")
-                    failureCount++
-                    
-                    // Mark operation as failed
-                    localOpDao.markOpAsFailed(op.opId, e.message ?: "Unknown error")
-                }
+
+            // Step 1: Get all pending operations
+            val allPendingOps = localOpDao.getPendingOps()
+
+            if (allPendingOps.isEmpty()) {
+                // No pending ops, just fetch server data
+                fetchServerData()
+                updateSyncState(successCount = 0, failureCount = 0)
+                return Result.success(Unit)
             }
-            
-            // Step 2: Fetch latest data from server
-            syncDataFromServer()
-            
-            _syncState.value = _syncState.value.copy(
-                isSyncing = false,
-                lastSyncTime = System.currentTimeMillis(),
-                pendingOperations = localOpDao.getPendingOpsCount(),
-                successfulOperations = successCount,
-                failedOperations = failureCount
-            )
-            
+
+            // Step 2: Process in batches of 50 (MAX_SYNC_OPERATIONS_PER_REQUEST)
+            val batches = allPendingOps.chunked(50)
+            var totalSuccess = 0
+            var totalFailures = 0
+            val allConflicts = mutableListOf<com.senthapps.slagrimarket.data.model.ConflictInfo>()
+
+            for (batch in batches) {
+                val result = processBatch(batch)
+                totalSuccess += result.successCount
+                totalFailures += result.failureCount
+                allConflicts.addAll(result.conflicts)
+            }
+
+            // Step 3: Log conflicts (future: expose to UI)
+            if (allConflicts.isNotEmpty()) {
+                Timber.w("Sync completed with ${allConflicts.size} conflicts")
+            }
+
+            updateSyncState(successCount = totalSuccess, failureCount = totalFailures, conflictCount = allConflicts.size)
             Result.success(Unit)
         } catch (e: Exception) {
             Timber.e(e, "Sync failed")
@@ -131,6 +121,60 @@ class SyncManager @Inject constructor(
         }
     }
     
+    private suspend fun processBatch(operations: List<LocalOp>): BatchResult {
+        val lastSyncTime = getLastSyncTimestamp()
+
+        val syncRequest = com.senthapps.slagrimarket.data.model.SyncRequest(
+            lastSyncAt = lastSyncTime,
+            operations = operations
+        )
+
+        val response = syncApiService.syncOperations(syncRequest)
+
+        if (!response.isSuccessful || response.body() == null) {
+            // Mark all operations in batch as failed
+            operations.forEach { op ->
+                localOpDao.markOpAsFailed(op.opId, "Batch sync failed: ${response.code()}")
+            }
+            return BatchResult(successCount = 0, failureCount = operations.size, conflicts = emptyList())
+        }
+
+        val batchResponse = response.body()!!
+
+        // Process successful operations
+        if (batchResponse.appliedOps.isNotEmpty()) {
+            localOpDao.markOpsAsSynced(batchResponse.appliedOps)
+        }
+
+        // Process failed operations
+        batchResponse.errors.forEach { opError ->
+            localOpDao.markOpAsFailed(opError.opId, opError.error)
+        }
+
+        // Process conflicts
+        batchResponse.conflicts.forEach { conflict ->
+            localOpDao.markOpAsFailed(conflict.opId, "Conflict: ${conflict.reason}")
+        }
+
+        // Update local database with server data
+        updateLocalDatabaseFromServerData(batchResponse.serverData)
+
+        // Store last sync timestamp
+        saveLastSyncTimestamp(batchResponse.serverTimestamp)
+
+        return BatchResult(
+            successCount = batchResponse.appliedOps.size,
+            failureCount = batchResponse.errors.size + batchResponse.conflicts.size,
+            conflicts = batchResponse.conflicts
+        )
+    }
+
+    private data class BatchResult(
+        val successCount: Int,
+        val failureCount: Int,
+        val conflicts: List<com.senthapps.slagrimarket.data.model.ConflictInfo>
+    )
+
     private suspend fun processCreateListing(op: LocalOp) {
         val request = moshi.adapter(CreateListingRequest::class.java).fromJson(op.payload)
             ?: throw Exception("Invalid create listing payload")
@@ -196,6 +240,57 @@ class SyncManager @Inject constructor(
         userDao.updateUser(request)
     }
     
+    private suspend fun updateLocalDatabaseFromServerData(serverData: com.senthapps.slagrimarket.data.model.ServerData) {
+        try {
+            // Update users (current user only)
+            if (serverData.users.isNotEmpty()) {
+                userDao.insertUsers(serverData.users)
+                Timber.d("Synced ${serverData.users.size} users from server")
+            }
+
+            // Update listings (first page from batch response)
+            if (serverData.listings.data.isNotEmpty()) {
+                listingDao.insertListings(serverData.listings.data)
+                Timber.d("Synced ${serverData.listings.data.size} of ${serverData.listings.total} listings")
+            }
+
+            // Update transactions (first page from batch response)
+            if (serverData.transactions.data.isNotEmpty()) {
+                transactionDao.insertTransactions(serverData.transactions.data)
+                Timber.d("Synced ${serverData.transactions.data.size} of ${serverData.transactions.total} transactions")
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to update local database from server data")
+            // Don't throw - this shouldn't fail the entire sync
+        }
+    }
+
+    private suspend fun fetchServerData(): Result<Unit> {
+        try {
+            val lastSyncTime = getLastSyncTimestamp()
+
+            val response = syncApiService.getSyncData(
+                lastSyncAt = lastSyncTime,
+                listingPage = 1,
+                listingLimit = 50,
+                transactionPage = 1,
+                transactionLimit = 50
+            )
+
+            if (response.isSuccessful && response.body() != null) {
+                val syncData = response.body()!!
+                updateLocalDatabaseFromServerData(syncData.serverData)
+                saveLastSyncTimestamp(syncData.serverTimestamp)
+                return Result.success(Unit)
+            }
+
+            return Result.failure(Exception("Failed to fetch server data: ${response.code()}"))
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to fetch server data")
+            return Result.failure(e)
+        }
+    }
+
     private suspend fun syncDataFromServer() {
         try {
             // Fetch latest listings from server
@@ -221,6 +316,29 @@ class SyncManager @Inject constructor(
         }
     }
     
+    private fun getLastSyncTimestamp(): String? {
+        return context.getSharedPreferences("sync_prefs", Context.MODE_PRIVATE)
+            .getString("last_sync_timestamp", null)
+    }
+
+    private fun saveLastSyncTimestamp(timestamp: String) {
+        context.getSharedPreferences("sync_prefs", Context.MODE_PRIVATE)
+            .edit()
+            .putString("last_sync_timestamp", timestamp)
+            .apply()
+    }
+
+    private suspend fun updateSyncState(successCount: Int, failureCount: Int, conflictCount: Int = 0) {
+        _syncState.value = _syncState.value.copy(
+            isSyncing = false,
+            lastSyncTime = System.currentTimeMillis(),
+            pendingOperations = localOpDao.getPendingOpsCount(),
+            successfulOperations = successCount,
+            failedOperations = failureCount,
+            conflictCount = conflictCount
+        )
+    }
+
     fun enableAutoSync(enabled: Boolean) {
         isAutoSyncEnabled = enabled
         if (enabled) {
@@ -365,6 +483,7 @@ data class SyncState(
     val pendingOperations: Int = 0,
     val successfulOperations: Int = 0,
     val failedOperations: Int = 0,
+    val conflictCount: Int = 0,
     val error: String? = null
 )
 

@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Edit",
+      "Write",
+      "Bash(*)",
       "Bash(cmd /c \"gradlew.bat :app:assembleDebug --no-daemon\")",
       "Bash(gradlew.bat:*)",
       "Bash(./gradlew.bat :app:compileDebugKotlin --console=plain)",
@@ -21,7 +24,44 @@
       "Bash(npx supabase:*)",
       "Bash(printf:*)",
       "Bash(vercel:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(test:*)",
+      "Bash(./gradlew :app:testDebugUnitTest:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(find:*)",
+      "Bash(./gradlew testDebugUnitTest:*)",
+      "Bash(./gradlew :app:compileDebugKotlin:*)",
+      "Bash(./gradlew clean:*)",
+      "Bash(./gradlew:*)",
+      "Bash(grep:*)",
+      "Bash(taskkill:*)",
+      "Bash(bc:*)",
+      "Bash(git fetch:*)",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(apksigner sign:*)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/build-tools/34.0.0/apksigner.bat\" sign --ks app/release-keystore.jks --ks-pass pass:agrimarket2026 --key-pass pass:agrimarket2026 --out app/build/outputs/apk/release/app-release-signed.apk app/build/outputs/apk/release/app-release-unsigned.apk)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/build-tools/34.0.0/apksigner.bat\" verify -v app/build/outputs/apk/release/app-release-signed.apk)",
+      "Bash(wc:*)",
+      "Bash(xargs:*)",
+      "Bash(powershell -Command:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
+    ]
+  },
+  "outputStyle": "default",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd C:/Dev/Agrimarket && npx prettier --write \"$FILE_PATH\" 2>&1 || echo 'Prettier not configured'",
+            "statusMessage": "Formatting code..."
+          }
+        ]
+      }
     ]
   }
 }

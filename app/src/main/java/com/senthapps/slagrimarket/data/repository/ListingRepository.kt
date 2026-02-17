@@ -546,7 +546,7 @@ class ListingRepository @Inject constructor(
     }
 
     /**
-     * Upload images for a listing to Firebase Storage
+     * Upload images for a listing via backend Storage API
      * Returns list of download URLs
      */
     suspend fun uploadImages(
@@ -559,8 +559,7 @@ class ListingRepository @Inject constructor(
                 return Result.success(emptyList())
             }
 
-            // Upload images to Firebase Storage
-            Timber.d("Uploading ${imageUris.size} images to Firebase Storage for listing $listingId")
+            Timber.d("Uploading ${imageUris.size} images via backend Storage API for listing $listingId")
             val result = storageRepository.uploadListingImages(imageUris, listingId)
 
             if (result.isSuccess) {
@@ -568,7 +567,7 @@ class ListingRepository @Inject constructor(
                 Timber.d("Successfully uploaded ${downloadUrls.size} images for listing $listingId")
                 Result.success(downloadUrls)
             } else {
-                Timber.e(result.exceptionOrNull(), "Failed to upload images to Firebase Storage")
+                Timber.e(result.exceptionOrNull(), "Failed to upload images via backend Storage API")
                 Result.failure(result.exceptionOrNull() ?: Exception("Failed to upload images"))
             }
         } catch (e: Exception) {
