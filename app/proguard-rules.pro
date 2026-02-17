@@ -50,6 +50,34 @@
 -keepnames @kotlin.Metadata class com.senthapps.slagrimarket.data.**
 
 # =====================================================
+# Enhanced Moshi Rules for Data Models
+# =====================================================
+# Keep all data classes in data.model package with JSON annotations
+-keep @com.squareup.moshi.JsonClass class com.senthapps.slagrimarket.data.model.** { *; }
+-keep class com.senthapps.slagrimarket.data.model.**JsonAdapter {
+    <init>(...);
+    <fields>;
+}
+
+# Keep Moshi adapters generated for our models
+-keep class com.senthapps.slagrimarket.data.model.**$JsonAdapter {
+    <init>(...);
+    <fields>;
+}
+
+# Keep all type converters (Room uses reflection)
+-keep class **Converters {
+    <init>();
+    public <methods>;
+}
+
+# Keep ListingConverters specifically
+-keep class com.senthapps.slagrimarket.data.model.ListingConverters {
+    <init>();
+    public <methods>;
+}
+
+# =====================================================
 # Room Database
 # =====================================================
 -keep class * extends androidx.room.RoomDatabase
@@ -111,6 +139,25 @@
 }
 
 # =====================================================
+# Enhanced Enum Handling for JSON Serialization
+# =====================================================
+# Keep all enums with Json annotations
+-keepclassmembers enum * {
+    @com.squareup.moshi.Json <fields>;
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+    ** name();
+}
+
+# Keep specific app enums that have methods used in UI
+-keepclassmembers enum com.senthapps.slagrimarket.data.model.QualityGrade {
+    public <methods>;
+}
+-keepclassmembers enum com.senthapps.slagrimarket.data.model.SyncStatus {
+    public <methods>;
+}
+
+# =====================================================
 # Google Maps
 # =====================================================
 -keep class com.google.android.libraries.maps.** { *; }
@@ -169,6 +216,32 @@
 -dontwarn io.ktor.**
 -keep class kotlinx.serialization.** { *; }
 -dontwarn kotlinx.serialization.**
+
+# =====================================================
+# Enhanced Ktor 3.x and Supabase 3.x Support
+# =====================================================
+# Ktor 3.x serialization support
+-keep class io.ktor.client.** { *; }
+-keep class io.ktor.http.** { *; }
+-keep class io.ktor.util.** { *; }
+-dontwarn io.ktor.client.plugins.**
+-dontwarn io.ktor.serialization.**
+
+# Supabase 3.x realtime and postgrest
+-keep class io.github.jan.supabase.realtime.** { *; }
+-keep class io.github.jan.supabase.postgrest.** { *; }
+-keep class io.github.jan.supabase.** { *; }
+-dontwarn io.github.jan.supabase.annotations.**
+
+# Websockets for Supabase Realtime
+-keep class io.ktor.websocket.** { *; }
+-dontwarn org.slf4j.**
+
+# Remove debug logging in release
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+}
 
 # =====================================================
 # General Android

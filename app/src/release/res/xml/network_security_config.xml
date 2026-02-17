@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- RELEASE BUILD: STRICT HTTPS ONLY - No cleartext exceptions -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust only system certificates (Google's built-in CA list) -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- No domain-config section - no cleartext exceptions allowed -->
+</network-security-config>

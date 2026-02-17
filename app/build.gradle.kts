@@ -42,10 +42,44 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "keystore/release.keystore")
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-            keyAlias = System.getenv("KEY_ALIAS") ?: "agrimarket"
-            keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            // Try environment variables first (for CI/CD), then local.properties
+            val keystorePath = System.getenv("KEYSTORE_PATH")
+                ?: localProperties.getProperty("KEYSTORE_PATH")
+            val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+                ?: localProperties.getProperty("KEYSTORE_PASSWORD")
+            val keyAliasValue = System.getenv("KEY_ALIAS")
+                ?: localProperties.getProperty("KEY_ALIAS", "agrimarket")
+            val keyPasswordValue = System.getenv("KEY_PASSWORD")
+                ?: localProperties.getProperty("KEY_PASSWORD")
+
+            // Validate signing configuration
+            if (keystorePath.isNullOrBlank() || keystorePassword.isNullOrBlank() || keyPasswordValue.isNullOrBlank()) {
+                logger.warn("""
+                    ⚠️  WARNING: Release signing is not properly configured.
+
+                    To sign release builds, set either:
+
+                    1. Environment Variables (for CI/CD):
+                       export KEYSTORE_PATH=/path/to/keystore.jks
+                       export KEYSTORE_PASSWORD=your_keystore_password
+                       export KEY_ALIAS=agrimarket
+                       export KEY_PASSWORD=your_key_password
+
+                    2. local.properties (for local development):
+                       KEYSTORE_PATH=/path/to/keystore.jks
+                       KEYSTORE_PASSWORD=your_keystore_password
+                       KEY_ALIAS=agrimarket
+                       KEY_PASSWORD=your_key_password
+
+                    Release builds will be unsigned until this is configured.
+                """.trimIndent())
+            }
+
+            // Set signing config (will be null/empty if not configured)
+            storeFile = keystorePath?.let { rootProject.file(it) }
+            storePassword = keystorePassword
+            keyAlias = keyAliasValue
+            keyPassword = keyPasswordValue
         }
     }
 
@@ -73,8 +107,10 @@ android {
                 "proguard-rules.pro"
             )
 
-            // API Configuration for release builds
+            // Apply signing configuration
             signingConfig = signingConfigs.getByName("release")
+
+            // API Configuration for release builds
             buildConfigField("String", "BASE_URL", "\"https://backend-psi-tan-18.vercel.app/api/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "false")
             buildConfigField("String", "SUPABASE_URL", "\"${localProperties.getProperty("SUPABASE_URL", "")}\"")
