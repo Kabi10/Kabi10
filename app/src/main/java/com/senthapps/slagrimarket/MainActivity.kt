@@ -60,11 +60,11 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         // 🔐 AUTHENTICATION CONTROL
-                        // DEBUG: Skip auth in debug builds to bypass broken backend
-                        // PRODUCTION: Require authentication via phone/OTP
-                        val requireAuth = !BuildConfig.DEBUG
-                        if (BuildConfig.DEBUG) {
-                            Timber.d("🔧 DEBUG: Skipping authentication - going straight to app")
+                        // TODO: Enable authentication when SMS/OTP backend is ready
+                        // For now, skip auth in all builds to allow Play Store testing
+                        val requireAuth = false // Will be: !BuildConfig.DEBUG
+                        if (!requireAuth) {
+                            Timber.d("⚠️  Authentication disabled - SMS/OTP backend not ready")
                         }
                         JaffnaMarketplaceNavigation(startWithAuth = requireAuth)
                     }
