@@ -179,6 +179,7 @@ fun IndustrialListingDetailScreen(
                     ActionButtonsSection(
                         language = language,
                         phoneAvailable = listing.sellerPhone.isNotEmpty(),
+                        sellerPhone = listing.sellerPhone,
                         onCallSeller = onCallSeller ?: {
                             // Default: open phone dialer
                             if (listing.sellerPhone.isNotEmpty()) {
@@ -322,7 +323,7 @@ private fun AvailabilitySection(
 }
 
 /**
- * Seller section - name, district, posted time
+ * Seller section - name, district, phone number (visible), posted time
  */
 @Composable
 private fun SellerSection(
@@ -366,6 +367,15 @@ private fun SellerSection(
             color = HumanIndustrial.Ink
         )
 
+        // Phone number — visible as plain text so farmer can dial manually if needed
+        if (listing.sellerPhone.isNotEmpty()) {
+            Text(
+                text = "📞 ${listing.sellerPhone}",
+                style = HumanIndustrialType.productName,
+                color = HumanIndustrial.Earth
+            )
+        }
+
         // Posted time
         Text(
             text = listing.postedTime,
@@ -376,52 +386,94 @@ private fun SellerSection(
 }
 
 /**
- * Action buttons section - Call and Send Message
+ * Action buttons section — CALL is the #1 action, WhatsApp fallback, then chat
+ *
+ * CALL button: full-width, 64dp, primary green — first and biggest
+ * WhatsApp: secondary, falls back to phone dialer if WhatsApp not installed
+ * Send Message: tertiary, below both
  */
 @Composable
 private fun ActionButtonsSection(
     language: AppLanguage,
     phoneAvailable: Boolean,
+    sellerPhone: String,
     onCallSeller: () -> Unit,
     onSendMessage: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(Spacing.lg.dp),
         verticalArrangement = Arrangement.spacedBy(Spacing.md.dp)
     ) {
-        // Primary: Call - disabled if phone not available
+        // ── #1: CALL — large 64dp primary green button ─────────────────
         if (phoneAvailable) {
-            PrimaryButton(
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .background(HumanIndustrial.Green)
+                    .industrialClickable(onClick = onCallSeller),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = when (language) {
+                        AppLanguage.SINHALA -> "📞  ඇමතුමක් ගන්න"
+                        AppLanguage.TAMIL -> "📞  அழைக்கவும்"
+                        AppLanguage.ENGLISH -> "📞  CALL SELLER"
+                    },
+                    style = HumanIndustrialType.button,
+                    color = HumanIndustrial.Rice
+                )
+            }
+
+            // ── #2: WhatsApp (with phone dialer fallback) ──────────────
+            SecondaryButton(
                 text = when (language) {
-                    AppLanguage.SINHALA -> "ඇමතුමක් ගන්න"
-                    AppLanguage.TAMIL -> "அழைக்கவும்"
-                    AppLanguage.ENGLISH -> "CALL"
+                    AppLanguage.SINHALA -> "💬  WhatsApp"
+                    AppLanguage.TAMIL -> "💬  WhatsApp"
+                    AppLanguage.ENGLISH -> "💬  WHATSAPP"
                 },
-                onClick = onCallSeller,
+                onClick = {
+                    // Try WhatsApp; fall back to regular dialer if not installed
+                    val whatsappPhone = sellerPhone.replace(Regex("[^0-9+]"), "")
+                    val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("https://wa.me/$whatsappPhone")
+                        setPackage("com.whatsapp")
+                    }
+                    try {
+                        context.startActivity(whatsappIntent)
+                    } catch (e: Exception) {
+                        // WhatsApp not installed — fall back to dialer
+                        val dialIntent = Intent(Intent.ACTION_DIAL).apply {
+                            data = Uri.parse("tel:$sellerPhone")
+                        }
+                        context.startActivity(dialIntent)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         } else {
-            // Show unavailable message when phone is missing
             SecondaryButton(
                 text = when (language) {
                     AppLanguage.SINHALA -> "දුරකතන අංකය නොමැත"
                     AppLanguage.TAMIL -> "தொலைபேசி இல்லை"
                     AppLanguage.ENGLISH -> "PHONE UNAVAILABLE"
                 },
-                onClick = { /* No action - informational only */ },
+                onClick = {},
                 enabled = false,
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-        // Secondary: Send Message
+        // ── #3: In-app chat message ────────────────────────────────────
         SecondaryButton(
             text = when (language) {
-                AppLanguage.SINHALA -> "පණිවිඩයක් යවන්න"
-                AppLanguage.TAMIL -> "செய்தி அனுப்பவும்"
-                AppLanguage.ENGLISH -> "SEND MESSAGE"
+                AppLanguage.SINHALA -> "✉️  පණිවිඩ ටයිප් කරන්න"
+                AppLanguage.TAMIL -> "✉️  செய்தி தட்டச்சு"
+                AppLanguage.ENGLISH -> "✉️  TYPE MESSAGE"
             },
             onClick = onSendMessage,
             modifier = Modifier.fillMaxWidth()

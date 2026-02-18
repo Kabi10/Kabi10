@@ -17,6 +17,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.senthapps.slagrimarket.data.model.getCropEmoji
+import com.senthapps.slagrimarket.ui.home.TickerPriceItem
+import com.senthapps.slagrimarket.ui.home.HomeViewModel
 import com.senthapps.slagrimarket.util.RelativeTimeUtil
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.IndustrialOtpVerificationScreen
@@ -101,6 +104,28 @@ fun JaffnaMarketplaceNavigation(
         }
         // MVP: Direct home screen access with unique route - INDUSTRIAL UI
         composable("home_direct") {
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val homeUiState by homeViewModel.uiState.collectAsState()
+            val currentUser by homeViewModel.currentUser.collectAsState(initial = null)
+            val language = LocalAppLanguage.current
+            val accessibilityViewModel: com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel = hiltViewModel()
+            val isLargeText by accessibilityViewModel.isLargeTextEnabled.collectAsState()
+
+            // Convert top-5 market prices to ticker items
+            val tickerPrices = homeUiState.marketPrices.take(5).map { mp ->
+                TickerPriceItem(
+                    emoji = mp.getCropEmoji(),
+                    cropName = when (language) {
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.SINHALA -> mp.cropNameSinhala
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.TAMIL -> mp.cropNameTamil
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH -> mp.cropNameEnglish
+                    },
+                    price = mp.currentPrice,
+                    unit = mp.unit,
+                    trend = mp.trend
+                )
+            }
+
             IndustrialHomeScreen(
                 onNavigateToSell = {
                     navController.navigate(Screen.QuickListing.route)
@@ -116,12 +141,39 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToSettings = {
                     navController.navigate(Screen.Settings.route)
-                }
+                },
+                language = language,
+                farmerName = currentUser?.name ?: "",
+                farmerDistrict = currentUser?.location ?: "",
+                marketPrices = tickerPrices,
+                activeListingCount = homeUiState.activeListingCount,
+                onToggleTextSize = { accessibilityViewModel.toggleLargeText(!isLargeText) }
             )
         }
 
         // Alternative home route (in case something tries to navigate to original home) - INDUSTRIAL UI
         composable(Screen.Home.route) {
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val homeUiState by homeViewModel.uiState.collectAsState()
+            val currentUser by homeViewModel.currentUser.collectAsState(initial = null)
+            val language = LocalAppLanguage.current
+            val accessibilityViewModel: com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel = hiltViewModel()
+            val isLargeText by accessibilityViewModel.isLargeTextEnabled.collectAsState()
+
+            val tickerPrices = homeUiState.marketPrices.take(5).map { mp ->
+                TickerPriceItem(
+                    emoji = mp.getCropEmoji(),
+                    cropName = when (language) {
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.SINHALA -> mp.cropNameSinhala
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.TAMIL -> mp.cropNameTamil
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH -> mp.cropNameEnglish
+                    },
+                    price = mp.currentPrice,
+                    unit = mp.unit,
+                    trend = mp.trend
+                )
+            }
+
             IndustrialHomeScreen(
                 onNavigateToSell = {
                     navController.navigate(Screen.QuickListing.route)
@@ -137,10 +189,16 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToSettings = {
                     navController.navigate(Screen.Settings.route)
-                }
+                },
+                language = language,
+                farmerName = currentUser?.name ?: "",
+                farmerDistrict = currentUser?.location ?: "",
+                marketPrices = tickerPrices,
+                activeListingCount = homeUiState.activeListingCount,
+                onToggleTextSize = { accessibilityViewModel.toggleLargeText(!isLargeText) }
             )
         }
-        
+
         composable(Screen.Listings.route) {
             ListingsScreen(
                 onNavigateBack = {
@@ -248,7 +306,9 @@ fun JaffnaMarketplaceNavigation(
 
         // Create Listing Success Screen (Industrial UI)
         composable(Screen.CreateListingSuccess.route) {
+            val language = LocalAppLanguage.current
             CreateListingSuccessScreen(
+                language = language,
                 onDone = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }

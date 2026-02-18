@@ -10,8 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -20,6 +23,11 @@ import java.util.*
 /**
  * Voice input button for Tamil, Sinhala, and English speech recognition
  * Critical for elderly farmers with low literacy
+ *
+ * @param onVoiceResult Called with recognized speech text
+ * @param language Language code: "ta", "si", or "en"
+ * @param enabled Whether the button is interactive
+ * @param onShowNumericKeypad Optional callback — if provided, shows a "123" fallback link below the mic
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -27,7 +35,8 @@ fun VoiceInputButton(
     onVoiceResult: (String) -> Unit,
     language: String = "ta", // Default to Tamil for Jaffna farmers
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShowNumericKeypad: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     var isListening by remember { mutableStateOf(false) }
@@ -77,37 +86,57 @@ fun VoiceInputButton(
         }
     }
 
-    IconButton(
-        onClick = {
-            when {
-                !permissionState.status.isGranted -> {
-                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                }
-                else -> {
-                    launchSpeechRecognition(
-                        context = context,
-                        language = localeMap[language] ?: "ta-IN",
-                        launcher = speechRecognitionLauncher,
-                        onListeningChanged = { isListening = it }
-                    )
-                }
-            }
-        },
-        enabled = enabled,
-        modifier = modifier
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isListening) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                strokeWidth = 2.dp
-            )
-        } else {
-            Text(
-                text = "🎤",
-                style = MaterialTheme.typography.titleLarge,
-                color = if (enabled) MaterialTheme.colorScheme.primary
-                       else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-            )
+        IconButton(
+            onClick = {
+                when {
+                    !permissionState.status.isGranted -> {
+                        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }
+                    else -> {
+                        launchSpeechRecognition(
+                            context = context,
+                            language = localeMap[language] ?: "ta-IN",
+                            launcher = speechRecognitionLauncher,
+                            onListeningChanged = { isListening = it }
+                        )
+                    }
+                }
+            },
+            enabled = enabled
+        ) {
+            if (isListening) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = "🎤",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = if (enabled) MaterialTheme.colorScheme.primary
+                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                )
+            }
+        }
+
+        // "123" keypad fallback link — shown only when caller provides the callback
+        if (onShowNumericKeypad != null) {
+            TextButton(
+                onClick = onShowNumericKeypad,
+                enabled = enabled,
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+            ) {
+                Text(
+                    text = "123",
+                    fontSize = 11.sp,
+                    color = if (enabled) Color(0xFF6B6B6B) else Color(0xFF6B6B6B).copy(alpha = 0.4f),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 

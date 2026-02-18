@@ -1,6 +1,7 @@
 package com.senthapps.slagrimarket.ui.profile
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.data.model.UserType
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.DistrictPickerDialog
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
+import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
+import com.senthapps.slagrimarket.ui.theme.industrialClickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +39,7 @@ fun EditProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
     val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     val focusManager = LocalFocusManager.current
+    var showDistrictPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
@@ -43,6 +49,18 @@ fun EditProfileScreen(
         if (uiState.isSuccess) {
             onNavigateBack()
         }
+    }
+
+    if (showDistrictPicker) {
+        DistrictPickerDialog(
+            language = currentLanguage,
+            selectedDistrict = uiState.location,
+            onDistrictSelected = { district ->
+                viewModel.updateLocation(district)
+                showDistrictPicker = false
+            },
+            onDismiss = { showDistrictPicker = false }
+        )
     }
 
     Scaffold(
@@ -166,39 +184,57 @@ fun EditProfileScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    // Location field
-                    OutlinedTextField(
-                        value = uiState.location,
-                        onValueChange = viewModel::updateLocation,
-                        label = {
-                            Text(when (currentLanguage) {
-                                "en" -> "Location *"
-                                "ta" -> "இடம் *"
-                                "si" -> "ස්ථානය *"
-                                else -> "Location *"
-                            })
-                        },
-                        isError = uiState.locationError != null,
-                        supportingText = uiState.locationError?.let { { Text(it) } },
-                        leadingIcon = {
-                            Icon(Icons.Default.LocationOn, null)
-                        },
-                        placeholder = {
-                            Text(when (currentLanguage) {
-                                "en" -> "e.g., Chavakachcheri, Jaffna"
-                                "ta" -> "எ.கா., சாவகச்சேரி, யாழ்ப்பாணம்"
-                                "si" -> "උදා., චාවකච්චේරි, යාපනය"
-                                else -> "e.g., Chavakachcheri, Jaffna"
-                            })
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = { focusManager.clearFocus() }
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    // Location field — taps to open district picker (no typing needed)
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = when (currentLanguage) {
+                                "en" -> "District *"
+                                "ta" -> "மாவட்டம் *"
+                                "si" -> "දිස්ත්‍රික්කය *"
+                                else -> "District *"
+                            },
+                            style = HumanIndustrialType.sectionLabel,
+                            color = HumanIndustrial.Stone
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .background(HumanIndustrial.Dust)
+                                .industrialClickable(onClick = { showDistrictPicker = true })
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = if (uiState.location.isBlank())
+                                        when (currentLanguage) {
+                                            "en" -> "📍 Tap to select district"
+                                            "ta" -> "📍 மாவட்டம் தேர்ந்தெடுக்கவும்"
+                                            "si" -> "📍 දිස්ත්‍රික්කය තෝරන්න"
+                                            else -> "📍 Tap to select district"
+                                        }
+                                    else "📍 ${uiState.location}",
+                                    style = HumanIndustrialType.body,
+                                    color = if (uiState.location.isBlank()) HumanIndustrial.Stone else HumanIndustrial.Ink
+                                )
+                                Text(text = "▶", color = HumanIndustrial.Earth)
+                            }
+                        }
+                        uiState.locationError?.let { err ->
+                            Text(
+                                text = err,
+                                style = HumanIndustrialType.timestamp,
+                                color = HumanIndustrial.Urgent,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
 
                     // Error message
                     uiState.error?.let { error ->

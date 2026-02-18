@@ -1,8 +1,15 @@
 package com.senthapps.slagrimarket.ui.listings
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.location.LocationServices
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +42,10 @@ import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.senthapps.slagrimarket.data.model.CropTypes
+import com.senthapps.slagrimarket.ui.components.DistrictPickerDialog
 import com.senthapps.slagrimarket.ui.components.IndustrialFormDropdown
 import com.senthapps.slagrimarket.ui.components.IndustrialFormField
+import com.senthapps.slagrimarket.ui.components.NumericKeypadDialog
 import com.senthapps.slagrimarket.ui.components.PrimaryButton
 import com.senthapps.slagrimarket.ui.components.SecondaryButton
 import com.senthapps.slagrimarket.ui.home.AppLanguage
@@ -54,7 +63,7 @@ import java.time.format.DateTimeFormatter
 // ============================================================================
 // QUICK LISTING SCREEN - Photo-First, 3-Step Flow
 // Step 1: Take photo (camera opens immediately)
-// Step 2: Pick crop type + set price
+// Step 2: Pick crop type + set price (with keypad + district picker)
 // Step 3: Submit
 // ============================================================================
 
@@ -91,16 +100,6 @@ fun QuickListingScreen(
         }
     }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) {
-            photoUri = uri
-            viewModel.updateImages(listOf(uri))
-            step = 2
-        }
-    }
-
     // Auto-launch camera on first entry
     LaunchedEffect(Unit) {
         try {
@@ -112,7 +111,7 @@ fun QuickListingScreen(
             )
             cameraLauncher.launch(tempPhotoUri!!)
         } catch (e: Exception) {
-            // Camera not available, show gallery option
+            // Camera not available, show form directly
             step = 1
         }
     }
@@ -152,12 +151,8 @@ fun QuickListingScreen(
                         )
                         cameraLauncher.launch(tempPhotoUri!!)
                     } catch (e: Exception) {
-                        // Fallback to gallery
-                        galleryLauncher.launch("image/*")
+                        step = 2 // Skip photo if camera unavailable
                     }
-                },
-                onPickFromGallery = {
-                    galleryLauncher.launch("image/*")
                 },
                 onNext = { step = 2 }
             )
@@ -168,7 +163,6 @@ fun QuickListingScreen(
                 viewModel = viewModel,
                 uiState = uiState,
                 onSubmit = {
-                    // Set defaults for quick mode
                     if (uiState.unit.isBlank()) viewModel.updateUnit("kg")
                     if (uiState.quality.isBlank()) viewModel.updateQuality("GRADE_A")
                     if (uiState.harvestDate.isBlank()) {
@@ -232,7 +226,6 @@ private fun PhotoStep(
     language: AppLanguage,
     photoUri: Uri?,
     onTakePhoto: () -> Unit,
-    onPickFromGallery: () -> Unit,
     onNext: () -> Unit
 ) {
     Column(
@@ -275,7 +268,7 @@ private fun PhotoStep(
                 onClick = onTakePhoto
             )
         } else {
-            // No photo yet - show options
+            // No photo yet — camera may still be launching
             Text(
                 text = when (language) {
                     AppLanguage.SINHALA -> "ඔබේ අස්වැන්නේ\nඡායාරූපයක් ගන්න"
@@ -297,17 +290,6 @@ private fun PhotoStep(
                 },
                 onClick = onTakePhoto
             )
-
-            Spacer(modifier = Modifier.height(Spacing.md.dp))
-
-            SecondaryButton(
-                text = when (language) {
-                    AppLanguage.SINHALA -> "ගැලරිය"
-                    AppLanguage.TAMIL -> "கேலரி"
-                    AppLanguage.ENGLISH -> "GALLERY"
-                },
-                onClick = onPickFromGallery
-            )
         }
     }
 }
@@ -320,6 +302,33 @@ private fun DetailsStep(
     uiState: CreateListingUiState,
     onSubmit: () -> Unit
 ) {
+    // Dialog state
+    var showPriceKeypad by remember { mutableStateOf(false) }
+    var showQuantityKeypad by remember { mutableStateOf(false) }
+    var showDistrictPicker by remember { mutableStateOf(false) }
+    // Voice crop confirmation
+    var voiceCropSuggestion by remember { mutableStateOf<Pair<String, String>?>(null) } // emoji to cropName
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    // GPS permission launcher
+    @SuppressLint("MissingPermission")
+    fun tryGpsAutoFill() {
+        val fusedClient = LocationServices.getFusedLocationProviderClient(context)
+        fusedClient.lastLocation.addOnSuccessListener { loc ->
+            if (loc != null) {
+                val district = nearestSriLankaDistrict(loc.latitude, loc.longitude)
+                viewModel.updateLocation(district)
+            }
+        }
+    }
+
+    val gpsPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) tryGpsAutoFill()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -350,43 +359,166 @@ private fun DetailsStep(
             onOptionSelected = viewModel::updateCropType
         )
 
-        // Price
-        IndustrialFormField(
-            label = when (language) {
-                AppLanguage.SINHALA -> "මිල (රු/කිලෝ)"
-                AppLanguage.TAMIL -> "விலை (ரூ/கிலோ)"
-                AppLanguage.ENGLISH -> "PRICE (RS/KG)"
-            },
-            value = uiState.pricePerUnit,
-            onValueChange = viewModel::updatePricePerUnit,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            errorMessage = uiState.priceError
-        )
+        // Voice crop confirmation chip — shown after fuzzy match
+        voiceCropSuggestion?.let { (emoji, cropName) ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(HumanIndustrial.Gold.copy(alpha = 0.12f))
+                    .padding(Spacing.sm.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm.dp)
+                ) {
+                    Text(
+                        text = when (language) {
+                            AppLanguage.SINHALA -> "$emoji $cropName ද?"
+                            AppLanguage.TAMIL -> "$emoji $cropName ஆ?"
+                            AppLanguage.ENGLISH -> "Did you mean $emoji $cropName?"
+                        },
+                        style = HumanIndustrialType.body,
+                        color = HumanIndustrial.Ink,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .background(HumanIndustrial.Green)
+                            .industrialClickable(onClick = {
+                                viewModel.updateCropType(cropName)
+                                voiceCropSuggestion = null
+                            })
+                            .padding(horizontal = Spacing.sm.dp, vertical = Spacing.xs.dp)
+                    ) { Text("✅", style = HumanIndustrialType.sectionLabel) }
+                    Box(
+                        modifier = Modifier
+                            .background(HumanIndustrial.Dust)
+                            .industrialClickable(onClick = { voiceCropSuggestion = null })
+                            .padding(horizontal = Spacing.sm.dp, vertical = Spacing.xs.dp)
+                    ) { Text("❌", style = HumanIndustrialType.sectionLabel) }
+                }
+            }
+        }
 
-        // Quantity
-        IndustrialFormField(
-            label = when (language) {
-                AppLanguage.SINHALA -> "ප්‍රමාණය (කිලෝ)"
-                AppLanguage.TAMIL -> "அளவு (கிலோ)"
-                AppLanguage.ENGLISH -> "QUANTITY (KG)"
-            },
-            value = uiState.quantity,
-            onValueChange = viewModel::updateQuantity,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            errorMessage = uiState.quantityError
-        )
+        // Price — tappable display field, opens keypad
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .background(HumanIndustrial.Dust)
+                .industrialClickable(onClick = { showPriceKeypad = true })
+                .padding(horizontal = Spacing.lg.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = when (language) {
+                        AppLanguage.SINHALA -> "මිල (රු/කිලෝ)"
+                        AppLanguage.TAMIL -> "விலை (ரூ/கிலோ)"
+                        AppLanguage.ENGLISH -> "PRICE (RS/KG)"
+                    },
+                    style = HumanIndustrialType.sectionLabel,
+                    color = HumanIndustrial.Stone
+                )
+                Text(
+                    text = if (uiState.pricePerUnit.isBlank()) "—" else "Rs ${uiState.pricePerUnit}",
+                    style = HumanIndustrialType.productName,
+                    color = if (uiState.pricePerUnit.isBlank()) HumanIndustrial.Stone else HumanIndustrial.Gold
+                )
+            }
+        }
 
-        // Location
-        IndustrialFormField(
-            label = when (language) {
-                AppLanguage.SINHALA -> "ස්ථානය"
-                AppLanguage.TAMIL -> "இடம்"
-                AppLanguage.ENGLISH -> "LOCATION"
-            },
-            value = uiState.location,
-            onValueChange = viewModel::updateLocation,
-            errorMessage = uiState.locationError
-        )
+        // Quantity — tappable display field, opens keypad
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .background(HumanIndustrial.Dust)
+                .industrialClickable(onClick = { showQuantityKeypad = true })
+                .padding(horizontal = Spacing.lg.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = when (language) {
+                        AppLanguage.SINHALA -> "ප්‍රමාණය (කිලෝ)"
+                        AppLanguage.TAMIL -> "அளவு (கிலோ)"
+                        AppLanguage.ENGLISH -> "QUANTITY (KG)"
+                    },
+                    style = HumanIndustrialType.sectionLabel,
+                    color = HumanIndustrial.Stone
+                )
+                Text(
+                    text = if (uiState.quantity.isBlank()) "—" else "${uiState.quantity} kg",
+                    style = HumanIndustrialType.productName,
+                    color = if (uiState.quantity.isBlank()) HumanIndustrial.Stone else HumanIndustrial.Ink
+                )
+            }
+        }
+
+        // Location — district picker + GPS auto-fill button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(64.dp)
+                    .background(HumanIndustrial.Dust)
+                    .industrialClickable(onClick = { showDistrictPicker = true })
+                    .padding(horizontal = Spacing.lg.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = when (language) {
+                            AppLanguage.SINHALA -> "📍 දිස්ත්‍රික්කය"
+                            AppLanguage.TAMIL -> "📍 மாவட்டம்"
+                            AppLanguage.ENGLISH -> "📍 DISTRICT"
+                        },
+                        style = HumanIndustrialType.sectionLabel,
+                        color = HumanIndustrial.Stone
+                    )
+                    Text(
+                        text = if (uiState.location.isBlank()) "▶ " + when (language) {
+                            AppLanguage.SINHALA -> "තෝරන්න"
+                            AppLanguage.TAMIL -> "தேர்ந்தெடு"
+                            AppLanguage.ENGLISH -> "SELECT"
+                        } else uiState.location,
+                        style = HumanIndustrialType.sectionLabel,
+                        color = if (uiState.location.isBlank()) HumanIndustrial.Earth else HumanIndustrial.Ink
+                    )
+                }
+            }
+            // GPS auto-detect button
+            Box(
+                modifier = Modifier
+                    .height(64.dp)
+                    .background(HumanIndustrial.Earth)
+                    .industrialClickable(onClick = {
+                        gpsPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    })
+                    .padding(horizontal = Spacing.md.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "🛰", style = HumanIndustrialType.productName)
+            }
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -423,4 +555,113 @@ private fun DetailsStep(
             )
         }
     }
+
+    // ── Dialogs ──────────────────────────────────────────────────────────────
+
+    if (showPriceKeypad) {
+        NumericKeypadDialog(
+            title = when (language) {
+                AppLanguage.SINHALA -> "මිල (රු/කිලෝ)"
+                AppLanguage.TAMIL -> "விலை (ரூ/கிலோ)"
+                AppLanguage.ENGLISH -> "Price (Rs per kg)"
+            },
+            initialValue = uiState.pricePerUnit,
+            onConfirm = { value ->
+                viewModel.updatePricePerUnit(value)
+                showPriceKeypad = false
+            },
+            onDismiss = { showPriceKeypad = false },
+            language = when (language) {
+                AppLanguage.SINHALA -> "si"
+                AppLanguage.TAMIL -> "ta"
+                AppLanguage.ENGLISH -> "en"
+            }
+        )
+    }
+
+    if (showQuantityKeypad) {
+        NumericKeypadDialog(
+            title = when (language) {
+                AppLanguage.SINHALA -> "ප්‍රමාණය (කිලෝ)"
+                AppLanguage.TAMIL -> "அளவு (கிலோ)"
+                AppLanguage.ENGLISH -> "Quantity (kg)"
+            },
+            initialValue = uiState.quantity,
+            onConfirm = { value ->
+                viewModel.updateQuantity(value)
+                showQuantityKeypad = false
+            },
+            onDismiss = { showQuantityKeypad = false },
+            language = when (language) {
+                AppLanguage.SINHALA -> "si"
+                AppLanguage.TAMIL -> "ta"
+                AppLanguage.ENGLISH -> "en"
+            }
+        )
+    }
+
+    if (showDistrictPicker) {
+        DistrictPickerDialog(
+            language = when (language) {
+                AppLanguage.SINHALA -> "si"
+                AppLanguage.TAMIL -> "ta"
+                AppLanguage.ENGLISH -> "en"
+            },
+            selectedDistrict = uiState.location,
+            onDistrictSelected = { district ->
+                viewModel.updateLocation(district)
+                showDistrictPicker = false
+            },
+            onDismiss = { showDistrictPicker = false }
+        )
+    }
+}
+
+/**
+ * Returns the name of the nearest Sri Lanka district to the given GPS coordinates,
+ * using Haversine distance to each district's centroid.
+ */
+private fun nearestSriLankaDistrict(lat: Double, lng: Double): String {
+    // District centroids (lat, lng, name) — all 25 districts
+    val centroids = listOf(
+        Triple(9.6615, 80.0255, "Jaffna"),
+        Triple(9.3803, 80.3770, "Kilinochchi"),
+        Triple(8.9778, 80.2114, "Mannar"),
+        Triple(9.1685, 80.8718, "Vavuniya"),
+        Triple(8.7514, 80.4997, "Mullaitivu"),
+        Triple(8.5922, 81.2341, "Trincomalee"),
+        Triple(8.3348, 80.8628, "Anuradhapura"),
+        Triple(8.0196, 81.0951, "Polonnaruwa"),
+        Triple(7.8731, 81.6969, "Batticaloa"),
+        Triple(7.2953, 81.6747, "Ampara"),
+        Triple(6.8917, 81.3322, "Badulla"),
+        Triple(6.9934, 80.7970, "Kandy"),
+        Triple(7.4863, 80.3647, "Kurunegala"),
+        Triple(7.0579, 79.9020, "Puttalam"),
+        Triple(6.9271, 79.8612, "Gampaha"),
+        Triple(6.9271, 79.8612, "Colombo"),
+        Triple(6.8219, 80.0415, "Kalutara"),
+        Triple(7.2906, 80.6337, "Matale"),
+        Triple(6.9497, 80.7891, "Nuwara Eliya"),
+        Triple(6.0535, 80.2210, "Galle"),
+        Triple(6.0411, 80.9716, "Monaragala"),
+        Triple(5.9549, 80.5550, "Hambantota"),
+        Triple(6.1222, 80.7108, "Matara"),
+        Triple(7.8731, 80.6497, "Kegalle"),
+        Triple(6.8279, 80.3640, "Ratnapura")
+    )
+
+    fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val r = 6371.0 // Earth radius km
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2).let { it * it } +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2).let { it * it }
+        return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    }
+
+    return centroids.minByOrNull { (cLat, cLng, _) ->
+        haversine(lat, lng, cLat, cLng)
+    }?.third ?: "Colombo"
 }

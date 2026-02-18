@@ -1,36 +1,45 @@
 package com.senthapps.slagrimarket.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import com.senthapps.slagrimarket.ui.theme.Spacing
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.industrialClickable
+import com.senthapps.slagrimarket.data.model.PriceTrend
 
 // ============================================================================
-// HUMAN INDUSTRIAL HOME SCREEN v2.0
-// "The Village Square" - Four clear directions, four clear purposes
-// Per UI Plan: BUY|SELL on top, PRICES|ORDERS on bottom
-// Rice background, Earth dividers, bold centered text with Sinhala labels
+// HUMAN INDUSTRIAL HOME SCREEN v3.0
+// "The Village Square" - Greeting + ticker + four clear directions
+// Per UI Plan: Greeting header, price ticker, BUY|SELL / PRICES|ORDERS grid
 // ============================================================================
 
 /**
@@ -43,23 +52,22 @@ enum class AppLanguage {
 }
 
 /**
- * Human Industrial home screen - warm 2x2 grid layout
- * Fixed layout per UI Plan:
+ * Human Industrial home screen - warm greeting + 2x2 grid layout
  *
- *   [SETTINGS header - 48dp]
- *   -----------------------
- *   BUY        |    SELL
- *   මිලට ගන්න   |   විකුණන්න
- *   -----------+-----------
- *   PRICES     |   ORDERS
- *   මිල ගණන්    |    ගනුදෙනු
+ *   [GREETING header - ~88dp: farmer name, district, AA toggle]
+ *   [PRICE TICKER - 44dp: scrolling crop prices]
+ *   ─────────────────────────────────────────
+ *   🛒 BUY        |   🌾 SELL [badge]
+ *   මිලට ගන්න     |   විකුණන්න
+ *   ──────────────+──────────────────────────
+ *   📊 PRICES     |   📦 ORDERS
+ *   මිල ගණන්      |   ගනුදෙනු
  *
- * @param onNavigateToBuy Navigate to buy flow (category selection)
- * @param onNavigateToSell Navigate to sell flow (category selection)
- * @param onNavigateToPrices Navigate to market prices screen
- * @param onNavigateToOrders Navigate to transactions/orders screen
- * @param onNavigateToSettings Navigate to language settings screen
- * @param language Current language for labels (default: SINHALA)
+ * @param farmerName Farmer's display name (from auth user)
+ * @param farmerDistrict Farmer's district for location display
+ * @param marketPrices Top prices for ticker strip
+ * @param activeListingCount Count of seller's active listings (SELL badge)
+ * @param onToggleTextSize Callback for AA text size cycle button
  */
 @Composable
 fun IndustrialHomeScreen(
@@ -68,7 +76,12 @@ fun IndustrialHomeScreen(
     onNavigateToPrices: () -> Unit,
     onNavigateToOrders: () -> Unit,
     onNavigateToSettings: () -> Unit = {},
-    language: AppLanguage = AppLanguage.SINHALA
+    language: AppLanguage = AppLanguage.SINHALA,
+    farmerName: String = "",
+    farmerDistrict: String = "",
+    marketPrices: List<TickerPriceItem> = emptyList(),
+    activeListingCount: Int = 0,
+    onToggleTextSize: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -77,34 +90,35 @@ fun IndustrialHomeScreen(
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Settings header - 56dp height (minimum touch target per Industrial spec)
+            // ─── Greeting Header ──────────────────────────────────────────
+            GreetingHeader(
+                language = language,
+                farmerName = farmerName,
+                farmerDistrict = farmerDistrict,
+                onNavigateToSettings = onNavigateToSettings,
+                onToggleTextSize = onToggleTextSize
+            )
+
+            // Thick Earth divider
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .background(HumanIndustrial.Rice)
-                    .padding(horizontal = Spacing.lg.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
+                    .height(BorderWidth.Thick)
+                    .background(HumanIndustrial.Earth)
+            )
+
+            // ─── Price Ticker Strip ───────────────────────────────────────
+            if (marketPrices.isNotEmpty()) {
+                PriceTickerStrip(prices = marketPrices, language = language)
                 Box(
                     modifier = Modifier
-                        .height(56.dp)
-                        .industrialClickable(onClick = onNavigateToSettings)
-                        .padding(horizontal = Spacing.md.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = when (language) {
-                            AppLanguage.SINHALA -> "සැකසුම්"
-                            AppLanguage.TAMIL -> "அமைப்புகள்"
-                            AppLanguage.ENGLISH -> "SETTINGS"
-                        },
-                        style = HumanIndustrialType.sectionLabel,
-                        color = HumanIndustrial.Earth
-                    )
-                }
+                        .fillMaxWidth()
+                        .height(BorderWidth.Thick)
+                        .background(HumanIndustrial.Earth)
+                )
             }
 
+            // ─── 2×2 Grid ─────────────────────────────────────────────────
             // Top row: BUY | SELL
             Row(
                 modifier = Modifier
@@ -113,6 +127,7 @@ fun IndustrialHomeScreen(
             ) {
                 // BUY quadrant (top-left)
                 HomeQuadrant(
+                    emoji = "🛒",
                     primaryText = when (language) {
                         AppLanguage.SINHALA -> "BUY"
                         AppLanguage.TAMIL -> "BUY"
@@ -137,23 +152,44 @@ fun IndustrialHomeScreen(
                         .background(HumanIndustrial.Earth)
                 )
 
-                // SELL quadrant (top-right)
-                HomeQuadrant(
-                    primaryText = when (language) {
-                        AppLanguage.SINHALA -> "SELL"
-                        AppLanguage.TAMIL -> "SELL"
-                        AppLanguage.ENGLISH -> "SELL"
-                    },
-                    secondaryText = when (language) {
-                        AppLanguage.SINHALA -> "විකුණන්න"
-                        AppLanguage.TAMIL -> "விற்க"
-                        AppLanguage.ENGLISH -> null
-                    },
-                    onClick = onNavigateToSell,
+                // SELL quadrant (top-right) with active listing badge
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                )
+                ) {
+                    HomeQuadrant(
+                        emoji = "🌾",
+                        primaryText = when (language) {
+                            AppLanguage.SINHALA -> "SELL"
+                            AppLanguage.TAMIL -> "SELL"
+                            AppLanguage.ENGLISH -> "SELL"
+                        },
+                        secondaryText = when (language) {
+                            AppLanguage.SINHALA -> "විකුණන්න"
+                            AppLanguage.TAMIL -> "விற்க"
+                            AppLanguage.ENGLISH -> null
+                        },
+                        onClick = onNavigateToSell,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    // Active listing count badge
+                    if (activeListingCount > 0) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(Spacing.sm.dp)
+                                .background(HumanIndustrial.Gold)
+                                .padding(horizontal = Spacing.sm.dp, vertical = Spacing.xs.dp)
+                        ) {
+                            Text(
+                                text = "$activeListingCount",
+                                style = HumanIndustrialType.statusBadge,
+                                color = HumanIndustrial.Rice
+                            )
+                        }
+                    }
+                }
             }
 
             // Horizontal divider
@@ -172,6 +208,7 @@ fun IndustrialHomeScreen(
             ) {
                 // PRICES quadrant (bottom-left)
                 HomeQuadrant(
+                    emoji = "📊",
                     primaryText = when (language) {
                         AppLanguage.SINHALA -> "PRICES"
                         AppLanguage.TAMIL -> "PRICES"
@@ -198,6 +235,7 @@ fun IndustrialHomeScreen(
 
                 // ORDERS quadrant (bottom-right)
                 HomeQuadrant(
+                    emoji = "📦",
                     primaryText = when (language) {
                         AppLanguage.SINHALA -> "ORDERS"
                         AppLanguage.TAMIL -> "ORDERS"
@@ -218,13 +256,191 @@ fun IndustrialHomeScreen(
     }
 }
 
+// ============================================================================
+// GREETING HEADER
+// ============================================================================
+
+@Composable
+private fun GreetingHeader(
+    language: AppLanguage,
+    farmerName: String,
+    farmerDistrict: String,
+    onNavigateToSettings: () -> Unit,
+    onToggleTextSize: () -> Unit
+) {
+    val greeting = when (language) {
+        AppLanguage.SINHALA -> "ආයුබෝවන්! 👋"
+        AppLanguage.TAMIL -> "வணக்கம்! 👋"
+        AppLanguage.ENGLISH -> "WELCOME! 👋"
+    }
+    val displayName = farmerName.ifBlank {
+        when (language) {
+            AppLanguage.SINHALA -> "ගොවියා"
+            AppLanguage.TAMIL -> "விவசாயி"
+            AppLanguage.ENGLISH -> "Farmer"
+        }
+    }
+    val settingsLabel = when (language) {
+        AppLanguage.SINHALA -> "සැකසුම්"
+        AppLanguage.TAMIL -> "அமைப்புகள்"
+        AppLanguage.ENGLISH -> "SETTINGS"
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF5C3317)) // Dark earth — rich soil header
+            .padding(horizontal = Spacing.lg.dp, vertical = Spacing.md.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = greeting,
+                        style = HumanIndustrialType.sectionLabel,
+                        color = Color(0xFFD4A84B) // Warm gold on dark earth
+                    )
+                    Text(
+                        text = "👨‍🌾 $displayName",
+                        style = HumanIndustrialType.screenTitle,
+                        color = HumanIndustrial.Rice
+                    )
+                    if (farmerDistrict.isNotBlank()) {
+                        Text(
+                            text = "📍 $farmerDistrict",
+                            style = HumanIndustrialType.body,
+                            color = Color(0xFFD4A84B)
+                        )
+                    }
+                }
+
+                // Right-side controls: AA + Settings
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
+                ) {
+                    // AA text size cycle button
+                    Box(
+                        modifier = Modifier
+                            .background(HumanIndustrial.Rice)
+                            .industrialClickable(onClick = onToggleTextSize)
+                            .padding(horizontal = Spacing.sm.dp, vertical = Spacing.xs.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "AA",
+                            style = HumanIndustrialType.sectionLabel,
+                            color = HumanIndustrial.Earth
+                        )
+                    }
+                    // Settings link
+                    Box(
+                        modifier = Modifier
+                            .industrialClickable(onClick = onNavigateToSettings)
+                            .padding(Spacing.xs.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = settingsLabel,
+                            style = HumanIndustrialType.timestamp,
+                            color = Color(0xFFD4A84B)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ============================================================================
+// PRICE TICKER STRIP
+// ============================================================================
+
 /**
- * Home quadrant tile - Rice background, Ink text
- * 24sp Bold centered text with optional secondary text below
- * Uses IndustrialIndication for pressed state (Earth 15% overlay)
+ * Lightweight price item for the ticker strip
+ */
+data class TickerPriceItem(
+    val emoji: String,
+    val cropName: String,     // In current language
+    val price: Double,
+    val unit: String,
+    val trend: PriceTrend = PriceTrend.STABLE
+)
+
+@Composable
+private fun PriceTickerStrip(
+    prices: List<TickerPriceItem>,
+    language: AppLanguage
+) {
+    val currencySymbol = when (language) {
+        AppLanguage.SINHALA -> "රු"
+        AppLanguage.TAMIL -> "ரூ"
+        AppLanguage.ENGLISH -> "Rs"
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(44.dp)
+            .background(Color(0xFFF5C518)) // Sun yellow ticker
+            .padding(horizontal = Spacing.sm.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = Spacing.xs.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.lg.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(prices) { item ->
+                val trendArrow = when (item.trend) {
+                    PriceTrend.UP -> "▲"
+                    PriceTrend.DOWN -> "▼"
+                    PriceTrend.STABLE -> "—"
+                }
+                val trendColor = when (item.trend) {
+                    PriceTrend.UP -> Color(0xFF22c55e)
+                    PriceTrend.DOWN -> Color(0xFFef4444)
+                    PriceTrend.STABLE -> HumanIndustrial.Ink
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(text = item.emoji, fontSize = 16.sp)
+                    Text(
+                        text = item.cropName,
+                        style = HumanIndustrialType.sectionLabel,
+                        color = HumanIndustrial.Ink
+                    )
+                    Text(
+                        text = "$currencySymbol${item.price.toInt()}",
+                        style = HumanIndustrialType.sectionLabel,
+                        color = HumanIndustrial.Earth
+                    )
+                    Text(
+                        text = trendArrow,
+                        style = HumanIndustrialType.sectionLabel,
+                        color = trendColor
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ============================================================================
+// HOME QUADRANT TILE
+// ============================================================================
+
+/**
+ * Home quadrant tile - Rice background, emoji + Ink text + local-language label
  */
 @Composable
 private fun HomeQuadrant(
+    emoji: String,
     primaryText: String,
     secondaryText: String?,
     onClick: () -> Unit,
@@ -236,7 +452,15 @@ private fun HomeQuadrant(
             .background(HumanIndustrial.Rice),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
+        ) {
+            Text(
+                text = emoji,
+                fontSize = 40.sp,
+                textAlign = TextAlign.Center
+            )
             Text(
                 text = primaryText,
                 style = HumanIndustrialType.homeTile,
@@ -259,6 +483,14 @@ private fun HomeQuadrant(
 // PREVIEWS
 // ============================================================================
 
+private val sampleTicker = listOf(
+    TickerPriceItem("🧅", "ළූණු", 120.0, "kg", PriceTrend.UP),
+    TickerPriceItem("🌶️", "මිරිස්", 280.0, "kg", PriceTrend.DOWN),
+    TickerPriceItem("🍅", "තක්කාලි", 95.0, "kg", PriceTrend.STABLE),
+    TickerPriceItem("🥥", "පොල්", 45.0, "piece", PriceTrend.UP),
+    TickerPriceItem("🌾", "සහල්", 220.0, "kg", PriceTrend.UP)
+)
+
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 private fun IndustrialHomeScreenPreview() {
@@ -267,19 +499,11 @@ private fun IndustrialHomeScreenPreview() {
         onNavigateToSell = {},
         onNavigateToPrices = {},
         onNavigateToOrders = {},
-        language = AppLanguage.SINHALA
-    )
-}
-
-@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-@Composable
-private fun IndustrialHomeScreenEnglishPreview() {
-    IndustrialHomeScreen(
-        onNavigateToBuy = {},
-        onNavigateToSell = {},
-        onNavigateToPrices = {},
-        onNavigateToOrders = {},
-        language = AppLanguage.ENGLISH
+        language = AppLanguage.SINHALA,
+        farmerName = "Suresh Kumar",
+        farmerDistrict = "Jaffna",
+        marketPrices = sampleTicker,
+        activeListingCount = 3
     )
 }
 
@@ -291,6 +515,29 @@ private fun IndustrialHomeScreenTamilPreview() {
         onNavigateToSell = {},
         onNavigateToPrices = {},
         onNavigateToOrders = {},
-        language = AppLanguage.TAMIL
+        language = AppLanguage.TAMIL,
+        farmerName = "Selvam",
+        farmerDistrict = "யாழ்ப்பாணம்",
+        marketPrices = listOf(
+            TickerPriceItem("🧅", "வெங்காயம்", 120.0, "kg", PriceTrend.UP),
+            TickerPriceItem("🌶️", "மிளகாய்", 280.0, "kg", PriceTrend.DOWN)
+        ),
+        activeListingCount = 0
+    )
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun IndustrialHomeScreenEnglishPreview() {
+    IndustrialHomeScreen(
+        onNavigateToBuy = {},
+        onNavigateToSell = {},
+        onNavigateToPrices = {},
+        onNavigateToOrders = {},
+        language = AppLanguage.ENGLISH,
+        farmerName = "",
+        farmerDistrict = "",
+        marketPrices = emptyList(),
+        activeListingCount = 1
     )
 }

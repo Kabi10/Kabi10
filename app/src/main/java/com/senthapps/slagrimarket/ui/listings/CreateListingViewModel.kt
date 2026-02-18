@@ -11,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -21,12 +23,28 @@ import javax.inject.Inject
 class CreateListingViewModel @Inject constructor(
     private val listingRepository: ListingRepository,
     private val authRepository: AuthRepository,
-    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
+    private val lastUsedPreferences: com.senthapps.slagrimarket.data.preferences.LastUsedPreferences
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(CreateListingUiState())
     val uiState: StateFlow<CreateListingUiState> = _uiState.asStateFlow()
-    
+
+    init {
+        viewModelScope.launch {
+            val lastCrop = lastUsedPreferences.getLastCropType().first()
+            val lastPrice = lastUsedPreferences.getLastPrice().first()
+            val lastLoc = lastUsedPreferences.getLastLocation().first()
+            _uiState.update { current ->
+                current.copy(
+                    cropType = if (lastCrop.isNotBlank()) lastCrop else current.cropType,
+                    pricePerUnit = if (lastPrice.isNotBlank()) lastPrice else current.pricePerUnit,
+                    location = if (lastLoc.isNotBlank()) lastLoc else current.location
+                )
+            }
+        }
+    }
+
     fun updateCropType(cropType: String) {
         _uiState.value = _uiState.value.copy(
             cropType = cropType,
@@ -168,6 +186,11 @@ class CreateListingViewModel @Inject constructor(
                         _uiState.value = state.copy(
                             isLoading = false,
                             isSuccess = true
+                        )
+                        lastUsedPreferences.saveLastListing(
+                            cropType = state.cropType,
+                            price = state.pricePerUnit,
+                            location = state.location
                         )
                         Timber.d("Listing created successfully: ${listing.id} with ${imageUrls.size} images")
                     },

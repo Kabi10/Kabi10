@@ -131,6 +131,23 @@ private fun NotificationCard(
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    // Determine if this notification type should show an action button
+    val actionLabel: String? = when (notification.type) {
+        NotificationType.ORDER_RECEIVED, NotificationType.ORDER_CONFIRMED,
+        NotificationType.ORDER_READY, NotificationType.ORDER_COMPLETED,
+        NotificationType.ORDER_CANCELLED -> when (currentLanguage) {
+            "si" -> "ඇණවුම බලන්න →"
+            "ta" -> "ஆர்டர் பார்க்க →"
+            else -> "VIEW ORDER →"
+        }
+        NotificationType.NEW_MESSAGE -> when (currentLanguage) {
+            "si" -> "පණිවිඩය බලන්න →"
+            "ta" -> "செய்தி பார்க்க →"
+            else -> "VIEW MESSAGE →"
+        }
+        else -> null
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -200,6 +217,21 @@ private fun NotificationCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                // Prominent action button for order/message notifications — easy for elderly farmers
+                if (actionLabel != null) {
+                    TextButton(
+                        onClick = onClick,
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Text(
+                            text = actionLabel,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = getNotificationColor(notification.type),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
 
             // Delete button

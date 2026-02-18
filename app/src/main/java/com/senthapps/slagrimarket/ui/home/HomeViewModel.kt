@@ -60,6 +60,7 @@ class HomeViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 recentListings = listings.take(5),
+                                activeListingCount = listings.size,
                                 isLoadingListings = false
                             )
                         }
@@ -276,5 +277,6 @@ data class HomeUiState(
     val todayOrders: Int = 0,
     val todayRevenue: Double = 0.0,
     val error: String? = null,
-    val lastPricesUpdated: Long = 0L
+    val lastPricesUpdated: Long = 0L,
+    val activeListingCount: Int = 0
 )

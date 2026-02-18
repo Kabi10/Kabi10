@@ -9,15 +9,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.senthapps.slagrimarket.data.model.PriceTrend
+import com.senthapps.slagrimarket.data.model.getCropEmoji
 import com.senthapps.slagrimarket.ui.components.SecondaryButton
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
@@ -27,51 +32,50 @@ import com.senthapps.slagrimarket.ui.theme.Spacing
 import com.senthapps.slagrimarket.ui.theme.industrialClickable
 
 // ============================================================================
-// HUMAN INDUSTRIAL MARKET PRICES SCREEN v2.0
-// "The Government Price Board" - Today's going rates
-// 72dp header, 40dp updated bar, 72dp rows with price/unit
+// HUMAN INDUSTRIAL MARKET PRICES SCREEN v3.0
+// "The Government Price Board" - crop emoji, trend arrows, offline badge
 // ============================================================================
 
 /**
- * Market price data class
+ * Market price data class — now includes trend and change for display
  */
 data class MarketPriceItem(
     val productName: String,
     val productNameSinhala: String = productName,
     val productNameTamil: String = productName,
     val price: Double,
-    val unit: String
+    val unit: String,
+    val emoji: String = "🌱",
+    val trend: PriceTrend = PriceTrend.STABLE,
+    val changeAmount: Double = 0.0
 )
 
 /**
  * Sample market price data per UI plan
  */
 val SAMPLE_MARKET_PRICES = listOf(
-    MarketPriceItem("Tomatoes", "තක්කාලි", "தக்காளி", 280.0, "kg"),
-    MarketPriceItem("Beans", "බෝංචි", "பீன்ஸ்", 320.0, "kg"),
-    MarketPriceItem("Eggplant", "වම්බටු", "கத்திரிக்காய்", 150.0, "kg"),
-    MarketPriceItem("Cabbage", "ගෝවා", "முட்டைக்கோஸ்", 180.0, "kg"),
-    MarketPriceItem("Carrot", "කැරට්", "கேரட்", 240.0, "kg"),
-    MarketPriceItem("Coconut", "පොල්", "தேங்காய்", 85.0, "nut"),
-    MarketPriceItem("Paddy", "වී", "நெல்", 95.0, "kg"),
-    MarketPriceItem("Mango", "අඹ", "மாம்பழம்", 350.0, "kg"),
-    MarketPriceItem("Fish", "මාළු", "மீன்", 800.0, "kg"),
-    MarketPriceItem("Chicken", "කුකුළු", "கோழி", 750.0, "kg")
+    MarketPriceItem("Tomatoes", "තක්කාලි", "தக்காளி", 280.0, "kg", "🍅", PriceTrend.UP, 12.0),
+    MarketPriceItem("Beans", "බෝංචි", "பீன்ஸ்", 320.0, "kg", "🫘", PriceTrend.STABLE, 0.0),
+    MarketPriceItem("Eggplant", "වම්බටු", "கத்திரிக்காய்", 150.0, "kg", "🍆", PriceTrend.DOWN, -8.0),
+    MarketPriceItem("Cabbage", "ගෝවා", "முட்டைக்கோஸ்", 180.0, "kg", "🥬", PriceTrend.UP, 5.0),
+    MarketPriceItem("Carrot", "කැරට්", "கேரட்", 240.0, "kg", "🥕", PriceTrend.STABLE, 0.0),
+    MarketPriceItem("Coconut", "පොල්", "தேங்காய்", 85.0, "nut", "🥥", PriceTrend.UP, 3.0),
+    MarketPriceItem("Paddy", "වී", "நெல்", 95.0, "kg", "🌾", PriceTrend.STABLE, 0.0),
+    MarketPriceItem("Mango", "අඹ", "மாம்பழம்", 350.0, "kg", "🥭", PriceTrend.DOWN, -15.0),
+    MarketPriceItem("Red Onion", "රතු ළූණු", "வெங்காயம்", 120.0, "kg", "🧅", PriceTrend.UP, 6.0),
+    MarketPriceItem("Chili", "මිරිස්", "மிளகாய்", 280.0, "kg", "🌶️", PriceTrend.DOWN, -33.0)
 )
 
 /**
- * Industrial market prices screen - daily price reference
+ * Industrial market prices screen — amber header, crop emoji, trend arrows, offline support
  *
- * Header: 72dp Rice with back text and title
- * Updated bar: 40dp Dust with timestamp
- * Rows: 72dp with product name left, price/unit right
- *
- * @param prices List of market prices
+ * @param prices List of market prices to display
  * @param language Current language for labels
  * @param lastUpdatedText Last updated timestamp text
  * @param onNavigateBack Callback to navigate back
  * @param isLoading Loading state
  * @param isError Error state
+ * @param isOffline True when showing cached data without live network
  * @param onRetry Retry callback
  */
 @Composable
@@ -82,6 +86,7 @@ fun IndustrialMarketPricesScreen(
     onNavigateBack: () -> Unit,
     isLoading: Boolean = false,
     isError: Boolean = false,
+    isOffline: Boolean = false,
     onRetry: () -> Unit = {}
 ) {
     val updatedText = lastUpdatedText ?: when (language) {
@@ -95,7 +100,7 @@ fun IndustrialMarketPricesScreen(
             .fillMaxSize()
             .background(HumanIndustrial.Rice)
     ) {
-        // Header - 72dp
+        // Header — amber/harvest gradient feel
         PricesHeader(
             backText = when (language) {
                 AppLanguage.SINHALA -> "ආපසු"
@@ -103,9 +108,9 @@ fun IndustrialMarketPricesScreen(
                 AppLanguage.ENGLISH -> "BACK"
             },
             title = when (language) {
-                AppLanguage.SINHALA -> "මිල ගණන්"
-                AppLanguage.TAMIL -> "விலைகள்"
-                AppLanguage.ENGLISH -> "PRICES"
+                AppLanguage.SINHALA -> "🏪 මිල ගණන්"
+                AppLanguage.TAMIL -> "🏪 விலைகள்"
+                AppLanguage.ENGLISH -> "🏪 PRICES"
             },
             onBackClick = onNavigateBack
         )
@@ -113,21 +118,52 @@ fun IndustrialMarketPricesScreen(
         // 4dp Earth divider
         EarthDivider()
 
-        // Updated bar - 40dp Dust background
+        // Updated bar — shows LIVE dot or OFFLINE badge
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
-                .background(HumanIndustrial.Dust)
+                .background(if (isOffline) Color(0xFFD4A84B) else HumanIndustrial.Dust)
                 .padding(horizontal = Spacing.lg.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = updatedText,
-                style = HumanIndustrialType.timestamp,
-                color = HumanIndustrial.Stone,
-                textAlign = TextAlign.Center
-            )
+            if (isOffline) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm.dp)
+                ) {
+                    Text(
+                        text = "📵",
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = when (language) {
+                            AppLanguage.SINHALA -> "OFFLINE — පෙර දත්ත"
+                            AppLanguage.TAMIL -> "OFFLINE — தற்காலிக தரவு"
+                            AppLanguage.ENGLISH -> "OFFLINE — Cached data"
+                        },
+                        style = HumanIndustrialType.sectionLabel,
+                        color = HumanIndustrial.Ink
+                    )
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(Color(0xFF22c55e))
+                    )
+                    Text(
+                        text = updatedText,
+                        style = HumanIndustrialType.timestamp,
+                        color = HumanIndustrial.Stone,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
 
         // 4dp Earth divider
@@ -211,9 +247,10 @@ fun IndustrialMarketPricesScreen(
     }
 }
 
-/**
- * Header component - 72dp Rice background
- */
+// ============================================================================
+// HEADER
+// ============================================================================
+
 @Composable
 private fun PricesHeader(
     backText: String,
@@ -224,7 +261,7 @@ private fun PricesHeader(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .background(HumanIndustrial.Rice)
+            .background(Color(0xFF5C3317)) // Dark earth header matching home
             .padding(horizontal = Spacing.lg.dp, vertical = Spacing.md.dp)
     ) {
         Box(
@@ -237,22 +274,23 @@ private fun PricesHeader(
             Text(
                 text = backText,
                 style = HumanIndustrialType.sectionLabel,
-                color = HumanIndustrial.Earth
+                color = Color(0xFFD4A84B)
             )
         }
 
         Text(
             text = title,
             style = HumanIndustrialType.screenTitle,
-            color = HumanIndustrial.Ink,
+            color = HumanIndustrial.Rice,
             modifier = Modifier.align(Alignment.CenterEnd)
         )
     }
 }
 
-/**
- * 4dp Earth divider
- */
+// ============================================================================
+// DIVIDER
+// ============================================================================
+
 @Composable
 private fun EarthDivider() {
     Box(
@@ -263,10 +301,10 @@ private fun EarthDivider() {
     )
 }
 
-/**
- * Price row - 72dp height
- * Product name left (20sp Bold), Price/unit right (20sp Bold Gold)
- */
+// ============================================================================
+// PRICE ROW — emoji left, name + Sinhala subtitle, trend + change right
+// ============================================================================
+
 @Composable
 private fun PriceRow(
     price: MarketPriceItem,
@@ -275,51 +313,118 @@ private fun PriceRow(
 ) {
     val backgroundColor = if (useAlternateBackground) HumanIndustrial.Dust else HumanIndustrial.Rice
     val textScale = LocalTextScale.current
+
     val productName = when (language) {
         AppLanguage.SINHALA -> price.productNameSinhala
         AppLanguage.TAMIL -> price.productNameTamil
         AppLanguage.ENGLISH -> price.productName
     }
+    // Always show Sinhala subtitle (unless current language is Sinhala — then skip)
+    val subtitle = when (language) {
+        AppLanguage.SINHALA -> null
+        AppLanguage.TAMIL -> price.productNameSinhala
+        AppLanguage.ENGLISH -> price.productNameSinhala
+    }
+
     val currencySymbol = when (language) {
         AppLanguage.SINHALA -> "රු"
         AppLanguage.TAMIL -> "ரூ"
         AppLanguage.ENGLISH -> "Rs"
     }
     val priceText = "$currencySymbol ${price.price.toInt()}/${price.unit}"
+
+    val trendArrow = when (price.trend) {
+        PriceTrend.UP -> "▲"
+        PriceTrend.DOWN -> "▼"
+        PriceTrend.STABLE -> "➡"
+    }
+    val trendColor = when (price.trend) {
+        PriceTrend.UP -> Color(0xFF22c55e)
+        PriceTrend.DOWN -> Color(0xFFef4444)
+        PriceTrend.STABLE -> HumanIndustrial.Stone
+    }
+
+    val changeText = if (price.changeAmount != 0.0) {
+        val sign = if (price.changeAmount > 0) "+" else ""
+        " $sign${price.changeAmount.toInt()}"
+    } else ""
+
     val scaledStyle = HumanIndustrialType.productName.copy(
         fontSize = HumanIndustrialType.productName.fontSize * textScale
     )
-    val rowHeight = (72 * textScale).dp
+    val rowHeight = (if (subtitle != null) 88 else 72) * textScale
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(rowHeight)
+            .height(rowHeight.dp)
             .background(backgroundColor)
             .padding(horizontal = Spacing.lg.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = productName,
-            style = scaledStyle,
-            color = HumanIndustrial.Ink
-        )
-        Text(
-            text = priceText,
-            style = scaledStyle,
-            color = HumanIndustrial.Gold
-        )
+        // Left: emoji + name column
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = price.emoji,
+                fontSize = (30 * textScale).sp
+            )
+            Column {
+                Text(
+                    text = productName,
+                    style = scaledStyle,
+                    color = HumanIndustrial.Ink
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = HumanIndustrialType.body.copy(
+                            fontSize = HumanIndustrialType.body.fontSize * textScale
+                        ),
+                        color = HumanIndustrial.Stone
+                    )
+                }
+            }
+        }
+
+        // Right: trend arrow + change + price
+        Column(horizontalAlignment = Alignment.End) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = trendArrow,
+                    style = scaledStyle.copy(fontSize = 16.sp * textScale),
+                    color = trendColor
+                )
+                if (changeText.isNotEmpty()) {
+                    Text(
+                        text = changeText,
+                        style = HumanIndustrialType.sectionLabel.copy(
+                            fontSize = HumanIndustrialType.sectionLabel.fontSize * textScale
+                        ),
+                        color = trendColor
+                    )
+                }
+            }
+            Text(
+                text = priceText,
+                style = scaledStyle,
+                color = HumanIndustrial.Gold
+            )
+        }
     }
 }
 
 // ============================================================================
-// BACKWARD COMPATIBILITY - Keep old function signature with MarketPrice
+// BACKWARD COMPATIBILITY — existing NavGraph passes List<MarketPrice>
 // ============================================================================
 
-/**
- * Legacy function signature for backward compatibility
- */
 @Composable
 fun IndustrialMarketPricesScreen(
     marketPrices: List<com.senthapps.slagrimarket.data.model.MarketPrice>,
@@ -327,6 +432,7 @@ fun IndustrialMarketPricesScreen(
     lastUpdatedText: String = "Updated: Just now",
     isLoading: Boolean = false,
     isError: Boolean = false,
+    isOffline: Boolean = false,
     onRetry: () -> Unit = {}
 ) {
     val convertedPrices = marketPrices.map { mp ->
@@ -335,7 +441,10 @@ fun IndustrialMarketPricesScreen(
             productNameSinhala = mp.cropNameSinhala,
             productNameTamil = mp.cropNameTamil,
             price = mp.currentPrice,
-            unit = "kg"
+            unit = mp.unit,
+            emoji = mp.getCropEmoji(),
+            trend = mp.trend,
+            changeAmount = mp.changeAmount
         )
     }
 
@@ -346,6 +455,7 @@ fun IndustrialMarketPricesScreen(
         onNavigateBack = onNavigateBack,
         isLoading = isLoading,
         isError = isError,
+        isOffline = isOffline,
         onRetry = onRetry
     )
 }
@@ -366,11 +476,12 @@ private fun MarketPricesPreview() {
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-private fun MarketPricesEnglishPreview() {
+private fun MarketPricesOfflinePreview() {
     IndustrialMarketPricesScreen(
         prices = SAMPLE_MARKET_PRICES,
         language = AppLanguage.ENGLISH,
-        onNavigateBack = {}
+        onNavigateBack = {},
+        isOffline = true
     )
 }
 

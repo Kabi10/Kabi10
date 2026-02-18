@@ -1,0 +1,572 @@
+--------- beginning of system
+02-17 18:43:18.820 I/ActivityManager( 1619): Killing 2261:com.google.android.partnersetup/u0a18 (adj 906): empty #17
+--------- beginning of main
+02-17 18:43:19.304 I/        ( 1383): free_cache(25448925) avail 6016077824
+02-17 18:43:19.806 W/art     ( 3149): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:19.813 I/ActivityManager( 1619): Start proc 3149:com.android.defcontainer/u0a8 for service com.android.defcontainer/.DefaultContainerService
+02-17 18:43:19.846 W/PackageParser( 1619): Unknown element under <manifest>: queries at /data/app/vmdl1695652754.tmp/base.apk Binary XML file line #36
+02-17 18:43:19.846 W/PackageParser( 1619): Unknown element under <application>: property at /data/app/vmdl1695652754.tmp/base.apk Binary XML file line #274
+02-17 18:43:19.848 W/PackageManager( 1619): Package com.senthapps.slagrimarket desires unavailable shared library android.ext.adservices; ignoring!
+02-17 18:43:19.849 I/SELinux ( 1383): SELinux: Loaded file_contexts contexts from /file_contexts.bin.
+02-17 18:43:19.851 I/PackageManager.DexOptimizer( 1619): Running dexopt (dex2oat) on: /data/app/vmdl1695652754.tmp/base.apk pkg=com.senthapps.slagrimarket isa=x86 vmSafeMode=false debuggable=true target-filter=interpret-only oatDir = /data/app/vmdl1695652754.tmp/oat sharedLibraries=null
+02-17 18:43:19.866 W/dex2oat ( 3163): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:19.866 W/dex2oat ( 3163): Mismatch between dex2oat instruction set features (ISA: X86 Feature string: smp,-ssse3,-sse4.1,-sse4.2,-avx,-avx2,-lock_add,-popcnt) and those of dex2oat executable (ISA: X86 Feature string: smp,ssse3,-sse4.1,-sse4.2,-avx,-avx2,-lock_add,-popcnt) for the command line:
+02-17 18:43:19.866 W/dex2oat ( 3163): /system/bin/dex2oat --zip-fd=6 --zip-location=base.apk --oat-fd=7 --oat-location=/data/app/vmdl1695652754.tmp/oat/x86/base.odex --instruction-set=x86 --instruction-set-variant=x86 --instruction-set-features=default --runtime-arg -Xms64m --runtime-arg -Xmx512m --compiler-filter=interpret-only --swap-fd=9 --debuggable
+02-17 18:43:19.866 I/dex2oat ( 3163): /system/bin/dex2oat --compiler-filter=interpret-only --debuggable
+02-17 18:43:21.192 I/dex2oat ( 3163): Large app, accepted running with swap.
+02-17 18:43:21.229 W/dex2oat ( 3163): Before Android 4.1, method int androidx.appcompat.widget.DropDownListView.lookForSelectablePosition(int, boolean) would have incorrectly overridden the package-private method in android.widget.ListView
+02-17 18:43:21.229 W/dex2oat ( 3163): Before Android 4.1, method int androidx.appcompat.widget.MenuPopupWindow$MenuDropDownListView.lookForSelectablePosition(int, boolean) would have incorrectly overridden the package-private method in android.widget.ListView
+02-17 18:43:21.590 W/dex2oat ( 3163): Before Android 4.1, method android.graphics.PorterDuffColorFilter androidx.vectordrawable.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter, android.content.res.ColorStateList, android.graphics.PorterDuff$Mode) would have incorrectly overridden the package-private method in android.graphics.drawable.Drawable
+02-17 18:43:25.532 W/dex2oat ( 3163): Before Android 4.1, method double java.util.concurrent.ThreadLocalRandom.internalNextDouble(double, double) would have incorrectly overridden the package-private method in java.util.Random
+02-17 18:43:25.532 W/dex2oat ( 3163): Before Android 4.1, method int java.util.concurrent.ThreadLocalRandom.internalNextInt(int, int) would have incorrectly overridden the package-private method in java.util.Random
+02-17 18:43:25.532 W/dex2oat ( 3163): Before Android 4.1, method long java.util.concurrent.ThreadLocalRandom.internalNextLong(long, long) would have incorrectly overridden the package-private method in java.util.Random
+02-17 18:43:28.845 I/ActivityManager( 1619): Killing 2706:com.google.process.gapps/u0a50 (adj 906): empty #17
+02-17 18:43:31.699 I/dex2oat ( 3163): dex2oat took 11.833s (threads: 4) arena alloc=748KB (766632B) java alloc=31MB (33039280B) native alloc=46MB (48721312B) free=3MB (3838560B) swap=16MB (16777216B)
+02-17 18:43:31.720 I/ActivityManager( 1619): Force stopping com.senthapps.slagrimarket appid=10078 user=-1: installPackageLI
+02-17 18:43:31.767 I/PackageManager( 1619): Package com.senthapps.slagrimarket codePath changed from /data/app/com.senthapps.slagrimarket-1 to /data/app/com.senthapps.slagrimarket-2; Retaining data and using new
+02-17 18:43:31.767 W/PackageManager( 1619): Package com.senthapps.slagrimarket desires unavailable shared library android.ext.adservices; ignoring!
+02-17 18:43:31.769 W/PackageManager( 1619): Code path for com.senthapps.slagrimarket changing from /data/app/com.senthapps.slagrimarket-1 to /data/app/com.senthapps.slagrimarket-2
+02-17 18:43:31.769 W/PackageManager( 1619): Resource path for com.senthapps.slagrimarket changing from /data/app/com.senthapps.slagrimarket-1 to /data/app/com.senthapps.slagrimarket-2
+02-17 18:43:31.792 W/PackageManager( 1619): Unknown permission android.permission.POST_NOTIFICATIONS in package com.senthapps.slagrimarket
+02-17 18:43:31.792 W/PackageManager( 1619): Unknown permission com.google.android.gms.permission.AD_ID in package com.senthapps.slagrimarket
+02-17 18:43:31.792 W/PackageManager( 1619): Unknown permission android.permission.ACCESS_ADSERVICES_ATTRIBUTION in package com.senthapps.slagrimarket
+02-17 18:43:31.792 W/PackageManager( 1619): Unknown permission android.permission.ACCESS_ADSERVICES_AD_ID in package com.senthapps.slagrimarket
+02-17 18:43:31.792 W/PackageManager( 1619): Unknown permission com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE in package com.senthapps.slagrimarket
+02-17 18:43:31.792 W/PackageManager( 1619): Unknown permission android.permission.FOREGROUND_SERVICE in package com.senthapps.slagrimarket
+02-17 18:43:31.827 I/art     ( 1619): Starting a blocking GC Explicit
+02-17 18:43:31.827 I/ActivityManager( 1619): Killing 2786:com.google.android.gms.ui/u0a13 (adj 906): empty #17
+02-17 18:43:31.845 I/art     ( 1619): Explicit concurrent mark sweep GC freed 52855(2MB) AllocSpace objects, 14(376KB) LOS objects, 25% free, 11MB/15MB, paused 962us total 18.116ms
+02-17 18:43:31.859 E/        ( 1383): Couldn't opendir /data/app/vmdl1695652754.tmp: No such file or directory
+02-17 18:43:31.861 I/ActivityManager( 1619): Force stopping com.senthapps.slagrimarket appid=10078 user=0: pkg removed
+02-17 18:43:31.867 E/JavaBinder( 1619): !!! FAILED BINDER TRANSACTION !!!  (parcel size = 140)
+02-17 18:43:31.878 W/art     ( 3169): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:31.886 I/ActivityManager( 1619): Start proc 3169:com.android.gallery3d/u0a49 for broadcast com.android.gallery3d/.app.PackagesMonitor
+02-17 18:43:31.888 W/ActivityManager( 1619): Permission Denial: Accessing service ComponentInfo{com.google.android.music/com.google.android.music.dial.DialMediaRouteProviderService} from pid=2900, uid=10073 that is not exported from uid 10059
+02-17 18:43:31.893 E/JavaBinder( 1619): !!! FAILED BINDER TRANSACTION !!!  (parcel size = 140)
+02-17 18:43:31.897 W/ActivityManager( 1619): Permission Denial: Accessing service ComponentInfo{com.google.android.music/com.google.android.music.dial.DialMediaRouteProviderService} from pid=2900, uid=10073 that is not exported from uid 10059
+02-17 18:43:31.903 W/ActivityManager( 1619): Permission Denial: Accessing service ComponentInfo{com.google.android.music/com.google.android.music.dial.DialMediaRouteProviderService} from pid=2900, uid=10073 that is not exported from uid 10059
+02-17 18:43:31.907 I/InputReader( 1619): Reconfiguring input devices.  changes=0x00000010
+02-17 18:43:31.908 I/InputReader( 1619): Reconfiguring input devices.  changes=0x00000010
+02-17 18:43:32.059 W/art     ( 3184): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:32.064 I/ActivityManager( 1619): Start proc 3184:com.android.keychain/1000 for broadcast com.android.keychain/.KeyChainBroadcastReceiver
+02-17 18:43:32.066 I/ActivityManager( 1619): Killing 1804:com.android.settings/1000 (adj 906): empty #17
+02-17 18:43:32.127 W/System  ( 3184): ClassLoader referenced unknown path: /system/app/KeyChain/lib/x86
+02-17 18:43:32.156 W/ContextImpl( 3184): Calling a method in the system process without a qualified user: android.app.ContextImpl.startService:1385 android.content.ContextWrapper.startService:613 android.content.ContextWrapper.startService:613 com.android.keychain.KeyChainBroadcastReceiver.onReceive:12 android.app.ActivityThread.handleReceiver:3011 
+02-17 18:43:32.231 W/art     ( 3199): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:32.244 I/ActivityManager( 1619): Start proc 3199:com.google.android.apps.docs/u0a43 for broadcast com.google.android.apps.docs/.receivers.AppPackageAddRemoveReceiver
+02-17 18:43:32.273 W/System  ( 3199): ClassLoader referenced unknown path: /system/app/Drive/lib/x86
+02-17 18:43:32.524 I/GAv4    ( 3199): Google Analytics 8.4.87 is starting up. To enable debug logging on a device run:
+02-17 18:43:32.524 I/GAv4    ( 3199):   adb shell setprop log.tag.GAv4 DEBUG
+02-17 18:43:32.524 I/GAv4    ( 3199):   adb logcat -s GAv4
+02-17 18:43:32.536 W/GAv4    ( 3199): AnalyticsReceiver is not registered or is disabled. Register the receiver for reliable dispatching on non-Google Play devices. See http://goo.gl/8Rd3yj for instructions.
+02-17 18:43:32.540 W/GAv4    ( 3199): CampaignTrackingReceiver is not registered, not exported or is disabled. Installation campaign tracking is not possible. See http://goo.gl/8Rd3yj for instructions.
+02-17 18:43:32.556 W/GAv4    ( 3199): AnalyticsService not registered in the app manifest. Hits might not be delivered reliably. See http://goo.gl/8Rd3yj for instructions.
+02-17 18:43:32.663 E/NetworkScheduler( 2029): Unrecognised action provided: android.intent.action.PACKAGE_REMOVED
+02-17 18:43:32.722 I/Finsky  ( 2431): [1] com.google.android.finsky.utils.PermissionPolicies$PermissionPolicyService.onStartCommand(117): post-install permissions check for com.senthapps.slagrimarket
+02-17 18:43:32.735 I/Finsky  ( 2431): [1] com.google.android.finsky.utils.bh.run(2302): Package state data is missing for com.senthapps.slagrimarket
+02-17 18:43:32.737 W/Finsky  ( 2431): [1] com.google.android.finsky.FinskyApp.i(1468): No account configured on this device.
+02-17 18:43:32.800 I/ActivityManager( 1619): Killing 2013:android.process.media/u0a11 (adj 906): empty #17
+02-17 18:43:32.880 W/art     ( 3241): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:32.886 I/ActivityManager( 1619): Start proc 3241:com.google.android.partnersetup/u0a18 for broadcast com.google.android.partnersetup/.RlzPingBroadcastReceiver
+02-17 18:43:32.910 W/System  ( 3241): ClassLoader referenced unknown path: /system/priv-app/GooglePartnerSetup/lib/x86
+02-17 18:43:32.936 W/ConfigurationChimeraPro( 2029): Got null configs for com.google.android.gms.chromesync
+02-17 18:43:32.939 I/UpdateIcingCorporaServi( 2165): Updating corpora: APPS=com.senthapps.slagrimarket, CONTACTS=MAYBE
+02-17 18:43:32.975 W/art     ( 2207): Suspending all threads took: 15.219ms
+02-17 18:43:32.990 W/ConfigurationChimeraPro( 2029): Got null configs for com.google.android.gms.appinvite
+02-17 18:43:33.116 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.googlequicksearchbox componentName=null serviceId=36
+02-17 18:43:33.148 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload true
+02-17 18:43:33.263 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=32
+02-17 18:43:33.264 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=36
+02-17 18:43:33.275 I/UpdateIcingCorporaServi( 2165): UpdateCorporaTask done [took 336 ms] updated apps [took 335 ms] 
+02-17 18:43:33.279 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:43:33.284 I/Icing   ( 2207): Indexing F4F297C0F7051C08AE157D16B42E2EC4398DBD54 from com.google.android.googlequicksearchbox
+02-17 18:43:33.396 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:43:33.406 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=32
+02-17 18:43:33.407 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=36
+02-17 18:43:33.420 I/Icing   ( 2207): Indexing done F4F297C0F7051C08AE157D16B42E2EC4398DBD54
+02-17 18:43:33.424 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:43:33.427 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:43:33.427 I/Icing   ( 2207): Indexing 07288480EC7D5B88D986F7C58FF4DB5426C636B2 from com.google.android.gms
+02-17 18:43:33.476 I/Icing   ( 2207): Indexing done 07288480EC7D5B88D986F7C58FF4DB5426C636B2
+02-17 18:43:33.477 I/Icing   ( 2207): Indexing 07288480EC7D5B88D986F7C58FF4DB5426C636B2 from com.google.android.gms
+02-17 18:43:33.478 I/Icing   ( 2207): Indexing done 07288480EC7D5B88D986F7C58FF4DB5426C636B2
+02-17 18:43:39.130 I/GoogleURLConnFactory( 2029): Using platform SSLCertificateSocketFactory
+02-17 18:43:39.146 I/GoogleURLConnFactory( 2029): Using platform SSLCertificateSocketFactory
+02-17 18:43:39.362 W/Binder:2417_2( 2417): type=1400 audit(0.0:16): avc: denied { read } for name="/" dev="tmpfs" ino=93 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:device:s0 tclass=dir permissive=0
+02-17 18:43:39.382 W/Binder:2417_2( 2417): type=1400 audit(0.0:17): avc: denied { read } for name="/" dev="tmpfs" ino=93 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:device:s0 tclass=dir permissive=0
+02-17 18:43:39.447 W/ConfigurationChimeraPro( 2029): Got null configs for com.google.android.gms.auth.account.base
+02-17 18:43:39.555 W/GLSUser ( 2029): [AppCertManager] Failed to get security token.
+02-17 18:43:39.555 W/GLSUser ( 2029): java.io.IOException: Invalid scope
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at vfm.b(:com.google.android.gms@11743470:39)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at vfm.a(:com.google.android.gms@11743470:47)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at vfj.b(:com.google.android.gms@11743470:11)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at vfj.a(:com.google.android.gms@11743470:29)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at eyw.b(:com.google.android.gms@11743470:4)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at eyw.a(:com.google.android.gms@11743470:56)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at eyu.a(:com.google.android.gms@11743470:8)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at eyq.a(:com.google.android.gms@11743470:1)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at eyp.a(:com.google.android.gms@11743470:10)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at com.google.android.gms.auth.account.be.legacy.AuthCronChimeraService.b(:com.google.android.gms@11743470:7)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at edr.call(:com.google.android.gms@11743470:3)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at java.util.concurrent.FutureTask.run(FutureTask.java:237)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at mmu.run(:com.google.android.gms@11743470:26)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at mse.run(:com.google.android.gms@11743470)
+02-17 18:43:39.555 W/GLSUser ( 2029): 	at java.lang.Thread.run(Thread.java:761)
+02-17 18:43:39.582 W/Conscrypt( 2029): Could not set socket write timeout:
+02-17 18:43:39.583 W/Conscrypt( 2029):    java.lang.reflect.Method.invoke(Native Method)
+02-17 18:43:39.583 W/Conscrypt( 2029):    com.google.android.gms.org.conscrypt.Platform.setSocketWriteTimeout(:com.google.android.gms@11743470:13)
+02-17 18:43:39.624 W/Conscrypt( 2029): Could not set socket write timeout:
+02-17 18:43:39.625 W/Conscrypt( 2029):    java.lang.reflect.Method.invoke(Native Method)
+02-17 18:43:39.625 W/Conscrypt( 2029):    com.google.android.gms.org.conscrypt.Platform.setSocketWriteTimeout(:com.google.android.gms@11743470:13)
+02-17 18:43:39.658 W/GLSUser ( 2029): [AppCertManager] IOException while requesting key: 
+02-17 18:43:39.658 W/GLSUser ( 2029): java.io.IOException: Invalid device key response.
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at eyw.a(:com.google.android.gms@11743470:14)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at eyw.a(:com.google.android.gms@11743470:65)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at eyu.a(:com.google.android.gms@11743470:8)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at eyq.a(:com.google.android.gms@11743470:1)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at eyp.a(:com.google.android.gms@11743470:10)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at com.google.android.gms.auth.account.be.legacy.AuthCronChimeraService.b(:com.google.android.gms@11743470:7)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at edr.call(:com.google.android.gms@11743470:3)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at java.util.concurrent.FutureTask.run(FutureTask.java:237)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at mmu.run(:com.google.android.gms@11743470:26)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at mse.run(:com.google.android.gms@11743470)
+02-17 18:43:39.658 W/GLSUser ( 2029): 	at java.lang.Thread.run(Thread.java:761)
+02-17 18:43:41.081 W/art     ( 3292): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:41.148 E/memtrack( 3292): Couldn't load memtrack module (No such file or directory)
+02-17 18:43:41.148 E/android.os.Debug( 3292): failed to load memtrack module: -2
+02-17 18:43:41.150 I/Radio-JNI( 3292): register_android_hardware_Radio DONE
+02-17 18:43:41.201 I/ActivityManager( 1619): START u0 {flg=0x10000000 cmp=com.senthapps.slagrimarket/.MainActivity} from uid 2000 on display 0
+02-17 18:43:41.269 I/art     ( 3302): Late-enabling -Xcheck:jni
+02-17 18:43:41.274 W/art     ( 3302): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:43:41.276 I/ActivityManager( 1619): Start proc 3302:com.senthapps.slagrimarket/u0a78 for activity com.senthapps.slagrimarket/.MainActivity
+02-17 18:43:41.381 W/asset   ( 1704): Asset path /data/app/com.senthapps.slagrimarket-1/base.apk is neither a directory nor file (type=1).
+02-17 18:43:41.382 W/PackageManager( 1704): Failure retrieving resources for com.senthapps.slagrimarket
+02-17 18:43:41.383 W/asset   ( 1704): Asset path /data/app/com.senthapps.slagrimarket-1/base.apk is neither a directory nor file (type=1).
+02-17 18:43:41.383 W/PackageManager( 1704): Failure retrieving resources for com.senthapps.slagrimarket
+02-17 18:43:41.383 W/asset   ( 1704): Asset path /data/app/com.senthapps.slagrimarket-1/base.apk is neither a directory nor file (type=1).
+02-17 18:43:41.383 W/PackageManager( 1704): Failure retrieving resources for com.senthapps.slagrimarket
+02-17 18:43:41.383 W/asset   ( 1704): Asset path /data/app/com.senthapps.slagrimarket-1/base.apk is neither a directory nor file (type=1).
+02-17 18:43:41.384 W/PackageManager( 1704): Failure retrieving resources for com.senthapps.slagrimarket
+02-17 18:43:41.384 W/asset   ( 1704): Asset path /data/app/com.senthapps.slagrimarket-1/base.apk is neither a directory nor file (type=1).
+02-17 18:43:41.384 W/PackageManager( 1704): Failure retrieving resources for com.senthapps.slagrimarket
+02-17 18:43:41.449 I/FirebaseApp( 3302): Device unlocked: initializing all Firebase APIs for app [DEFAULT]
+02-17 18:43:41.521 I/FirebaseCrashlytics( 3302): Initializing Firebase Crashlytics 19.3.0 for com.senthapps.slagrimarket
+02-17 18:43:41.584 W/GmsModuleProvider( 2207): Unknown dynamite feature measurement.dynamite
+02-17 18:43:41.585 I/DynamiteModule( 3302): Considering local module com.google.android.gms.measurement.dynamite:127 and remote module com.google.android.gms.measurement.dynamite:0
+02-17 18:43:41.586 I/DynamiteModule( 3302): Selected local version of com.google.android.gms.measurement.dynamite
+02-17 18:43:41.586 W/GmsModuleProvider( 2207): Unknown dynamite feature measurement.dynamite
+02-17 18:43:41.605 W/ConfigurationChimeraPro( 2029): Got null configs for com.google.android.gms.measurement
+02-17 18:43:41.605 W/ConfigurationContentLdr( 3302): ContentProvider query returned null cursor, using default values
+02-17 18:43:41.657 I/FA      ( 3302): App measurement initialized, version: 106000
+02-17 18:43:41.657 I/FA      ( 3302): To enable debug logging run: adb shell setprop log.tag.FA VERBOSE
+02-17 18:43:41.664 I/FA      ( 3302): To enable faster debug mode event logging run:
+02-17 18:43:41.664 I/FA      ( 3302):   adb shell setprop debug.firebase.analytics.app com.senthapps.slagrimarket
+02-17 18:43:41.690 I/FirebaseCrashlytics( 3302): No version control information found
+02-17 18:43:41.693 I/FirebaseInitProvider( 3302): FirebaseApp initialization successful
+02-17 18:43:41.739 W/GooglePlayServicesUtil( 3302): Google Play services out of date for com.senthapps.slagrimarket.  Requires 12451000 but found 11743470
+02-17 18:43:41.779 I/FA      ( 3302): Tag Manager is not found and thus will not be used
+02-17 18:43:41.846 W/System  ( 3302): Ignoring header X-Firebase-Locale because its value was null.
+02-17 18:43:41.853 W/LocalRequestInterceptor( 3302): Error getting App Check token; using placeholder token instead. Error: com.google.firebase.FirebaseException: No AppCheckProvider installed.
+02-17 18:43:41.931 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:43:42.147 I/art     ( 3302): Do partial code cache collection, code=30KB, data=27KB
+02-17 18:43:42.148 I/art     ( 3302): After code cache collection, code=30KB, data=27KB
+02-17 18:43:42.148 I/art     ( 3302): Increasing code cache capacity to 128KB
+02-17 18:43:42.217 I/art     ( 3302): Do partial code cache collection, code=61KB, data=57KB
+02-17 18:43:42.218 I/art     ( 3302): After code cache collection, code=61KB, data=57KB
+02-17 18:43:42.218 I/art     ( 3302): Increasing code cache capacity to 256KB
+02-17 18:43:42.289 I/OpenGLRenderer( 3302): Initialized EGL, version 1.4
+02-17 18:43:42.291 W/OpenGLRenderer( 3302): Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+02-17 18:43:42.384 W/GooglePlayServicesUtil( 3302): Google Play services out of date for com.senthapps.slagrimarket.  Requires 12451000 but found 11743470
+02-17 18:43:42.447 I/ActivityManager( 1619): Displayed com.senthapps.slagrimarket/.MainActivity: +1s180ms
+02-17 18:43:42.500 I/WindowManager( 1619): Destroying surface Surface(name=com.android.launcher3/com.android.launcher3.Launcher) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.AppWindowToken.notifyAppStopped:389 com.android.server.wm.WindowManagerService.notifyAppStopped:4463 com.android.server.am.ActivityStack.activityStoppedLocked:1252 com.android.server.am.ActivityManagerService.activityStopped:6903 
+02-17 18:43:42.654 I/WindowManager( 1619): Destroying surface Surface(name=Starting com.senthapps.slagrimarket) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 com.android.server.wm.WindowAnimator.animateLocked:704 
+02-17 18:43:44.569 W/System  ( 3199): ClassLoader referenced unknown path: /system/priv-app/PrebuiltGmsCore/lib/x86
+02-17 18:43:44.585 W/System  ( 3199): ClassLoader referenced unknown path: /system/priv-app/PrebuiltGmsCore/lib/x86
+02-17 18:43:44.585 W/System  ( 3199): ClassLoader referenced unknown path: /system/priv-app/PrebuiltGmsCore/lib/x86
+02-17 18:43:44.591 W/System  ( 3199): ClassLoader referenced unknown path: /system/priv-app/PrebuiltGmsCore/lib/x86
+02-17 18:43:44.591 W/System  ( 3199): ClassLoader referenced unknown path: /system/priv-app/PrebuiltGmsCore/lib/x86
+02-17 18:43:44.594 W/linker  ( 3199): /data/user_de/0/com.google.android.gms/app_extracted_libs/x86/libconscrypt_gmscore_jni.so: unused DT entry: type 0xf arg 0x91
+02-17 18:43:44.608 I/ProviderInstaller( 3199): Installed default security provider GmsCore_OpenSSL
+02-17 18:43:47.737 W/Finsky  ( 2431): [142] com.google.android.finsky.FinskyApp.i(1468): No account configured on this device.
+02-17 18:43:47.739 I/Finsky  ( 2431): [142] com.google.android.finsky.c.e.run(1151): Replicating app states via AMAS.
+02-17 18:43:47.764 W/System  ( 2207): ClassLoader referenced unknown path: /system/priv-app/PrebuiltGmsCore/lib/x86
+02-17 18:43:47.787 I/Finsky  ( 2431): [142] com.google.android.finsky.c.c.a(311): Completed 0 account content syncs with 0 successful.
+02-17 18:43:47.794 I/Finsky  ( 2431): [1] com.google.android.finsky.services.j.a(149): Installation state replication succeeded.
+02-17 18:43:52.656 I/art     ( 3302): Starting a blocking GC Explicit
+02-17 18:43:52.669 I/art     ( 3302): Explicit concurrent mark sweep GC freed 22328(1468KB) AllocSpace objects, 1(20KB) LOS objects, 33% free, 7MB/11MB, paused 708us total 12.388ms
+02-17 18:43:56.931 I/ActivityManager( 1619): Killing 2559:com.google.android.calendar/u0a33 (adj 906): empty #17
+02-17 18:43:56.960 I/art     ( 3302): Do full code cache collection, code=104KB, data=121KB
+02-17 18:43:56.963 I/art     ( 3302): After code cache collection, code=46KB, data=41KB
+02-17 18:43:57.349 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:43:57.399 W/GooglePlayServicesUtil( 3302): Google Play services out of date for com.senthapps.slagrimarket.  Requires 12451000 but found 11743470
+02-17 18:43:57.674 I/ActivityManager( 1619): Killing 2101:com.google.android.music:main/u0a59 (adj 906): empty #17
+02-17 18:43:57.854 I/WindowManager( 1619): Destroying surface Surface(name=com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.removeLocked:1456 com.android.server.wm.WindowManagerService.removeWindowInnerLocked:2484 com.android.server.wm.AppWindowToken.destroySurfaces:365 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 
+02-17 18:43:57.918 W/OpenGLRenderer( 2085): Incorrectly called buildLayer on View: ShortcutAndWidgetContainer, destroying layer...
+02-17 18:43:59.423 I/FA      ( 3302): Application backgrounded at: timestamp_millis: 1771382637379
+02-17 18:44:08.933 I/ActivityManager( 1619): Killing 2633:com.google.android.gm/u0a66 (adj 906): empty #17
+02-17 18:44:09.536 I/art     ( 3302): Starting a blocking GC Explicit
+02-17 18:44:09.551 I/art     ( 3302): Explicit concurrent mark sweep GC freed 7358(341KB) AllocSpace objects, 0(0B) LOS objects, 21% free, 7MB/9MB, paused 1.049ms total 14.552ms
+02-17 18:44:11.025 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:44:11.044 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:44:13.911 W/audio_hw_generic( 1380): Not supplying enough data to HAL, expected position 281 , only wrote 0
+02-17 18:44:13.942 I/ActivityManager( 1619): START u0 {flg=0x10804000 cmp=com.android.systemui/.recents.RecentsActivity} from uid 10027 on display 0
+02-17 18:44:14.200 I/ActivityManager( 1619): Displayed com.android.systemui/.recents.RecentsActivity: +233ms
+02-17 18:44:14.203 I/WindowManager( 1619): Destroying surface Surface(name=com.android.launcher3/com.android.launcher3.Launcher) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 com.android.server.wm.WindowAnimator.animateLocked:704 
+02-17 18:44:15.216 I/ActivityManager( 1619): START u0 {flg=0x10100000 cmp=com.senthapps.slagrimarket/.MainActivity} from uid 2000 on display 0
+02-17 18:44:15.239 E/ActivityManager( 1619): applyOptionsLocked: Unknown animationType=0
+02-17 18:44:15.443 I/art     ( 3302): Do partial code cache collection, code=106KB, data=125KB
+02-17 18:44:15.444 I/art     ( 3302): After code cache collection, code=101KB, data=123KB
+02-17 18:44:15.444 I/art     ( 3302): Increasing code cache capacity to 512KB
+02-17 18:44:15.544 I/ActivityManager( 1619): Displayed com.senthapps.slagrimarket/.MainActivity: +305ms
+02-17 18:44:15.579 W/GooglePlayServicesUtil( 3302): Google Play services out of date for com.senthapps.slagrimarket.  Requires 12451000 but found 11743470
+02-17 18:44:15.658 I/TRuntime.CctTransportBa( 3302): Making request to: https://firebaselogging-pa.googleapis.com/v1/firelog/legacy/batchlog
+02-17 18:44:15.921 I/WindowManager( 1619): Destroying surface Surface(name=com.android.systemui/com.android.systemui.recents.RecentsActivity) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.WindowManagerService.tryStartExitingAnimation:3024 com.android.server.wm.WindowManagerService.relayoutWindow:2904 com.android.server.wm.Session.relayout:224 android.view.IWindowSession$Stub.onTransact:286 com.android.server.wm.Session.onTransact:145 
+02-17 18:44:17.317 I/art     ( 3302): Do full code cache collection, code=198KB, data=241KB
+02-17 18:44:17.319 I/art     ( 3302): After code cache collection, code=170KB, data=143KB
+02-17 18:44:17.744 I/TRuntime.CctTransportBa( 3302): Status Code: 200
+02-17 18:44:18.427 W/audio_hw_generic( 1380): Not supplying enough data to HAL, expected position 431728 , only wrote 216720
+02-17 18:44:20.898 W/art     ( 3391): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:44:20.921 E/memtrack( 3391): Couldn't load memtrack module (No such file or directory)
+02-17 18:44:20.921 E/android.os.Debug( 3391): failed to load memtrack module: -2
+02-17 18:44:20.922 I/Radio-JNI( 3391): register_android_hardware_Radio DONE
+02-17 18:44:20.936 I/Input   ( 3391): injectMotionEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=270.0, y[0]=450.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=123080, downTime=123080, deviceId=0, source=0x1002 }
+02-17 18:44:20.937 I/Input   ( 3391): injectMotionEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=270.0, y[0]=450.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=123080, downTime=123080, deviceId=0, source=0x1002 }
+02-17 18:44:21.152 I/WindowManager( 1619): Destroying surface Surface(name=com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 com.android.server.wm.WindowAnimator.animateLocked:704 
+02-17 18:44:21.299 I/art     ( 3302): Do partial code cache collection, code=203KB, data=200KB
+02-17 18:44:21.300 I/art     ( 3302): After code cache collection, code=193KB, data=195KB
+02-17 18:44:21.300 I/art     ( 3302): Increasing code cache capacity to 1024KB
+02-17 18:44:22.185 I/WindowManager( 1619): Destroying surface Surface(name=com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 com.android.server.wm.WindowAnimator.animateLocked:704 
+02-17 18:44:22.784 I/art     ( 3302): Starting a blocking GC Explicit
+02-17 18:44:22.804 I/art     ( 3302): Explicit concurrent mark sweep GC freed 23384(1200KB) AllocSpace objects, 2(40KB) LOS objects, 32% free, 8MB/12MB, paused 1.106ms total 19.900ms
+02-17 18:44:23.801 I/art     ( 3302): Do full code cache collection, code=499KB, data=500KB
+02-17 18:44:23.803 I/art     ( 3302): After code cache collection, code=462KB, data=405KB
+02-17 18:44:24.085 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:44:24.098 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:44:28.499 I/art     ( 3302): Do partial code cache collection, code=489KB, data=439KB
+02-17 18:44:28.499 I/art     ( 3302): After code cache collection, code=467KB, data=423KB
+02-17 18:44:28.499 I/art     ( 3302): Increasing code cache capacity to 2MB
+02-17 18:44:33.293 I/art     ( 3302): Compiler allocated 5MB to compile int com.google.crypto.tink.shaded.protobuf.MessageSchema.getSerializedSizeProto3(java.lang.Object)
+02-17 18:44:35.149 W/art     ( 3412): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:44:35.171 E/memtrack( 3412): Couldn't load memtrack module (No such file or directory)
+02-17 18:44:35.171 E/android.os.Debug( 3412): failed to load memtrack module: -2
+02-17 18:44:35.171 I/Radio-JNI( 3412): register_android_hardware_Radio DONE
+02-17 18:44:35.182 I/Input   ( 3412): injectKeyEvent: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x0, repeatCount=0, eventTime=137327, downTime=137327, deviceId=-1, source=0x101 }
+02-17 18:44:35.187 I/Input   ( 3412): injectKeyEvent: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x0, repeatCount=0, eventTime=137327, downTime=137327, deviceId=-1, source=0x101 }
+02-17 18:44:35.254 I/art     ( 3302): Compiler allocated 4MB to compile void com.senthapps.slagrimarket.ui.home.IndustrialHomeScreenKt.IndustrialHomeScreen(kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, com.senthapps.slagrimarket.ui.home.AppLanguage, androidx.compose.runtime.Composer, int, int)
+02-17 18:44:37.517 W/art     ( 3422): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:44:37.539 E/memtrack( 3422): Couldn't load memtrack module (No such file or directory)
+02-17 18:44:37.539 E/android.os.Debug( 3422): failed to load memtrack module: -2
+02-17 18:44:37.539 I/Radio-JNI( 3422): register_android_hardware_Radio DONE
+02-17 18:44:37.554 I/Input   ( 3422): injectMotionEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1100.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=139697, downTime=139697, deviceId=0, source=0x1002 }
+02-17 18:44:37.558 I/Input   ( 3422): injectMotionEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1100.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=139697, downTime=139697, deviceId=0, source=0x1002 }
+02-17 18:44:37.801 W/AuthInterceptor( 3302): No access token available for request: http://10.0.2.2:3000/api/v1/activities?userId=debug_user_123&page=1&limit=50&sortBy=timestamp&sortOrder=desc&language=en
+02-17 18:44:37.802 I/okhttp.OkHttpClient( 3302): --> GET http://10.0.2.2:3000/api/v1/activities?userId=debug_user_123&page=1&limit=50&sortBy=timestamp&sortOrder=desc&language=en
+02-17 18:44:37.803 I/okhttp.OkHttpClient( 3302): --> END GET
+02-17 18:44:40.704 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:44:40.719 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:44:49.728 W/art     ( 3444): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:44:49.745 E/memtrack( 3444): Couldn't load memtrack module (No such file or directory)
+02-17 18:44:49.745 E/android.os.Debug( 3444): failed to load memtrack module: -2
+02-17 18:44:49.746 I/Radio-JNI( 3444): register_android_hardware_Radio DONE
+02-17 18:44:49.758 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1200.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151903, downTime=151903, deviceId=0, source=0x1002 }
+02-17 18:44:49.761 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1200.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151903, downTime=151903, deviceId=0, source=0x1002 }
+02-17 18:44:49.768 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1174.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151916, downTime=151916, deviceId=0, source=0x1002 }
+02-17 18:44:49.786 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1140.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151933, downTime=151933, deviceId=0, source=0x1002 }
+02-17 18:44:49.804 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1102.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151952, downTime=151952, deviceId=0, source=0x1002 }
+02-17 18:44:49.820 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1072.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151967, downTime=151967, deviceId=0, source=0x1002 }
+02-17 18:44:49.837 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1038.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=151984, downTime=151984, deviceId=0, source=0x1002 }
+02-17 18:44:49.853 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1004.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152001, downTime=152001, deviceId=0, source=0x1002 }
+02-17 18:44:49.869 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=972.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152017, downTime=152017, deviceId=0, source=0x1002 }
+02-17 18:44:49.886 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=940.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152033, downTime=152033, deviceId=0, source=0x1002 }
+02-17 18:44:49.902 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=906.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152050, downTime=152050, deviceId=0, source=0x1002 }
+02-17 18:44:49.919 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=872.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152067, downTime=152067, deviceId=0, source=0x1002 }
+02-17 18:44:49.937 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=838.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152084, downTime=152084, deviceId=0, source=0x1002 }
+02-17 18:44:49.952 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=806.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152100, downTime=152100, deviceId=0, source=0x1002 }
+02-17 18:44:49.970 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=770.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152118, downTime=152118, deviceId=0, source=0x1002 }
+02-17 18:44:49.987 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=738.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152134, downTime=152134, deviceId=0, source=0x1002 }
+02-17 18:44:50.004 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=702.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152152, downTime=152152, deviceId=0, source=0x1002 }
+02-17 18:44:50.019 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=672.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152167, downTime=152167, deviceId=0, source=0x1002 }
+02-17 18:44:50.036 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=640.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152183, downTime=152183, deviceId=0, source=0x1002 }
+02-17 18:44:50.052 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=270.0, y[0]=606.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152200, downTime=152200, deviceId=0, source=0x1002 }
+02-17 18:44:50.069 I/Input   ( 3444): injectMotionEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=270.0, y[0]=600.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=152217, downTime=152217, deviceId=0, source=0x1002 }
+02-17 18:44:52.174 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:44:52.185 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:45:00.912 W/art     ( 3459): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:45:00.926 E/memtrack( 3459): Couldn't load memtrack module (No such file or directory)
+02-17 18:45:00.926 E/android.os.Debug( 3459): failed to load memtrack module: -2
+02-17 18:45:00.927 I/Radio-JNI( 3459): register_android_hardware_Radio DONE
+02-17 18:45:00.935 I/Input   ( 3459): injectKeyEvent: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x0, repeatCount=0, eventTime=163081, downTime=163081, deviceId=-1, source=0x101 }
+02-17 18:45:00.938 I/Input   ( 3459): injectKeyEvent: KeyEvent { action=ACTION_UP, keyCode=KEYCODE_BACK, scanCode=0, metaState=0, flags=0x0, repeatCount=0, eventTime=163081, downTime=163081, deviceId=-1, source=0x101 }
+02-17 18:45:01.011 E/HomeViewModel$loadRecen( 3302): Error loading recent listings
+02-17 18:45:01.011 E/HomeViewModel$loadRecen( 3302): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@dfcd49b
+02-17 18:45:01.012 E/ActivityRepository$getA( 3302): Failed to refresh activities from network
+02-17 18:45:01.012 E/ActivityRepository$getA( 3302): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@dfcd49b
+02-17 18:45:01.013 I/okhttp.OkHttpClient( 3302): <-- HTTP FAILED: java.net.SocketException: Socket closed
+02-17 18:45:01.024 E/ActivityRepository$getA( 3302): Failed to insert sample activities
+02-17 18:45:01.024 E/ActivityRepository$getA( 3302): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@dfcd49b
+02-17 18:45:01.024 E/ActivityRepository$getA( 3302): Error getting activities
+02-17 18:45:01.024 E/ActivityRepository$getA( 3302): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@dfcd49b
+02-17 18:45:01.032 E/HomeViewModel$loadRecen( 3302): Error loading activities
+02-17 18:45:01.032 E/HomeViewModel$loadRecen( 3302): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@dfcd49b
+02-17 18:45:03.148 W/art     ( 3470): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:45:03.160 E/memtrack( 3470): Couldn't load memtrack module (No such file or directory)
+02-17 18:45:03.160 E/android.os.Debug( 3470): failed to load memtrack module: -2
+02-17 18:45:03.160 I/Radio-JNI( 3470): register_android_hardware_Radio DONE
+02-17 18:45:03.171 I/Input   ( 3470): injectMotionEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1100.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=165315, downTime=165315, deviceId=0, source=0x1002 }
+02-17 18:45:03.175 I/Input   ( 3470): injectMotionEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=270.0, y[0]=1100.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=165315, downTime=165315, deviceId=0, source=0x1002 }
+02-17 18:45:03.225 I/art     ( 3302): Compiler allocated 4MB to compile void com.senthapps.slagrimarket.ui.home.IndustrialMarketPricesScreenKt.IndustrialMarketPricesScreen(java.util.List, com.senthapps.slagrimarket.ui.home.AppLanguage, java.lang.String, kotlin.jvm.functions.Function0, boolean, boolean, kotlin.jvm.functions.Function0, androidx.compose.runtime.Composer, int, int)
+02-17 18:45:06.277 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:45:06.290 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:45:07.706 W/ActivityManager( 1619): Unable to start service Intent { act=com.google.android.gms.drive.ApiService.RESET_AFTER_BOOT flg=0x4 cmp=com.google.android.gms/.drive.api.ApiService (has extras) } U=0: not found
+02-17 18:46:03.889 I/art     ( 3302): Do full code cache collection, code=1002KB, data=949KB
+02-17 18:46:03.890 I/art     ( 3302): After code cache collection, code=938KB, data=819KB
+02-17 18:46:03.892 E/HomeViewModel$loadRecen( 3302): Error loading recent listings
+02-17 18:46:03.892 E/HomeViewModel$loadRecen( 3302): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@1a7312
+02-17 18:46:13.775 I/art     ( 3302): Do partial code cache collection, code=964KB, data=858KB
+02-17 18:46:13.776 I/art     ( 3302): After code cache collection, code=943KB, data=844KB
+02-17 18:46:13.776 I/art     ( 3302): Increasing code cache capacity to 3MB
+02-17 18:46:15.952 I/WindowManager( 1619): Destroying surface Surface(name=com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 com.android.server.wm.WindowAnimator.animateLocked:704 
+02-17 18:47:31.231 W/PlayEventLogger( 2431): No account for auth token provided
+02-17 18:47:36.751 I/CastDatabase( 2207): Saving the database
+02-17 18:47:36.760 I/SQLiteCastStore( 2207): [CastNetworkInfo] saved: 0, skipped: 0, [CastDeviceInfo]: saved 0, skipped 0, Paired Guest Mode DeviceInfo] saved: 0, skipped: 0.
+02-17 18:51:50.170 I/        ( 1383): free_cache(25448925) avail 6015766528
+02-17 18:51:50.640 W/PackageParser( 1619): Unknown element under <manifest>: queries at /data/app/vmdl655407352.tmp/base.apk Binary XML file line #36
+02-17 18:51:50.642 W/PackageParser( 1619): Unknown element under <application>: property at /data/app/vmdl655407352.tmp/base.apk Binary XML file line #274
+02-17 18:51:50.642 W/PackageManager( 1619): Package com.senthapps.slagrimarket desires unavailable shared library android.ext.adservices; ignoring!
+02-17 18:51:50.643 I/PackageManager.DexOptimizer( 1619): Running dexopt (dex2oat) on: /data/app/vmdl655407352.tmp/base.apk pkg=com.senthapps.slagrimarket isa=x86 vmSafeMode=false debuggable=true target-filter=interpret-only oatDir = /data/app/vmdl655407352.tmp/oat sharedLibraries=null
+02-17 18:51:50.657 W/dex2oat ( 3536): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:51:50.658 W/dex2oat ( 3536): Mismatch between dex2oat instruction set features (ISA: X86 Feature string: smp,-ssse3,-sse4.1,-sse4.2,-avx,-avx2,-lock_add,-popcnt) and those of dex2oat executable (ISA: X86 Feature string: smp,ssse3,-sse4.1,-sse4.2,-avx,-avx2,-lock_add,-popcnt) for the command line:
+02-17 18:51:50.658 W/dex2oat ( 3536): /system/bin/dex2oat --zip-fd=6 --zip-location=base.apk --oat-fd=7 --oat-location=/data/app/vmdl655407352.tmp/oat/x86/base.odex --instruction-set=x86 --instruction-set-variant=x86 --instruction-set-features=default --runtime-arg -Xms64m --runtime-arg -Xmx512m --compiler-filter=interpret-only --swap-fd=9 --debuggable
+02-17 18:51:50.658 I/dex2oat ( 3536): /system/bin/dex2oat --compiler-filter=interpret-only --debuggable
+02-17 18:51:51.859 I/dex2oat ( 3536): Large app, accepted running with swap.
+02-17 18:51:51.893 W/dex2oat ( 3536): Before Android 4.1, method int androidx.appcompat.widget.DropDownListView.lookForSelectablePosition(int, boolean) would have incorrectly overridden the package-private method in android.widget.ListView
+02-17 18:51:51.893 W/dex2oat ( 3536): Before Android 4.1, method int androidx.appcompat.widget.MenuPopupWindow$MenuDropDownListView.lookForSelectablePosition(int, boolean) would have incorrectly overridden the package-private method in android.widget.ListView
+02-17 18:51:52.167 W/dex2oat ( 3536): Before Android 4.1, method android.graphics.PorterDuffColorFilter androidx.vectordrawable.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter, android.content.res.ColorStateList, android.graphics.PorterDuff$Mode) would have incorrectly overridden the package-private method in android.graphics.drawable.Drawable
+02-17 18:51:55.920 W/dex2oat ( 3536): Before Android 4.1, method double java.util.concurrent.ThreadLocalRandom.internalNextDouble(double, double) would have incorrectly overridden the package-private method in java.util.Random
+02-17 18:51:55.920 W/dex2oat ( 3536): Before Android 4.1, method int java.util.concurrent.ThreadLocalRandom.internalNextInt(int, int) would have incorrectly overridden the package-private method in java.util.Random
+02-17 18:51:55.920 W/dex2oat ( 3536): Before Android 4.1, method long java.util.concurrent.ThreadLocalRandom.internalNextLong(long, long) would have incorrectly overridden the package-private method in java.util.Random
+02-17 18:52:02.436 I/dex2oat ( 3536): dex2oat took 11.779s (threads: 4) arena alloc=747KB (765352B) java alloc=31MB (33054928B) native alloc=46MB (48715176B) free=3MB (3320408B) swap=16MB (16777216B)
+02-17 18:52:02.448 I/ActivityManager( 1619): Force stopping com.senthapps.slagrimarket appid=10078 user=-1: installPackageLI
+02-17 18:52:02.448 I/ActivityManager( 1619): Killing 3302:com.senthapps.slagrimarket/u0a78 (adj 0): stop com.senthapps.slagrimarket
+02-17 18:52:02.450 W/ActivityManager( 1619): Force removing ActivityRecord{6d32f6d u0 com.senthapps.slagrimarket/.MainActivity t11}: app died, no saved state
+02-17 18:52:02.453 W/InputDispatcher( 1619): channel '352488f com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity (server)' ~ Consumer closed input channel or an error occurred.  events=0x9
+02-17 18:52:02.453 E/InputDispatcher( 1619): channel '352488f com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity (server)' ~ Channel is unrecoverably broken and will be disposed!
+02-17 18:52:02.460 W/InputDispatcher( 1619): Attempted to unregister already unregistered input channel '352488f com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity (server)'
+02-17 18:52:02.470 I/WindowManager( 1619): Destroying surface Surface(name=com.senthapps.slagrimarket/com.senthapps.slagrimarket.MainActivity) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.removeLocked:1456 com.android.server.wm.WindowManagerService.removeWindowInnerLocked:2484 com.android.server.wm.WindowManagerService.removeWindowLocked:2442 com.android.server.wm.WindowManagerService.removeWindowLocked:2311 com.android.server.wm.AppWindowToken.removeAllWindows:530 com.android.server.wm.AppWindowToken.removeAppFromTaskLocked:326 
+02-17 18:52:02.477 W/WindowManager( 1619): Failed looking up window
+02-17 18:52:02.477 W/WindowManager( 1619): java.lang.IllegalArgumentException: Requested window android.os.BinderProxy@5e08bee does not exist
+02-17 18:52:02.477 W/WindowManager( 1619): 	at com.android.server.wm.WindowManagerService.windowForClientLocked(WindowManagerService.java:9107)
+02-17 18:52:02.477 W/WindowManager( 1619): 	at com.android.server.wm.WindowManagerService.windowForClientLocked(WindowManagerService.java:9098)
+02-17 18:52:02.477 W/WindowManager( 1619): 	at com.android.server.wm.WindowState$DeathRecipient.binderDied(WindowState.java:1784)
+02-17 18:52:02.477 W/WindowManager( 1619): 	at android.os.BinderProxy.sendDeathNotice(Binder.java:688)
+02-17 18:52:02.477 I/WindowManager( 1619): WIN DEATH: null
+02-17 18:52:02.482 I/PackageManager( 1619): Package com.senthapps.slagrimarket codePath changed from /data/app/com.senthapps.slagrimarket-2 to /data/app/com.senthapps.slagrimarket-1; Retaining data and using new
+02-17 18:52:02.482 W/PackageManager( 1619): Package com.senthapps.slagrimarket desires unavailable shared library android.ext.adservices; ignoring!
+02-17 18:52:02.483 W/PackageManager( 1619): Code path for com.senthapps.slagrimarket changing from /data/app/com.senthapps.slagrimarket-2 to /data/app/com.senthapps.slagrimarket-1
+02-17 18:52:02.483 W/PackageManager( 1619): Resource path for com.senthapps.slagrimarket changing from /data/app/com.senthapps.slagrimarket-2 to /data/app/com.senthapps.slagrimarket-1
+02-17 18:52:02.533 W/PackageManager( 1619): Unknown permission android.permission.POST_NOTIFICATIONS in package com.senthapps.slagrimarket
+02-17 18:52:02.533 W/PackageManager( 1619): Unknown permission com.google.android.gms.permission.AD_ID in package com.senthapps.slagrimarket
+02-17 18:52:02.533 W/PackageManager( 1619): Unknown permission android.permission.ACCESS_ADSERVICES_ATTRIBUTION in package com.senthapps.slagrimarket
+02-17 18:52:02.533 W/PackageManager( 1619): Unknown permission android.permission.ACCESS_ADSERVICES_AD_ID in package com.senthapps.slagrimarket
+02-17 18:52:02.534 W/PackageManager( 1619): Unknown permission com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE in package com.senthapps.slagrimarket
+02-17 18:52:02.534 W/PackageManager( 1619): Unknown permission android.permission.FOREGROUND_SERVICE in package com.senthapps.slagrimarket
+02-17 18:52:02.578 I/art     ( 1619): Starting a blocking GC Explicit
+02-17 18:52:02.603 I/art     ( 1619): Explicit concurrent mark sweep GC freed 18450(1071KB) AllocSpace objects, 6(120KB) LOS objects, 25% free, 11MB/15MB, paused 1.139ms total 25.741ms
+02-17 18:52:02.625 E/        ( 1383): Couldn't opendir /data/app/vmdl655407352.tmp: No such file or directory
+02-17 18:52:02.628 I/ActivityManager( 1619): Force stopping com.senthapps.slagrimarket appid=10078 user=0: pkg removed
+02-17 18:52:02.656 W/ActivityManager( 1619): Permission Denial: Accessing service ComponentInfo{com.google.android.music/com.google.android.music.dial.DialMediaRouteProviderService} from pid=2900, uid=10073 that is not exported from uid 10059
+02-17 18:52:02.664 I/InputReader( 1619): Reconfiguring input devices.  changes=0x00000010
+02-17 18:52:02.665 W/ActivityManager( 1619): Permission Denial: Accessing service ComponentInfo{com.google.android.music/com.google.android.music.dial.DialMediaRouteProviderService} from pid=2900, uid=10073 that is not exported from uid 10059
+02-17 18:52:02.666 I/InputReader( 1619): Reconfiguring input devices.  changes=0x00000010
+02-17 18:52:02.667 W/ActivityManager( 1619): Permission Denial: Accessing service ComponentInfo{com.google.android.music/com.google.android.music.dial.DialMediaRouteProviderService} from pid=2900, uid=10073 that is not exported from uid 10059
+02-17 18:52:02.670 I/InputReader( 1619): Reconfiguring input devices.  changes=0x00000010
+02-17 18:52:02.725 W/ContextImpl( 3184): Calling a method in the system process without a qualified user: android.app.ContextImpl.startService:1385 android.content.ContextWrapper.startService:613 android.content.ContextWrapper.startService:613 com.android.keychain.KeyChainBroadcastReceiver.onReceive:12 android.app.ActivityThread.handleReceiver:3011 
+02-17 18:52:02.787 E/NetworkScheduler( 2029): Unrecognised action provided: android.intent.action.PACKAGE_REMOVED
+02-17 18:52:02.858 I/Finsky  ( 2431): [1] com.google.android.finsky.utils.PermissionPolicies$PermissionPolicyService.onStartCommand(117): post-install permissions check for com.senthapps.slagrimarket
+02-17 18:52:02.870 I/Finsky  ( 2431): [1] com.google.android.finsky.utils.bh.run(2302): Package state data is missing for com.senthapps.slagrimarket
+02-17 18:52:02.870 W/Finsky  ( 2431): [1] com.google.android.finsky.FinskyApp.i(1468): No account configured on this device.
+02-17 18:52:03.025 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=32
+02-17 18:52:03.025 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=36
+02-17 18:52:03.039 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:52:03.042 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:52:03.044 I/Icing   ( 2207): Indexing 07288480EC7D5B88D986F7C58FF4DB5426C636B2 from com.google.android.gms
+02-17 18:52:03.073 I/UpdateIcingCorporaServi( 2165): Updating corpora: APPS=com.senthapps.slagrimarket, CONTACTS=MAYBE
+02-17 18:52:03.118 W/OpenGLRenderer( 2085): Incorrectly called buildLayer on View: ShortcutAndWidgetContainer, destroying layer...
+02-17 18:52:03.129 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.googlequicksearchbox componentName=null serviceId=36
+02-17 18:52:03.144 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload true
+02-17 18:52:03.144 I/Icing   ( 2207): Indexing done 07288480EC7D5B88D986F7C58FF4DB5426C636B2
+02-17 18:52:03.177 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=32
+02-17 18:52:03.178 I/Icing   ( 2207): IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=36
+02-17 18:52:03.180 I/UpdateIcingCorporaServi( 2165): UpdateCorporaTask done [took 106 ms] updated apps [took 106 ms] 
+02-17 18:52:03.181 I/Icing   ( 2207): Indexing F4F297C0F7051C08AE157D16B42E2EC4398DBD54 from com.google.android.googlequicksearchbox
+02-17 18:52:03.201 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:52:03.205 I/Icing   ( 2207): Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0, imm upload false
+02-17 18:52:03.213 I/Icing   ( 2207): Indexing done F4F297C0F7051C08AE157D16B42E2EC4398DBD54
+02-17 18:52:03.214 I/Icing   ( 2207): Indexing 07288480EC7D5B88D986F7C58FF4DB5426C636B2 from com.google.android.gms
+02-17 18:52:03.236 I/Icing   ( 2207): Indexing done 07288480EC7D5B88D986F7C58FF4DB5426C636B2
+02-17 18:52:10.327 W/art     ( 3571): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:52:10.348 E/memtrack( 3571): Couldn't load memtrack module (No such file or directory)
+02-17 18:52:10.348 E/android.os.Debug( 3571): failed to load memtrack module: -2
+02-17 18:52:10.348 I/Radio-JNI( 3571): register_android_hardware_Radio DONE
+02-17 18:52:10.357 I/ActivityManager( 1619): START u0 {flg=0x10000000 cmp=com.senthapps.slagrimarket/.MainActivity} from uid 2000 on display 0
+02-17 18:52:10.365 I/art     ( 3581): Late-enabling -Xcheck:jni
+02-17 18:52:10.365 W/art     ( 3581): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:52:10.375 I/ActivityManager( 1619): Start proc 3581:com.senthapps.slagrimarket/u0a78 for activity com.senthapps.slagrimarket/.MainActivity
+02-17 18:52:10.480 I/FirebaseApp( 3581): Device unlocked: initializing all Firebase APIs for app [DEFAULT]
+02-17 18:52:10.546 I/FirebaseCrashlytics( 3581): Initializing Firebase Crashlytics 19.3.0 for com.senthapps.slagrimarket
+02-17 18:52:10.572 W/GmsModuleProvider( 2207): Unknown dynamite feature measurement.dynamite
+02-17 18:52:10.575 I/DynamiteModule( 3581): Considering local module com.google.android.gms.measurement.dynamite:127 and remote module com.google.android.gms.measurement.dynamite:0
+02-17 18:52:10.575 I/DynamiteModule( 3581): Selected local version of com.google.android.gms.measurement.dynamite
+02-17 18:52:10.576 W/GmsModuleProvider( 2207): Unknown dynamite feature measurement.dynamite
+02-17 18:52:10.596 W/ConfigurationChimeraPro( 2029): Got null configs for com.google.android.gms.measurement
+02-17 18:52:10.596 W/ConfigurationContentLdr( 3581): ContentProvider query returned null cursor, using default values
+02-17 18:52:10.647 I/FA      ( 3581): App measurement initialized, version: 106000
+02-17 18:52:10.647 I/FA      ( 3581): To enable debug logging run: adb shell setprop log.tag.FA VERBOSE
+02-17 18:52:10.648 I/FA      ( 3581): To enable faster debug mode event logging run:
+02-17 18:52:10.648 I/FA      ( 3581):   adb shell setprop debug.firebase.analytics.app com.senthapps.slagrimarket
+02-17 18:52:10.650 I/FirebaseCrashlytics( 3581): No version control information found
+02-17 18:52:10.666 I/FirebaseInitProvider( 3581): FirebaseApp initialization successful
+02-17 18:52:10.699 W/GooglePlayServicesUtil( 3581): Google Play services out of date for com.senthapps.slagrimarket.  Requires 12451000 but found 11743470
+02-17 18:52:10.785 W/System  ( 3581): Ignoring header X-Firebase-Locale because its value was null.
+02-17 18:52:10.801 W/LocalRequestInterceptor( 3581): Error getting App Check token; using placeholder token instead. Error: com.google.firebase.FirebaseException: No AppCheckProvider installed.
+02-17 18:52:10.863 I/FA      ( 3581): Tag Manager is not found and thus will not be used
+02-17 18:52:10.879 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:52:11.064 I/art     ( 3581): Do partial code cache collection, code=30KB, data=25KB
+02-17 18:52:11.064 I/art     ( 3581): After code cache collection, code=30KB, data=25KB
+02-17 18:52:11.064 I/art     ( 3581): Increasing code cache capacity to 128KB
+02-17 18:52:11.131 I/art     ( 3581): Do partial code cache collection, code=54KB, data=55KB
+02-17 18:52:11.131 I/art     ( 3581): After code cache collection, code=53KB, data=54KB
+02-17 18:52:11.132 I/art     ( 3581): Increasing code cache capacity to 256KB
+02-17 18:52:11.212 I/OpenGLRenderer( 3581): Initialized EGL, version 1.4
+02-17 18:52:11.213 W/OpenGLRenderer( 3581): Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+02-17 18:52:11.284 W/GooglePlayServicesUtil( 3581): Google Play services out of date for com.senthapps.slagrimarket.  Requires 12451000 but found 11743470
+02-17 18:52:11.342 I/ActivityManager( 1619): Displayed com.senthapps.slagrimarket/.MainActivity: +981ms
+02-17 18:52:11.371 I/WindowManager( 1619): Destroying surface Surface(name=com.android.launcher3/com.android.launcher3.Launcher) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.AppWindowToken.notifyAppStopped:389 com.android.server.wm.WindowManagerService.notifyAppStopped:4463 com.android.server.am.ActivityStack.activityStoppedLocked:1252 com.android.server.am.ActivityManagerService.activityStopped:6903 
+02-17 18:52:11.537 I/WindowManager( 1619): Destroying surface Surface(name=Starting com.senthapps.slagrimarket) called by com.android.server.wm.WindowStateAnimator.destroySurface:2016 com.android.server.wm.WindowStateAnimator.destroySurfaceLocked:882 com.android.server.wm.WindowState.destroyOrSaveSurface:2100 com.android.server.wm.AppWindowToken.destroySurfaces:363 com.android.server.wm.WindowStateAnimator.finishExit:565 com.android.server.wm.WindowStateAnimator.stepAnimationLocked:491 com.android.server.wm.WindowAnimator.updateWindowsLocked:303 com.android.server.wm.WindowAnimator.animateLocked:704 
+02-17 18:52:21.450 I/art     ( 3581): Starting a blocking GC Explicit
+02-17 18:52:21.462 I/art     ( 3581): Explicit concurrent mark sweep GC freed 19555(1325KB) AllocSpace objects, 1(20KB) LOS objects, 33% free, 7MB/11MB, paused 557us total 11.249ms
+02-17 18:52:27.439 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:52:27.451 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:52:27.768 W/Finsky  ( 2431): [142] com.google.android.finsky.FinskyApp.i(1468): No account configured on this device.
+02-17 18:52:27.769 I/Finsky  ( 2431): [142] com.google.android.finsky.c.e.run(1151): Replicating app states via AMAS.
+02-17 18:52:27.809 I/Finsky  ( 2431): [142] com.google.android.finsky.c.c.a(311): Completed 0 account content syncs with 0 successful.
+02-17 18:52:27.810 I/Finsky  ( 2431): [1] com.google.android.finsky.services.j.a(149): Installation state replication succeeded.
+02-17 18:52:29.387 W/art     ( 3648): Unexpected CPU variant for X86 using defaults: x86
+02-17 18:52:29.399 E/memtrack( 3648): Couldn't load memtrack module (No such file or directory)
+02-17 18:52:29.399 E/android.os.Debug( 3648): failed to load memtrack module: -2
+02-17 18:52:29.400 I/Radio-JNI( 3648): register_android_hardware_Radio DONE
+02-17 18:52:29.409 I/Input   ( 3648): injectMotionEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=180.0, y[0]=1200.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=611553, downTime=611553, deviceId=0, source=0x1002 }
+02-17 18:52:29.419 I/Input   ( 3648): injectMotionEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=180.0, y[0]=1200.0, toolType[0]=TOOL_TYPE_UNKNOWN, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=611553, downTime=611553, deviceId=0, source=0x1002 }
+02-17 18:52:29.460 I/art     ( 3581): Do full code cache collection, code=120KB, data=124KB
+02-17 18:52:29.461 I/art     ( 3581): After code cache collection, code=90KB, data=74KB
+02-17 18:52:29.541 I/art     ( 3581): Do partial code cache collection, code=116KB, data=100KB
+02-17 18:52:29.542 I/art     ( 3581): After code cache collection, code=116KB, data=100KB
+02-17 18:52:29.542 I/art     ( 3581): Increasing code cache capacity to 512KB
+02-17 18:52:29.661 W/AuthInterceptor( 3581): No access token available for request: http://10.0.2.2:3000/api/v1/activities?userId=debug_user_123&page=1&limit=50&sortBy=timestamp&sortOrder=desc&language=en
+02-17 18:52:29.661 I/okhttp.OkHttpClient( 3581): --> GET http://10.0.2.2:3000/api/v1/activities?userId=debug_user_123&page=1&limit=50&sortBy=timestamp&sortOrder=desc&language=en
+02-17 18:52:29.662 I/okhttp.OkHttpClient( 3581): --> END GET
+02-17 18:52:29.770 W/AuthInterceptor( 3581): No access token available for request: http://10.0.2.2:3000/api/market-prices?page=1&limit=100&sortBy=lastUpdated&sortOrder=desc
+02-17 18:52:29.770 I/okhttp.OkHttpClient( 3581): --> GET http://10.0.2.2:3000/api/market-prices?page=1&limit=100&sortBy=lastUpdated&sortOrder=desc
+02-17 18:52:29.770 I/okhttp.OkHttpClient( 3581): --> END GET
+02-17 18:52:29.805 I/art     ( 3581): Do full code cache collection, code=238KB, data=250KB
+02-17 18:52:29.805 I/art     ( 3581): After code cache collection, code=177KB, data=161KB
+02-17 18:52:31.528 E/SurfaceFlinger( 1331): ro.sf.lcd_density must be defined as a build property
+02-17 18:52:31.541 E/EGL_emulation( 1331): tid 1331: eglCreateSyncKHR(1901): error 0x3004 (EGL_BAD_ATTRIBUTE)
+02-17 18:52:36.793 I/CastDatabase( 2207): Saving the database
+02-17 18:52:36.801 I/SQLiteCastStore( 2207): [CastNetworkInfo] saved: 0, skipped: 0, [CastDeviceInfo]: saved 0, skipped 0, Paired Guest Mode DeviceInfo] saved: 0, skipped: 0.
+02-17 18:52:40.945 I/TRuntime.CctTransportBa( 3581): Making request to: https://firebaselogging-pa.googleapis.com/v1/firelog/legacy/batchlog
+02-17 18:52:43.001 I/TRuntime.CctTransportBa( 3581): Status Code: 200
+02-17 18:52:48.046 I/art     ( 3581): Starting a blocking GC Explicit
+02-17 18:52:48.059 I/art     ( 3581): Explicit concurrent mark sweep GC freed 5618(317KB) AllocSpace objects, 2(40KB) LOS objects, 30% free, 9MB/13MB, paused 597us total 12.631ms
+02-17 18:52:59.719 I/okhttp.OkHttpClient( 3581): <-- HTTP FAILED: java.net.SocketTimeoutException: connect timed out
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): Failed to refresh activities from network
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): java.net.SocketTimeoutException: connect timed out
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.net.PlainSocketImpl.socketConnect(Native Method)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:334)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:196)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:178)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:356)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.net.Socket.connect(Socket.java:586)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.platform.AndroidPlatform.connectSocket(AndroidPlatform.kt:63)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:295)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:207)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.logging.HttpLoggingInterceptor.intercept(HttpLoggingInterceptor.kt:221)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at com.senthapps.slagrimarket.data.network.AuthInterceptor.intercept(AuthInterceptor.kt:28)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+02-17 18:52:59.723 E/ActivityRepository$getA( 3581): 	at java.lang.Thread.run(Thread.java:761)
+02-17 18:52:59.797 I/okhttp.OkHttpClient( 3581): <-- HTTP FAILED: java.net.SocketTimeoutException: connect timed out
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): Failed to refresh market prices from network
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): java.net.SocketTimeoutException: connect timed out
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.net.PlainSocketImpl.socketConnect(Native Method)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:334)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:196)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:178)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:356)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.net.Socket.connect(Socket.java:586)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.platform.AndroidPlatform.connectSocket(AndroidPlatform.kt:63)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:295)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:207)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.logging.HttpLoggingInterceptor.intercept(HttpLoggingInterceptor.kt:221)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at com.senthapps.slagrimarket.data.network.AuthInterceptor.intercept(AuthInterceptor.kt:28)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+02-17 18:52:59.798 E/MarketPriceRepository$g( 3581): 	at java.lang.Thread.run(Thread.java:761)
+02-17 18:53:29.590 W/art     ( 3581): No such thread id for suspend: 33
+02-17 18:53:29.590 W/art     ( 3581): No such thread id for suspend: 33
+02-17 18:55:06.268 W/VibratorService( 1619): Tried to stop vibrating but there is no vibrator device.
+02-17 18:55:07.874 W/InputMethodManagerService( 1619): Window already focused, ignoring focus gain of: com.android.internal.view.IInputMethodClient$Stub$Proxy@df33748 attribute=null, token = android.os.BinderProxy@816677e
+02-17 18:55:08.535 I/art     ( 3581): Do partial code cache collection, code=201KB, data=211KB
+02-17 18:55:08.536 I/art     ( 3581): After code cache collection, code=195KB, data=208KB
+02-17 18:55:08.536 I/art     ( 3581): Increasing code cache capacity to 1024KB
+02-17 18:55:08.539 I/art     ( 3581): Compiler allocated 4MB to compile void com.senthapps.slagrimarket.ui.home.IndustrialHomeScreenKt.IndustrialHomeScreen(kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, com.senthapps.slagrimarket.ui.home.AppLanguage, androidx.compose.runtime.Composer, int, int)
+02-17 18:55:08.581 E/HomeViewModel$loadRecen( 3581): Error loading recent listings
+02-17 18:55:08.581 E/HomeViewModel$loadRecen( 3581): kotlinx.coroutines.JobCancellationException: Job was cancelled; job=SupervisorJobImpl{Cancelling}@de1feb
+02-17 18:57:29.844 I/ContextCompilationHandl( 2165): Compiling grammar for: en-US, type=CONTACT_DIALING
+02-17 18:57:29.850 I/ContextCompilationHandl( 2165): No grammar compilation resources for COMPILER, aborting. 
+02-17 18:57:29.850 I/ContextCompilationHandl( 2165): Compiling grammar for: en-US, type=HANDS_FREE_COMMANDS
+02-17 18:57:29.851 I/ContextCompilationHandl( 2165): No grammar compilation resources for COMPILER, aborting. 
+02-17 18:57:29.851 I/ContextCompilationHandl( 2165): Compiling grammar for: en-US, type=CONTACT_NAMES
+02-17 18:57:29.851 I/ContextCompilationHandl( 2165): No grammar compilation resources for VOICE_ACTIONS_COMPILER, aborting. 
+02-17 18:57:29.851 I/ContextCompilationHandl( 2165): Compiling grammar for: en-US, type=APP_NAMES
+02-17 18:57:29.863 I/ContextCompilationHandl( 2165): No grammar compilation resources for VOICE_ACTIONS_COMPILER, aborting. 
+02-17 18:57:29.863 I/ContextCompilationHandl( 2165): Compiling grammar for: en-US, type=MUSIC_NAMES
+02-17 18:57:29.864 I/ContextCompilationHandl( 2165): No grammar compilation resources for VOICE_ACTIONS_COMPILER, aborting. 
+02-17 18:57:36.834 I/CastDatabase( 2207): Saving the database
+02-17 18:57:36.836 I/SQLiteCastStore( 2207): [CastNetworkInfo] saved: 0, skipped: 0, [CastDeviceInfo]: saved 0, skipped 0, Paired Guest Mode DeviceInfo] saved: 0, skipped: 0.
