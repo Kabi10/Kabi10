@@ -11,16 +11,19 @@ Agrimarket ("we," "our," or "us") operates the Agrimarket mobile application (th
 ## Information We Collect
 
 ### Information You Provide
+
 - **Listings Data:** When you create a listing, we collect the information you provide (crop type, quantity, price, location, photos)
 - **Messages:** If you communicate with other users through the App
 - **Location:** General location information (district/city) for marketplace functionality
 
 ### Information Collected Automatically
+
 - **Device Information:** Device type, operating system version
 - **Usage Data:** Features used, screens viewed (analytics)
 - **Crash Reports:** Technical data when the app crashes (Firebase Crashlytics)
 
 ### Information We DO NOT Collect
+
 - We do NOT require user accounts in the current version
 - We do NOT collect personal identification documents
 - We do NOT collect payment information (transactions handled offline)
@@ -29,6 +32,7 @@ Agrimarket ("we," "our," or "us") operates the Agrimarket mobile application (th
 ## How We Use Your Information
 
 We use the collected information to:
+
 - Display your listings to potential buyers
 - Enable communication between buyers and sellers
 - Improve app functionality and user experience
@@ -38,11 +42,13 @@ We use the collected information to:
 ## Data Sharing
 
 ### We Share Data With:
+
 - **Other Users:** Your public listings are visible to all app users
 - **Firebase/Google:** Crash analytics and app performance data
 - **Supabase:** Backend database hosting (encrypted)
 
 ### We DO NOT:
+
 - Sell your data to third parties
 - Share your personal information with advertisers
 - Use your data for purposes other than stated here
@@ -57,6 +63,7 @@ We use the collected information to:
 ## Your Rights
 
 You have the right to:
+
 - **Access:** View all data associated with your listings
 - **Delete:** Remove your listings from the platform
 - **Correct:** Edit and update your listing information
@@ -69,6 +76,7 @@ Agrimarket is intended for users aged 13 and above. We do not knowingly collect 
 ## Changes to This Policy
 
 We may update this Privacy Policy from time to time. We will notify users of significant changes through:
+
 - App update notifications
 - In-app announcements
 - Updated "Last Modified" date on this policy
@@ -76,6 +84,7 @@ We may update this Privacy Policy from time to time. We will notify users of sig
 ## Third-Party Services
 
 We use the following third-party services:
+
 - **Firebase (Google):** Analytics and crash reporting
 - **Supabase:** Database and backend services
 - **Vercel:** API hosting
@@ -92,6 +101,7 @@ Each service has its own privacy policy governing data handling.
 ## International Data Transfer
 
 Your data may be transferred to and processed in countries outside Sri Lanka, including:
+
 - United States (Firebase, Vercel)
 - Singapore (Supabase Asia region)
 
@@ -115,23 +125,27 @@ By using Agrimarket, you consent to this Privacy Policy and our data practices a
 ## Summary (Plain Language)
 
 **What we collect:**
+
 - Listings you create (crops, prices, photos)
 - Messages you send
 - General location (city/district)
 - App usage data and crash reports
 
 **How we use it:**
+
 - Show your listings to buyers
 - Make the app work better
 - Fix bugs and crashes
 
 **What we DON'T do:**
+
 - Sell your information
 - Track your exact location
 - Require personal ID documents
 - Collect payment information
 
 **Your control:**
+
 - You can delete your listings anytime
 - You can stop using the app anytime
 - Contact us to delete all your data
@@ -140,4 +154,4 @@ By using Agrimarket, you consent to this Privacy Policy and our data practices a
 
 ---
 
-*This privacy policy was last updated on February 16, 2026.*
+_This privacy policy was last updated on February 16, 2026._

@@ -14,6 +14,7 @@ keytool -genkey -v -keystore agrimarket-release.keystore \
 ```
 
 You will be prompted to enter:
+
 - **Keystore password**: Create a strong password (save this securely!)
 - **Key password**: Create a strong password (can be same as keystore password)
 - **Organization details**: Your name, organization, city, state, country
@@ -23,6 +24,7 @@ You will be prompted to enter:
 ### 2. Secure Storage
 
 ⚠️ **CRITICAL SECURITY REQUIREMENTS**:
+
 - **NEVER** commit the keystore file to git
 - **NEVER** commit passwords to git or share them in plain text
 - Store keystore file in a secure location (NOT in the project directory)
@@ -50,6 +52,7 @@ SUPABASE_ANON_KEY=your_anon_key_here
 ```
 
 **Notes**:
+
 - Use absolute paths for `KEYSTORE_PATH` (e.g., `C:/Users/YourName/keystores/agrimarket-release.keystore` on Windows)
 - On Windows, use forward slashes (/) or escaped backslashes (\\\\) in paths
 - Do NOT use relative paths - they may not resolve correctly during builds
@@ -59,6 +62,7 @@ SUPABASE_ANON_KEY=your_anon_key_here
 Configure in GitHub Actions Secrets or your CI/CD platform:
 
 1. **Encode keystore to Base64** (for CI/CD upload):
+
 ```bash
 # Linux/Mac
 base64 -i agrimarket-release.keystore -o keystore.base64
@@ -76,6 +80,7 @@ base64 -i agrimarket-release.keystore -o keystore.base64
      - `KEY_PASSWORD`: Your key password
 
 3. **In GitHub Actions workflow**, decode the keystore:
+
 ```yaml
 - name: Decode Keystore
   env:
@@ -103,6 +108,7 @@ base64 -i agrimarket-release.keystore -o keystore.base64
 ### Success Indicators
 
 ✅ **Properly Configured**:
+
 - No signing warnings in build output
 - APK generated at `app/build/outputs/apk/release/app-release.apk` (note: **not** `-unsigned.apk`)
 - Signature verification passes:
@@ -114,6 +120,7 @@ base64 -i agrimarket-release.keystore -o keystore.base64
 ### Failure Indicators
 
 ❌ **Not Configured**:
+
 - Warning in build output: `⚠️ Release build will be UNSIGNED`
 - APK filename: `app-release-unsigned.apk`
 - Signature verification fails or says "jar is unsigned"
@@ -131,6 +138,7 @@ keytool -list -v -keystore agrimarket-release.keystore -alias agrimarket
 ```
 
 **Important**: Copy the SHA-1 and SHA-256 fingerprints - you'll need these for:
+
 - Google Play Console app signing configuration
 - Firebase app configuration
 - Google Maps API keys
@@ -162,6 +170,7 @@ keytool -list -v -keystore agrimarket-release.keystore -alias agrimarket
 ### 4. Backup Strategy
 
 Create multiple secure backups:
+
 1. **Encrypted cloud storage** (Google Drive, Dropbox with encryption)
 2. **Offline backup** (USB drive in secure location)
 3. **Password manager** (attach keystore to a secure note)
@@ -176,6 +185,7 @@ Create multiple secure backups:
 **Cause**: Wrong password or corrupted keystore file
 
 **Solutions**:
+
 1. Verify you're using the correct keystore password:
    ```bash
    keytool -list -v -keystore agrimarket-release.keystore
@@ -190,6 +200,7 @@ Create multiple secure backups:
 **Cause**: Wrong path or file moved
 
 **Solutions**:
+
 1. Verify the path in `local.properties` is correct and absolute
 2. Check the keystore file exists at that location
 3. On Windows, ensure path uses forward slashes or escaped backslashes
@@ -199,7 +210,9 @@ Create multiple secure backups:
 **Cause**: Android SDK not found
 
 **Solutions**:
+
 1. Set `ANDROID_HOME` environment variable:
+
    ```bash
    # Linux/Mac
    export ANDROID_HOME=$HOME/Android/Sdk
@@ -207,6 +220,7 @@ Create multiple secure backups:
    # Windows
    set ANDROID_HOME=C:\Users\YourName\AppData\Local\Android\Sdk
    ```
+
 2. Verify Android SDK is installed
 
 ### Warning: "Release build will be UNSIGNED"
@@ -214,6 +228,7 @@ Create multiple secure backups:
 **Cause**: Signing config not properly set or keystore file not found
 
 **Solutions**:
+
 1. Check `local.properties` has all 4 properties set
 2. Verify `KEYSTORE_PATH` points to existing file
 3. Ensure passwords are not empty strings
@@ -232,6 +247,7 @@ keytool -keypasswd -alias agrimarket -keystore agrimarket-release.keystore
 ```
 
 **After rotation**:
+
 1. Update `local.properties` with new passwords
 2. Update CI/CD secrets with new passwords
 3. Update password manager entries
@@ -265,6 +281,7 @@ For enhanced security, consider using **Google Play App Signing**:
 ## Support
 
 If you encounter issues not covered in this guide:
+
 1. Check build output for detailed error messages
 2. Verify all 4 signing properties are set correctly
 3. Test keystore access with `keytool -list` command

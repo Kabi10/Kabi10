@@ -28,6 +28,7 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 > **TL;DR:** Most common testing commands for rapid verification. See detailed sections below for full context.
 
 ### Automated Tests
+
 ```powershell
 .\gradlew test                     # Unit tests (142)
 .\gradlew lint                     # Lint checks
@@ -36,11 +37,13 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 ```
 
 ### Logcat Monitoring
+
 ```powershell
 & $env:ADB logcat -v time | Select-String "(OkHttp|HTTP|200|201|Auth|Sync)"
 ```
 
 ### App Control
+
 ```powershell
 & $env:ADB shell pm clear com.senthapps.slagrimarket          # Fresh start
 & $env:ADB shell am start -n com.senthapps.slagrimarket/.MainActivity
@@ -48,12 +51,14 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 ```
 
 ### Network Testing
+
 ```powershell
 & $env:ADB shell cmd connectivity airplane-mode enable   # Offline
 & $env:ADB shell cmd connectivity airplane-mode disable  # Online
 ```
 
 ### Language Testing
+
 ```powershell
 & $env:ADB shell "setprop persist.sys.locale ta-IN; stop; start"  # Tamil
 & $env:ADB shell "setprop persist.sys.locale si-LK; stop; start"  # Sinhala
@@ -61,6 +66,7 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 ```
 
 ### Dark Mode & Screenshots
+
 ```powershell
 & $env:ADB shell "cmd uimode night yes"    # Dark mode ON
 & $env:ADB shell "cmd uimode night no"     # Dark mode OFF
@@ -68,6 +74,7 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 ```
 
 ### TalkBack Accessibility
+
 ```powershell
 # Enable
 & $env:ADB shell settings put secure enabled_accessibility_services com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
@@ -80,20 +87,20 @@ $DEVICE = (& $env:ADB devices | Select-String -Pattern "^\w+" | Select-Object -F
 
 ### 12-Point Verification Checklist
 
-| # | Item | Command/Action | ✓ |
-|---|------|----------------|---|
-| 1 | **Release Build** | `.\gradlew assembleRelease` (must succeed) | [ ] |
-| 2 | **Debug Bypass OFF** | Verify `BuildConfig.DEBUG=false` in release APK | [ ] |
-| 3 | API Health | `Invoke-RestMethod "https://backend-psi-tan-18.vercel.app/api/health"` | [ ] |
-| 4 | Auth Flow | Manual login with OTP (no debug bypass) | [ ] |
-| 5 | Sync Test | Toggle airplane mode | [ ] |
-| 6 | Offline Data | View cached listings offline | [ ] |
-| 7 | Create Listing | Add new listing, check logcat | [ ] |
-| 8 | Unit Tests | `.\gradlew test` | [ ] |
-| 9 | UI Tests | `.\gradlew connectedAndroidTest` | [ ] |
-| 10 | Tamil UI | Language toggle | [ ] |
-| 11 | Dark Mode | Theme consistency | [ ] |
-| 12 | TalkBack | Accessibility | [ ] |
+| #   | Item                 | Command/Action                                                         | ✓   |
+| --- | -------------------- | ---------------------------------------------------------------------- | --- |
+| 1   | **Release Build**    | `.\gradlew assembleRelease` (must succeed)                             | [ ] |
+| 2   | **Debug Bypass OFF** | Verify `BuildConfig.DEBUG=false` in release APK                        | [ ] |
+| 3   | API Health           | `Invoke-RestMethod "https://backend-psi-tan-18.vercel.app/api/health"` | [ ] |
+| 4   | Auth Flow            | Manual login with OTP (no debug bypass)                                | [ ] |
+| 5   | Sync Test            | Toggle airplane mode                                                   | [ ] |
+| 6   | Offline Data         | View cached listings offline                                           | [ ] |
+| 7   | Create Listing       | Add new listing, check logcat                                          | [ ] |
+| 8   | Unit Tests           | `.\gradlew test`                                                       | [ ] |
+| 9   | UI Tests             | `.\gradlew connectedAndroidTest`                                       | [ ] |
+| 10  | Tamil UI             | Language toggle                                                        | [ ] |
+| 11  | Dark Mode            | Theme consistency                                                      | [ ] |
+| 12  | TalkBack             | Accessibility                                                          | [ ] |
 
 ---
 
@@ -129,11 +136,13 @@ $AAPT = "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\aapt2.exe"
 ### PB-3. Verify Debug Bypass is Disabled
 
 The `AuthRepository.kt` uses `BuildConfig.DEBUG` to enable/disable debug bypass:
+
 ```kotlin
 private val isDebugMode: Boolean = BuildConfig.DEBUG
 ```
 
 **Verification Steps:**
+
 ```powershell
 # 1. Install RELEASE APK (not debug)
 & $env:ADB install -r ".\app\build\outputs\apk\release\app-release.apk"
@@ -151,6 +160,7 @@ private val isDebugMode: Boolean = BuildConfig.DEBUG
 ```
 
 **Pass Criteria:**
+
 - [ ] Release APK builds successfully
 - [ ] App shows login screen on fresh install (NOT home screen)
 - [ ] No "debug_user_123" or "Debug Farmer" visible
@@ -229,6 +239,7 @@ Write-Host "Release APK Size: $SizeMB MB"
 ### 1. Backend API Connectivity & Supabase Integration
 
 #### 1.1 Verify API Base URL Configuration
+
 ```powershell
 # Check release build config
 Select-String -Path ".\app\build.gradle.kts" -Pattern "BASE_URL"
@@ -236,6 +247,7 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "BASE_URL"
 ```
 
 #### 1.2 Test API Health Endpoint
+
 ```powershell
 # Direct API health check
 Invoke-RestMethod -Uri "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-projects.vercel.app/api/health" -Method GET
@@ -246,6 +258,7 @@ Invoke-RestMethod -Uri "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-
 ```
 
 #### 1.3 Monitor API Calls via Logcat
+
 ```powershell
 # Clear logcat and filter for HTTP calls
 & $env:ADB logcat -c
@@ -258,6 +271,7 @@ Invoke-RestMethod -Uri "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-
 ```
 
 **Pass Criteria:**
+
 - [ ] Health endpoint returns HTTP 200 with `status: "ok"`
 - [ ] Logcat shows actual HTTP requests (not just cached data)
 - [ ] No persistent 4xx/5xx errors during normal operation
@@ -267,6 +281,7 @@ Invoke-RestMethod -Uri "https://agrimarket-bf32inyap-kabilantharmaratnam-kpucas-
 ### 2. User Authentication Flow
 
 #### 2.1 Verify Auth is Enabled (Not Demo Mode)
+
 ```powershell
 # Check MainActivity doesn't bypass auth
 Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\MainActivity.kt" -Pattern "startWithAuth"
@@ -278,6 +293,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data\reposit
 ```
 
 #### 2.2 Test Full OTP Flow via ADB
+
 ```powershell
 # Launch app fresh (clear data first)
 & $env:ADB shell pm clear com.senthapps.slagrimarket
@@ -288,6 +304,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data\reposit
 ```
 
 #### 2.3 Manual Auth Flow Test Steps
+
 1. Open app → Should show Login/Register screen
 2. Enter phone number → OTP should be sent
 3. Enter OTP → Should navigate to Home screen
@@ -295,6 +312,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data\reposit
 5. Logout → Should return to Login screen
 
 **Pass Criteria:**
+
 - [ ] App starts with authentication screen (not Home directly)
 - [ ] OTP verification works with real backend
 - [ ] Token persists across app restarts
@@ -305,6 +323,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data\reposit
 ### 3. Real-Time Data Synchronization
 
 #### 3.1 Verify Sync Manager Configuration
+
 ```powershell
 # Check SyncWorker exists
 Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket" -Recurse -Filter "*Sync*.kt"
@@ -312,11 +331,13 @@ Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket" -Recurse -F
 ```
 
 #### 3.2 Monitor Sync Operations via Logcat
+
 ```powershell
 & $env:ADB logcat -v time | Select-String -Pattern "(SyncWorker|SyncManager|SYNC|LocalOp|enqueue|pending)"
 ```
 
 #### 3.3 Test Sync with Network Toggle
+
 ```powershell
 # Disable network
 & $env:ADB shell cmd connectivity airplane-mode enable
@@ -330,6 +351,7 @@ Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket" -Recurse -F
 ```
 
 **Pass Criteria:**
+
 - [ ] Offline changes queue in LocalOp table
 - [ ] Sync triggers automatically when online
 - [ ] Logcat shows successful upload after reconnection
@@ -339,13 +361,15 @@ Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket" -Recurse -F
 ### 4. Offline Functionality & Caching
 
 #### 4.1 Verify Room Database Schema
+
 ```powershell
 # Check Room entities exist
-Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket\data" -Recurse -Filter "*.kt" | 
+Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket\data" -Recurse -Filter "*.kt" |
     Select-String -Pattern "@Entity"
 ```
 
 #### 4.2 Test Offline Mode
+
 ```powershell
 # Load app with data (while online)
 & $env:ADB shell am start -n com.senthapps.slagrimarket/.MainActivity
@@ -360,6 +384,7 @@ Start-Sleep -Seconds 5
 ```
 
 #### 4.3 Verify Offline Operation Types
+
 ```powershell
 # Check LocalOp implementation
 Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data" -Recurse -Pattern "LocalOp|OperationType"
@@ -367,6 +392,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data" -Recur
 ```
 
 **Pass Criteria:**
+
 - [ ] App displays cached data when offline
 - [ ] CRUD operations create LocalOp entries offline
 - [ ] No crash when offline (graceful degradation)
@@ -377,23 +403,27 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data" -Recur
 ### 5. CRUD Operations for Marketplace Features
 
 #### 5.1 Test Listing CRUD via Logcat
+
 ```powershell
 & $env:ADB logcat -c
 & $env:ADB logcat -v time | Select-String -Pattern "(listing|Listing|POST|PUT|DELETE|GET /api/listings)"
 ```
 
 **Manual Test Steps:**
+
 1. **CREATE:** Add new listing → Verify HTTP 201 in logcat
 2. **READ:** View listings → Verify HTTP 200 in logcat
 3. **UPDATE:** Edit listing details → Verify HTTP 200 in logcat
 4. **DELETE:** Remove listing → Verify HTTP 200 in logcat
 
 #### 5.2 Verify Transaction CRUD
+
 ```powershell
 & $env:ADB logcat -v time | Select-String -Pattern "(transaction|Transaction|order)"
 ```
 
 **Pass Criteria:**
+
 - [ ] Create listing → HTTP 201 response
 - [ ] Fetch listings → HTTP 200 with data
 - [ ] Update listing → HTTP 200 response
@@ -405,17 +435,20 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\data" -Recur
 ### 6. API Error Handling & Retry Logic
 
 #### 6.1 Verify Error Handler Implementation
+
 ```powershell
 Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\util\ErrorHandling.kt" -Pattern "getErrorMessage|UnknownHostException|SocketTimeoutException"
 ```
 
 #### 6.2 Verify Retry Configuration
+
 ```powershell
 # Check SyncWorker retry policy
 Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "backoffPolicy|BackoffPolicy|Result.retry|maxAttempts"
 ```
 
 #### 6.3 Simulate Network Error
+
 ```powershell
 # Temporarily break network during operation
 & $env:ADB shell cmd connectivity airplane-mode enable
@@ -427,6 +460,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "backo
 ```
 
 **Pass Criteria:**
+
 - [ ] Network errors show user-friendly messages
 - [ ] Failed requests automatically retry with backoff
 - [ ] Max retry limit prevents infinite loops
@@ -436,12 +470,14 @@ Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "backo
 ### 7. Network Connectivity Detection
 
 #### 7.1 Verify Network Monitoring
+
 ```powershell
 # Check for connectivity checks
 Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "ConnectivityManager|NetworkCallback|isNetworkAvailable"
 ```
 
 #### 7.2 Test Connectivity UI Feedback
+
 ```powershell
 # Toggle airplane mode and observe UI
 & $env:ADB shell cmd connectivity airplane-mode enable
@@ -454,6 +490,7 @@ Start-Sleep -Seconds 3
 ```
 
 **Pass Criteria:**
+
 - [ ] App detects network state changes
 - [ ] UI provides feedback when offline
 - [ ] Operations gracefully degrade offline
@@ -465,6 +502,7 @@ Start-Sleep -Seconds 3
 ### 8. Trilingual Support (English/Tamil/Sinhala)
 
 #### 8.1 Verify String Resources Exist
+
 ```powershell
 # Count strings in each language
 (Get-Content ".\app\src\main\res\values\strings.xml" | Select-String "<string").Count
@@ -474,6 +512,7 @@ Start-Sleep -Seconds 3
 ```
 
 #### 8.2 Compare String Keys Across Languages
+
 ```powershell
 # Extract string names and compare
 $en = (Get-Content ".\app\src\main\res\values\strings.xml" | Select-String 'name="(\w+)"' -AllMatches).Matches.Groups[1].Value | Sort-Object
@@ -486,6 +525,7 @@ Compare-Object $en $si
 ```
 
 #### 8.3 Test Language Toggle via ADB
+
 ```powershell
 # Change device language to Tamil
 & $env:ADB shell "setprop persist.sys.locale ta-IN; stop; start"
@@ -502,6 +542,7 @@ Compare-Object $en $si
 ```
 
 **Pass Criteria:**
+
 - [ ] All 173+ strings present in all 3 languages
 - [ ] No missing translations (string names match)
 - [ ] Language toggle changes all visible text
@@ -512,6 +553,7 @@ Compare-Object $en $si
 ### 9. Material Design 3 Dark Theme Consistency
 
 #### 9.1 Verify Theme Colors
+
 ```powershell
 # Check for Green-600 CTA color
 Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\theme" -Recurse -Pattern "16a34a|Green.?600"
@@ -521,6 +563,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\theme" -R
 ```
 
 #### 9.2 Test Dark Theme via ADB
+
 ```powershell
 # Enable dark mode
 & $env:ADB shell "cmd uimode night yes"
@@ -535,6 +578,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\theme" -R
 ```
 
 **Pass Criteria:**
+
 - [ ] Green-600 (#16a34a) used for primary CTAs
 - [ ] Blue-400 (#60a5fa) used for secondary actions
 - [ ] Dark theme applies consistently across all screens
@@ -545,6 +589,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\theme" -R
 ### 10. UI Responsiveness
 
 #### 10.1 Test on Multiple Screen Sizes
+
 ```powershell
 # Get current display info
 & $env:ADB shell wm size
@@ -558,6 +603,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\theme" -R
 ```
 
 #### 10.2 Test Different Android Versions
+
 ```powershell
 # Check minSdk and targetSdk
 Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk"
@@ -565,6 +611,7 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk"
 ```
 
 **Pass Criteria:**
+
 - [ ] UI scales properly across screen sizes
 - [ ] No cut-off text or overlapping elements
 - [ ] Works on Android 7.0 (API 24) through Android 14 (API 34)
@@ -574,20 +621,23 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk"
 ### 11. Form Validation & Error Messages
 
 #### 11.1 Test Form Validation (Manual Steps)
+
 1. **Phone Number Field:** Enter invalid format → Should show error
 2. **Listing Price:** Enter non-numeric value → Should reject
 3. **Required Fields:** Leave empty → Should prevent submission
 4. **Image Upload:** Select >5MB image → Should show size error
 
 #### 11.2 Verify Error Messages in All Languages
+
 ```powershell
 # Check for validation error strings
 Select-String -Path ".\app\src\main\res\values\strings.xml" -Pattern "error|invalid|required"
-Select-String -Path ".\app\src\main\res\values-ta\strings.xml" -Pattern "error|invalid|required" 
+Select-String -Path ".\app\src\main\res\values-ta\strings.xml" -Pattern "error|invalid|required"
 Select-String -Path ".\app\src\main\res\values-si\strings.xml" -Pattern "error|invalid|required"
 ```
 
 **Pass Criteria:**
+
 - [ ] All form fields have validation
 - [ ] Error messages display in current language
 - [ ] Validation prevents invalid data submission
@@ -597,6 +647,7 @@ Select-String -Path ".\app\src\main\res\values-si\strings.xml" -Pattern "error|i
 ### 12. Loading States & Progress Indicators
 
 #### 12.1 Verify Loading Skeleton Implementation
+
 ```powershell
 # Check for loading components
 Get-ChildItem -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\components" -Recurse -Filter "*Loading*.kt"
@@ -604,6 +655,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "Loadi
 ```
 
 #### 12.2 Test Slow Network Loading States
+
 ```powershell
 # Throttle network to see loading states
 & $env:ADB shell "tc qdisc add dev wlan0 root netem delay 3000ms"
@@ -612,6 +664,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "Loadi
 ```
 
 **Pass Criteria:**
+
 - [ ] Loading skeletons appear during data fetch
 - [ ] Progress indicators for long operations
 - [ ] Smooth transitions from loading to content
@@ -621,12 +674,14 @@ Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "Loadi
 ### 12b. TalkBack Accessibility
 
 #### 12b.1 Verify Semantic Descriptions
+
 ```powershell
 # Check for contentDescription in components
 Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\components" -Recurse -Pattern "semantics|contentDescription|Modifier.semantics"
 ```
 
 #### 12b.2 Test with TalkBack Enabled
+
 ```powershell
 # Enable TalkBack
 & $env:ADB shell settings put secure enabled_accessibility_services com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
@@ -640,6 +695,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\component
 ```
 
 **Pass Criteria:**
+
 - [ ] All interactive elements have content descriptions
 - [ ] TalkBack announces elements in logical order
 - [ ] Buttons and actions clearly described in all languages
@@ -653,13 +709,14 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\component
 
 #### 13.1 Test Coverage Overview
 
-| Test Type | Tests | Files | Description |
-|-----------|-------|-------|-------------|
-| **Unit Tests** | 142 | 12 | ViewModels, Repositories |
-| **UI Automation** | 27 | 5 | Screen tests, Navigation |
-| **Total** | **75** | **12** | Full test suite |
+| Test Type         | Tests  | Files  | Description              |
+| ----------------- | ------ | ------ | ------------------------ |
+| **Unit Tests**    | 142    | 12     | ViewModels, Repositories |
+| **UI Automation** | 27     | 5      | Screen tests, Navigation |
+| **Total**         | **75** | **12** | Full test suite          |
 
 #### 13.2 Run All Unit Tests
+
 ```powershell
 # Run unit tests
 .\gradlew test
@@ -684,6 +741,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\component
 | `ExampleUnitTest.kt` | Basic sanity tests |
 
 #### 13.3 Run UI Automation Tests
+
 ```powershell
 # Run all UI tests (requires device/emulator)
 .\gradlew connectedAndroidTest
@@ -705,6 +763,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\component
 | `ExampleInstrumentedTest.kt` | Basic sanity | 1 test |
 
 #### 13.4 Run Lint Checks
+
 ```powershell
 # Run Android lint
 .\gradlew lint
@@ -713,6 +772,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\ui\component
 ```
 
 #### 13.5 Custom ADB UI Automation Script
+
 ```powershell
 # Login flow automation
 & $env:ADB shell input text "0771234567"  # Enter phone
@@ -729,6 +789,7 @@ Start-Sleep -Seconds 5
 ```
 
 **Pass Criteria:**
+
 - [ ] All 142 unit tests pass (`.\gradlew test`)
 - [ ] All 27 UI tests pass (`.\gradlew connectedAndroidTest`)
 - [ ] Lint check passes with no errors (`.\gradlew lint`)
@@ -740,6 +801,7 @@ Start-Sleep -Seconds 5
 ### 14. Logcat Verification of API Calls
 
 #### 14.1 Enable Verbose Logging
+
 ```powershell
 # Verify logging is enabled in debug build
 Select-String -Path ".\app\build.gradle.kts" -Pattern "ENABLE_LOGGING"
@@ -747,6 +809,7 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "ENABLE_LOGGING"
 ```
 
 #### 14.2 Monitor All API Traffic
+
 ```powershell
 # Real-time API monitoring with timestamps
 & $env:ADB logcat -v time "*:S OkHttp:D Retrofit:D"
@@ -757,14 +820,16 @@ Get-Content api_traffic.log | Select-String -Pattern "200|201|OK|POST|GET|PUT|DE
 ```
 
 #### 14.3 Verify Not Using Cached Data Only
+
 ```powershell
 # Look for actual network requests vs cache hits
-& $env:ADB logcat -v time | Select-String -Pattern "(-->|<--)" 
+& $env:ADB logcat -v time | Select-String -Pattern "(-->|<--)"
 # --> = outgoing request, <-- = response
 # If only cache hits, you'll see Room/DAO logs without HTTP traffic
 ```
 
 **Pass Criteria:**
+
 - [ ] Logcat shows actual HTTP requests
 - [ ] HTTP 200/201 responses visible
 - [ ] Network traffic occurs on data refresh
@@ -774,12 +839,14 @@ Get-Content api_traffic.log | Select-String -Pattern "200|201|OK|POST|GET|PUT|DE
 ### 15. Memory Leak Detection
 
 #### 15.1 Verify LeakCanary Integration
+
 ```powershell
 Select-String -Path ".\app\build.gradle.kts" -Pattern "leakcanary"
 # Expected: debugImplementation(libs.leakcanary)
 ```
 
 #### 15.2 Run Memory Leak Detection
+
 ```powershell
 # Install debug build
 .\gradlew installDebug
@@ -792,6 +859,7 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "leakcanary"
 ```
 
 **Pass Criteria:**
+
 - [ ] LeakCanary installed in debug builds
 - [ ] No memory leaks reported during navigation
 - [ ] Activities/Fragments properly destroyed
@@ -801,6 +869,7 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "leakcanary"
 ### 16. APK Size Optimization
 
 #### 16.1 Build Release APK and Check Size
+
 ```powershell
 .\gradlew assembleRelease
 
@@ -814,6 +883,7 @@ Get-ChildItem ".\app\build\outputs\bundle\release\*.aab" | Select-Object Name, @
 ```
 
 #### 16.2 Analyze APK Contents
+
 ```powershell
 # Use Android Studio APK Analyzer or:
 $APK_ANALYZER = "$env:LOCALAPPDATA\Android\Sdk\cmdline-tools\latest\bin\apkanalyzer.bat"
@@ -821,6 +891,7 @@ $APK_ANALYZER = "$env:LOCALAPPDATA\Android\Sdk\cmdline-tools\latest\bin\apkanaly
 ```
 
 **Pass Criteria:**
+
 - [ ] Release APK < 20MB
 - [ ] R8/ProGuard shrinking enabled
 - [ ] No debug resources in release build
@@ -830,6 +901,7 @@ $APK_ANALYZER = "$env:LOCALAPPDATA\Android\Sdk\cmdline-tools\latest\bin\apkanaly
 ### 17. Crash Reporting & Analytics
 
 #### 17.1 Verify Firebase Crashlytics Setup
+
 ```powershell
 # Check Crashlytics initialization
 Select-String -Path ".\app\src\main\java\com\senthapps\slagrimarket\JaffnaMarketplaceApplication.kt" -Pattern "Crashlytics|setCrashCollectionEnabled"
@@ -839,6 +911,7 @@ Test-Path ".\app\google-services.json"
 ```
 
 #### 17.2 Test Crash Reporting
+
 ```powershell
 # Force a test crash (if crash test button exists)
 # Or check logcat for Crashlytics initialization
@@ -846,6 +919,7 @@ Test-Path ".\app\google-services.json"
 ```
 
 **Pass Criteria:**
+
 - [ ] Firebase Crashlytics initialized
 - [ ] Crashes uploaded to Firebase Console
 - [ ] User identifiers properly set
@@ -855,6 +929,7 @@ Test-Path ".\app\google-services.json"
 ### 18. Edge Case Handling
 
 #### 18.1 Test Empty States
+
 ```powershell
 # Clear app data and login fresh
 & $env:ADB shell pm clear com.senthapps.slagrimarket
@@ -866,6 +941,7 @@ Select-String -Path ".\app\src\main\java\com\senthapps" -Recurse -Pattern "Empty
 ```
 
 #### 18.2 Test Poor Network Conditions
+
 ```powershell
 # Simulate poor network (if supported)
 & $env:ADB shell svc wifi disable
@@ -877,6 +953,7 @@ Start-Sleep -Seconds 2
 ```
 
 **Pass Criteria:**
+
 - [ ] Empty states display appropriate messages
 - [ ] App handles slow/intermittent network
 - [ ] No crashes on edge cases
@@ -888,6 +965,7 @@ Start-Sleep -Seconds 2
 ### 19. App Signing Configuration
 
 #### 19.1 Verify Release Signing
+
 ```powershell
 # Check for signing config (shouldn't expose keys, just verify config exists)
 Select-String -Path ".\app\build.gradle.kts" -Pattern "signingConfigs|release"
@@ -897,6 +975,7 @@ Test-Path ".\app\release-keystore.jks"
 ```
 
 #### 19.2 Build Signed Release
+
 ```powershell
 .\gradlew bundleRelease
 # Check if AAB is signed
@@ -905,6 +984,7 @@ $AAB = Get-ChildItem ".\app\build\outputs\bundle\release\*.aab" -Name
 ```
 
 **Pass Criteria:**
+
 - [ ] Release keystore configured
 - [ ] AAB properly signed
 - [ ] Keystore password not hardcoded
@@ -914,6 +994,7 @@ $AAB = Get-ChildItem ".\app\build\outputs\bundle\release\*.aab" -Name
 ### 20. ProGuard/R8 Obfuscation
 
 #### 20.1 Verify ProGuard Configuration
+
 ```powershell
 # Check ProGuard is enabled
 Select-String -Path ".\app\build.gradle.kts" -Pattern "isMinifyEnabled|isShrinkResources"
@@ -925,11 +1006,13 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "isMinifyEnabled|isShrinkR
 ```
 
 #### 20.2 Verify Critical Classes Preserved
+
 ```powershell
 Select-String -Path ".\app\proguard-rules.pro" -Pattern "keep class.*model|keep class.*dto|Retrofit|Moshi|Room|Firebase"
 ```
 
 **Pass Criteria:**
+
 - [ ] `isMinifyEnabled = true` in release
 - [ ] `isShrinkResources = true` in release
 - [ ] API models preserved in ProGuard rules
@@ -939,17 +1022,20 @@ Select-String -Path ".\app\proguard-rules.pro" -Pattern "keep class.*model|keep 
 ### 21. Version Code & Version Name
 
 #### 21.1 Check Version Configuration
+
 ```powershell
 Select-String -Path ".\app\build.gradle.kts" -Pattern "versionCode|versionName"
 # Expected: Incremented from previous release
 ```
 
 #### 21.2 Verify Version in Built APK
+
 ```powershell
 & $env:ADB shell "dumpsys package com.senthapps.slagrimarket | grep -E 'versionCode|versionName'"
 ```
 
 **Pass Criteria:**
+
 - [ ] versionCode incremented for new release
 - [ ] versionName follows semantic versioning (e.g., 1.0.0)
 - [ ] Matches what's shown in app settings
@@ -959,11 +1045,13 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "versionCode|versionName"
 ### 22. Permissions Audit
 
 #### 22.1 List Requested Permissions
+
 ```powershell
 Select-String -Path ".\app\src\main\AndroidManifest.xml" -Pattern "uses-permission"
 ```
 
 #### 22.2 Verify Only Necessary Permissions
+
 ```
 Required permissions:
 - INTERNET (API calls)
@@ -980,6 +1068,7 @@ Avoid:
 ```
 
 **Pass Criteria:**
+
 - [ ] Only required permissions declared
 - [ ] Dangerous permissions have runtime requests
 - [ ] No unused permissions
@@ -989,16 +1078,19 @@ Avoid:
 ### 23. Privacy Policy & Terms Integration
 
 #### 23.1 Check for Legal Links
+
 ```powershell
 Select-String -Path ".\app\src\main" -Recurse -Pattern "privacy.policy|terms.of.service|legal"
 ```
 
 #### 23.2 Manual Verification
+
 1. Go to Settings/About screen
 2. Tap Privacy Policy → Should open browser with policy
 3. Tap Terms of Service → Should open browser with terms
 
 **Pass Criteria:**
+
 - [ ] Privacy Policy link present and working
 - [ ] Terms of Service link present and working
 - [ ] Links accessible from Settings/About screen
@@ -1008,18 +1100,21 @@ Select-String -Path ".\app\src\main" -Recurse -Pattern "privacy.policy|terms.of.
 ### 24. SDK Version Verification
 
 #### 24.1 Verify SDK Versions
+
 ```powershell
 Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk|compileSdk"
 ```
 
 #### 24.2 Expected Values
-| Property | Value | Notes |
-|----------|-------|-------|
-| `minSdk` | 24 | Android 7.0 Nougat |
-| `targetSdk` | 36 | Latest stable |
-| `compileSdk` | 36 | Latest stable |
+
+| Property     | Value | Notes              |
+| ------------ | ----- | ------------------ |
+| `minSdk`     | 24    | Android 7.0 Nougat |
+| `targetSdk`  | 36    | Latest stable      |
+| `compileSdk` | 36    | Latest stable      |
 
 **Pass Criteria:**
+
 - [ ] minSdk = 24 (Android 7.0+)
 - [ ] targetSdk = 34 or higher (Play Store requirement)
 - [ ] compileSdk matches targetSdk
@@ -1029,18 +1124,21 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk|compileS
 ### 25. Google Play Store Requirements
 
 #### 25.1 Build App Bundle
+
 ```powershell
 .\gradlew bundleRelease
 ```
 
 #### 25.2 Screenshot Requirements
-| Screen | Sizes Needed | Languages |
-|--------|--------------|-----------|
-| Phone | 2-8 screenshots | EN, TA, SI |
-| Tablet 7" | 1-8 screenshots | EN, TA, SI |
+
+| Screen     | Sizes Needed    | Languages  |
+| ---------- | --------------- | ---------- |
+| Phone      | 2-8 screenshots | EN, TA, SI |
+| Tablet 7"  | 1-8 screenshots | EN, TA, SI |
 | Tablet 10" | 1-8 screenshots | EN, TA, SI |
 
 #### 25.3 Store Listing Checklist
+
 - [ ] Short description (80 chars) in all 3 languages
 - [ ] Full description (4000 chars) in all 3 languages
 - [ ] Feature graphic (1024x500)
@@ -1050,6 +1148,7 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk|compileS
 - [ ] Target audience selected
 
 **Pass Criteria:**
+
 - [ ] AAB builds successfully
 - [ ] All store assets prepared
 - [ ] Descriptions in EN/TA/SI
@@ -1059,26 +1158,31 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk|compileS
 ## 🧪 Final Verification Commands
 
 ### Run All Unit Tests
+
 ```powershell
 .\gradlew test
 ```
 
 ### Run All UI Tests
+
 ```powershell
 .\gradlew connectedAndroidTest
 ```
 
 ### Run Lint Checks
+
 ```powershell
 .\gradlew lint
 ```
 
 ### Build Release Bundle
+
 ```powershell
 .\gradlew bundleRelease
 ```
 
 ### Test Coverage Report
+
 ```powershell
 .\gradlew jacocoTestReport
 # View: app/build/reports/jacoco/html/index.html
@@ -1088,14 +1192,14 @@ Select-String -Path ".\app\build.gradle.kts" -Pattern "minSdk|targetSdk|compileS
 
 ## 📊 Summary Checklist
 
-| Category | Total Items | Status |
-|----------|-------------|--------|
-| 🚨 PRODUCTION BUILD (PB-1 to PB-7) | 7 | [ ] |
-| 🔴 CRITICAL (1-7) | 7 | [ ] |
-| 🟡 HIGH (8-12) | 5 | [ ] |
-| 🟠 MEDIUM (13-18) | 6 | [ ] |
-| 🟢 STANDARD (19-25) | 7 | [ ] |
-| **TOTAL** | **32** | [ ] |
+| Category                           | Total Items | Status |
+| ---------------------------------- | ----------- | ------ |
+| 🚨 PRODUCTION BUILD (PB-1 to PB-7) | 7           | [ ]    |
+| 🔴 CRITICAL (1-7)                  | 7           | [ ]    |
+| 🟡 HIGH (8-12)                     | 5           | [ ]    |
+| 🟠 MEDIUM (13-18)                  | 6           | [ ]    |
+| 🟢 STANDARD (19-25)                | 7           | [ ]    |
+| **TOTAL**                          | **32**      | [ ]    |
 
 ### ⚡ Priority Order for Launch
 

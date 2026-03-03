@@ -1,9 +1,11 @@
 # Feature Spec: Industrial UI Integration
 
 ## Goal
+
 Replace existing screens with industrial UI screens and remove all navigation transitions to create a brutal, machinery-inspired user experience.
 
 ## Scope (Single Feature Only)
+
 - [x] Replace HomeScreen with IndustrialHomeScreen
 - [x] Replace MarketPricesScreen with IndustrialMarketPricesScreen
 - [x] Replace ListingDetailScreen with IndustrialListingDetailScreen
@@ -14,16 +16,19 @@ Replace existing screens with industrial UI screens and remove all navigation tr
 - [x] Wire up proper navigation flow for buyer journey (Category → List → Detail)
 
 ## Files to Modify
+
 - `navigation/JaffnaMarketplaceNavigation.kt` - Update all composable routes
 - Navigation transitions will be set to `EnterTransition.None` and `ExitTransition.None`
 
 ## New Routes to Add
+
 - `categories` - Category selection screen (2×2 grid)
 - `category_listings/{category}` - Listings list for a specific category
 
 ## Navigation Flow Changes
 
 ### OLD FLOW (Home → Listings → Detail):
+
 ```
 Home
  ├─ BUY → Listings (all listings)
@@ -31,6 +36,7 @@ Home
 ```
 
 ### NEW FLOW (Home → Categories → List → Detail):
+
 ```
 IndustrialHome
  ├─ BUY → Categories (2×2 grid) → CategoryListings (filtered) → Detail
@@ -42,12 +48,14 @@ IndustrialHome
 ## Implementation Strategy
 
 ### Phase 1: Update Navigation Graph
+
 1. Import industrial screen imports
 2. Add new routes for Categories and CategoryListings
 3. Replace old screen composables with industrial versions
 4. Add transition animations = None to NavHost
 
 ### Phase 2: Wire Navigation Callbacks
+
 1. IndustrialHomeScreen callbacks:
    - onNavigateToSell → CreateListing route
    - onNavigateToBuy → Categories route (NEW)
@@ -75,12 +83,15 @@ IndustrialHome
    - onSubmit → (save listing, navigate back)
 
 ### Phase 3: Data Wiring
+
 IndustrialListingsListScreen and IndustrialListingDetailScreen need real data:
+
 - Use existing ListingsViewModel
 - Fetch listings via Hilt injection
 - Filter by category when displaying category listings
 
 ## Out of Scope
+
 - Changing existing ViewModels (reuse them)
 - Modifying bottom navigation bar (keep it for now)
 - Updating tests (will do in separate task)
@@ -88,6 +99,7 @@ IndustrialListingsListScreen and IndustrialListingDetailScreen need real data:
 - Removing old screen files (keep for gradual migration)
 
 ## Success Criteria
+
 - [x] App builds successfully
 - [x] Navigation flows from Home → Categories → Listings → Detail
 - [x] All industrial screens display correctly (pending manual verification)
@@ -118,6 +130,7 @@ All navigation integration tasks have been completed:
    - Added IndustrialListingsListScreen (filtered list view)
 
 3. **Navigation Flow**
+
    ```
    IndustrialHome (2×2 grid)
     ├─ BUY → Categories → CategoryListings → ListingDetail

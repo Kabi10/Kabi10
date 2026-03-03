@@ -9,11 +9,13 @@
 ## Pre-Release Configuration ✅
 
 ### 1. Network Security (Phase 1) ✅ COMPLETE
+
 - [x] Debug build allows localhost/10.0.2.2 (for emulator development)
 - [x] Release build enforces HTTPS ONLY (no cleartext)
 - [x] Variant-specific configs in `app/src/debug/` and `app/src/release/`
 
 **Verification:**
+
 ```bash
 # Check release APK network config
 unzip -p app/build/outputs/apk/release/app-release.apk res/xml/network_security_config.xml
@@ -27,13 +29,16 @@ unzip -p app/build/outputs/apk/release/app-release.apk res/xml/network_security_
 **Status:** Not configured yet (APK will be unsigned)
 
 **Action Required:**
+
 1. Generate release keystore (one-time):
+
 ```bash
 keytool -genkey -v -keystore agrimarket-release.keystore \
   -alias agrimarket -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 2. Add to `local.properties`:
+
 ```properties
 KEYSTORE_PATH=/absolute/path/to/agrimarket-release.keystore
 KEYSTORE_PASSWORD=your_keystore_password
@@ -42,6 +47,7 @@ KEY_PASSWORD=your_key_password
 ```
 
 3. Rebuild and verify:
+
 ```bash
 ./gradlew assembleRelease
 jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
@@ -54,6 +60,7 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 ---
 
 ### 3. ProGuard/R8 Obfuscation (Phase 3) ✅ COMPLETE
+
 - [x] Enhanced rules for Moshi, Room, Retrofit, Hilt
 - [x] Data model preservation
 - [x] Enum serialization with `@Json` annotations
@@ -62,6 +69,7 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 - [x] Unit tests validate serialization
 
 **Verification:**
+
 ```bash
 ./gradlew testDebugUnitTest --tests ProguardTest
 # All 11 tests should pass
@@ -72,6 +80,7 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 ### 4. Automated Verification (Phase 4) ✅ COMPLETE
 
 **Run before every release:**
+
 ```bash
 # Bash (Git Bash, WSL, Linux, macOS)
 ./scripts/verify_release_build.sh
@@ -81,6 +90,7 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 ```
 
 **Checks:**
+
 - ✅ Network security (HTTPS only)
 - ✅ APK signature
 - ✅ ProGuard mapping file (>100KB)
@@ -92,12 +102,14 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 ## Build Commands
 
 ### Debug Build (for development)
+
 ```bash
 ./gradlew assembleDebug
 # APK: app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ### Release Build (for Play Store)
+
 ```bash
 ./gradlew assembleRelease
 # APK: app/build/outputs/apk/release/app-release.apk (signed)
@@ -105,6 +117,7 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 ```
 
 ### Clean Build (recommended before release)
+
 ```bash
 ./gradlew clean assembleRelease
 ```
@@ -116,6 +129,7 @@ jarsigner -verify -verbose app/build/outputs/apk/release/app-release.apk
 Install release APK on **physical device** (not emulator) and test:
 
 ### Core Functionality
+
 - [ ] **Login/Authentication:** OTP works, user can log in
 - [ ] **Listings:** Fetch listings from production API
 - [ ] **Create Listing:** Upload images, set quality grade, save listing
@@ -124,6 +138,7 @@ Install release APK on **physical device** (not emulator) and test:
 - [ ] **Notifications:** Receive and view notifications
 
 ### UI/Display
+
 - [ ] **Quality Grades:** A, B, C display correctly with colors
 - [ ] **Crop Types:** Emojis show correctly (🧅 🌾 🥕)
 - [ ] **Tamil/Sinhala:** Language switching works
@@ -131,6 +146,7 @@ Install release APK on **physical device** (not emulator) and test:
 - [ ] **Dark Mode:** Toggle works (if implemented)
 
 ### Network & Security
+
 - [ ] **HTTPS Enforcement:** Cannot connect to HTTP endpoints
 - [ ] **API Calls:** All API calls succeed (production URL)
 - [ ] **Error Handling:** Graceful handling of network errors
@@ -138,6 +154,7 @@ Install release APK on **physical device** (not emulator) and test:
 - [ ] **Sync:** Background sync completes successfully
 
 ### Edge Cases
+
 - [ ] **No crashes** on app startup
 - [ ] **No crashes** on network timeout
 - [ ] **No crashes** on invalid data
@@ -149,6 +166,7 @@ Install release APK on **physical device** (not emulator) and test:
 ## Play Store Submission
 
 ### 1. Build Final APK
+
 ```bash
 # Clean build
 ./gradlew clean assembleRelease
@@ -158,6 +176,7 @@ Install release APK on **physical device** (not emulator) and test:
 ```
 
 ### 2. Verify Signature
+
 ```bash
 jarsigner -verify -verbose -certs app/build/outputs/apk/release/app-release.apk
 
@@ -169,6 +188,7 @@ keytool -list -v -keystore agrimarket-release.keystore -alias agrimarket
 ### 3. Prepare Store Listing
 
 **Content from `store-listing.md`:**
+
 - App title: "Agrimarket - Sri Lanka Farmers Marketplace"
 - Short description (80 chars max)
 - Full description (4000 chars max)
@@ -177,6 +197,7 @@ keytool -list -v -keystore agrimarket-release.keystore -alias agrimarket
 - App icon (512x512)
 
 **Additional Requirements:**
+
 - Privacy Policy URL: Add to Play Console
 - Content rating questionnaire
 - Target audience: Adults
@@ -195,6 +216,7 @@ keytool -list -v -keystore agrimarket-release.keystore -alias agrimarket
 ### 5. Internal Testing (Recommended)
 
 Before public release:
+
 1. Upload to Internal Testing track
 2. Add test users (email addresses)
 3. Share testing link with team
@@ -208,17 +230,20 @@ Before public release:
 ## Post-Release Monitoring
 
 ### 1. Firebase Crashlytics
+
 - Monitor crash-free rate (target: >99%)
 - Review top crashes
 - Fix critical crashes in next update
 
 ### 2. Play Console Metrics
+
 - Install/uninstall rate
 - User ratings/reviews
 - ANR (App Not Responding) rate
 - Crash rate
 
 ### 3. API Monitoring
+
 - Monitor Vercel backend logs
 - Check Supabase database performance
 - Review API error rates
@@ -228,6 +253,7 @@ Before public release:
 ## Version Increments
 
 For next release, update `app/build.gradle.kts`:
+
 ```kotlin
 versionCode = 2  // Increment by 1 for each release
 versionName = "1.1"  // Follow semantic versioning
@@ -240,26 +266,32 @@ versionName = "1.1"  // Follow semantic versioning
 ## Troubleshooting
 
 ### "Release build will be UNSIGNED"
+
 **Cause:** Keystore not configured
 **Solution:** Configure signing in `local.properties` (see Phase 2)
 
 ### "Cleartext traffic not permitted"
+
 **Cause:** App trying to connect to HTTP in release build
 **Solution:** Ensure production BASE_URL uses HTTPS
 
 ### ProGuard/R8 crashes at runtime
+
 **Cause:** Missing ProGuard rules
 **Solution:** Run `./gradlew testDebugUnitTest --tests ProguardTest` to identify issues
 
 ### APK size too large (>150MB)
+
 **Cause:** Too many resources or dependencies
 **Solution:**
+
 - Enable resource shrinking (already enabled)
 - Remove unused dependencies
 - Use WebP images instead of PNG
 - Enable App Bundle (`.aab` instead of `.apk`)
 
 ### Location permissions warning in Play Console
+
 **Cause:** Maps SDK included
 **Solution:** Already addressed - location is disabled in code (`isMyLocationEnabled = false`)
 
@@ -268,24 +300,29 @@ versionName = "1.1"  // Follow semantic versioning
 ## Important Files
 
 **Build Configuration:**
+
 - `app/build.gradle.kts` - Build config, signing, ProGuard
 - `app/proguard-rules.pro` - ProGuard rules
 - `local.properties` - Signing credentials (NOT in git)
 
 **Network Security:**
+
 - `app/src/debug/res/xml/network_security_config.xml` - Debug config
 - `app/src/release/res/xml/network_security_config.xml` - Release config
 
 **Documentation:**
+
 - `docs/RELEASE_SIGNING_SETUP.md` - Signing guide
 - `PRODUCTION_READINESS_ASSESSMENT.md` - MVP checklist
 - `docs/PRE_LAUNCH_CHECKLIST.md` - Testing checklist
 
 **Scripts:**
+
 - `scripts/verify_release_build.sh` - Bash verification
 - `scripts/verify_release_build.ps1` - PowerShell verification
 
 **Tests:**
+
 - `app/src/test/java/com/senthapps/slagrimarket/ProguardTest.kt` - ProGuard tests
 
 ---
@@ -293,6 +330,7 @@ versionName = "1.1"  // Follow semantic versioning
 ## Security Best Practices
 
 ### DO ✅
+
 - ✅ Always use HTTPS for production API
 - ✅ Store keystore in secure location (NOT in git)
 - ✅ Use Play App Signing (Google manages final key)
@@ -302,6 +340,7 @@ versionName = "1.1"  // Follow semantic versioning
 - ✅ Monitor crash reports
 
 ### DON'T ❌
+
 - ❌ Never commit keystore to git (even private repos)
 - ❌ Never hardcode API keys in source code
 - ❌ Never use `android:debuggable="true"` in release
@@ -315,12 +354,14 @@ versionName = "1.1"  // Follow semantic versioning
 ## Emergency Contacts
 
 **If keystore is lost:**
+
 1. **Cannot update existing app** - Play Store rejects different signatures
 2. Must publish as new app with new package name
 3. Lose all ratings, reviews, install base
 4. **Prevention:** Back up keystore in 3 secure locations NOW
 
 **If critical crash post-release:**
+
 1. Monitor Firebase Crashlytics for stack traces
 2. Fix in development branch
 3. Test thoroughly

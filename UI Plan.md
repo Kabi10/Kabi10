@@ -2,7 +2,7 @@
 
 ---
 
-```
+````
 You are Claude Code / Claude CLI.
 
 ════════════════════════════════════════════════════════════════════════════════
@@ -914,7 +914,7 @@ object IndustrialIndication : Indication {
             }
         }
     }
-    
+
     @Composable
     override fun rememberUpdatedInstance(
         interactionSource: InteractionSource
@@ -934,16 +934,17 @@ fun Modifier.industrialClickable(onClick: () -> Unit) = composed {
         onClick = onClick
     )
 }
-```
+````
 
 LANGUAGE HANDLING:
+
 ```kotlin
 // DataStore for language preference
 class LanguagePreferences(private val dataStore: DataStore<Preferences>) {
     val language: Flow<Language> = dataStore.data.map { prefs ->
         Language.valueOf(prefs[LANGUAGE_KEY] ?: Language.SINHALA.name)
     }
-    
+
     suspend fun setLanguage(language: Language) {
         dataStore.edit { it[LANGUAGE_KEY] = language.name }
     }
@@ -957,6 +958,7 @@ fun String.industrialCase(language: Language): String =
 ```
 
 ERROR HANDLING UX:
+
 - Network timeout: 15 seconds
 - On error: Show ErrorState with message + RETRY button
 - RETRY triggers ViewModel re-fetch
@@ -968,77 +970,77 @@ SECTION 7: FILE STRUCTURE
 
 app/src/main/java/com/agrimarket/
 ├── ui/
-│   ├── theme/
-│   │   ├── Color.kt                 # Token definitions
-│   │   ├── Type.kt                  # Typography
-│   │   └── Spacing.kt               # Spacing constants
-│   ├── components/
-│   │   ├── IndustrialHeader.kt      # 72dp header with back + title
-│   │   ├── IndustrialDivider.kt     # 4dp Earth divider
-│   │   ├── IndustrialRow.kt         # Base row with accent bar option
-│   │   ├── Buttons.kt               # Primary, Secondary, Urgent, Text
-│   │   ├── States.kt                # Loading, Empty, Error
-│   │   ├── FormFields.kt            # TextField, Dropdown
-│   │   ├── ListingRow.kt            # 112dp listing row
-│   │   ├── PriceRow.kt              # 72dp price row
-│   │   ├── OrderRow.kt              # 96dp order row
-│   │   ├── CategoryRow.kt           # 96dp category row
-│   │   └── QuadrantGrid.kt          # 2×2 home grid
-│   ├── screens/
-│   │   ├── home/
-│   │   │   ├── HomeScreen.kt
-│   │   │   └── HomeViewModel.kt     # (minimal, mostly navigation)
-│   │   ├── category/
-│   │   │   └── CategoryScreen.kt
-│   │   ├── listings/
-│   │   │   ├── ListingsScreen.kt
-│   │   │   └── ListingsViewModel.kt
-│   │   ├── listing_detail/
-│   │   │   ├── ListingDetailScreen.kt
-│   │   │   └── ListingDetailViewModel.kt
-│   │   ├── create_listing/
-│   │   │   ├── CreateListingScreen.kt
-│   │   │   ├── CreateListingViewModel.kt
-│   │   │   └── CreateListingSuccessScreen.kt
-│   │   ├── prices/
-│   │   │   ├── PricesScreen.kt
-│   │   │   └── PricesViewModel.kt
-│   │   ├── orders/
-│   │   │   ├── OrdersScreen.kt
-│   │   │   └── OrdersViewModel.kt
-│   │   ├── order_detail/
-│   │   │   ├── OrderDetailScreen.kt
-│   │   │   └── OrderDetailViewModel.kt
-│   │   └── settings/
-│   │       ├── SettingsScreen.kt
-│   │       └── SettingsViewModel.kt
-│   └── navigation/
-│       ├── NavRoutes.kt
-│       └── NavGraph.kt
+│ ├── theme/
+│ │ ├── Color.kt # Token definitions
+│ │ ├── Type.kt # Typography
+│ │ └── Spacing.kt # Spacing constants
+│ ├── components/
+│ │ ├── IndustrialHeader.kt # 72dp header with back + title
+│ │ ├── IndustrialDivider.kt # 4dp Earth divider
+│ │ ├── IndustrialRow.kt # Base row with accent bar option
+│ │ ├── Buttons.kt # Primary, Secondary, Urgent, Text
+│ │ ├── States.kt # Loading, Empty, Error
+│ │ ├── FormFields.kt # TextField, Dropdown
+│ │ ├── ListingRow.kt # 112dp listing row
+│ │ ├── PriceRow.kt # 72dp price row
+│ │ ├── OrderRow.kt # 96dp order row
+│ │ ├── CategoryRow.kt # 96dp category row
+│ │ └── QuadrantGrid.kt # 2×2 home grid
+│ ├── screens/
+│ │ ├── home/
+│ │ │ ├── HomeScreen.kt
+│ │ │ └── HomeViewModel.kt # (minimal, mostly navigation)
+│ │ ├── category/
+│ │ │ └── CategoryScreen.kt
+│ │ ├── listings/
+│ │ │ ├── ListingsScreen.kt
+│ │ │ └── ListingsViewModel.kt
+│ │ ├── listing_detail/
+│ │ │ ├── ListingDetailScreen.kt
+│ │ │ └── ListingDetailViewModel.kt
+│ │ ├── create_listing/
+│ │ │ ├── CreateListingScreen.kt
+│ │ │ ├── CreateListingViewModel.kt
+│ │ │ └── CreateListingSuccessScreen.kt
+│ │ ├── prices/
+│ │ │ ├── PricesScreen.kt
+│ │ │ └── PricesViewModel.kt
+│ │ ├── orders/
+│ │ │ ├── OrdersScreen.kt
+│ │ │ └── OrdersViewModel.kt
+│ │ ├── order_detail/
+│ │ │ ├── OrderDetailScreen.kt
+│ │ │ └── OrderDetailViewModel.kt
+│ │ └── settings/
+│ │ ├── SettingsScreen.kt
+│ │ └── SettingsViewModel.kt
+│ └── navigation/
+│ ├── NavRoutes.kt
+│ └── NavGraph.kt
 ├── data/
-│   ├── api/
-│   │   ├── ListingsApi.kt
-│   │   ├── TransactionsApi.kt
-│   │   └── PricesApi.kt
-│   ├── repository/
-│   │   ├── ListingsRepository.kt
-│   │   ├── TransactionsRepository.kt
-│   │   └── PricesRepository.kt
-│   └── local/
-│       └── LanguagePreferences.kt
+│ ├── api/
+│ │ ├── ListingsApi.kt
+│ │ ├── TransactionsApi.kt
+│ │ └── PricesApi.kt
+│ ├── repository/
+│ │ ├── ListingsRepository.kt
+│ │ ├── TransactionsRepository.kt
+│ │ └── PricesRepository.kt
+│ └── local/
+│ └── LanguagePreferences.kt
 ├── di/
-│   └── AppModule.kt                 # Hilt module
+│ └── AppModule.kt # Hilt module
 └── util/
-    ├── StringExtensions.kt          # industrialCase()
-    └── TimeUtils.kt                 # Relative time formatting
+├── StringExtensions.kt # industrialCase()
+└── TimeUtils.kt # Relative time formatting
 
 app/src/main/res/
 ├── values/
-│   └── strings.xml                  # English strings
+│ └── strings.xml # English strings
 ├── values-si/
-│   └── strings.xml                  # Sinhala strings
+│ └── strings.xml # Sinhala strings
 └── values-ta/
-    └── strings.xml                  # Tamil strings
+└── strings.xml # Tamil strings
 
 ════════════════════════════════════════════════════════════════════════════════
 SECTION 8: ASSIGNMENT
@@ -1131,6 +1133,7 @@ SECTION 10: CONSTRAINTS (NON-NEGOTIABLE)
 ════════════════════════════════════════════════════════════════════════════════
 
 BEGIN. Start by scanning existing code and reporting findings.
+
 ```
 
 ---
@@ -1152,3 +1155,4 @@ BEGIN. Start by scanning existing code and reporting findings.
 | **Output Format** | Explicit expectations for what Claude should produce |
 
 This prompt is now **self-contained** — Claude CLI has everything needed to implement the full UI without guessing or asking clarifying questions.
+```

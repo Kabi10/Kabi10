@@ -21,11 +21,13 @@
 ## 📱 Testing on Emulator (Required Before Submission)
 
 ### Start Emulator
+
 1. Open Android Studio
 2. Tools → Device Manager (or AVD Manager)
 3. Click ▶️ to start an emulator (API 28+ recommended)
 
 ### Install Release APK
+
 ```bash
 # Option 1: Using adb (if in PATH)
 adb install app/build/outputs/apk/release/app-release.apk
@@ -39,6 +41,7 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
 ```
 
 ### Test Checklist (15 minutes)
+
 - [ ] App launches without crashes
 - [ ] **No login screen appears** (auth disabled)
 - [ ] Browse listings screen loads
@@ -62,11 +65,13 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
 ### 1. Google Play Console Setup
 
 **Create Account:**
+
 - Go to: https://play.google.com/console
 - Sign in with Google account
 - Pay one-time $25 registration fee (required)
 
 **Create App:**
+
 1. Click "Create app"
 2. Fill in:
    - App name: **Agrimarket - Sri Lanka Farmers Marketplace**
@@ -78,11 +83,13 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
 ### 2. Upload APK
 
 **Internal Testing Track (Recommended First):**
+
 1. Release → Internal testing
 2. Create new release
 3. Upload: `app/build/outputs/apk/release/app-release.apk`
 4. Release name: "1.0 - MVP Launch"
 5. Release notes:
+
    ```
    Initial release of Agrimarket - connecting Sri Lankan farmers with buyers.
 
@@ -95,6 +102,7 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
    ```
 
 **OR Production Track (Direct to Public):**
+
 1. Release → Production
 2. Upload APK
 3. Fill same details as above
@@ -102,12 +110,15 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
 ### 3. Store Listing
 
 **App Details:**
+
 - Short description (80 chars max):
+
   ```
   Connect Sri Lankan farmers with buyers. Fresh produce, fair prices.
   ```
 
 - Full description (4000 chars max):
+
   ```
   Agrimarket brings Sri Lankan farmers and buyers together on one platform.
 
@@ -140,10 +151,12 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
   ```
 
 **App Category:**
+
 - Category: **Shopping** or **Food & Drink**
 - Tags: agriculture, farming, marketplace, sri lanka, produce
 
 **Contact Details:**
+
 - Email: your-email@example.com
 - Phone: +94 XXX XXX XXX (optional)
 - Website: https://agrimarket-web.vercel.app (your landing page)
@@ -153,14 +166,17 @@ export ANDROID_HOME="/c/Users/Tharma/AppData/Local/Android/Sdk"
 You need to create these before submission:
 
 **App Icon** (already have):
+
 - ✅ 512x512 PNG
 - Location: `app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`
 
 **Screenshots** (minimum 2 required):
+
 - 📱 Phone: 1080x1920 or 1080x2340
 - Minimum 2 screenshots, maximum 8
 
 **Create Screenshots:**
+
 ```bash
 # Option 1: From running emulator
 1. Run app on emulator
@@ -176,6 +192,7 @@ Tools → Logcat → Screenshot icon
 ```
 
 **Screenshots to Capture:**
+
 1. Browse listings screen (main screen)
 2. Listing detail with images
 3. Create new listing screen
@@ -183,10 +200,12 @@ Tools → Logcat → Screenshot icon
 5. Messages (if implemented)
 
 **Feature Graphic** (REQUIRED):
+
 - 1024x500 PNG
 - Banner image shown in Play Store
 
 **Create Feature Graphic:**
+
 - Use Canva, Figma, or Photoshop
 - Include: App name, tagline, key visual
 - Keep text minimal (displays small on mobile)
@@ -194,6 +213,7 @@ Tools → Logcat → Screenshot icon
 ### 5. Content Rating
 
 **Fill Questionnaire:**
+
 1. Go to: Content rating
 2. Start questionnaire
 3. Select: Shopping
@@ -210,14 +230,17 @@ Tools → Logcat → Screenshot icon
 ### 6. Target Audience & Content
 
 **Target Age:**
+
 - Primary: 18-65+ (adults)
 - Appeals to: Everyone
 
 **Store Presence:**
+
 - Countries: Sri Lanka (primary)
 - Can add: India, other South Asian countries later
 
 **Pricing & Distribution:**
+
 - Free app
 - No in-app purchases (for now)
 - No ads (for now)
@@ -229,15 +252,18 @@ Tools → Logcat → Screenshot icon
 **Option 1: Create Simple Privacy Policy:**
 
 I can help you create one, or use online generators:
+
 - https://www.privacypolicygenerator.info/
 - https://www.freeprivacypolicy.com/
 
 **Host on:**
+
 - Your website: https://agrimarket-web.vercel.app/privacy
 - GitHub Pages (free)
 - Notion (public page)
 
 **Required sections:**
+
 - Data collection (phone number, location, photos)
 - Data usage (marketplace functionality)
 - Data sharing (between buyers/sellers)
@@ -249,11 +275,13 @@ I can help you create one, or use online generators:
 
 **Email List:**
 Add test users who can access Internal Testing:
+
 - Your email
 - Team members
 - Friends/family for testing
 
 **Testing Period:**
+
 - Minimum 14 days recommended
 - Get feedback, fix critical bugs
 - Then promote to production
@@ -261,6 +289,7 @@ Add test users who can access Internal Testing:
 ### 9. Submit for Review
 
 **Before Submitting:**
+
 - [ ] All required fields filled
 - [ ] Privacy policy URL added
 - [ ] Screenshots uploaded (minimum 2)
@@ -270,6 +299,7 @@ Add test users who can access Internal Testing:
 - [ ] Store listing looks good (preview it!)
 
 **Submit:**
+
 1. Review everything one more time
 2. Click "Send X items for review"
 3. Review time: 1-7 days (usually 1-3 days)
@@ -279,11 +309,13 @@ Add test users who can access Internal Testing:
 ## 📊 Post-Submission
 
 ### Monitor Review Status
+
 - Check Play Console daily
 - Email notifications enabled
 - Typical review: 1-3 days
 
 ### Prepare for Launch
+
 - [ ] Announce on social media when approved
 - [ ] Share Play Store link with early users
 - [ ] Monitor ratings and reviews
@@ -292,12 +324,14 @@ Add test users who can access Internal Testing:
 ### Post-Launch Monitoring
 
 **Week 1:**
+
 - Daily: Check crash reports (Firebase Crashlytics)
 - Daily: Read user reviews
 - Daily: Monitor install/uninstall rates
 - Fix critical bugs immediately
 
 **Metrics to Watch:**
+
 - Install rate
 - Crash-free rate (target: >99%)
 - ANR (App Not Responding) rate
@@ -309,18 +343,21 @@ Add test users who can access Internal Testing:
 ## 🐛 Known Limitations (Document for Support)
 
 **Authentication:**
+
 - ⚠️ No user accounts in v1.0
 - Users are anonymous
 - No saved preferences across devices
 - **Fix:** Implement Firebase Auth in v1.1
 
 **Without Auth, Users CANNOT:**
+
 - Save favorites across devices
 - Have profile/account settings
 - Get personalized recommendations
 - Receive push notifications (user-specific)
 
 **What DOES Work:**
+
 - Browse all listings
 - Create listings (locally stored)
 - Search and filter
@@ -333,6 +370,7 @@ Add test users who can access Internal Testing:
 ## 📝 Version 1.1 Roadmap
 
 **Priority Features:**
+
 1. **Firebase Phone Authentication** (3-5 hours)
    - Proper user accounts
    - Cloud sync
@@ -354,17 +392,21 @@ Add test users who can access Internal Testing:
 ## 🆘 Common Issues & Solutions
 
 ### "App not available in your country"
+
 **Cause:** Country restrictions in Play Console
 **Fix:** Go to Production → Countries/Regions → Add Sri Lanka
 
 ### "App requires an update"
+
 **Cause:** Min SDK version too high
 **Fix:** Your minSdk=24 (Android 7.0) is fine for 95%+ devices
 
 ### Users report crashes
+
 **Fix:** Check Firebase Crashlytics, fix critical issues, push update
 
 ### Low ratings
+
 **Action:** Respond to reviews, fix reported issues, improve in v1.1
 
 ---
@@ -372,11 +414,13 @@ Add test users who can access Internal Testing:
 ## 📞 Support Channels
 
 **Set up BEFORE launch:**
+
 - [ ] Support email: support@agrimarket.lk (or Gmail)
 - [ ] Facebook page (optional)
 - [ ] WhatsApp business number (popular in Sri Lanka)
 
 **In Play Store Listing:**
+
 - List support email
 - Add website URL
 - Optional: Privacy policy link
@@ -404,12 +448,14 @@ Add test users who can access Internal Testing:
 **Next Step:** Start with Internal Testing for 7-14 days, then promote to Production.
 
 **Estimated Timeline:**
+
 - Internal testing setup: 30 minutes
 - Review approval: 1-3 days
 - Testing period: 7-14 days
 - Production release: After testing complete
 
 **Questions?** Check:
+
 - Play Console Help: https://support.google.com/googleplay/android-developer
 - This checklist: Document everything
 

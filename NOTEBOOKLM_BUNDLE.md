@@ -1,4 +1,5 @@
 # Agrimarket Project Knowledge Base
+
 ## For NotebookLM - Complete Project Context
 
 **Generated:** February 14, 2026
@@ -13,6 +14,7 @@
 Sri Lanka Farmers Marketplace is an offline-first Android marketplace app for Sri Lankan farmers. It connects farmers with buyers, supports Tamil, Sinhala, and English, and is designed for low-end Android devices with poor internet connectivity.
 
 **Live URLs:**
+
 - Backend API: https://backend-psi-tan-18.vercel.app
 - Web Landing: https://agrimarket-landing.vercel.app
 - Database: Supabase (PostgreSQL) with Row Level Security
@@ -22,22 +24,22 @@ Sri Lanka Farmers Marketplace is an offline-first Android marketplace app for Sr
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Android UI | Jetpack Compose + Material Design 3 |
-| Language | Kotlin 2.0 |
-| Architecture | MVVM + Repository + Clean Architecture |
-| DI | Hilt (Dagger) |
-| Local DB | Room (offline-first with sync) |
-| Networking | Retrofit + OkHttp |
-| Real-time | Supabase Realtime (for chat) |
-| Backend | Node.js + Express on Vercel (serverless) |
-| Database | Supabase (PostgreSQL) |
-| Auth | Custom OTP (phone-based, Sri Lankan numbers +94) |
-| Live Prices | HDX HAPI (WFP food price data) |
-| CI/CD | GitHub Actions + CodeQL |
-| Crash Reporting | Firebase Crashlytics |
-| Image Upload | Supabase Storage |
+| Layer           | Technology                                       |
+| --------------- | ------------------------------------------------ |
+| Android UI      | Jetpack Compose + Material Design 3              |
+| Language        | Kotlin 2.0                                       |
+| Architecture    | MVVM + Repository + Clean Architecture           |
+| DI              | Hilt (Dagger)                                    |
+| Local DB        | Room (offline-first with sync)                   |
+| Networking      | Retrofit + OkHttp                                |
+| Real-time       | Supabase Realtime (for chat)                     |
+| Backend         | Node.js + Express on Vercel (serverless)         |
+| Database        | Supabase (PostgreSQL)                            |
+| Auth            | Custom OTP (phone-based, Sri Lankan numbers +94) |
+| Live Prices     | HDX HAPI (WFP food price data)                   |
+| CI/CD           | GitHub Actions + CodeQL                          |
+| Crash Reporting | Firebase Crashlytics                             |
+| Image Upload    | Supabase Storage                                 |
 
 ## Key Design Principles
 
@@ -53,30 +55,30 @@ Sri Lanka Farmers Marketplace is an offline-first Android marketplace app for Sr
 
 ## What's Working
 
-| Feature | Backend | Android | Status |
-|---------|---------|---------|--------|
-| OTP Authentication | Deployed | Wired | Working (mock SMS in dev) |
-| Listings CRUD | Deployed | Wired | Working (offline-first) |
-| Transactions | Deployed | Wired | Working |
-| Market Prices | Deployed (584 live prices from HDX HAPI) | Wired | Working |
-| Live Price Refresh | Vercel cron (daily 6AM UTC) | Auto via API | Working |
-| Photo-First Quick Listing | Uses existing API | New screen | Built (not tested on device) |
-| Accessibility/Large Text | N/A | DataStore prefs | Built (not tested on device) |
-| Offline Sync | Deployed | SyncWorker + Room | Working |
-| Web Landing | Deployed | N/A | Live |
-| Privacy/Terms Pages | Deployed | N/A | Live |
+| Feature                   | Backend                                  | Android           | Status                       |
+| ------------------------- | ---------------------------------------- | ----------------- | ---------------------------- |
+| OTP Authentication        | Deployed                                 | Wired             | Working (mock SMS in dev)    |
+| Listings CRUD             | Deployed                                 | Wired             | Working (offline-first)      |
+| Transactions              | Deployed                                 | Wired             | Working                      |
+| Market Prices             | Deployed (584 live prices from HDX HAPI) | Wired             | Working                      |
+| Live Price Refresh        | Vercel cron (daily 6AM UTC)              | Auto via API      | Working                      |
+| Photo-First Quick Listing | Uses existing API                        | New screen        | Built (not tested on device) |
+| Accessibility/Large Text  | N/A                                      | DataStore prefs   | Built (not tested on device) |
+| Offline Sync              | Deployed                                 | SyncWorker + Room | Working                      |
+| Web Landing               | Deployed                                 | N/A               | Live                         |
+| Privacy/Terms Pages       | Deployed                                 | N/A               | Live                         |
 
 ## What's UI-Only (No Backend Yet)
 
 These features have Android UI screens but are Room-only (local database) with no backend API wiring:
 
-| Feature | Android Screen | Backend Route | Wiring |
-|---------|---------------|---------------|--------|
-| Chat/Messaging | ConversationsScreen, ChatScreen | messages.js (created) | NOT wired to Android |
-| Favorites | FavoritesScreen | favorites.js (created) | NOT wired to Android |
-| Reviews | ReviewScreen | reviews.js (created) | NOT wired to Android |
-| Notifications | NotificationsScreen | notifications.js (created) | NOT wired to Android |
-| Profile Editing | ProfileScreen | users/profile PUT (exists) | NOT wired to Android |
+| Feature         | Android Screen                  | Backend Route              | Wiring               |
+| --------------- | ------------------------------- | -------------------------- | -------------------- |
+| Chat/Messaging  | ConversationsScreen, ChatScreen | messages.js (created)      | NOT wired to Android |
+| Favorites       | FavoritesScreen                 | favorites.js (created)     | NOT wired to Android |
+| Reviews         | ReviewScreen                    | reviews.js (created)       | NOT wired to Android |
+| Notifications   | NotificationsScreen             | notifications.js (created) | NOT wired to Android |
+| Profile Editing | ProfileScreen                   | users/profile PUT (exists) | NOT wired to Android |
 
 **Key insight:** The backend routes for all 5 features have been created and deployed. The Android app has the UI screens. What's missing is the Retrofit API service interfaces and the repository wiring to connect them.
 
@@ -171,20 +173,20 @@ backend/src/
 
 ## Database Tables
 
-| Table | Purpose | Rows (est.) |
-|-------|---------|-------------|
-| users | Farmer/buyer profiles with phone auth | ~100 |
-| listings | Agricultural product listings | ~500 |
-| transactions | Buy/sell transactions | ~200 |
-| conversations | Chat thread metadata | ~50 |
-| messages | Individual chat messages | ~500 |
-| favorites | Saved listings | ~100 |
-| reviews | Transaction reviews (1-5 stars) | ~50 |
-| notifications | System/user notifications | ~200 |
-| market_prices | Live commodity prices (592 rows from HDX HAPI) | 592 |
-| local_ops | Offline operation queue | varies |
-| otp_verifications | Phone OTP codes | varies |
-| sync_metadata | Sync tracking per entity | varies |
+| Table             | Purpose                                        | Rows (est.) |
+| ----------------- | ---------------------------------------------- | ----------- |
+| users             | Farmer/buyer profiles with phone auth          | ~100        |
+| listings          | Agricultural product listings                  | ~500        |
+| transactions      | Buy/sell transactions                          | ~200        |
+| conversations     | Chat thread metadata                           | ~50         |
+| messages          | Individual chat messages                       | ~500        |
+| favorites         | Saved listings                                 | ~100        |
+| reviews           | Transaction reviews (1-5 stars)                | ~50         |
+| notifications     | System/user notifications                      | ~200        |
+| market_prices     | Live commodity prices (592 rows from HDX HAPI) | 592         |
+| local_ops         | Offline operation queue                        | varies      |
+| otp_verifications | Phone OTP codes                                | varies      |
+| sync_metadata     | Sync tracking per entity                       | varies      |
 
 ---
 
@@ -230,7 +232,9 @@ HDX HAPI (WFP)  --->  livePriceService.js  --->  Supabase market_prices table
 ## What's Remaining
 
 ### Phase 4: Android API Wiring (the big one)
+
 Create Retrofit interfaces and wire repositories for:
+
 1. MessageApiService.kt + MessageRepository wiring
 2. FavoriteApiService.kt + FavoriteRepository wiring
 3. ReviewApiService.kt + ReviewRepository wiring
@@ -238,11 +242,13 @@ Create Retrofit interfaces and wire repositories for:
 5. UserApiService.kt + AuthRepository profile wiring
 
 ### Phase 5: Real-Time Chat
+
 1. SupabaseModule.kt (Hilt DI for Supabase client)
 2. ChatRealtimeService.kt (subscribe to postgres_changes on messages)
 3. Update ChatViewModel to use real-time subscriptions
 
 ### Phase 6: Play Store (partially done)
+
 - Privacy/terms pages: DONE
 - Store listing content: DONE
 - Release signing: configured (needs keystore password)
@@ -301,6 +307,7 @@ curl -X POST https://backend-psi-tan-18.vercel.app/api/v1/market-prices/refresh-
 ## Patterns to Follow
 
 ### Adding a new API-backed feature:
+
 1. Create Retrofit interface in `data/api/`
 2. Register in `di/NetworkModule.kt`
 3. Wire repository in `data/repository/` (offline-first: Room cache + API refresh)
@@ -309,6 +316,7 @@ curl -X POST https://backend-psi-tan-18.vercel.app/api/v1/market-prices/refresh-
 6. Add navigation route in `JaffnaMarketplaceNavigation.kt`
 
 ### Adding a new screen:
+
 1. Create Composable in appropriate `ui/` subfolder
 2. Use `HumanIndustrial` design tokens (colors, typography, spacing)
 3. Support all 3 languages via `when(language)` pattern
@@ -322,26 +330,31 @@ curl -X POST https://backend-psi-tan-18.vercel.app/api/v1/market-prices/refresh-
 Use these prompts to get the most out of NotebookLM with this knowledge base:
 
 ### Planning
+
 - "What are the remaining features that need Android API wiring? Prioritize them."
 - "What's the fastest path to getting the app on Google Play Store?"
 - "What are the risks of launching without real-time chat?"
 
 ### Architecture
+
 - "How does the offline-first pattern work in this app? What could break?"
 - "What would need to change to support 100,000 users?"
 - "How should I implement push notifications with Firebase Cloud Messaging?"
 
 ### Product
+
 - "What features would be most valuable to Sri Lankan farmers?"
 - "How can we improve the onboarding experience for farmers who aren't tech-savvy?"
 - "What's missing from the marketplace flow that buyers would need?"
 
 ### Technical Debt
+
 - "What are the biggest technical risks in the current codebase?"
 - "Which parts of the app have the least test coverage?"
 - "What security improvements should be prioritized?"
 
 ### Business
+
 - "What would a monetization strategy look like for this app?"
 - "How does this compare to existing agricultural marketplaces in South Asia?"
 - "What partnerships (government, NGO, telco) would accelerate adoption?"
@@ -350,19 +363,19 @@ Use these prompts to get the most out of NotebookLM with this knowledge base:
 
 # SECTION 8: KEY FILES REFERENCE
 
-| File | Purpose | When to Read |
-|------|---------|-------------|
-| `CLAUDE.md` | AI agent instructions, project rules | Before any coding session |
-| `README.md` | Project overview, quick start | Onboarding |
-| `docs/DOCUMENTATION.md` | Full architecture + dev guide | Architecture questions |
-| `PRODUCTION_READINESS_ASSESSMENT.md` | Security/testing/deploy checklist | Launch planning |
-| `backend/README.md` | API endpoints, SMS config, deployment | Backend work |
-| `backend/src/database/schema.sql` | Complete DB schema (12 tables) | Data modeling |
-| `navigation/JaffnaMarketplaceNavigation.kt` | All screen routes + navigation | Adding screens |
-| `di/NetworkModule.kt` | All Retrofit service registrations | Adding API services |
-| `backend/src/services/livePriceService.js` | HDX HAPI integration | Price data work |
-| `app/build.gradle.kts` | Dependencies, build config, signing | Build issues |
+| File                                        | Purpose                               | When to Read              |
+| ------------------------------------------- | ------------------------------------- | ------------------------- |
+| `CLAUDE.md`                                 | AI agent instructions, project rules  | Before any coding session |
+| `README.md`                                 | Project overview, quick start         | Onboarding                |
+| `docs/DOCUMENTATION.md`                     | Full architecture + dev guide         | Architecture questions    |
+| `PRODUCTION_READINESS_ASSESSMENT.md`        | Security/testing/deploy checklist     | Launch planning           |
+| `backend/README.md`                         | API endpoints, SMS config, deployment | Backend work              |
+| `backend/src/database/schema.sql`           | Complete DB schema (12 tables)        | Data modeling             |
+| `navigation/JaffnaMarketplaceNavigation.kt` | All screen routes + navigation        | Adding screens            |
+| `di/NetworkModule.kt`                       | All Retrofit service registrations    | Adding API services       |
+| `backend/src/services/livePriceService.js`  | HDX HAPI integration                  | Price data work           |
+| `app/build.gradle.kts`                      | Dependencies, build config, signing   | Build issues              |
 
 ---
 
-*This document was generated by Claude Code for use with Google NotebookLM. It contains the complete context needed to understand, plan, and build the Agrimarket project.*
+_This document was generated by Claude Code for use with Google NotebookLM. It contains the complete context needed to understand, plan, and build the Agrimarket project._

@@ -58,30 +58,30 @@
 
 ### Activities Table Structure
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary key (auto-generated) |
-| `user_id` | UUID | Foreign key to users table |
-| `activity_type` | VARCHAR(50) | Type of activity (enum) |
-| `title` | VARCHAR(255) | Activity title (English) |
-| `title_tamil` | VARCHAR(255) | Activity title (Tamil) |
-| `title_sinhala` | VARCHAR(255) | Activity title (Sinhala) |
-| `description` | TEXT | Activity description (English) |
-| `description_tamil` | TEXT | Activity description (Tamil) |
-| `description_sinhala` | TEXT | Activity description (Sinhala) |
-| `related_entity_type` | VARCHAR(50) | Entity type (e.g., "listing", "transaction") |
-| `related_entity_id` | UUID | Entity ID |
-| `priority` | VARCHAR(20) | LOW, NORMAL, HIGH, URGENT |
-| `status` | VARCHAR(20) | ACTIVE, DISMISSED, ARCHIVED |
-| `is_read` | BOOLEAN | Read status (default: false) |
-| `is_actionable` | BOOLEAN | Requires user action (default: false) |
-| `expires_at` | TIMESTAMPTZ | Optional expiration time |
-| `created_at` | TIMESTAMPTZ | Creation timestamp |
-| `updated_at` | TIMESTAMPTZ | Last update timestamp |
-| `read_at` | TIMESTAMPTZ | When marked as read |
-| `dismissed_at` | TIMESTAMPTZ | When dismissed |
-| `archived_at` | TIMESTAMPTZ | When archived |
-| `metadata` | JSONB | Flexible JSON storage |
+| Column                | Type         | Description                                  |
+| --------------------- | ------------ | -------------------------------------------- |
+| `id`                  | UUID         | Primary key (auto-generated)                 |
+| `user_id`             | UUID         | Foreign key to users table                   |
+| `activity_type`       | VARCHAR(50)  | Type of activity (enum)                      |
+| `title`               | VARCHAR(255) | Activity title (English)                     |
+| `title_tamil`         | VARCHAR(255) | Activity title (Tamil)                       |
+| `title_sinhala`       | VARCHAR(255) | Activity title (Sinhala)                     |
+| `description`         | TEXT         | Activity description (English)               |
+| `description_tamil`   | TEXT         | Activity description (Tamil)                 |
+| `description_sinhala` | TEXT         | Activity description (Sinhala)               |
+| `related_entity_type` | VARCHAR(50)  | Entity type (e.g., "listing", "transaction") |
+| `related_entity_id`   | UUID         | Entity ID                                    |
+| `priority`            | VARCHAR(20)  | LOW, NORMAL, HIGH, URGENT                    |
+| `status`              | VARCHAR(20)  | ACTIVE, DISMISSED, ARCHIVED                  |
+| `is_read`             | BOOLEAN      | Read status (default: false)                 |
+| `is_actionable`       | BOOLEAN      | Requires user action (default: false)        |
+| `expires_at`          | TIMESTAMPTZ  | Optional expiration time                     |
+| `created_at`          | TIMESTAMPTZ  | Creation timestamp                           |
+| `updated_at`          | TIMESTAMPTZ  | Last update timestamp                        |
+| `read_at`             | TIMESTAMPTZ  | When marked as read                          |
+| `dismissed_at`        | TIMESTAMPTZ  | When dismissed                               |
+| `archived_at`         | TIMESTAMPTZ  | When archived                                |
+| `metadata`            | JSONB        | Flexible JSON storage                        |
 
 ### Activity Types (20 supported)
 
@@ -118,6 +118,7 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 ### 1. GET /api/v1/activities
 
 **Query Parameters**:
+
 - `activityType` (string) - Filter by activity type
 - `status` (string) - Filter by status (ACTIVE, DISMISSED, ARCHIVED)
 - `priority` (string) - Filter by priority (LOW, NORMAL, HIGH, URGENT)
@@ -132,9 +133,12 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 - `language` (string, default: "en") - Language for titles/descriptions (en, ta, si)
 
 **Response**:
+
 ```json
 {
-  "activities": [ /* Activity objects */ ],
+  "activities": [
+    /* Activity objects */
+  ],
   "totalCount": 150,
   "page": 1,
   "totalPages": 8,
@@ -151,6 +155,7 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 ### 3. GET /api/v1/activities/unread-count
 
 **Response**:
+
 ```json
 {
   "count": 12
@@ -160,6 +165,7 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 ### 4. GET /api/v1/activities/actionable-count
 
 **Response**:
+
 ```json
 {
   "count": 5
@@ -169,9 +175,11 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 ### 5. GET /api/v1/activities/summary
 
 **Query Parameters**:
+
 - `timeframe` (string, default: "24h") - Time window (24h, 7d, 30d)
 
 **Response**:
+
 ```json
 {
   "totalActivities": 150,
@@ -187,13 +195,16 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
     "NORMAL": 120,
     "LOW": 20
   },
-  "recentActivities": [ /* Last 5 activities */ ]
+  "recentActivities": [
+    /* Last 5 activities */
+  ]
 }
 ```
 
 ### 6. GET /api/v1/activities/recent
 
 **Query Parameters**:
+
 - `limit` (int, default: 10, max: 50) - Number of recent activities
 
 **Response**: Same as GET /activities (but only recent, active activities)
@@ -201,6 +212,7 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 ### 7. POST /api/v1/activities
 
 **Request Body**:
+
 ```json
 {
   "userId": "uuid",
@@ -235,16 +247,19 @@ All endpoints require authentication (`Authorization: Bearer <JWT>`).
 ## 🔐 Security
 
 ### Authentication
+
 - All endpoints require JWT authentication
 - Uses `authenticateToken` middleware
 - User ID extracted from `req.user.userId`
 
 ### Row Level Security (RLS)
+
 - Supabase RLS policies ensure users can only access their own activities
 - Policies for SELECT, INSERT, UPDATE, DELETE
 - Service role can bypass RLS for admin operations
 
 ### Validation
+
 - Input validation using `express-validator`
 - UUID validation for IDs
 - Enum validation for activity types, status, priority
@@ -265,18 +280,21 @@ All backend route code is implemented and registered in the server.
 **To apply the migration**:
 
 #### Option 1: Supabase CLI (Recommended)
+
 ```bash
 cd supabase
 npx supabase db push
 ```
 
 #### Option 2: Supabase Dashboard
+
 1. Go to Supabase project dashboard
 2. Navigate to Database → Migrations
 3. Upload `20260216000001_create_activities_table.sql`
 4. Run migration
 
 #### Option 3: Direct SQL (Supabase SQL Editor)
+
 1. Open Supabase SQL Editor
 2. Copy contents of `supabase/migrations/20260216000001_create_activities_table.sql`
 3. Execute SQL
@@ -334,15 +352,15 @@ curl -X GET https://backend-psi-tan-18.vercel.app/api/v1/activities/summary?time
 
 ## 🔄 Comparison: Activities vs Notifications
 
-| Feature | Activities | Notifications |
-|---------|-----------|---------------|
-| **Purpose** | Historical activity feed | Real-time alerts |
-| **Lifecycle** | ACTIVE → DISMISSED → ARCHIVED | Created → Read → Deleted |
-| **Retention** | Long-term (historical record) | Short-term (ephemeral) |
-| **Metadata** | Rich (priority, actionable, expiration) | Simple (type, title, message) |
-| **Multilingual** | Full (title + description in 3 languages) | Partial (single language) |
-| **Filtering** | Advanced (type, status, priority, date range) | Basic (read status) |
-| **Use Cases** | "Your listing was viewed 50 times this week" | "New message from buyer" |
+| Feature          | Activities                                    | Notifications                 |
+| ---------------- | --------------------------------------------- | ----------------------------- |
+| **Purpose**      | Historical activity feed                      | Real-time alerts              |
+| **Lifecycle**    | ACTIVE → DISMISSED → ARCHIVED                 | Created → Read → Deleted      |
+| **Retention**    | Long-term (historical record)                 | Short-term (ephemeral)        |
+| **Metadata**     | Rich (priority, actionable, expiration)       | Simple (type, title, message) |
+| **Multilingual** | Full (title + description in 3 languages)     | Partial (single language)     |
+| **Filtering**    | Advanced (type, status, priority, date range) | Basic (read status)           |
+| **Use Cases**    | "Your listing was viewed 50 times this week"  | "New message from buyer"      |
 
 ---
 
