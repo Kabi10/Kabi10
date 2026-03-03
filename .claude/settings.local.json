@@ -46,10 +46,16 @@
       "Bash(xargs:*)",
       "Bash(powershell -Command:*)",
       "WebSearch",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "mcp__gemini-bridge-mcp__gemini_execute",
+      "mcp__vibe_kanban__list_organizations",
+      "mcp__vibe_kanban__list_projects",
+      "mcp__vibe_kanban__list_issues",
+      "mcp__vibe_kanban__get_issue",
+      "mcp__vibe_kanban__create_issue",
+      "mcp__vibe_kanban__update_issue"
     ]
   },
-  "outputStyle": "default",
   "hooks": {
     "PostToolUse": [
       {
@@ -63,5 +69,6 @@
         ]
       }
     ]
-  }
+  },
+  "outputStyle": "default"
 }

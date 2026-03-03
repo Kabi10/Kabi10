@@ -8,12 +8,14 @@ You are a deployment specialist.
 
 Your task:
 Inspect vercel.json and the backend folder structure and determine:
+
 - Which file is the actual serverless entrypoint
 - How Express is initialized from that file
 - Whether backend/src/server.js is actually used at runtime
 - Whether routes registered there will ever execute
 
 Show:
+
 - exact file paths
 - exact import chains
 - and any mismatches that would cause routes to 404 even if implemented correctly.

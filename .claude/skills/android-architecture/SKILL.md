@@ -11,6 +11,7 @@ description: Enforces MVVM + Compose + Hilt patterns for Agrimarket Android app.
 ---
 
 ## Reference Docs First
+
 - `docs/DOCUMENTATION.md` - Full architecture overview
 - `README.md` - Tech stack & quick start
 
@@ -19,19 +20,21 @@ description: Enforces MVVM + Compose + Hilt patterns for Agrimarket Android app.
 ## Architecture Rules
 
 ### 1. Tech Stack (Required for New or Modified Code)
-| Layer | Technology | Pattern |
-|-------|------------|---------|
-| UI | **Jetpack Compose + Material 3** | Stateless composables |
-| State | **StateFlow** | MutableStateFlow → asStateFlow() |
-| Logic | **ViewModel** | @HiltViewModel, viewModelScope |
-| Data | **Repository** | @Singleton, offline-first |
-| Local | **Room** | DAOs + Flow |
-| Remote | **Retrofit/OkHttp** | Moshi serialization |
-| DI | **Hilt** | @Inject constructor |
+
+| Layer  | Technology                       | Pattern                          |
+| ------ | -------------------------------- | -------------------------------- |
+| UI     | **Jetpack Compose + Material 3** | Stateless composables            |
+| State  | **StateFlow**                    | MutableStateFlow → asStateFlow() |
+| Logic  | **ViewModel**                    | @HiltViewModel, viewModelScope   |
+| Data   | **Repository**                   | @Singleton, offline-first        |
+| Local  | **Room**                         | DAOs + Flow                      |
+| Remote | **Retrofit/OkHttp**              | Moshi serialization              |
+| DI     | **Hilt**                         | @Inject constructor              |
 
 > Existing legacy code (Fragments, LiveData, etc.) may remain untouched unless the task explicitly requires migration.
 
 ### 2. File Structure
+
 ```
 app/src/main/java/com/senthapps/slagrimarket/
 ├── data/
@@ -48,21 +51,23 @@ app/src/main/java/com/senthapps/slagrimarket/
 ```
 
 ### 3. Naming Conventions
-| Type | Pattern | Example |
-|------|---------|---------|
-| Screen | `<Feature>Screen` | `ListingsScreen.kt` |
-| ViewModel | `<Feature>ViewModel` | `ListingsViewModel.kt` |
-| UI State | `<Feature>UiState` | `ListingsUiState` |
-| Repository | `<Feature>Repository` | `ListingRepository.kt` |
-| DAO | `<Feature>Dao` | `ListingDao.kt` |
+
+| Type        | Pattern               | Example                |
+| ----------- | --------------------- | ---------------------- |
+| Screen      | `<Feature>Screen`     | `ListingsScreen.kt`    |
+| ViewModel   | `<Feature>ViewModel`  | `ListingsViewModel.kt` |
+| UI State    | `<Feature>UiState`    | `ListingsUiState`      |
+| Repository  | `<Feature>Repository` | `ListingRepository.kt` |
+| DAO         | `<Feature>Dao`        | `ListingDao.kt`        |
 | API Service | `<Feature>ApiService` | `ListingApiService.kt` |
-| Hilt Module | `<Category>Module` | `NetworkModule.kt` |
+| Hilt Module | `<Category>Module`    | `NetworkModule.kt`     |
 
 ---
 
 ## Templates
 
 ### ViewModel Template
+
 ```kotlin
 package com.senthapps.slagrimarket.ui.<feature>
 
@@ -80,14 +85,14 @@ import javax.inject.Inject
 class <Feature>ViewModel @Inject constructor(
     private val repository: <Feature>Repository
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(<Feature>UiState())
     val uiState: StateFlow<<Feature>UiState> = _uiState.asStateFlow()
-    
+
     init {
         loadData()
     }
-    
+
     private fun loadData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
@@ -110,7 +115,7 @@ class <Feature>ViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
@@ -124,6 +129,7 @@ data class <Feature>UiState(
 ```
 
 ### Screen Template
+
 ```kotlin
 @Composable
 fun <Feature>Screen(
@@ -133,7 +139,7 @@ fun <Feature>Screen(
     viewModel: <Feature>ViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
+
     Scaffold(
         topBar = { /* TopAppBar */ }
     ) { paddingValues ->
@@ -149,6 +155,7 @@ fun <Feature>Screen(
 ```
 
 ### Navigation Route Template
+
 ```kotlin
 // In navigation/Screen.kt
 object <Feature> : Screen("<feature>")
@@ -161,24 +168,25 @@ object <Feature>Detail : Screen("<feature>_detail/{id}") {
 
 ## DO NOT DO
 
-| ❌ Forbidden | ✅ Instead |
-|-------------|-----------|
-| XML layouts | Compose only |
-| Fragment-based navigation | NavHost composables |
-| LiveData for new code | StateFlow |
-| Manual DI | Hilt @Inject |
-| ViewModel in composables | Pass via hiltViewModel() at screen level |
-| Hardcoded strings | String resources (values/, values-ta/, values-si/) |
-| Business logic in UI | Move to ViewModel/Repository |
-| Direct API calls from UI | Repository → ViewModel → UI |
-| New architectural patterns | Follow existing patterns |
-| Broad refactors | Single-feature scope |
+| ❌ Forbidden               | ✅ Instead                                         |
+| -------------------------- | -------------------------------------------------- |
+| XML layouts                | Compose only                                       |
+| Fragment-based navigation  | NavHost composables                                |
+| LiveData for new code      | StateFlow                                          |
+| Manual DI                  | Hilt @Inject                                       |
+| ViewModel in composables   | Pass via hiltViewModel() at screen level           |
+| Hardcoded strings          | String resources (values/, values-ta/, values-si/) |
+| Business logic in UI       | Move to ViewModel/Repository                       |
+| Direct API calls from UI   | Repository → ViewModel → UI                        |
+| New architectural patterns | Follow existing patterns                           |
+| Broad refactors            | Single-feature scope                               |
 
 ---
 
 ## Offline-First Pattern
 
 When offline-first is already used in a feature, implement data flow as:
+
 1. **Emit cached data first** from Room
 2. **Fetch from network** in background
 3. **Update cache** on success
@@ -193,6 +201,7 @@ Reference: `ListingRepository.kt` for implementation example.
 ## Resource Wrapper
 
 Use `Resource<T>` sealed class from `data/repository/Resource.kt`:
+
 - `Resource.Loading(data?)` - Show loading, optionally with stale data
 - `Resource.Success(data)` - Show fresh data
 - `Resource.Error(message, exception?, data?)` - Show error with optional fallback
