@@ -315,5 +315,106 @@ class ListingRepositoryTest {
             awaitComplete()
         }
     }
+
+    // ============================================================================
+    // KAB-7: Additional coverage — error paths and offline edge cases
+    // ============================================================================
+
+    @Test
+    fun `createListing daoInsertThrows returnsFailure`() = runTest {
+        // Given: DAO throws on insert (e.g. DB constraint or disk error)
+        coEvery { listingDao.insertListing(any()) } throws RuntimeException("DB write failed")
+
+        // When
+        val result = repository.createListing(
+            cropType = "Tomatoes",
+            quantity = 100.0,
+            unit = "kg",
+            pricePerUnit = 50.0,
+            quality = "A",
+            harvestDate = "2025-11-20",
+            location = "Jaffna",
+            farmerId = "farmer1"
+        )
+
+        // Then: propagated as failure, localOpDao never called
+        assertTrue(result.isFailure)
+        coVerify(exactly = 0) { localOpDao.insertOp(any()) }
+    }
+
+    @Test
+    fun `getAllActiveListings cachedData thenNetworkError completesSilently`() = runTest {
+        // Given: cache has one listing, network fails
+        // Offline-first behaviour: network error is SUPPRESSED when cache is available —
+        // the user sees cached data and no error toast (line 76 in ListingRepository).
+        val cachedListings = listOf(mockListings[0])
+        coEvery { listingDao.getAllActiveListings() } returns cachedListings
+        coEvery { listingApiService.getListings(limit = 100, isActive = true) } throws IOException("Offline")
+
+        // When/Then: Loading → Success(cached) → complete (no Error emitted)
+        repository.getAllActiveListings(forceRefresh = true).test {
+            assertTrue(awaitItem() is Resource.Loading)
+
+            val cached = awaitItem()
+            assertTrue(cached is Resource.Success)
+            assertEquals(1, (cached as Resource.Success).data?.size)
+
+            awaitComplete() // flow ends cleanly — no error when cache is present
+        }
+    }
+
+    @Test
+    fun `refreshListings networkSuccess updatesDao`() = runTest {
+        // Given: API returns listings successfully
+        val networkResponse = ListingsResponse(
+            listings = mockListings,
+            totalCount = mockListings.size,
+            page = 1,
+            totalPages = 1,
+            hasNext = false,
+            hasPrevious = false,
+            lastUpdated = "2025-11-20T10:00:00Z"
+        )
+        coEvery { listingApiService.getListings(limit = 100, isActive = true) } returns Response.success(networkResponse)
+        coEvery { listingDao.insertListings(any()) } just Runs
+
+        // When
+        val result = repository.refreshListings()
+
+        // Then: Success and DAO updated with network data
+        assertTrue(result is Resource.Success)
+        coVerify { listingDao.insertListings(mockListings) }
+    }
+
+    @Test
+    fun `getListingById existsLocally emitsSuccess`() = runTest {
+        // Given: listing in local cache and API mirrors it
+        coEvery { listingDao.getListingById("1") } returns mockListings[0]
+        coEvery { listingApiService.getListingById("1") } returns Response.success(mockListings[0])
+        coEvery { listingDao.insertListing(any()) } just Runs
+
+        // When/Then: Loading → Success(local) → (network refresh, ignored)
+        repository.getListingById("1").test {
+            assertTrue(awaitItem() is Resource.Loading)
+            val result = awaitItem()
+            assertTrue(result is Resource.Success)
+            assertEquals("Tomatoes", (result as Resource.Success).data?.cropType)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `getListingById notFoundAnywhere emitsError`() = runTest {
+        // Given: not in cache, network throws
+        coEvery { listingDao.getListingById("notfound") } returns null
+        coEvery { listingApiService.getListingById("notfound") } throws IOException("Not found")
+
+        // When/Then: Loading → Error
+        repository.getListingById("notfound").test {
+            assertTrue(awaitItem() is Resource.Loading)
+            assertTrue(awaitItem() is Resource.Error)
+            awaitComplete()
+        }
+    }
 }
 

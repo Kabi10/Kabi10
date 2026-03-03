@@ -13,6 +13,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -248,6 +249,69 @@ class HomeViewModelTest {
 
         // Then: marketPriceRepository.refreshMarketPrices() called exactly once and refresh flag cleared
         coVerify(exactly = 1) { marketPriceRepository.refreshMarketPrices() }
+        assertFalse(viewModel.uiState.value.isRefreshing)
+    }
+
+    // ============================================================================
+    // KAB-7: Additional coverage — error paths and edge cases
+    // ============================================================================
+
+    @Test
+    fun `loadAllData marketPricesError setsErrorState`() = runTest {
+        // Given: market price repository emits an error resource
+        coEvery { marketPriceRepository.getAllMarketPrices(any()) } returns flowOf(Resource.Error("Server error"))
+
+        // When
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: error state is populated, prices list is empty
+        val state = viewModel.uiState.value
+        assertNotNull(state.error)
+        assertFalse(state.isLoadingPrices)
+        assertTrue(state.marketPrices.isEmpty())
+    }
+
+    @Test
+    fun `loadAllData statisticsFail statsRemainZero`() = runTest {
+        // Given: transaction stats throws (simulates network/DB failure)
+        coEvery { transactionRepository.getTransactionStatisticsResource(any()) } throws RuntimeException("Stats unavailable")
+
+        // When
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: stats remain at defaults, isLoadingStats cleared (graceful degradation)
+        val state = viewModel.uiState.value
+        assertEquals(0, state.todayOrders)
+        assertEquals(0.0, state.todayRevenue, 0.01)
+        assertFalse(state.isLoadingStats)
+    }
+
+    @Test
+    fun `currentUser populated from authRepository flow`() = runTest {
+        // Given/When: ViewModel created with mockUser in auth flow (default setup)
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: currentUser flow emits the expected user
+        val user = viewModel.currentUser.first()
+        assertEquals("user1", user?.id)
+        assertEquals("Test Farmer", user?.name)
+    }
+
+    @Test
+    fun `refreshData marketPricesRefreshThrows clearsIsRefreshing`() = runTest {
+        // Given: refresh call throws (e.g. network down during pull-to-refresh)
+        coEvery { marketPriceRepository.refreshMarketPrices() } throws RuntimeException("Network error during refresh")
+
+        // When
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: isRefreshing always cleared even on exception
         assertFalse(viewModel.uiState.value.isRefreshing)
     }
 }
