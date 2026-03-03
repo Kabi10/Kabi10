@@ -1,587 +1,1085 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Agrimarket - Connecting farmers directly to consumers in Sri Lanka. Tamil-first, offline-first agricultural marketplace.">
-    <meta name="keywords" content="agriculture, farmers, marketplace, Sri Lanka, Tamil, direct-to-consumer">
-    <meta name="author" content="Agrimarket">
-    <title>Agrimarket - Sri Lanka Farmers Marketplace | இலங்கை விவசாயிகள் சந்தை</title>
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Agrimarket - Connecting farmers directly to consumers in Sri Lanka. Tamil-first, offline-first agricultural marketplace."
+    />
+    <meta
+      name="keywords"
+      content="agriculture, farmers, marketplace, Sri Lanka, Tamil, direct-to-consumer"
+    />
+    <meta name="author" content="Agrimarket" />
+    <title>
+      Agrimarket - Sri Lanka Farmers Marketplace | இலங்கை விவசாயிகள் சந்தை
+    </title>
+
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <link rel="alternate icon" type="image/png" href="assets/favicon.png">
-    
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="alternate icon" type="image/png" href="assets/favicon.png" />
+
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <!-- Skip to content link for accessibility -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
-        <div class="container nav-container">
-            <div class="nav-brand">
-                <span class="brand-icon">🌾</span>
-                <span class="brand-name" data-en="Agrimarket" data-ta="அக்ரிமார்க்கெட்" data-si="ඇග්‍රිමාර්කට්">Agrimarket</span>
-            </div>
-            
-            <div class="nav-menu" id="navMenu">
-                <a href="#home" class="nav-link" data-en="Home" data-ta="முகப்பு" data-si="මුල් පිටුව">Home</a>
-                <a href="#features" class="nav-link" data-en="Features" data-ta="அம்சங்கள்" data-si="විශේෂාංග">Features</a>
-                <a href="#how-it-works" class="nav-link" data-en="How It Works" data-ta="எவ்வாறு செயல்படுகிறது" data-si="එය ක්‍රියා කරන ආකාරය">How It Works</a>
-                <a href="#about" class="nav-link" data-en="About" data-ta="எங்களை பற்றி" data-si="අප ගැන">About</a>
-                <a href="#contact" class="nav-link" data-en="Contact" data-ta="தொடர்பு" data-si="සම්බන්ධ වන්න">Contact</a>
-            </div>
-            
-            <div class="nav-actions">
-                <div class="language-toggle">
-                    <button class="lang-btn active" data-lang="en">EN</button>
-                    <button class="lang-btn" data-lang="ta">த</button>
-                    <button class="lang-btn" data-lang="si">සි</button>
-                </div>
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <span class="material-icons">menu</span>
-                </button>
-            </div>
+      <div class="container nav-container">
+        <div class="nav-brand">
+          <span class="brand-icon">🌾</span>
+          <span
+            class="brand-name"
+            data-en="Agrimarket"
+            data-ta="அக்ரிமார்க்கெட்"
+            data-si="ඇග්‍රිමාර්කට්"
+            >Agrimarket</span
+          >
         </div>
+
+        <div class="nav-menu" id="navMenu">
+          <a
+            href="#home"
+            class="nav-link"
+            data-en="Home"
+            data-ta="முகப்பு"
+            data-si="මුල් පිටුව"
+            >Home</a
+          >
+          <a
+            href="#features"
+            class="nav-link"
+            data-en="Features"
+            data-ta="அம்சங்கள்"
+            data-si="විශේෂාංග"
+            >Features</a
+          >
+          <a
+            href="#how-it-works"
+            class="nav-link"
+            data-en="How It Works"
+            data-ta="எவ்வாறு செயல்படுகிறது"
+            data-si="එය ක්‍රියා කරන ආකාරය"
+            >How It Works</a
+          >
+          <a
+            href="#about"
+            class="nav-link"
+            data-en="About"
+            data-ta="எங்களை பற்றி"
+            data-si="අප ගැන"
+            >About</a
+          >
+          <a
+            href="#contact"
+            class="nav-link"
+            data-en="Contact"
+            data-ta="தொடர்பு"
+            data-si="සම්බන්ධ වන්න"
+            >Contact</a
+          >
+        </div>
+
+        <div class="nav-actions">
+          <div class="language-toggle">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ta">த</button>
+            <button class="lang-btn" data-lang="si">සි</button>
+          </div>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span class="material-icons">menu</span>
+          </button>
+        </div>
+      </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home" id="main-content">
-        <div class="hero-background"></div>
-        <div class="container hero-container">
-            <div class="hero-content">
-                <h1 class="hero-title" 
-                    data-en="Connecting Farmers Directly to Consumers" 
-                    data-ta="விவசாயிகளை நேரடியாக நுகர்வோருடன் இணைக்கிறது" 
-                    data-si="ගොවීන් සෘජුවම පාරිභෝගිකයන් සමඟ සම්බන්ධ කිරීම">
-                    Connecting Farmers Directly to Consumers
-                </h1>
-                <p class="hero-subtitle"
-                    data-en="Works offline for patchy signal."
-                    data-ta="பலவீனமான இணைப்பிலும் ஆஃப்லைனில் செயல்படும்."
-                    data-si="දුර්වල සම්බන්ධතාවයේදීත් නොබැඳිව ක්‍රියා කරයි.">
-                    Works offline for patchy signal.
-                </p>
-                <div class="hero-cta">
-                    <a href="#download" class="btn btn-primary">
-                        <span class="material-icons">download</span>
-                        <span data-en="Download App" data-ta="பயன்பாட்டைப் பதிவிறக்கவும்" data-si="යෙදුම බාගන්න">Download App</span>
-                    </a>
-                    <a href="#how-it-works" class="btn btn-secondary">
-                        <span class="material-icons">play_circle</span>
-                        <span data-en="Learn More" data-ta="மேலும் அறிக" data-si="තව දැනගන්න">Learn More</span>
-                    </a>
-                </div>
-                <div class="platform-badges">
-                    <div class="badge">
-                        <span class="material-icons">android</span>
-                        <span data-en="Android" data-ta="ஆண்ட்ராய்டு" data-si="ඇන්ඩ්‍රොයිඩ්">Android</span>
-                    </div>
-                    <div class="badge">
-                        <span class="material-icons">apple</span>
-                        <span data-en="iOS (Coming Soon)" data-ta="iOS (விரைவில்)" data-si="iOS (ඉක්මනින්)">iOS (Coming Soon)</span>
-                    </div>
-                </div>
+      <div class="hero-background"></div>
+      <div class="container hero-container">
+        <div class="hero-content">
+          <h1
+            class="hero-title"
+            data-en="Connecting Farmers Directly to Consumers"
+            data-ta="விவசாயிகளை நேரடியாக நுகர்வோருடன் இணைக்கிறது"
+            data-si="ගොවීන් සෘජුවම පාරිභෝගිකයන් සමඟ සම්බන්ධ කිරීම"
+          >
+            Connecting Farmers Directly to Consumers
+          </h1>
+          <p
+            class="hero-subtitle"
+            data-en="Works offline for patchy signal."
+            data-ta="பலவீனமான இணைப்பிலும் ஆஃப்லைனில் செயல்படும்."
+            data-si="දුර්වල සම්බන්ධතාවයේදීත් නොබැඳිව ක්‍රියා කරයි."
+          >
+            Works offline for patchy signal.
+          </p>
+          <div class="hero-cta">
+            <a href="#download" class="btn btn-primary">
+              <span class="material-icons">download</span>
+              <span
+                data-en="Download App"
+                data-ta="பயன்பாட்டைப் பதிவிறக்கவும்"
+                data-si="යෙදුම බාගන්න"
+                >Download App</span
+              >
+            </a>
+            <a href="#how-it-works" class="btn btn-secondary">
+              <span class="material-icons">play_circle</span>
+              <span
+                data-en="Learn More"
+                data-ta="மேலும் அறிக"
+                data-si="තව දැනගන්න"
+                >Learn More</span
+              >
+            </a>
+          </div>
+          <div class="platform-badges">
+            <div class="badge">
+              <span class="material-icons">android</span>
+              <span
+                data-en="Android"
+                data-ta="ஆண்ட்ராய்டு"
+                data-si="ඇන්ඩ්‍රොයිඩ්"
+                >Android</span
+              >
             </div>
+            <div class="badge">
+              <span class="material-icons">apple</span>
+              <span
+                data-en="iOS (Coming Soon)"
+                data-ta="iOS (விரைவில்)"
+                data-si="iOS (ඉක්මනින්)"
+                >iOS (Coming Soon)</span
+              >
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Features Section -->
     <section class="features" id="features">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title"
-                    data-en="Made for Sri Lanka's farmers and buyers"
-                    data-ta="இலங்கையின் விவசாயிகள் மற்றும் வாங்குபவர்களுக்காக உருவாக்கப்பட்டது"
-                    data-si="ශ්‍රී ලංකාවේ ගොවීන් සහ ගැනුම්කරුවන් සඳහා නිර්මාණය කරන ලදී">
-                    Made for Sri Lanka's farmers and buyers
-                </h2>
-                <p class="section-subtitle"
-                    data-en="Designed for real farming challenges in Sri Lanka"
-                    data-ta="இலங்கையில் உண்மையான விவசாய சவால்களுக்காக வடிவமைக்கப்பட்டது"
-                    data-si="ශ්‍රී ලංකාවේ සැබෑ ගොවි අභියෝග සඳහා නිර්මාණය කර ඇත">
-                    Designed for real farming challenges in Sri Lanka
-                </p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3 class="feature-title" data-en="Offline-First" data-ta="ஆஃப்லைன் முதன்மை" data-si="නොබැඳි-පළමු">Offline-First</h3>
-                    <p class="feature-description" 
-                        data-en="Full functionality without internet. Perfect for rural areas with poor connectivity." 
-                        data-ta="இணையம் இல்லாமல் முழு செயல்பாடு. மோசமான இணைப்பு உள்ள கிராமப்புற பகுதிகளுக்கு சரியானது." 
-                        data-si="අන්තර්ජාලය නොමැතිව සම්පූර්ණ ක්‍රියාකාරිත්වය. දුර්වල සම්බන්ධතාවයක් ඇති ග්‍රාමීය ප්‍රදේශ සඳහා පරිපූර්ණයි.">
-                        Full functionality without internet. Perfect for rural areas with poor connectivity.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
-                    <h3 class="feature-title" data-en="Trilingual Support" data-ta="முத்தமிழ் ஆதரவு" data-si="ත්‍රිභාෂා සහාය">Trilingual Support</h3>
-                    <p class="feature-description" 
-                        data-en="Available in Tamil, English, and Sinhala. Tamil-first design for Sri Lankan farmers."
-                        data-ta="தமிழ், ஆங்கிலம் மற்றும் சிங்களத்தில் கிடைக்கிறது. இலங்கை விவசாயிகளுக்கான தமிழ் முதன்மை வடிவமைப்பு."
-                        data-si="දෙමළ, ඉංග්‍රීසි සහ සිංහලෙන් ලබා ගත හැකිය. ශ්‍රී ලංකා ගොවීන් සඳහා දෙමළ-පළමු සැලසුම.">
-                        Available in Tamil, English, and Sinhala. Tamil-first design for Sri Lankan farmers.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">💰</div>
-                    <h3 class="feature-title" data-en="Direct Trading" data-ta="நேரடி வர்த்தகம்" data-si="සෘජු වෙළඳාම">Direct Trading</h3>
-                    <p class="feature-description"
-                        data-en="Connect farmers directly with buyers. No middlemen, better prices for everyone."
-                        data-ta="விவசாயிகளை வாங்குபவர்களுடன் நேரடியாக இணைக்கவும். இடைத்தரகர்கள் இல்லை, அனைவருக்கும் சிறந்த விலைகள்."
-                        data-si="ගොවීන් සෘජුවම ගැනුම්කරුවන් සමඟ සම්බන්ධ කරන්න. මැදිහත්කරුවන් නැත, සෑම කෙනෙකුටම වඩා හොඳ මිල.">
-                        Connect farmers directly with buyers. No middlemen, better prices for everyone.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3 class="feature-title" data-en="Market Insights" data-ta="சந்தை நுண்ணறிவு" data-si="වෙළඳපල තීක්ෂ්ණ බුද්ධිය">Market Insights</h3>
-                    <p class="feature-description"
-                        data-en="Real-time market prices and trends to help farmers make informed decisions."
-                        data-ta="விவசாயிகள் தகவலறிந்த முடிவுகளை எடுக்க உதவும் நிகழ்நேர சந்தை விலைகள் மற்றும் போக்குகள்."
-                        data-si="ගොවීන්ට දැනුවත් තීරණ ගැනීමට උපකාර කිරීම සඳහා තත්‍ය කාලීන වෙළඳපල මිල සහ ප්‍රවණතා.">
-                        Real-time market prices and trends to help farmers make informed decisions.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3 class="feature-title" data-en="Secure & Simple" data-ta="பாதுகாப்பான மற்றும் எளிமையான" data-si="ආරක්ෂිත සහ සරල">Secure & Simple</h3>
-                    <p class="feature-description"
-                        data-en="OTP-based authentication for Sri Lankan phone numbers. Easy to use for everyone."
-                        data-ta="இலங்கை தொலைபேசி எண்களுக்கான OTP அடிப்படையிலான அங்கீகாரம். அனைவருக்கும் பயன்படுத்த எளிதானது."
-                        data-si="ශ්‍රී ලංකා දුරකථන අංක සඳහා OTP මත පදනම් වූ සත්‍යාපනය. සෑම කෙනෙකුටම භාවිතා කිරීමට පහසුයි.">
-                        OTP-based authentication for Sri Lankan phone numbers. Easy to use for everyone.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">💳</div>
-                    <h3 class="feature-title" data-en="Flexible Payments" data-ta="நெகிழ்வான கொடுப்பனவுகள்" data-si="නම්‍යශීලී ගෙවීම්">Flexible Payments</h3>
-                    <p class="feature-description"
-                        data-en="Support for cash, card, and digital payments. Choose what works best for you."
-                        data-ta="பணம், அட்டை மற்றும் டிஜிட்டல் கொடுப்பனவுகளுக்கான ஆதரவு. உங்களுக்கு சிறந்ததைத் தேர்வு செய்யவும்."
-                        data-si="මුදල්, කාඩ්පත් සහ ඩිජිටල් ගෙවීම් සඳහා සහාය. ඔබට වඩාත් සුදුසු දේ තෝරන්න.">
-                        Support for cash, card, and digital payments. Choose what works best for you.
-                    </p>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header">
+          <h2
+            class="section-title"
+            data-en="Made for Sri Lanka's farmers and buyers"
+            data-ta="இலங்கையின் விவசாயிகள் மற்றும் வாங்குபவர்களுக்காக உருவாக்கப்பட்டது"
+            data-si="ශ්‍රී ලංකාවේ ගොවීන් සහ ගැනුම්කරුවන් සඳහා නිර්මාණය කරන ලදී"
+          >
+            Made for Sri Lanka's farmers and buyers
+          </h2>
+          <p
+            class="section-subtitle"
+            data-en="Designed for real farming challenges in Sri Lanka"
+            data-ta="இலங்கையில் உண்மையான விவசாய சவால்களுக்காக வடிவமைக்கப்பட்டது"
+            data-si="ශ්‍රී ලංකාවේ සැබෑ ගොවි අභියෝග සඳහා නිර්මාණය කර ඇත"
+          >
+            Designed for real farming challenges in Sri Lanka
+          </p>
         </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3
+              class="feature-title"
+              data-en="Offline-First"
+              data-ta="ஆஃப்லைன் முதன்மை"
+              data-si="නොබැඳි-පළමු"
+            >
+              Offline-First
+            </h3>
+            <p
+              class="feature-description"
+              data-en="Full functionality without internet. Perfect for rural areas with poor connectivity."
+              data-ta="இணையம் இல்லாமல் முழு செயல்பாடு. மோசமான இணைப்பு உள்ள கிராமப்புற பகுதிகளுக்கு சரியானது."
+              data-si="අන්තර්ජාලය නොමැතිව සම්පූර්ණ ක්‍රියාකාරිත්වය. දුර්වල සම්බන්ධතාවයක් ඇති ග්‍රාමීය ප්‍රදේශ සඳහා පරිපූර්ණයි."
+            >
+              Full functionality without internet. Perfect for rural areas with
+              poor connectivity.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3
+              class="feature-title"
+              data-en="Trilingual Support"
+              data-ta="முத்தமிழ் ஆதரவு"
+              data-si="ත්‍රිභාෂා සහාය"
+            >
+              Trilingual Support
+            </h3>
+            <p
+              class="feature-description"
+              data-en="Available in Tamil, English, and Sinhala. Tamil-first design for Sri Lankan farmers."
+              data-ta="தமிழ், ஆங்கிலம் மற்றும் சிங்களத்தில் கிடைக்கிறது. இலங்கை விவசாயிகளுக்கான தமிழ் முதன்மை வடிவமைப்பு."
+              data-si="දෙමළ, ඉංග්‍රීසි සහ සිංහලෙන් ලබා ගත හැකිය. ශ්‍රී ලංකා ගොවීන් සඳහා දෙමළ-පළමු සැලසුම."
+            >
+              Available in Tamil, English, and Sinhala. Tamil-first design for
+              Sri Lankan farmers.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3
+              class="feature-title"
+              data-en="Direct Trading"
+              data-ta="நேரடி வர்த்தகம்"
+              data-si="සෘජු වෙළඳාම"
+            >
+              Direct Trading
+            </h3>
+            <p
+              class="feature-description"
+              data-en="Connect farmers directly with buyers. No middlemen, better prices for everyone."
+              data-ta="விவசாயிகளை வாங்குபவர்களுடன் நேரடியாக இணைக்கவும். இடைத்தரகர்கள் இல்லை, அனைவருக்கும் சிறந்த விலைகள்."
+              data-si="ගොවීන් සෘජුවම ගැනුම්කරුවන් සමඟ සම්බන්ධ කරන්න. මැදිහත්කරුවන් නැත, සෑම කෙනෙකුටම වඩා හොඳ මිල."
+            >
+              Connect farmers directly with buyers. No middlemen, better prices
+              for everyone.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3
+              class="feature-title"
+              data-en="Market Insights"
+              data-ta="சந்தை நுண்ணறிவு"
+              data-si="වෙළඳපල තීක්ෂ්ණ බුද්ධිය"
+            >
+              Market Insights
+            </h3>
+            <p
+              class="feature-description"
+              data-en="Real-time market prices and trends to help farmers make informed decisions."
+              data-ta="விவசாயிகள் தகவலறிந்த முடிவுகளை எடுக்க உதவும் நிகழ்நேர சந்தை விலைகள் மற்றும் போக்குகள்."
+              data-si="ගොවීන්ට දැනුවත් තීරණ ගැනීමට උපකාර කිරීම සඳහා තත්‍ය කාලීන වෙළඳපල මිල සහ ප්‍රවණතා."
+            >
+              Real-time market prices and trends to help farmers make informed
+              decisions.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3
+              class="feature-title"
+              data-en="Secure & Simple"
+              data-ta="பாதுகாப்பான மற்றும் எளிமையான"
+              data-si="ආරක්ෂිත සහ සරල"
+            >
+              Secure & Simple
+            </h3>
+            <p
+              class="feature-description"
+              data-en="OTP-based authentication for Sri Lankan phone numbers. Easy to use for everyone."
+              data-ta="இலங்கை தொலைபேசி எண்களுக்கான OTP அடிப்படையிலான அங்கீகாரம். அனைவருக்கும் பயன்படுத்த எளிதானது."
+              data-si="ශ්‍රී ලංකා දුරකථන අංක සඳහා OTP මත පදනම් වූ සත්‍යාපනය. සෑම කෙනෙකුටම භාවිතා කිරීමට පහසුයි."
+            >
+              OTP-based authentication for Sri Lankan phone numbers. Easy to use
+              for everyone.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💳</div>
+            <h3
+              class="feature-title"
+              data-en="Flexible Payments"
+              data-ta="நெகிழ்வான கொடுப்பனவுகள்"
+              data-si="නම්‍යශීලී ගෙවීම්"
+            >
+              Flexible Payments
+            </h3>
+            <p
+              class="feature-description"
+              data-en="Support for cash, card, and digital payments. Choose what works best for you."
+              data-ta="பணம், அட்டை மற்றும் டிஜிட்டல் கொடுப்பனவுகளுக்கான ஆதரவு. உங்களுக்கு சிறந்ததைத் தேர்வு செய்யவும்."
+              data-si="මුදල්, කාඩ්පත් සහ ඩිජිටල් ගෙවීම් සඳහා සහාය. ඔබට වඩාත් සුදුසු දේ තෝරන්න."
+            >
+              Support for cash, card, and digital payments. Choose what works
+              best for you.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- How It Works Section -->
     <section class="how-it-works" id="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title"
-                    data-en="How It Works"
-                    data-ta="எவ்வாறு செயல்படுகிறது"
-                    data-si="එය ක්‍රියා කරන ආකාරය">
-                    How It Works
-                </h2>
-                <p class="section-subtitle"
-                    data-en="Simple steps to connect farmers and buyers"
-                    data-ta="விவசாயிகள் மற்றும் வாங்குபவர்களை இணைக்க எளிய படிகள்"
-                    data-si="ගොවීන් සහ ගැනුම්කරුවන් සම්බන්ධ කිරීමට සරල පියවර">
-                    Simple steps to connect farmers and buyers
-                </p>
-            </div>
-
-            <div class="workflow-tabs">
-                <button class="tab-btn active" data-tab="farmer">
-                    <span class="material-icons">agriculture</span>
-                    <span data-en="For Farmers" data-ta="விவசாயிகளுக்கு" data-si="ගොවීන් සඳහා">For Farmers</span>
-                </button>
-                <button class="tab-btn" data-tab="buyer">
-                    <span class="material-icons">shopping_cart</span>
-                    <span data-en="For Buyers" data-ta="வாங்குபவர்களுக்கு" data-si="ගැනුම්කරුවන් සඳහා">For Buyers</span>
-                </button>
-            </div>
-
-            <div class="workflow-content">
-                <div class="workflow-panel active" id="farmer-workflow">
-                    <div class="steps-grid">
-                        <div class="step-card">
-                            <div class="step-number">1</div>
-                            <div class="step-icon">📱</div>
-                            <h3 class="step-title" data-en="Download & Register" data-ta="பதிவிறக்கம் மற்றும் பதிவு" data-si="බාගන්න සහ ලියාපදිංචි වන්න">Download & Register</h3>
-                            <p class="step-description"
-                                data-en="Download the app and register with your Sri Lankan phone number"
-                                data-ta="பயன்பாட்டைப் பதிவிறக்கி உங்கள் இலங்கை தொலைபேசி எண்ணுடன் பதிவு செய்யவும்"
-                                data-si="යෙදුම බාගෙන ඔබේ ශ්‍රී ලංකා දුරකථන අංකය සමඟ ලියාපදිංචි වන්න">
-                                Download the app and register with your Sri Lankan phone number
-                            </p>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="step-number">2</div>
-                            <div class="step-icon">📝</div>
-                            <h3 class="step-title" data-en="Create Listings" data-ta="பட்டியல்களை உருவாக்கவும்" data-si="ලැයිස්තු සාදන්න">Create Listings</h3>
-                            <p class="step-description"
-                                data-en="List your produce with photos, prices, and availability"
-                                data-ta="புகைப்படங்கள், விலைகள் மற்றும் கிடைக்கும் தன்மையுடன் உங்கள் விளைபொருட்களை பட்டியலிடவும்"
-                                data-si="ඡායාරූප, මිල සහ ලබා ගත හැකි බව සමඟ ඔබේ නිෂ්පාදන ලැයිස්තුගත කරන්න">
-                                List your produce with photos, prices, and availability
-                            </p>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="step-number">3</div>
-                            <div class="step-icon">🤝</div>
-                            <h3 class="step-title" data-en="Connect with Buyers" data-ta="வாங்குபவர்களுடன் இணைக்கவும்" data-si="ගැනුම්කරුවන් සමඟ සම්බන්ධ වන්න">Connect with Buyers</h3>
-                            <p class="step-description"
-                                data-en="Receive orders and communicate directly with interested buyers"
-                                data-ta="ஆர்டர்களைப் பெறுங்கள் மற்றும் ஆர்வமுள்ள வாங்குபவர்களுடன் நேரடியாக தொடர்பு கொள்ளுங்கள்"
-                                data-si="ඇණවුම් ලබා ගන්න සහ උනන්දුවක් දක්වන ගැනුම්කරුවන් සමඟ සෘජුවම සන්නිවේදනය කරන්න">
-                                Receive orders and communicate directly with interested buyers
-                            </p>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="step-number">4</div>
-                            <div class="step-icon">💰</div>
-                            <h3 class="step-title" data-en="Complete Transaction" data-ta="பரிவர்த்தனையை முடிக்கவும்" data-si="ගනුදෙනුව සම්පූර්ණ කරන්න">Complete Transaction</h3>
-                            <p class="step-description"
-                                data-en="Arrange pickup and receive payment through your preferred method"
-                                data-ta="பிக்அப் ஏற்பாடு செய்து உங்கள் விருப்பமான முறை மூலம் கொடுப்பனவைப் பெறுங்கள்"
-                                data-si="පිකප් සකස් කර ඔබේ කැමති ක්‍රමය හරහා ගෙවීම ලබා ගන්න">
-                                Arrange pickup and receive payment through your preferred method
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-panel" id="buyer-workflow">
-                    <div class="steps-grid">
-                        <div class="step-card">
-                            <div class="step-number">1</div>
-                            <div class="step-icon">📱</div>
-                            <h3 class="step-title" data-en="Download & Register" data-ta="பதிவிறக்கம் மற்றும் பதிவு" data-si="බාගන්න සහ ලියාපදිංචි වන්න">Download & Register</h3>
-                            <p class="step-description"
-                                data-en="Download the app and create your buyer account"
-                                data-ta="பயன்பாட்டைப் பதிவிறக்கி உங்கள் வாங்குபவர் கணக்கை உருவாக்கவும்"
-                                data-si="යෙදුම බාගෙන ඔබේ ගැනුම්කරු ගිණුම සාදන්න">
-                                Download the app and create your buyer account
-                            </p>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="step-number">2</div>
-                            <div class="step-icon">🔍</div>
-                            <h3 class="step-title" data-en="Browse Products" data-ta="தயாரிப்புகளை உலாவவும்" data-si="නිෂ්පාදන බ්‍රවුස් කරන්න">Browse Products</h3>
-                            <p class="step-description"
-                                data-en="Search for fresh produce from local farmers in your area"
-                                data-ta="உங்கள் பகுதியில் உள்ள உள்ளூர் விவசாயிகளிடமிருந்து புதிய விளைபொருட்களைத் தேடுங்கள்"
-                                data-si="ඔබේ ප්‍රදේශයේ දේශීය ගොවීන්ගෙන් නැවුම් නිෂ්පාදන සොයන්න">
-                                Search for fresh produce from local farmers in your area
-                            </p>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="step-number">3</div>
-                            <div class="step-icon">🛒</div>
-                            <h3 class="step-title" data-en="Place Order" data-ta="ஆர்டர் செய்யவும்" data-si="ඇණවුම් කරන්න">Place Order</h3>
-                            <p class="step-description"
-                                data-en="Select quantity and place your order directly with the farmer"
-                                data-ta="அளவைத் தேர்ந்தெடுத்து விவசாயியிடம் நேரடியாக உங்கள் ஆர்டரை வைக்கவும்"
-                                data-si="ප්‍රමාණය තෝරා ගොවියා සමඟ සෘජුවම ඔබේ ඇණවුම කරන්න">
-                                Select quantity and place your order directly with the farmer
-                            </p>
-                        </div>
-
-                        <div class="step-card">
-                            <div class="step-number">4</div>
-                            <div class="step-icon">✅</div>
-                            <h3 class="step-title" data-en="Pickup & Pay" data-ta="எடுத்துச் செல்லுங்கள் மற்றும் செலுத்துங்கள்" data-si="පිකප් සහ ගෙවන්න">Pickup & Pay</h3>
-                            <p class="step-description"
-                                data-en="Collect your fresh produce and pay using your preferred method"
-                                data-ta="உங்கள் புதிய விளைபொருட்களை சேகரித்து உங்கள் விருப்பமான முறையைப் பயன்படுத்தி செலுத்துங்கள்"
-                                data-si="ඔබේ නැවුම් නිෂ්පාදන එකතු කර ඔබේ කැමති ක්‍රමය භාවිතයෙන් ගෙවන්න">
-                                Collect your fresh produce and pay using your preferred method
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header">
+          <h2
+            class="section-title"
+            data-en="How It Works"
+            data-ta="எவ்வாறு செயல்படுகிறது"
+            data-si="එය ක්‍රියා කරන ආකාරය"
+          >
+            How It Works
+          </h2>
+          <p
+            class="section-subtitle"
+            data-en="Simple steps to connect farmers and buyers"
+            data-ta="விவசாயிகள் மற்றும் வாங்குபவர்களை இணைக்க எளிய படிகள்"
+            data-si="ගොවීන් සහ ගැනුම්කරුවන් සම්බන්ධ කිරීමට සරල පියවර"
+          >
+            Simple steps to connect farmers and buyers
+          </p>
         </div>
+
+        <div class="workflow-tabs">
+          <button class="tab-btn active" data-tab="farmer">
+            <span class="material-icons">agriculture</span>
+            <span
+              data-en="For Farmers"
+              data-ta="விவசாயிகளுக்கு"
+              data-si="ගොවීන් සඳහා"
+              >For Farmers</span
+            >
+          </button>
+          <button class="tab-btn" data-tab="buyer">
+            <span class="material-icons">shopping_cart</span>
+            <span
+              data-en="For Buyers"
+              data-ta="வாங்குபவர்களுக்கு"
+              data-si="ගැනුම්කරුවන් සඳහා"
+              >For Buyers</span
+            >
+          </button>
+        </div>
+
+        <div class="workflow-content">
+          <div class="workflow-panel active" id="farmer-workflow">
+            <div class="steps-grid">
+              <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-icon">📱</div>
+                <h3
+                  class="step-title"
+                  data-en="Download & Register"
+                  data-ta="பதிவிறக்கம் மற்றும் பதிவு"
+                  data-si="බාගන්න සහ ලියාපදිංචි වන්න"
+                >
+                  Download & Register
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Download the app and register with your Sri Lankan phone number"
+                  data-ta="பயன்பாட்டைப் பதிவிறக்கி உங்கள் இலங்கை தொலைபேசி எண்ணுடன் பதிவு செய்யவும்"
+                  data-si="යෙදුම බාගෙන ඔබේ ශ්‍රී ලංකා දුරකථන අංකය සමඟ ලියාපදිංචි වන්න"
+                >
+                  Download the app and register with your Sri Lankan phone
+                  number
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-icon">📝</div>
+                <h3
+                  class="step-title"
+                  data-en="Create Listings"
+                  data-ta="பட்டியல்களை உருவாக்கவும்"
+                  data-si="ලැයිස්තු සාදන්න"
+                >
+                  Create Listings
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="List your produce with photos, prices, and availability"
+                  data-ta="புகைப்படங்கள், விலைகள் மற்றும் கிடைக்கும் தன்மையுடன் உங்கள் விளைபொருட்களை பட்டியலிடவும்"
+                  data-si="ඡායාරූප, මිල සහ ලබා ගත හැකි බව සමඟ ඔබේ නිෂ්පාදන ලැයිස්තුගත කරන්න"
+                >
+                  List your produce with photos, prices, and availability
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-icon">🤝</div>
+                <h3
+                  class="step-title"
+                  data-en="Connect with Buyers"
+                  data-ta="வாங்குபவர்களுடன் இணைக்கவும்"
+                  data-si="ගැනුම්කරුවන් සමඟ සම්බන්ධ වන්න"
+                >
+                  Connect with Buyers
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Receive orders and communicate directly with interested buyers"
+                  data-ta="ஆர்டர்களைப் பெறுங்கள் மற்றும் ஆர்வமுள்ள வாங்குபவர்களுடன் நேரடியாக தொடர்பு கொள்ளுங்கள்"
+                  data-si="ඇණවුම් ලබා ගන්න සහ උනන්දුවක් දක්වන ගැනුම්කරුවන් සමඟ සෘජුවම සන්නිවේදනය කරන්න"
+                >
+                  Receive orders and communicate directly with interested buyers
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-icon">💰</div>
+                <h3
+                  class="step-title"
+                  data-en="Complete Transaction"
+                  data-ta="பரிவர்த்தனையை முடிக்கவும்"
+                  data-si="ගනුදෙනුව සම්පූර්ණ කරන්න"
+                >
+                  Complete Transaction
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Arrange pickup and receive payment through your preferred method"
+                  data-ta="பிக்அப் ஏற்பாடு செய்து உங்கள் விருப்பமான முறை மூலம் கொடுப்பனவைப் பெறுங்கள்"
+                  data-si="පිකප් සකස් කර ඔබේ කැමති ක්‍රමය හරහා ගෙවීම ලබා ගන්න"
+                >
+                  Arrange pickup and receive payment through your preferred
+                  method
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="workflow-panel" id="buyer-workflow">
+            <div class="steps-grid">
+              <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-icon">📱</div>
+                <h3
+                  class="step-title"
+                  data-en="Download & Register"
+                  data-ta="பதிவிறக்கம் மற்றும் பதிவு"
+                  data-si="බාගන්න සහ ලියාපදිංචි වන්න"
+                >
+                  Download & Register
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Download the app and create your buyer account"
+                  data-ta="பயன்பாட்டைப் பதிவிறக்கி உங்கள் வாங்குபவர் கணக்கை உருவாக்கவும்"
+                  data-si="යෙදුම බාගෙන ඔබේ ගැනුම්කරු ගිණුම සාදන්න"
+                >
+                  Download the app and create your buyer account
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-icon">🔍</div>
+                <h3
+                  class="step-title"
+                  data-en="Browse Products"
+                  data-ta="தயாரிப்புகளை உலாவவும்"
+                  data-si="නිෂ්පාදන බ්‍රවුස් කරන්න"
+                >
+                  Browse Products
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Search for fresh produce from local farmers in your area"
+                  data-ta="உங்கள் பகுதியில் உள்ள உள்ளூர் விவசாயிகளிடமிருந்து புதிய விளைபொருட்களைத் தேடுங்கள்"
+                  data-si="ඔබේ ප්‍රදේශයේ දේශීය ගොවීන්ගෙන් නැවුම් නිෂ්පාදන සොයන්න"
+                >
+                  Search for fresh produce from local farmers in your area
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-icon">🛒</div>
+                <h3
+                  class="step-title"
+                  data-en="Place Order"
+                  data-ta="ஆர்டர் செய்யவும்"
+                  data-si="ඇණවුම් කරන්න"
+                >
+                  Place Order
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Select quantity and place your order directly with the farmer"
+                  data-ta="அளவைத் தேர்ந்தெடுத்து விவசாயியிடம் நேரடியாக உங்கள் ஆர்டரை வைக்கவும்"
+                  data-si="ප්‍රමාණය තෝරා ගොවියා සමඟ සෘජුවම ඔබේ ඇණවුම කරන්න"
+                >
+                  Select quantity and place your order directly with the farmer
+                </p>
+              </div>
+
+              <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-icon">✅</div>
+                <h3
+                  class="step-title"
+                  data-en="Pickup & Pay"
+                  data-ta="எடுத்துச் செல்லுங்கள் மற்றும் செலுத்துங்கள்"
+                  data-si="පිකප් සහ ගෙවන්න"
+                >
+                  Pickup & Pay
+                </h3>
+                <p
+                  class="step-description"
+                  data-en="Collect your fresh produce and pay using your preferred method"
+                  data-ta="உங்கள் புதிய விளைபொருட்களை சேகரித்து உங்கள் விருப்பமான முறையைப் பயன்படுத்தி செலுத்துங்கள்"
+                  data-si="ඔබේ නැවුම් නිෂ්පාදන එකතු කර ඔබේ කැමති ක්‍රමය භාවිතයෙන් ගෙවන්න"
+                >
+                  Collect your fresh produce and pay using your preferred method
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- About Section -->
     <section class="about" id="about">
-        <div class="container">
-            <div class="about-grid">
-                <div class="about-content">
-                    <h2 class="section-title"
-                        data-en="About Agrimarket"
-                        data-ta="அக்ரிமார்க்கெட் பற்றி"
-                        data-si="ඇග්‍රිමාර්කට් ගැන">
-                        About Agrimarket
-                    </h2>
-                    <p class="about-text"
-                        data-en="Agrimarket connects farmers directly to buyers in Sri Lanka. Farmers get better prices. Buyers get fresh produce. No middlemen taking a cut."
-                        data-ta="Agrimarket இலங்கையில் விவசாயிகளை நேரடியாக வாங்குபவர்களுடன் இணைக்கிறது. விவசாயிகள் சிறந்த விலை பெறுகிறார்கள். வாங்குபவர்கள் புதிய விளைபொருட்களைப் பெறுகிறார்கள். எந்த இடைத்தரகரும் வெட்டு எடுக்கவில்லை."
-                        data-si="Agrimarket ශ්‍රී ලංකාවේ ගොවීන් සෘජුවම ගැනුම්කරුවන් සමඟ සම්බන්ධ කරයි. ගොවීන්ට වඩා හොඳ මිල ලැබේ. ගැනුම්කරුවන්ට නැවුම් නිෂ්පාදන ලැබේ. කිසිදු මැදිහත්කරුවෙකු කැපුම් ගනු ගනී.">
-                        Agrimarket connects farmers directly to buyers in Sri Lanka. Farmers get better prices. Buyers get fresh produce. No middlemen taking a cut.
-                    </p>
-                    <p class="about-text"
-                        data-en="Built with offline-first technology, it works even with poor signal. Available in Tamil, English, and Sinhala. Designed for real farming conditions in Sri Lanka."
-                        data-ta="ஆஃப்லைன் முதன்மை தொழில்நுட்பத்துடன் நிர்மிত, இது மோசமான சமிக்ஞை கூட வேலை செய்கிறது. தமிழ், ஆங்கிலம் மற்றும் சிங்களத்தில் கிடைக்கிறது. இலங்கையில் உண்மையான விவசாய நிலைமைகளுக்கு வடிவமைக்கப்பட்டுள்ளது."
-                        data-si="නොබැඳි-පළමු තාක්ෂණය සමඟ ගොඩනගා ඇති, එය දුර්වල සිග්නල් සමඟ පවා ක්‍රියා කරයි. දෙමළ, ඉංග්‍රීසි සහ සිංහලෙන් ලබා ගත හැකිය. ශ්‍රී ලංකාවේ සැබෑ ගොවි තත්ත්වයන් සඳහා නිර්මාණය කර ඇත.">
-                        Built with offline-first technology, it works even with poor signal. Available in Tamil, English, and Sinhala. Designed for real farming conditions in Sri Lanka.
-                    </p>
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-content">
+            <h2
+              class="section-title"
+              data-en="About Agrimarket"
+              data-ta="அக்ரிமார்க்கெட் பற்றி"
+              data-si="ඇග්‍රිමාර්කට් ගැන"
+            >
+              About Agrimarket
+            </h2>
+            <p
+              class="about-text"
+              data-en="Agrimarket connects farmers directly to buyers in Sri Lanka. Farmers get better prices. Buyers get fresh produce. No middlemen taking a cut."
+              data-ta="Agrimarket இலங்கையில் விவசாயிகளை நேரடியாக வாங்குபவர்களுடன் இணைக்கிறது. விவசாயிகள் சிறந்த விலை பெறுகிறார்கள். வாங்குபவர்கள் புதிய விளைபொருட்களைப் பெறுகிறார்கள். எந்த இடைத்தரகரும் வெட்டு எடுக்கவில்லை."
+              data-si="Agrimarket ශ්‍රී ලංකාවේ ගොවීන් සෘජුවම ගැනුම්කරුවන් සමඟ සම්බන්ධ කරයි. ගොවීන්ට වඩා හොඳ මිල ලැබේ. ගැනුම්කරුවන්ට නැවුම් නිෂ්පාදන ලැබේ. කිසිදු මැදිහත්කරුවෙකු කැපුම් ගනු ගනී."
+            >
+              Agrimarket connects farmers directly to buyers in Sri Lanka.
+              Farmers get better prices. Buyers get fresh produce. No middlemen
+              taking a cut.
+            </p>
+            <p
+              class="about-text"
+              data-en="Built with offline-first technology, it works even with poor signal. Available in Tamil, English, and Sinhala. Designed for real farming conditions in Sri Lanka."
+              data-ta="ஆஃப்லைன் முதன்மை தொழில்நுட்பத்துடன் நிர்மிত, இது மோசமான சமிக்ஞை கூட வேலை செய்கிறது. தமிழ், ஆங்கிலம் மற்றும் சிங்களத்தில் கிடைக்கிறது. இலங்கையில் உண்மையான விவசாய நிலைமைகளுக்கு வடிவமைக்கப்பட்டுள்ளது."
+              data-si="නොබැඳි-පළමු තාක්ෂණය සමඟ ගොඩනගා ඇති, එය දුර්වල සිග්නල් සමඟ පවා ක්‍රියා කරයි. දෙමළ, ඉංග්‍රීසි සහ සිංහලෙන් ලබා ගත හැකිය. ශ්‍රී ලංකාවේ සැබෑ ගොවි තත්ත්වයන් සඳහා නිර්මාණය කර ඇත."
+            >
+              Built with offline-first technology, it works even with poor
+              signal. Available in Tamil, English, and Sinhala. Designed for
+              real farming conditions in Sri Lanka.
+            </p>
 
-                    <div class="mission-values">
-                        <div class="value-item">
-                            <span class="value-icon">🎯</span>
-                            <div>
-                                <h4 data-en="Our Mission" data-ta="எங்கள் நோக்கம்" data-si="අපගේ මෙහෙවර">Our Mission</h4>
-                                <p data-en="Give farmers better prices and buyers fresh produce"
-                                   data-ta="விவசாயிகளுக்கு சிறந்த விலை மற்றும் வாங்குபவர்களுக்கு புதிய விளைபொருட்களை வழங்குங்கள்"
-                                   data-si="ගොවීන්ට වඩා හොඳ මිල සහ ගැනුම්කරුවන්ට නැවුම් නිෂ්පාදන ලබා දෙන්න">
-                                   Give farmers better prices and buyers fresh produce
-                                </p>
-                            </div>
-                        </div>
-                        <div class="value-item">
-                            <span class="value-icon">💡</span>
-                            <div>
-                                <h4 data-en="Our Vision" data-ta="எங்கள் பார்வை" data-si="අපගේ දැක්ම">Our Vision</h4>
-                                <p data-en="Farming in Sri Lanka that works for farmers"
-                                   data-ta="இலங்கையில் விவசாயிகளுக்கு வேலை செய்யும் விவசாயம்"
-                                   data-si="ශ්‍රී ලංකාවේ ගොවීන් සඳහා ක්‍රියා කරන ගොවිතැනුම">
-                                   Farming in Sri Lanka that works for farmers
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="project-status">
-                        <h4 data-en="Project Status" data-ta="திட்ட நிலை" data-si="ව්‍යාපෘති තත්ත්වය">Project Status</h4>
-                        <div class="status-badges">
-                            <span class="status-badge">
-                                <span class="material-icons">check_circle</span>
-                                <span data-en="Active Development" data-ta="செயலில் உள்ள மேம்பாடு" data-si="ක්‍රියාකාරී සංවර්ධනය">Active Development</span>
-                            </span>
-                            <span class="status-badge">
-                                <span class="material-icons">schedule</span>
-                                <span data-en="Target Launch: Q1 2026" data-ta="இலக்கு வெளியீடு: Q1 2026" data-si="ඉලක්ක දියත් කිරීම: Q1 2026">Target Launch: Q1 2026</span>
-                            </span>
-                            <span class="status-badge">
-                                <span class="material-icons">code</span>
-                                <span data-en="Production-Grade Code" data-ta="உற்பத்தி தர குறியீடு" data-si="නිෂ්පාදන ශ්‍රේණියේ කේතය">Production-Grade Code</span>
-                            </span>
-                        </div>
-                    </div>
+            <div class="mission-values">
+              <div class="value-item">
+                <span class="value-icon">🎯</span>
+                <div>
+                  <h4
+                    data-en="Our Mission"
+                    data-ta="எங்கள் நோக்கம்"
+                    data-si="අපගේ මෙහෙවර"
+                  >
+                    Our Mission
+                  </h4>
+                  <p
+                    data-en="Give farmers better prices and buyers fresh produce"
+                    data-ta="விவசாயிகளுக்கு சிறந்த விலை மற்றும் வாங்குபவர்களுக்கு புதிய விளைபொருட்களை வழங்குங்கள்"
+                    data-si="ගොවීන්ට වඩා හොඳ මිල සහ ගැනුම්කරුවන්ට නැවුම් නිෂ්පාදන ලබා දෙන්න"
+                  >
+                    Give farmers better prices and buyers fresh produce
+                  </p>
                 </div>
-
-                <div class="about-image">
-                    <div class="image-placeholder">
-                        <span class="material-icons">agriculture</span>
-                        <p data-en="Empowering Farmers" data-ta="விவசாயிகளை மேம்படுத்துதல்" data-si="ගොවීන් සවිබල ගැන්වීම">Empowering Farmers</p>
-                    </div>
+              </div>
+              <div class="value-item">
+                <span class="value-icon">💡</span>
+                <div>
+                  <h4
+                    data-en="Our Vision"
+                    data-ta="எங்கள் பார்வை"
+                    data-si="අපගේ දැක්ම"
+                  >
+                    Our Vision
+                  </h4>
+                  <p
+                    data-en="Farming in Sri Lanka that works for farmers"
+                    data-ta="இலங்கையில் விவசாயிகளுக்கு வேலை செய்யும் விவசாயம்"
+                    data-si="ශ්‍රී ලංකාවේ ගොවීන් සඳහා ක්‍රියා කරන ගොවිතැනුම"
+                  >
+                    Farming in Sri Lanka that works for farmers
+                  </p>
                 </div>
+              </div>
             </div>
+
+            <div class="project-status">
+              <h4
+                data-en="Project Status"
+                data-ta="திட்ட நிலை"
+                data-si="ව්‍යාපෘති තත්ත්වය"
+              >
+                Project Status
+              </h4>
+              <div class="status-badges">
+                <span class="status-badge">
+                  <span class="material-icons">check_circle</span>
+                  <span
+                    data-en="Active Development"
+                    data-ta="செயலில் உள்ள மேம்பாடு"
+                    data-si="ක්‍රියාකාරී සංවර්ධනය"
+                    >Active Development</span
+                  >
+                </span>
+                <span class="status-badge">
+                  <span class="material-icons">schedule</span>
+                  <span
+                    data-en="Target Launch: Q1 2026"
+                    data-ta="இலக்கு வெளியீடு: Q1 2026"
+                    data-si="ඉලක්ක දියත් කිරීම: Q1 2026"
+                    >Target Launch: Q1 2026</span
+                  >
+                </span>
+                <span class="status-badge">
+                  <span class="material-icons">code</span>
+                  <span
+                    data-en="Production-Grade Code"
+                    data-ta="உற்பத்தி தர குறியீடு"
+                    data-si="නිෂ්පාදන ශ්‍රේණියේ කේතය"
+                    >Production-Grade Code</span
+                  >
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-image">
+            <div class="image-placeholder">
+              <span class="material-icons">agriculture</span>
+              <p
+                data-en="Empowering Farmers"
+                data-ta="விவசாயிகளை மேம்படுத்துதல்"
+                data-si="ගොවීන් සවිබල ගැන්වීම"
+              >
+                Empowering Farmers
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Download Section -->
     <section class="download" id="download">
-        <div class="container">
-            <div class="download-content">
-                <h2 class="section-title"
-                    data-en="Download the app"
-                    data-ta="பயன்பாட்டைப் பதிவிறக்கவும்"
-                    data-si="යෙදුම බාගෙන ගන්න">
-                    Download the app
-                </h2>
-                <p class="section-subtitle"
-                    data-en="Coming soon Q1 2026"
-                    data-ta="Q1 2026 இல் விரைவில் வரவுள்ளது"
-                    data-si="Q1 2026 හි ඉක්මනින් පැමිණේ">
-                    Coming soon Q1 2026
-                </p>
+      <div class="container">
+        <div class="download-content">
+          <h2
+            class="section-title"
+            data-en="Download the app"
+            data-ta="பயன்பாட்டைப் பதிவிறக்கவும்"
+            data-si="යෙදුම බාගෙන ගන්න"
+          >
+            Download the app
+          </h2>
+          <p
+            class="section-subtitle"
+            data-en="Coming soon Q1 2026"
+            data-ta="Q1 2026 இல் விரைவில் வரவுள்ளது"
+            data-si="Q1 2026 හි ඉක්මනින් පැමිණේ"
+          >
+            Coming soon Q1 2026
+          </p>
 
-                <div class="download-buttons">
-                    <a class="download-btn android disabled">
-                        <span class="material-icons">android</span>
-                        <div class="download-text">
-                            <span class="download-label" data-en="Coming Soon" data-ta="விரைவில்" data-si="ඉක්මනින්">Coming Soon</span>
-                            <span class="download-platform">Android</span>
-                        </div>
-                    </a>
-                    <a class="download-btn ios disabled">
-                        <span class="material-icons">apple</span>
-                        <div class="download-text">
-                            <span class="download-label" data-en="Coming Soon" data-ta="விரைவில்" data-si="ඉක්මනින්">Coming Soon</span>
-                            <span class="download-platform">iOS</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+          <div class="download-buttons">
+            <a class="download-btn android disabled">
+              <span class="material-icons">android</span>
+              <div class="download-text">
+                <span
+                  class="download-label"
+                  data-en="Coming Soon"
+                  data-ta="விரைவில்"
+                  data-si="ඉක්මනින්"
+                  >Coming Soon</span
+                >
+                <span class="download-platform">Android</span>
+              </div>
+            </a>
+            <a class="download-btn ios disabled">
+              <span class="material-icons">apple</span>
+              <div class="download-text">
+                <span
+                  class="download-label"
+                  data-en="Coming Soon"
+                  data-ta="விரைவில்"
+                  data-si="ඉක්මනින්"
+                  >Coming Soon</span
+                >
+                <span class="download-platform">iOS</span>
+              </div>
+            </a>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Internship/Join Section -->
     <section class="join">
-        <div class="container">
-            <div class="join-content">
-                <h2 class="section-title"
-                    data-en="Join Our Team"
-                    data-ta="எங்கள் குழுவில் சேரவும்"
-                    data-si="අපගේ කණ්ඩායමට එක්වන්න">
-                    Join Our Team
-                </h2>
-                <p class="section-subtitle"
-                    data-en="We're building Agrimarket with developers, designers, and community builders. If you want to work on something real, get in touch."
-                    data-ta="நாங்கள் Agrimarket ஐ டெவலப்பர்கள், ডিজাইনர்கள் மற்றும் சமூக கட்டமைப்பாளர்களுடன் கட்டுகிறோம். நீங்கள் உண்மையான ஒன்றில் வேலை செய்ய விரும்பினால், தொடர்பு கொள்ளுங்கள்."
-                    data-si="අපි Agrimarket ඩිවෙලපර්, ඩිසේනර් සහ ප්‍රජා ගොඩනැගුවන් සමඟ ගොඩනගමින් සිටිමු. ඔබ සැබෑ දෙයක් කරන්න කැමති නම්, අපට සම්බන්ධ වන්න.">
-                    We're building Agrimarket with developers, designers, and community builders. If you want to work on something real, get in touch.
-                </p>
+      <div class="container">
+        <div class="join-content">
+          <h2
+            class="section-title"
+            data-en="Join Our Team"
+            data-ta="எங்கள் குழுவில் சேரவும்"
+            data-si="අපගේ කණ්ඩායමට එක්වන්න"
+          >
+            Join Our Team
+          </h2>
+          <p
+            class="section-subtitle"
+            data-en="We're building Agrimarket with developers, designers, and community builders. If you want to work on something real, get in touch."
+            data-ta="நாங்கள் Agrimarket ஐ டெவலப்பர்கள், ডিজাইনர்கள் மற்றும் சமூக கட்டமைப்பாளர்களுடன் கட்டுகிறோம். நீங்கள் உண்மையான ஒன்றில் வேலை செய்ய விரும்பினால், தொடர்பு கொள்ளுங்கள்."
+            data-si="අපි Agrimarket ඩිවෙලපර්, ඩිසේනර් සහ ප්‍රජා ගොඩනැගුවන් සමඟ ගොඩනගමින් සිටිමු. ඔබ සැබෑ දෙයක් කරන්න කැමති නම්, අපට සම්බන්ධ වන්න."
+          >
+            We're building Agrimarket with developers, designers, and community
+            builders. If you want to work on something real, get in touch.
+          </p>
 
-                <div class="opportunities-grid">
-                    <div class="opportunity-card">
-                        <span class="material-icons">code</span>
-                        <h3 data-en="Software Development" data-ta="மென்பொருள் மேம்பாடு" data-si="මෘදුකාංග සංවර්ධනය">Software Development</h3>
-                        <p data-en="Android, Backend, Web" data-ta="ஆண்ட்ராய்டு, பின்தளம், வலை" data-si="ඇන්ඩ්‍රොයිඩ්, පසුබිම, වෙබ්">Android, Backend, Web</p>
-                    </div>
-                    <div class="opportunity-card">
-                        <span class="material-icons">design_services</span>
-                        <h3 data-en="UI/UX Design" data-ta="UI/UX வடிவமைப்பு" data-si="UI/UX නිර්මාණය">UI/UX Design</h3>
-                        <p data-en="Mobile & Web Design" data-ta="மொபைல் மற்றும் வலை வடிவமைப்பு" data-si="ජංගම සහ වෙබ් නිර්මාණය">Mobile & Web Design</p>
-                    </div>
-                    <div class="opportunity-card">
-                        <span class="material-icons">campaign</span>
-                        <h3 data-en="Marketing & Outreach" data-ta="சந்தைப்படுத்தல் மற்றும் வெளிச்செல்லுதல்" data-si="අලෙවිකරණය සහ ප්‍රචාරණය">Marketing & Outreach</h3>
-                        <p data-en="Community Building" data-ta="சமூக கட்டமைப்பு" data-si="ප්‍රජා ගොඩනැගීම">Community Building</p>
-                    </div>
-                </div>
-
-                <a href="#contact" class="btn btn-primary">
-                    <span class="material-icons">mail</span>
-                    <span data-en="Get In Touch" data-ta="தொடர்பு கொள்ளுங்கள்" data-si="සම්බන්ධ වන්න">Get In Touch</span>
-                </a>
+          <div class="opportunities-grid">
+            <div class="opportunity-card">
+              <span class="material-icons">code</span>
+              <h3
+                data-en="Software Development"
+                data-ta="மென்பொருள் மேம்பாடு"
+                data-si="මෘදුකාංග සංවර්ධනය"
+              >
+                Software Development
+              </h3>
+              <p
+                data-en="Android, Backend, Web"
+                data-ta="ஆண்ட்ராய்டு, பின்தளம், வலை"
+                data-si="ඇන්ඩ්‍රොයිඩ්, පසුබිම, වෙබ්"
+              >
+                Android, Backend, Web
+              </p>
             </div>
+            <div class="opportunity-card">
+              <span class="material-icons">design_services</span>
+              <h3
+                data-en="UI/UX Design"
+                data-ta="UI/UX வடிவமைப்பு"
+                data-si="UI/UX නිර්මාණය"
+              >
+                UI/UX Design
+              </h3>
+              <p
+                data-en="Mobile & Web Design"
+                data-ta="மொபைல் மற்றும் வலை வடிவமைப்பு"
+                data-si="ජංගම සහ වෙබ් නිර්මාණය"
+              >
+                Mobile & Web Design
+              </p>
+            </div>
+            <div class="opportunity-card">
+              <span class="material-icons">campaign</span>
+              <h3
+                data-en="Marketing & Outreach"
+                data-ta="சந்தைப்படுத்தல் மற்றும் வெளிச்செல்லுதல்"
+                data-si="අලෙවිකරණය සහ ප්‍රචාරණය"
+              >
+                Marketing & Outreach
+              </h3>
+              <p
+                data-en="Community Building"
+                data-ta="சமூக கட்டமைப்பு"
+                data-si="ප්‍රජා ගොඩනැගීම"
+              >
+                Community Building
+              </p>
+            </div>
+          </div>
+
+          <a href="#contact" class="btn btn-primary">
+            <span class="material-icons">mail</span>
+            <span
+              data-en="Get In Touch"
+              data-ta="தொடர்பு கொள்ளுங்கள்"
+              data-si="සම්බන්ධ වන්න"
+              >Get In Touch</span
+            >
+          </a>
         </div>
+      </div>
     </section>
 
     <!-- Contact Section -->
     <section class="contact" id="contact">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title"
-                    data-en="Contact"
-                    data-ta="தொடர்பு"
-                    data-si="සම්බන්ධ වන්න">
-                    Contact
-                </h2>
-                <p class="section-subtitle"
-                    data-en="Questions or feedback? Reach out to us."
-                    data-ta="கேள்விகள் அல்லது கருத்துக்கள்? எங்களை தொடர்பு கொள்ளுங்கள்."
-                    data-si="ප්‍රශ්න හෝ ප්‍රතිපෝෂණ? අප අමතන්න.">
-                    Questions or feedback? Reach out to us.
-                </p>
-            </div>
-
-            <div class="contact-simple">
-                <div class="contact-email-card">
-                    <span class="material-icons">email</span>
-                    <div class="contact-email-content">
-                        <h3 data-en="Email" data-ta="மின்னஞ்சல்" data-si="විද්‍යුත් තැපෑල">Email</h3>
-                        <a href="mailto:admin@agrimarket.lk">admin@agrimarket.lk</a>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header">
+          <h2
+            class="section-title"
+            data-en="Contact"
+            data-ta="தொடர்பு"
+            data-si="සම්බන්ධ වන්න"
+          >
+            Contact
+          </h2>
+          <p
+            class="section-subtitle"
+            data-en="Questions or feedback? Reach out to us."
+            data-ta="கேள்விகள் அல்லது கருத்துக்கள்? எங்களை தொடர்பு கொள்ளுங்கள்."
+            data-si="ප්‍රශ්න හෝ ප්‍රතිපෝෂණ? අප අමතන්න."
+          >
+            Questions or feedback? Reach out to us.
+          </p>
         </div>
+
+        <div class="contact-simple">
+          <div class="contact-email-card">
+            <span class="material-icons">email</span>
+            <div class="contact-email-content">
+              <h3
+                data-en="Email"
+                data-ta="மின்னஞ்சல்"
+                data-si="විද්‍යුත් තැපෑල"
+              >
+                Email
+              </h3>
+              <a href="mailto:admin@agrimarket.lk">admin@agrimarket.lk</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-section">
-                    <div class="footer-brand">
-                        <span class="brand-icon">🌾</span>
-                        <span class="brand-name">Agrimarket</span>
-                    </div>
-                    <p class="footer-description"
-                        data-en="Connecting farmers directly to consumers in Sri Lanka"
-                        data-ta="இலங்கையில் விவசாயிகளை நேரடியாக நுகர்வோருடன் இணைக்கிறது"
-                        data-si="ශ්‍රී ලංකාවේ ගොවීන් සෘජුවම පාරිභෝගිකයන් සමඟ සම්බන්ධ කිරීම">
-                        Connecting farmers directly to consumers in Sri Lanka
-                    </p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook"><span class="material-icons">facebook</span></a>
-                        <a href="#" aria-label="Twitter"><span class="material-icons">tag</span></a>
-                        <a href="https://github.com/yourusername/agrimarket" target="_blank" aria-label="GitHub"><span class="material-icons">code</span></a>
-                    </div>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title" data-en="Quick Links" data-ta="விரைவு இணைப்புகள்" data-si="ඉක්මන් සබැඳි">Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="#home" data-en="Home" data-ta="முகப்பு" data-si="මුල් පිටුව">Home</a></li>
-                        <li><a href="#features" data-en="Features" data-ta="அம்சங்கள்" data-si="විශේෂාංග">Features</a></li>
-                        <li><a href="#how-it-works" data-en="How It Works" data-ta="எவ்வாறு செயல்படுகிறது" data-si="එය ක්‍රියා කරන ආකාරය">How It Works</a></li>
-                        <li><a href="#about" data-en="About" data-ta="எங்களை பற்றி" data-si="අප ගැන">About</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title" data-en="Resources" data-ta="வளங்கள்" data-si="සම්පත්">Resources</h4>
-                    <ul class="footer-links">
-                        <li><a href="#download" data-en="Download App" data-ta="பயன்பாட்டைப் பதிவிறக்கவும்" data-si="යෙදුම බාගන්න">Download App</a></li>
-                        <li><a href="#contact" data-en="Contact Us" data-ta="எங்களை தொடர்பு கொள்ளுங்கள்" data-si="අප අමතන්න">Contact Us</a></li>
-                        <li><a href="https://github.com/yourusername/agrimarket" target="_blank" data-en="GitHub" data-ta="GitHub" data-si="GitHub">GitHub</a></li>
-                        <li><a href="privacy.html" data-en="Privacy Policy" data-ta="தனியுரிமை கொள்கை" data-si="රහස්‍යතා ප්‍රතිපත්තිය">Privacy Policy</a></li>
-                        <li><a href="terms.html" data-en="Terms of Service" data-ta="சேவை விதிமுறைகள்" data-si="සේවා කොන්දේසි">Terms of Service</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4 class="footer-title" data-en="Technology" data-ta="தொழில்நுட்பம்" data-si="තාක්ෂණය">Technology</h4>
-                    <ul class="footer-links">
-                        <li><span data-en="Android (Jetpack Compose)" data-ta="ஆண்ட்ராய்டு (Jetpack Compose)" data-si="ඇන්ඩ්‍රොයිඩ් (Jetpack Compose)">Android (Jetpack Compose)</span></li>
-                        <li><span data-en="Node.js Backend" data-ta="Node.js பின்தளம்" data-si="Node.js පසුබිම">Node.js Backend</span></li>
-                        <li><span data-en="Supabase Database" data-ta="Supabase தரவுத்தளம்" data-si="Supabase දත්ත ගබඩාව">Supabase Database</span></li>
-                        <li><span data-en="Offline-First Design" data-ta="ஆஃப்லைன் முதன்மை வடிவமைப்பு" data-si="නොබැඳි-පළමු සැලසුම">Offline-First Design</span></li>
-                    </ul>
-                </div>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-section">
+            <div class="footer-brand">
+              <span class="brand-icon">🌾</span>
+              <span class="brand-name">Agrimarket</span>
             </div>
-
-            <div class="footer-bottom">
-                <p class="copyright">
-                    <span data-en="© 2024 Agrimarket. All rights reserved." data-ta="© 2024 அக்ரிமார்க்கெட். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை." data-si="© 2024 ඇග්‍රිමාර්කට්. සියලුම හිමිකම් ඇවිරිණි.">© 2024 Agrimarket. All rights reserved.</span>
-                </p>
-                <p class="footer-note">
-                    <span data-en="Built with ❤️ for the farming community of Sri Lanka" data-ta="இலங்கை விவசாய சமூகத்திற்காக ❤️ உடன் உருவாக்கப்பட்டது" data-si="ශ්‍රී ලංකාවේ ගොවි ප්‍රජාව සඳහා ❤️ සමඟ ගොඩනගා ඇත">Built with ❤️ for the farming community of Sri Lanka</span>
-                </p>
+            <p
+              class="footer-description"
+              data-en="Connecting farmers directly to consumers in Sri Lanka"
+              data-ta="இலங்கையில் விவசாயிகளை நேரடியாக நுகர்வோருடன் இணைக்கிறது"
+              data-si="ශ්‍රී ලංකාවේ ගොවීන් සෘජුවම පාරිභෝගිකයන් සමඟ සම්බන්ධ කිරීම"
+            >
+              Connecting farmers directly to consumers in Sri Lanka
+            </p>
+            <div class="social-links">
+              <a href="#" aria-label="Facebook"
+                ><span class="material-icons">facebook</span></a
+              >
+              <a href="#" aria-label="Twitter"
+                ><span class="material-icons">tag</span></a
+              >
+              <a
+                href="https://github.com/yourusername/agrimarket"
+                target="_blank"
+                aria-label="GitHub"
+                ><span class="material-icons">code</span></a
+              >
             </div>
+          </div>
+
+          <div class="footer-section">
+            <h4
+              class="footer-title"
+              data-en="Quick Links"
+              data-ta="விரைவு இணைப்புகள்"
+              data-si="ඉක්මන් සබැඳි"
+            >
+              Quick Links
+            </h4>
+            <ul class="footer-links">
+              <li>
+                <a
+                  href="#home"
+                  data-en="Home"
+                  data-ta="முகப்பு"
+                  data-si="මුල් පිටුව"
+                  >Home</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#features"
+                  data-en="Features"
+                  data-ta="அம்சங்கள்"
+                  data-si="විශේෂාංග"
+                  >Features</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#how-it-works"
+                  data-en="How It Works"
+                  data-ta="எவ்வாறு செயல்படுகிறது"
+                  data-si="එය ක්‍රියා කරන ආකාරය"
+                  >How It Works</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#about"
+                  data-en="About"
+                  data-ta="எங்களை பற்றி"
+                  data-si="අප ගැන"
+                  >About</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4
+              class="footer-title"
+              data-en="Resources"
+              data-ta="வளங்கள்"
+              data-si="සම්පත්"
+            >
+              Resources
+            </h4>
+            <ul class="footer-links">
+              <li>
+                <a
+                  href="#download"
+                  data-en="Download App"
+                  data-ta="பயன்பாட்டைப் பதிவிறக்கவும்"
+                  data-si="යෙදුම බාගන්න"
+                  >Download App</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#contact"
+                  data-en="Contact Us"
+                  data-ta="எங்களை தொடர்பு கொள்ளுங்கள்"
+                  data-si="අප අමතන්න"
+                  >Contact Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/yourusername/agrimarket"
+                  target="_blank"
+                  data-en="GitHub"
+                  data-ta="GitHub"
+                  data-si="GitHub"
+                  >GitHub</a
+                >
+              </li>
+              <li>
+                <a
+                  href="privacy.html"
+                  data-en="Privacy Policy"
+                  data-ta="தனியுரிமை கொள்கை"
+                  data-si="රහස්‍යතා ප්‍රතිපත්තිය"
+                  >Privacy Policy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="terms.html"
+                  data-en="Terms of Service"
+                  data-ta="சேவை விதிமுறைகள்"
+                  data-si="සේවා කොන්දේසි"
+                  >Terms of Service</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4
+              class="footer-title"
+              data-en="Technology"
+              data-ta="தொழில்நுட்பம்"
+              data-si="තාක්ෂණය"
+            >
+              Technology
+            </h4>
+            <ul class="footer-links">
+              <li>
+                <span
+                  data-en="Android (Jetpack Compose)"
+                  data-ta="ஆண்ட்ராய்டு (Jetpack Compose)"
+                  data-si="ඇන්ඩ්‍රොයිඩ් (Jetpack Compose)"
+                  >Android (Jetpack Compose)</span
+                >
+              </li>
+              <li>
+                <span
+                  data-en="Node.js Backend"
+                  data-ta="Node.js பின்தளம்"
+                  data-si="Node.js පසුබිම"
+                  >Node.js Backend</span
+                >
+              </li>
+              <li>
+                <span
+                  data-en="Supabase Database"
+                  data-ta="Supabase தரவுத்தளம்"
+                  data-si="Supabase දත්ත ගබඩාව"
+                  >Supabase Database</span
+                >
+              </li>
+              <li>
+                <span
+                  data-en="Offline-First Design"
+                  data-ta="ஆஃப்லைன் முதன்மை வடிவமைப்பு"
+                  data-si="නොබැඳි-පළමු සැලසුම"
+                  >Offline-First Design</span
+                >
+              </li>
+            </ul>
+          </div>
         </div>
+
+        <div class="footer-bottom">
+          <p class="copyright">
+            <span
+              data-en="© 2024 Agrimarket. All rights reserved."
+              data-ta="© 2024 அக்ரிமார்க்கெட். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை."
+              data-si="© 2024 ඇග්‍රිමාර්කට්. සියලුම හිමිකම් ඇවිරිණි."
+              >© 2024 Agrimarket. All rights reserved.</span
+            >
+          </p>
+          <p class="footer-note">
+            <span
+              data-en="Built with ❤️ for the farming community of Sri Lanka"
+              data-ta="இலங்கை விவசாய சமூகத்திற்காக ❤️ உடன் உருவாக்கப்பட்டது"
+              data-si="ශ්‍රී ලංකාවේ ගොවි ප්‍රජාව සඳහා ❤️ සමඟ ගොඩනගා ඇත"
+              >Built with ❤️ for the farming community of Sri Lanka</span
+            >
+          </p>
+        </div>
+      </div>
     </footer>
 
     <!-- Scroll to Top Button -->
     <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
-        <span class="material-icons">arrow_upward</span>
+      <span class="material-icons">arrow_upward</span>
     </button>
 
     <!-- JavaScript -->
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
-

@@ -14,17 +14,20 @@ Professional landing page for Agrimarket.lk - connecting farmers directly to con
 ## 🎨 Design System
 
 ### Colors
+
 - **Primary Green**: `#16a34a` - Used for CTAs and primary actions
 - **Secondary Blue**: `#60a5fa` - Used for secondary actions
 - **Dark Background**: `#0f172a` - Main background color
 - **Surface Dark**: `#1e293b` - Card and surface backgrounds
 
 ### Typography
+
 - **Sans-serif**: Inter (English)
 - **Tamil**: Noto Sans Tamil
 - **Sinhala**: Noto Sans Sinhala
 
 ### Spacing
+
 - Based on 8dp grid system
 - Border radius: 16dp standard
 
@@ -47,11 +50,13 @@ web/
 ### Deploy to Vercel
 
 1. **Install Vercel CLI** (if not already installed):
+
    ```bash
    npm install -g vercel
    ```
 
 2. **Deploy from the web directory**:
+
    ```bash
    cd web
    vercel
@@ -73,11 +78,13 @@ web/
 ### Deploy to Netlify
 
 1. **Install Netlify CLI**:
+
    ```bash
    npm install -g netlify-cli
    ```
 
 2. **Deploy**:
+
    ```bash
    cd web
    netlify deploy
@@ -91,6 +98,7 @@ web/
 ### Deploy to GitHub Pages
 
 1. **Create a new branch** `gh-pages`:
+
    ```bash
    git checkout -b gh-pages
    ```
@@ -98,6 +106,7 @@ web/
 2. **Copy web files to root** (or configure GitHub Pages to use the web directory)
 
 3. **Push to GitHub**:
+
    ```bash
    git push origin gh-pages
    ```
@@ -109,12 +118,14 @@ web/
 Simply open `index.html` in a web browser, or use a local server:
 
 ### Using Python
+
 ```bash
 cd web
 python -m http.server 8000
 ```
 
 ### Using Node.js (http-server)
+
 ```bash
 npm install -g http-server
 cd web
@@ -122,6 +133,7 @@ http-server
 ```
 
 ### Using PHP
+
 ```bash
 cd web
 php -S localhost:8000
@@ -141,11 +153,13 @@ Then open `http://localhost:8000` in your browser.
 ### Updating Content
 
 All content is in `index.html` with trilingual support using `data-*` attributes:
+
 - `data-en` - English text
 - `data-ta` - Tamil text
 - `data-si` - Sinhala text
 
 Example:
+
 ```html
 <h1 data-en="Welcome" data-ta="வரவேற்கிறோம்" data-si="ආයුබෝවන්">Welcome</h1>
 ```
@@ -153,11 +167,12 @@ Example:
 ### Updating Colors
 
 Edit CSS variables in `styles.css`:
+
 ```css
 :root {
-    --primary-green: #16a34a;
-    --secondary-blue: #60a5fa;
-    /* ... other variables */
+  --primary-green: #16a34a;
+  --secondary-blue: #60a5fa;
+  /* ... other variables */
 }
 ```
 
@@ -218,10 +233,10 @@ This landing page is part of the larger Agrimarket project. For contribution gui
 ## 📧 Contact
 
 For questions or support:
+
 - Email: info@agrimarket.lk
 - GitHub: [Agrimarket Repository](https://github.com/Kabi10/Srilanka-Farmers-Marketplace)
 
 ---
 
 Built with ❤️ for the farming community of Jaffna, Sri Lanka 🌾
-

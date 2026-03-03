@@ -24,16 +24,19 @@ Vercel offers excellent performance, automatic HTTPS, and easy deployment.
 #### Initial Setup
 
 1. **Install Vercel CLI**:
+
    ```bash
    npm install -g vercel
    ```
 
 2. **Login to Vercel**:
+
    ```bash
    vercel login
    ```
 
 3. **Deploy from the web directory**:
+
    ```bash
    cd web
    vercel
@@ -63,6 +66,7 @@ Vercel offers excellent performance, automatic HTTPS, and easy deployment.
 #### Environment Variables
 
 If you add backend integration later:
+
 1. Go to Settings → Environment Variables
 2. Add your variables (API keys, etc.)
 
@@ -73,16 +77,19 @@ Netlify is another excellent option with similar features to Vercel.
 #### Initial Setup
 
 1. **Install Netlify CLI**:
+
    ```bash
    npm install -g netlify-cli
    ```
 
 2. **Login to Netlify**:
+
    ```bash
    netlify login
    ```
 
 3. **Deploy**:
+
    ```bash
    cd web
    netlify deploy
@@ -108,18 +115,20 @@ Free hosting directly from your GitHub repository.
 #### Setup
 
 1. **Create a new branch** for GitHub Pages:
+
    ```bash
    git checkout -b gh-pages
    ```
 
 2. **Copy web files to root** (or configure to use web directory):
+
    ```bash
    # Option A: Copy files to root
    cp -r web/* .
    git add .
    git commit -m "Deploy to GitHub Pages"
    git push origin gh-pages
-   
+
    # Option B: Use web directory (requires configuration)
    git push origin gh-pages
    ```
@@ -142,16 +151,19 @@ Google's hosting solution with excellent performance.
 #### Setup
 
 1. **Install Firebase CLI**:
+
    ```bash
    npm install -g firebase-tools
    ```
 
 2. **Login to Firebase**:
+
    ```bash
    firebase login
    ```
 
 3. **Initialize Firebase**:
+
    ```bash
    cd web
    firebase init hosting
@@ -181,6 +193,7 @@ For enterprise-grade hosting with AWS.
    - Set index document to `index.html`
 
 2. **Upload files**:
+
    ```bash
    aws s3 sync . s3://your-bucket-name --exclude ".git/*"
    ```
@@ -201,6 +214,7 @@ For enterprise-grade hosting with AWS.
 For custom domain (e.g., agrimarket.lk):
 
 **A Record**:
+
 ```
 Type: A
 Name: @
@@ -208,6 +222,7 @@ Value: [Your hosting provider's IP]
 ```
 
 **CNAME Record** (for www):
+
 ```
 Type: CNAME
 Name: www
@@ -231,12 +246,17 @@ Add Google Analytics or similar:
 
 ```html
 <!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
+></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'GA_MEASUREMENT_ID');
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "GA_MEASUREMENT_ID");
 </script>
 ```
 
@@ -247,6 +267,7 @@ Add Google Analytics or similar:
    - Submit to search engines
 
 2. **robots.txt**:
+
    ```
    User-agent: *
    Allow: /
@@ -268,9 +289,9 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'web/**'
+      - "web/**"
 
 jobs:
   deploy:
@@ -355,11 +376,13 @@ jobs:
 ## 📞 Support
 
 For deployment issues:
+
 - Check hosting provider documentation
 - Review deployment logs
 - Contact hosting support
 
 For code issues:
+
 - Check browser console
 - Review GitHub issues
 - Contact development team
@@ -368,4 +391,3 @@ For code issues:
 
 **Last Updated**: 2026-01-04
 **Version**: 1.0.0
-
