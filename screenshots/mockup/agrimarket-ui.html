@@ -1,803 +1,1012 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgriMarket – Farmer UI Mockup</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700;900&family=Baloo+2:wght@400;600;800&family=Noto+Serif+Tamil:wght@700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --soil: #4a2c0a;
-    --earth: #7a4419;
-    --harvest: #c8860a;
-    --sun: #f5c842;
-    --leaf: #2d7a2d;
-    --leaf-light: #4aab4a;
-    --sky: #e8f4e8;
-    --cream: #fdf6ec;
-    --white: #ffffff;
-    --text-dark: #1a0f00;
-    --text-mid: #5a3a1a;
-    --shadow: rgba(74, 44, 10, 0.18);
-    --font-main: 'Baloo 2', 'Noto Sans Sinhala', sans-serif;
-    --font-sinhala: 'Noto Sans Sinhala', sans-serif;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriMarket – Farmer UI Mockup</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700;900&family=Baloo+2:wght@400;600;800&family=Noto+Serif+Tamil:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --soil: #4a2c0a;
+        --earth: #7a4419;
+        --harvest: #c8860a;
+        --sun: #f5c842;
+        --leaf: #2d7a2d;
+        --leaf-light: #4aab4a;
+        --sky: #e8f4e8;
+        --cream: #fdf6ec;
+        --white: #ffffff;
+        --text-dark: #1a0f00;
+        --text-mid: #5a3a1a;
+        --shadow: rgba(74, 44, 10, 0.18);
+        --font-main: "Baloo 2", "Noto Sans Sinhala", sans-serif;
+        --font-sinhala: "Noto Sans Sinhala", sans-serif;
+      }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  body {
-    background: #c8a97a;
-    background-image: 
-      radial-gradient(ellipse at 20% 80%, #8b5e2a 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, #6b8c3a 0%, transparent 50%),
-      url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a07840' fill-opacity='0.15'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 32px 16px;
-    gap: 32px;
-    flex-wrap: wrap;
-    font-family: var(--font-main);
-  }
+      body {
+        background: #c8a97a;
+        background-image:
+          radial-gradient(ellipse at 20% 80%, #8b5e2a 0%, transparent 50%),
+          radial-gradient(ellipse at 80% 20%, #6b8c3a 0%, transparent 50%),
+          url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a07840' fill-opacity='0.15'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 32px 16px;
+        gap: 32px;
+        flex-wrap: wrap;
+        font-family: var(--font-main);
+      }
 
-  /* ── PHONE SHELL ── */
-  .phone {
-    width: 360px;
-    background: var(--cream);
-    border-radius: 40px;
-    overflow: hidden;
-    box-shadow: 
-      0 24px 80px rgba(0,0,0,0.45),
-      0 0 0 8px #1a0f00,
-      0 0 0 10px #3a2008,
-      inset 0 2px 0 rgba(255,255,255,0.1);
-    position: relative;
-  }
+      /* ── PHONE SHELL ── */
+      .phone {
+        width: 360px;
+        background: var(--cream);
+        border-radius: 40px;
+        overflow: hidden;
+        box-shadow:
+          0 24px 80px rgba(0, 0, 0, 0.45),
+          0 0 0 8px #1a0f00,
+          0 0 0 10px #3a2008,
+          inset 0 2px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+      }
 
-  .phone-label {
-    text-align: center;
-    font-family: var(--font-main);
-    font-weight: 800;
-    font-size: 13px;
-    color: var(--cream);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    opacity: 0.85;
-  }
+      .phone-label {
+        text-align: center;
+        font-family: var(--font-main);
+        font-weight: 800;
+        font-size: 13px;
+        color: var(--cream);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        opacity: 0.85;
+      }
 
-  /* ── STATUS BAR ── */
-  .statusbar {
-    background: var(--soil);
-    color: var(--sun);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px 8px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .statusbar .time { font-size: 15px; }
+      /* ── STATUS BAR ── */
+      .statusbar {
+        background: var(--soil);
+        color: var(--sun);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px 8px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .statusbar .time {
+        font-size: 15px;
+      }
 
-  /* ── SCREEN 1: HOME ── */
-  .screen { display: flex; flex-direction: column; min-height: 700px; }
+      /* ── SCREEN 1: HOME ── */
+      .screen {
+        display: flex;
+        flex-direction: column;
+        min-height: 700px;
+      }
 
-  .home-header {
-    background: linear-gradient(160deg, var(--soil) 0%, var(--earth) 100%);
-    padding: 20px 24px 28px;
-    position: relative;
-    overflow: hidden;
-  }
-  .home-header::before {
-    content: '';
-    position: absolute;
-    top: -30px; right: -30px;
-    width: 140px; height: 140px;
-    background: radial-gradient(circle, rgba(245,200,66,0.25) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-  .greeting-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-  .greeting-sinhala {
-    font-family: var(--font-sinhala);
-    font-size: 13px;
-    color: rgba(255,255,255,0.65);
-    font-weight: 400;
-  }
-  .profile-btn {
-    width: 40px; height: 40px;
-    background: var(--harvest);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  }
-  .farmer-name {
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--white);
-    line-height: 1.1;
-    margin-bottom: 4px;
-  }
-  .location-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 20px;
-    padding: 3px 12px;
-    font-size: 13px;
-    color: var(--sun);
-    font-weight: 600;
-    margin-top: 4px;
-  }
+      .home-header {
+        background: linear-gradient(160deg, var(--soil) 0%, var(--earth) 100%);
+        padding: 20px 24px 28px;
+        position: relative;
+        overflow: hidden;
+      }
+      .home-header::before {
+        content: "";
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        width: 140px;
+        height: 140px;
+        background: radial-gradient(
+          circle,
+          rgba(245, 200, 66, 0.25) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+      .greeting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .greeting-sinhala {
+        font-family: var(--font-sinhala);
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.65);
+        font-weight: 400;
+      }
+      .profile-btn {
+        width: 40px;
+        height: 40px;
+        background: var(--harvest);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+      .farmer-name {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--white);
+        line-height: 1.1;
+        margin-bottom: 4px;
+      }
+      .location-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 13px;
+        color: var(--sun);
+        font-weight: 600;
+        margin-top: 4px;
+      }
 
-  /* ── MARKET PRICE BANNER ── */
-  .price-ticker {
-    background: var(--sun);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
-  }
-  .ticker-label {
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--soil);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    background: var(--soil);
-    color: var(--sun);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 10px;
-  }
-  .ticker-items {
-    display: flex;
-    gap: 20px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--soil);
-    white-space: nowrap;
-    animation: ticker 12s linear infinite;
-  }
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .ticker-item { display: flex; align-items: center; gap: 4px; }
+      /* ── MARKET PRICE BANNER ── */
+      .price-ticker {
+        background: var(--sun);
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        overflow: hidden;
+      }
+      .ticker-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--soil);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        background: var(--soil);
+        color: var(--sun);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+      }
+      .ticker-items {
+        display: flex;
+        gap: 20px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--soil);
+        white-space: nowrap;
+        animation: ticker 12s linear infinite;
+      }
+      @keyframes ticker {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .ticker-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
 
-  /* ── MAIN ACTIONS ── */
-  .main-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    flex: 1;
-  }
+      /* ── MAIN ACTIONS ── */
+      .main-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        flex: 1;
+      }
 
-  .action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 28px 16px;
-    cursor: pointer;
-    border: none;
-    position: relative;
-    transition: transform 0.12s, filter 0.12s;
-    min-height: 170px;
-  }
-  .action-btn:active { transform: scale(0.97); filter: brightness(0.92); }
+      .action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 16px;
+        cursor: pointer;
+        border: none;
+        position: relative;
+        transition:
+          transform 0.12s,
+          filter 0.12s;
+        min-height: 170px;
+      }
+      .action-btn:active {
+        transform: scale(0.97);
+        filter: brightness(0.92);
+      }
 
-  .action-btn.buy { background: #eef7ee; border-right: 2px solid rgba(74,44,10,0.12); border-bottom: 2px solid rgba(74,44,10,0.12); }
-  .action-btn.sell { background: #fff8ec; border-bottom: 2px solid rgba(74,44,10,0.12); }
-  .action-btn.prices { background: #fef4e4; border-right: 2px solid rgba(74,44,10,0.12); }
-  .action-btn.orders { background: #f0f8ff; }
+      .action-btn.buy {
+        background: #eef7ee;
+        border-right: 2px solid rgba(74, 44, 10, 0.12);
+        border-bottom: 2px solid rgba(74, 44, 10, 0.12);
+      }
+      .action-btn.sell {
+        background: #fff8ec;
+        border-bottom: 2px solid rgba(74, 44, 10, 0.12);
+      }
+      .action-btn.prices {
+        background: #fef4e4;
+        border-right: 2px solid rgba(74, 44, 10, 0.12);
+      }
+      .action-btn.orders {
+        background: #f0f8ff;
+      }
 
-  .action-emoji {
-    font-size: 52px;
-    line-height: 1;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
-  }
-  .action-en {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--soil);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .action-si {
-    font-family: var(--font-sinhala);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--earth);
-    margin-top: 2px;
-  }
-  .action-badge {
-    position: absolute;
-    top: 14px; right: 14px;
-    background: var(--leaf);
-    color: white;
-    border-radius: 50%;
-    width: 26px; height: 26px;
-    font-size: 13px;
-    font-weight: 800;
-    display: flex; align-items: center; justify-content: center;
-  }
+      .action-emoji {
+        font-size: 52px;
+        line-height: 1;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15));
+      }
+      .action-en {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--soil);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .action-si {
+        font-family: var(--font-sinhala);
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--earth);
+        margin-top: 2px;
+      }
+      .action-badge {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: var(--leaf);
+        color: white;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  /* ── BOTTOM NAV ── */
-  .bottom-nav {
-    background: var(--soil);
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 8px 18px;
-  }
-  .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 12px;
-    transition: background 0.15s;
-  }
-  .nav-item.active { background: rgba(245,200,66,0.2); }
-  .nav-item .nav-icon { font-size: 26px; }
-  .nav-item .nav-label {
-    font-family: var(--font-sinhala);
-    font-size: 10px;
-    color: rgba(255,255,255,0.6);
-    font-weight: 600;
-  }
-  .nav-item.active .nav-label { color: var(--sun); }
+      /* ── BOTTOM NAV ── */
+      .bottom-nav {
+        background: var(--soil);
+        display: flex;
+        justify-content: space-around;
+        padding: 12px 8px 18px;
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 12px;
+        transition: background 0.15s;
+      }
+      .nav-item.active {
+        background: rgba(245, 200, 66, 0.2);
+      }
+      .nav-item .nav-icon {
+        font-size: 26px;
+      }
+      .nav-item .nav-label {
+        font-family: var(--font-sinhala);
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 600;
+      }
+      .nav-item.active .nav-label {
+        color: var(--sun);
+      }
 
-  /* ─────────────────────────────── */
-  /* ── SCREEN 2: SELL (CREATE LISTING) ── */
+      /* ─────────────────────────────── */
+      /* ── SCREEN 2: SELL (CREATE LISTING) ── */
 
-  .sell-header {
-    background: linear-gradient(160deg, var(--earth) 0%, #a05020 100%);
-    padding: 16px 20px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .back-btn {
-    width: 44px; height: 44px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  .sell-title { font-size: 22px; font-weight: 800; color: white; }
-  .sell-subtitle { font-family: var(--font-sinhala); font-size: 14px; color: rgba(255,255,255,0.75); }
+      .sell-header {
+        background: linear-gradient(160deg, var(--earth) 0%, #a05020 100%);
+        padding: 16px 20px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .back-btn {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .sell-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: white;
+      }
+      .sell-subtitle {
+        font-family: var(--font-sinhala);
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.75);
+      }
 
-  /* CROP PICKER */
-  .section-head {
-    padding: 16px 20px 8px;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--soil);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-  }
-  .section-head-si {
-    font-family: var(--font-sinhala);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--earth);
-    padding: 0 20px 10px;
-  }
+      /* CROP PICKER */
+      .section-head {
+        padding: 16px 20px 8px;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--soil);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+      .section-head-si {
+        font-family: var(--font-sinhala);
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--earth);
+        padding: 0 20px 10px;
+      }
 
-  .crop-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    padding: 0 16px 8px;
-  }
-  .crop-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: white;
-    border: 2.5px solid rgba(122,68,25,0.15);
-    border-radius: 16px;
-    padding: 10px 4px 8px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .crop-chip.selected {
-    border-color: var(--leaf);
-    background: #eef7ee;
-    box-shadow: 0 0 0 3px rgba(45,122,45,0.2);
-  }
-  .crop-chip .crop-em { font-size: 30px; line-height: 1; }
-  .crop-chip .crop-name { font-size: 10px; font-weight: 700; color: var(--text-mid); margin-top: 4px; text-align: center; }
-  .crop-chip .crop-name-si { font-family: var(--font-sinhala); font-size: 10px; color: var(--earth); }
+      .crop-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 0 16px 8px;
+      }
+      .crop-chip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: white;
+        border: 2.5px solid rgba(122, 68, 25, 0.15);
+        border-radius: 16px;
+        padding: 10px 4px 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .crop-chip.selected {
+        border-color: var(--leaf);
+        background: #eef7ee;
+        box-shadow: 0 0 0 3px rgba(45, 122, 45, 0.2);
+      }
+      .crop-chip .crop-em {
+        font-size: 30px;
+        line-height: 1;
+      }
+      .crop-chip .crop-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-mid);
+        margin-top: 4px;
+        text-align: center;
+      }
+      .crop-chip .crop-name-si {
+        font-family: var(--font-sinhala);
+        font-size: 10px;
+        color: var(--earth);
+      }
 
-  /* VOICE FIELD */
-  .voice-field {
-    margin: 4px 16px;
-    background: white;
-    border: 2.5px solid rgba(122,68,25,0.2);
-    border-radius: 18px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .voice-field .field-label {
-    flex: 1;
-  }
-  .field-label-en { font-size: 12px; font-weight: 800; color: var(--soil); text-transform: uppercase; letter-spacing: 1px; }
-  .field-label-si { font-family: var(--font-sinhala); font-size: 15px; color: var(--earth); font-weight: 700; }
-  .field-value { font-size: 22px; font-weight: 800; color: var(--text-dark); }
-  .field-unit { font-size: 12px; color: var(--text-mid); font-weight: 600; }
-  .mic-btn {
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, var(--harvest) 0%, #e07800 100%);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 4px 14px rgba(200,134,10,0.4);
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: transform 0.12s;
-  }
-  .mic-btn:hover { transform: scale(1.08); }
-  .mic-btn.active {
-    background: linear-gradient(135deg, #e02020 0%, #b00000 100%);
-    box-shadow: 0 4px 14px rgba(224,32,32,0.5);
-    animation: pulse-mic 1s ease-in-out infinite;
-  }
-  @keyframes pulse-mic {
-    0%, 100% { transform: scale(1); box-shadow: 0 4px 14px rgba(224,32,32,0.5); }
-    50% { transform: scale(1.1); box-shadow: 0 4px 24px rgba(224,32,32,0.7); }
-  }
+      /* VOICE FIELD */
+      .voice-field {
+        margin: 4px 16px;
+        background: white;
+        border: 2.5px solid rgba(122, 68, 25, 0.2);
+        border-radius: 18px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+      .voice-field .field-label {
+        flex: 1;
+      }
+      .field-label-en {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--soil);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .field-label-si {
+        font-family: var(--font-sinhala);
+        font-size: 15px;
+        color: var(--earth);
+        font-weight: 700;
+      }
+      .field-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text-dark);
+      }
+      .field-unit {
+        font-size: 12px;
+        color: var(--text-mid);
+        font-weight: 600;
+      }
+      .mic-btn {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, var(--harvest) 0%, #e07800 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 14px rgba(200, 134, 10, 0.4);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: transform 0.12s;
+      }
+      .mic-btn:hover {
+        transform: scale(1.08);
+      }
+      .mic-btn.active {
+        background: linear-gradient(135deg, #e02020 0%, #b00000 100%);
+        box-shadow: 0 4px 14px rgba(224, 32, 32, 0.5);
+        animation: pulse-mic 1s ease-in-out infinite;
+      }
+      @keyframes pulse-mic {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 4px 14px rgba(224, 32, 32, 0.5);
+        }
+        50% {
+          transform: scale(1.1);
+          box-shadow: 0 4px 24px rgba(224, 32, 32, 0.7);
+        }
+      }
 
-  .voice-hint {
-    margin: 0 16px 4px;
-    font-size: 11px;
-    color: var(--harvest);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
+      .voice-hint {
+        margin: 0 16px 4px;
+        font-size: 11px;
+        color: var(--harvest);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
 
-  .submit-btn {
-    margin: 12px 16px 20px;
-    background: linear-gradient(135deg, var(--leaf) 0%, #1a5e1a 100%);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 18px;
-    width: calc(100% - 32px);
-    font-family: var(--font-main);
-    font-size: 20px;
-    font-weight: 800;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    box-shadow: 0 6px 20px rgba(45,122,45,0.4);
-    letter-spacing: 0.5px;
-  }
-  .submit-si {
-    font-family: var(--font-sinhala);
-    font-size: 16px;
-    opacity: 0.85;
-  }
+      .submit-btn {
+        margin: 12px 16px 20px;
+        background: linear-gradient(135deg, var(--leaf) 0%, #1a5e1a 100%);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 18px;
+        width: calc(100% - 32px);
+        font-family: var(--font-main);
+        font-size: 20px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 6px 20px rgba(45, 122, 45, 0.4);
+        letter-spacing: 0.5px;
+      }
+      .submit-si {
+        font-family: var(--font-sinhala);
+        font-size: 16px;
+        opacity: 0.85;
+      }
 
-  /* ─────────────────────────────── */
-  /* ── SCREEN 3: PRICES ── */
+      /* ─────────────────────────────── */
+      /* ── SCREEN 3: PRICES ── */
 
-  .prices-header {
-    background: linear-gradient(160deg, var(--harvest) 0%, #e07000 100%);
-    padding: 16px 20px 22px;
-  }
-  .prices-title { font-size: 28px; font-weight: 800; color: white; }
-  .prices-subtitle { font-family: var(--font-sinhala); font-size: 16px; color: rgba(255,255,255,0.8); }
-  .update-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
-    color: white;
-    font-weight: 700;
-    margin-top: 8px;
-  }
-  .live-dot {
-    width: 8px; height: 8px;
-    background: #7fff7f;
-    border-radius: 50%;
-    animation: blink 1.2s ease-in-out infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
-  }
+      .prices-header {
+        background: linear-gradient(160deg, var(--harvest) 0%, #e07000 100%);
+        padding: 16px 20px 22px;
+      }
+      .prices-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: white;
+      }
+      .prices-subtitle {
+        font-family: var(--font-sinhala);
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .update-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 12px;
+        color: white;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        background: #7fff7f;
+        border-radius: 50%;
+        animation: blink 1.2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
 
-  .price-list { padding: 8px 0; flex: 1; }
-  .price-row {
-    display: flex;
-    align-items: center;
-    padding: 14px 20px;
-    gap: 14px;
-    border-bottom: 1.5px solid rgba(122,68,25,0.08);
-    cursor: pointer;
-    transition: background 0.12s;
-  }
-  .price-row:nth-child(even) { background: rgba(122,68,25,0.035); }
-  .price-row:active { background: rgba(200,134,10,0.12); }
-  .crop-icon-lg { font-size: 36px; line-height: 1; flex-shrink: 0; }
-  .crop-info { flex: 1; }
-  .crop-name-en { font-size: 18px; font-weight: 800; color: var(--text-dark); }
-  .crop-name-si-sm { font-family: var(--font-sinhala); font-size: 13px; color: var(--text-mid); }
-  .price-badge {
-    text-align: right;
-  }
-  .price-num { font-size: 22px; font-weight: 800; color: var(--harvest); }
-  .price-unit { font-size: 12px; color: var(--text-mid); font-weight: 600; }
-  .trend-up { color: var(--leaf); font-size: 13px; font-weight: 700; }
-  .trend-down { color: #d03030; font-size: 13px; font-weight: 700; }
+      .price-list {
+        padding: 8px 0;
+        flex: 1;
+      }
+      .price-row {
+        display: flex;
+        align-items: center;
+        padding: 14px 20px;
+        gap: 14px;
+        border-bottom: 1.5px solid rgba(122, 68, 25, 0.08);
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+      .price-row:nth-child(even) {
+        background: rgba(122, 68, 25, 0.035);
+      }
+      .price-row:active {
+        background: rgba(200, 134, 10, 0.12);
+      }
+      .crop-icon-lg {
+        font-size: 36px;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .crop-info {
+        flex: 1;
+      }
+      .crop-name-en {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-dark);
+      }
+      .crop-name-si-sm {
+        font-family: var(--font-sinhala);
+        font-size: 13px;
+        color: var(--text-mid);
+      }
+      .price-badge {
+        text-align: right;
+      }
+      .price-num {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--harvest);
+      }
+      .price-unit {
+        font-size: 12px;
+        color: var(--text-mid);
+        font-weight: 600;
+      }
+      .trend-up {
+        color: var(--leaf);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .trend-down {
+        color: #d03030;
+        font-size: 13px;
+        font-weight: 700;
+      }
 
-  /* ─── LAYOUT LABELS ─── */
-  .screens-wrapper {
-    display: flex;
-    gap: 28px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: center;
-    max-width: 1260px;
-  }
-  .screen-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+      /* ─── LAYOUT LABELS ─── */
+      .screens-wrapper {
+        display: flex;
+        gap: 28px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: center;
+        max-width: 1260px;
+      }
+      .screen-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
 
-  /* SCROLLABLE CONTENT */
-  .scrollable { overflow-y: auto; }
-  .scrollable::-webkit-scrollbar { display: none; }
-</style>
-</head>
-<body>
+      /* SCROLLABLE CONTENT */
+      .scrollable {
+        overflow-y: auto;
+      }
+      .scrollable::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screens-wrapper">
+      <!-- ══════════════════════════════ -->
+      <!-- SCREEN 1: HOME -->
+      <!-- ══════════════════════════════ -->
+      <div class="screen-col">
+        <div class="phone-label">🏠 Home Screen</div>
+        <div class="phone">
+          <div class="statusbar">
+            <span>📶 LTE</span>
+            <span class="time">☀️ 6:44</span>
+            <span>🔋</span>
+          </div>
+          <div class="screen">
+            <div class="home-header">
+              <div class="greeting-row">
+                <span class="greeting-sinhala">ආයුබෝවන්!</span>
+                <div class="profile-btn">👨‍🌾</div>
+              </div>
+              <div class="farmer-name">Sumanarathna</div>
+              <div class="location-tag">📍 Jaffna District</div>
+            </div>
 
-<div class="screens-wrapper">
+            <!-- Live price ticker -->
+            <div class="price-ticker">
+              <span class="ticker-label">LIVE</span>
+              <div class="ticker-items">
+                <span class="ticker-item">🧅 Onion Rs 120</span>
+                <span class="ticker-item">🌶️ Chili Rs 280</span>
+                <span class="ticker-item">🍅 Tomato Rs 95</span>
+                <span class="ticker-item">🥬 Okra Rs 110</span>
+                <span class="ticker-item">🍆 Brinjal Rs 85</span>
+                <!-- repeat for animation -->
+                <span class="ticker-item">🧅 Onion Rs 120</span>
+                <span class="ticker-item">🌶️ Chili Rs 280</span>
+                <span class="ticker-item">🍅 Tomato Rs 95</span>
+              </div>
+            </div>
 
-  <!-- ══════════════════════════════ -->
-  <!-- SCREEN 1: HOME -->
-  <!-- ══════════════════════════════ -->
-  <div class="screen-col">
-    <div class="phone-label">🏠 Home Screen</div>
-    <div class="phone">
-      <div class="statusbar">
-        <span>📶 LTE</span>
-        <span class="time">☀️ 6:44</span>
-        <span>🔋</span>
+            <!-- 4 big action buttons -->
+            <div class="main-actions">
+              <button class="action-btn buy">
+                <div class="action-emoji">🛒</div>
+                <div class="action-en">BUY</div>
+                <div class="action-si">මිලට ගන්න</div>
+              </button>
+              <button class="action-btn sell">
+                <div class="action-emoji">🌾</div>
+                <div class="action-en">SELL</div>
+                <div class="action-si">විකුණන්න</div>
+                <div class="action-badge">3</div>
+              </button>
+              <button class="action-btn prices">
+                <div class="action-emoji">📊</div>
+                <div class="action-en">PRICES</div>
+                <div class="action-si">මිල ගණන්</div>
+              </button>
+              <button class="action-btn orders">
+                <div class="action-emoji">📦</div>
+                <div class="action-en">ORDERS</div>
+                <div class="action-si">ගනුදෙනු</div>
+                <div class="action-badge" style="background: var(--harvest)">
+                  1
+                </div>
+              </button>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">ගෙදර</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-label">සොයන්න</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">📣</div>
+                <div class="nav-label">දැන්වීම්</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">ගිණුම</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="screen">
-        <div class="home-header">
-          <div class="greeting-row">
-            <span class="greeting-sinhala">ආයුබෝවන්!</span>
-            <div class="profile-btn">👨‍🌾</div>
-          </div>
-          <div class="farmer-name">Sumanarathna</div>
-          <div class="location-tag">📍 Jaffna District</div>
-        </div>
 
-        <!-- Live price ticker -->
-        <div class="price-ticker">
-          <span class="ticker-label">LIVE</span>
-          <div class="ticker-items">
-            <span class="ticker-item">🧅 Onion Rs 120</span>
-            <span class="ticker-item">🌶️ Chili Rs 280</span>
-            <span class="ticker-item">🍅 Tomato Rs 95</span>
-            <span class="ticker-item">🥬 Okra Rs 110</span>
-            <span class="ticker-item">🍆 Brinjal Rs 85</span>
-            <!-- repeat for animation -->
-            <span class="ticker-item">🧅 Onion Rs 120</span>
-            <span class="ticker-item">🌶️ Chili Rs 280</span>
-            <span class="ticker-item">🍅 Tomato Rs 95</span>
+      <!-- ══════════════════════════════ -->
+      <!-- SCREEN 2: SELL / CREATE LISTING -->
+      <!-- ══════════════════════════════ -->
+      <div class="screen-col">
+        <div class="phone-label">🌾 Sell – Voice Listing</div>
+        <div class="phone">
+          <div class="statusbar">
+            <span>📶 LTE</span>
+            <span class="time">☀️ 6:44</span>
+            <span>🔋</span>
+          </div>
+          <div class="screen scrollable">
+            <div class="sell-header">
+              <div class="back-btn">←</div>
+              <div>
+                <div class="sell-title">SELL 🌾</div>
+                <div class="sell-subtitle">ඔබේ අස්වැන්න විකුණන්න</div>
+              </div>
+            </div>
+
+            <!-- Crop Picker -->
+            <div class="section-head">What are you selling?</div>
+            <div class="section-head-si" style="padding-top: 0">
+              ඔබ විකුණන්නේ කුමක්ද?
+            </div>
+
+            <div class="crop-grid">
+              <div class="crop-chip selected">
+                <div class="crop-em">🌶️</div>
+                <div class="crop-name">Chili</div>
+                <div class="crop-name-si">මිරිස්</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🍅</div>
+                <div class="crop-name">Tomato</div>
+                <div class="crop-name-si">තක්කාලි</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🧅</div>
+                <div class="crop-name">Onion</div>
+                <div class="crop-name-si">ළූනු</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🥬</div>
+                <div class="crop-name">Okra</div>
+                <div class="crop-name-si">බණ්ඩක්කා</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🍆</div>
+                <div class="crop-name">Brinjal</div>
+                <div class="crop-name-si">වම්බටු</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🌴</div>
+                <div class="crop-name">Coconut</div>
+                <div class="crop-name-si">පොල්</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🍚</div>
+                <div class="crop-name">Rice</div>
+                <div class="crop-name-si">හාල්</div>
+              </div>
+              <div class="crop-chip">
+                <div class="crop-em">🐟</div>
+                <div class="crop-name">Fish</div>
+                <div class="crop-name-si">මාළු</div>
+              </div>
+            </div>
+
+            <!-- Quantity voice field -->
+            <div class="voice-hint">🎤 Tap mic and speak</div>
+            <div class="voice-field" style="margin-top: 6px">
+              <div class="field-label">
+                <div class="field-label-en">Quantity</div>
+                <div class="field-label-si">ප්‍රමාණය</div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: baseline;
+                    gap: 6px;
+                    margin-top: 4px;
+                  "
+                >
+                  <div class="field-value">50</div>
+                  <div class="field-unit">kg</div>
+                </div>
+              </div>
+              <div class="mic-btn active">🎤</div>
+            </div>
+
+            <!-- Price voice field -->
+            <div class="voice-hint" style="margin-top: 8px">
+              🎤 Market price: Rs 280/kg today
+            </div>
+            <div class="voice-field">
+              <div class="field-label">
+                <div class="field-label-en">Your Price</div>
+                <div class="field-label-si">ඔබේ මිල</div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: baseline;
+                    gap: 6px;
+                    margin-top: 4px;
+                  "
+                >
+                  <div class="field-value" style="color: var(--harvest)">
+                    Rs 260
+                  </div>
+                  <div class="field-unit">/kg</div>
+                </div>
+              </div>
+              <div class="mic-btn">🎤</div>
+            </div>
+
+            <!-- Location voice field -->
+            <div class="voice-field" style="margin-top: 10px">
+              <div class="field-label">
+                <div class="field-label-en">Location</div>
+                <div class="field-label-si">ස්ථානය</div>
+                <div style="margin-top: 4px">
+                  <div
+                    style="
+                      font-size: 16px;
+                      font-weight: 800;
+                      color: var(--leaf);
+                    "
+                  >
+                    📍 Jaffna
+                  </div>
+                </div>
+              </div>
+              <div class="mic-btn">🎤</div>
+            </div>
+
+            <button class="submit-btn">
+              ✅ POST LISTING &nbsp;
+              <span class="submit-si">දැන්විම යොදන්න</span>
+            </button>
           </div>
         </div>
+      </div>
 
-        <!-- 4 big action buttons -->
-        <div class="main-actions">
-          <button class="action-btn buy">
-            <div class="action-emoji">🛒</div>
-            <div class="action-en">BUY</div>
-            <div class="action-si">මිලට ගන්න</div>
-          </button>
-          <button class="action-btn sell">
-            <div class="action-emoji">🌾</div>
-            <div class="action-en">SELL</div>
-            <div class="action-si">විකුණන්න</div>
-            <div class="action-badge">3</div>
-          </button>
-          <button class="action-btn prices">
-            <div class="action-emoji">📊</div>
-            <div class="action-en">PRICES</div>
-            <div class="action-si">මිල ගණන්</div>
-          </button>
-          <button class="action-btn orders">
-            <div class="action-emoji">📦</div>
-            <div class="action-en">ORDERS</div>
-            <div class="action-si">ගනුදෙනු</div>
-            <div class="action-badge" style="background:var(--harvest)">1</div>
-          </button>
-        </div>
+      <!-- ══════════════════════════════ -->
+      <!-- SCREEN 3: PRICES -->
+      <!-- ══════════════════════════════ -->
+      <div class="screen-col">
+        <div class="phone-label">📊 Market Prices</div>
+        <div class="phone">
+          <div class="statusbar">
+            <span>📶 LTE</span>
+            <span class="time">☀️ 6:45</span>
+            <span>🔋</span>
+          </div>
+          <div class="screen">
+            <div class="prices-header">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <div>
+                  <div class="prices-title">PRICES 📊</div>
+                  <div class="prices-subtitle">මිල ගණන්</div>
+                </div>
+                <div style="font-size: 40px">🏪</div>
+              </div>
+              <div class="update-badge">
+                <div class="live-dot"></div>
+                Updated just now
+              </div>
+            </div>
 
-        <div class="bottom-nav">
-          <div class="nav-item active">
-            <div class="nav-icon">🏠</div>
-            <div class="nav-label">ගෙදර</div>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">🔍</div>
-            <div class="nav-label">සොයන්න</div>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">📣</div>
-            <div class="nav-label">දැන්වීම්</div>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">ගිණුම</div>
+            <div class="price-list">
+              <div class="price-row">
+                <div class="crop-icon-lg">🌶️</div>
+                <div class="crop-info">
+                  <div class="crop-name-en">Chili</div>
+                  <div class="crop-name-si-sm">මිරිස්</div>
+                </div>
+                <div class="price-badge">
+                  <div class="price-num">Rs 280</div>
+                  <div class="price-unit">/kg</div>
+                  <div class="trend-up">▲ +15</div>
+                </div>
+              </div>
+              <div class="price-row">
+                <div class="crop-icon-lg">🥬</div>
+                <div class="crop-info">
+                  <div class="crop-name-en">Okra</div>
+                  <div class="crop-name-si-sm">බණ්ඩක්කා</div>
+                </div>
+                <div class="price-badge">
+                  <div class="price-num">Rs 110</div>
+                  <div class="price-unit">/kg</div>
+                  <div class="trend-down">▼ −5</div>
+                </div>
+              </div>
+              <div class="price-row">
+                <div class="crop-icon-lg">🍆</div>
+                <div class="crop-info">
+                  <div class="crop-name-en">Brinjal</div>
+                  <div class="crop-name-si-sm">වම්බටු</div>
+                </div>
+                <div class="price-badge">
+                  <div class="price-num">Rs 85</div>
+                  <div class="price-unit">/kg</div>
+                  <div class="trend-up">▲ +8</div>
+                </div>
+              </div>
+              <div class="price-row">
+                <div class="crop-icon-lg">🍅</div>
+                <div class="crop-info">
+                  <div class="crop-name-en">Tomato</div>
+                  <div class="crop-name-si-sm">තක්කාලි</div>
+                </div>
+                <div class="price-badge">
+                  <div class="price-num">Rs 95</div>
+                  <div class="price-unit">/kg</div>
+                  <div class="trend-up">▲ +3</div>
+                </div>
+              </div>
+              <div class="price-row">
+                <div class="crop-icon-lg">🧅</div>
+                <div class="crop-info">
+                  <div class="crop-name-en">Red Onion</div>
+                  <div class="crop-name-si-sm">රතු ළූනු</div>
+                </div>
+                <div class="price-badge">
+                  <div class="price-num">Rs 120</div>
+                  <div class="price-unit">/kg</div>
+                  <div class="trend-down">▼ −10</div>
+                </div>
+              </div>
+              <div class="price-row">
+                <div class="crop-icon-lg">🌴</div>
+                <div class="crop-info">
+                  <div class="crop-name-en">Coconut</div>
+                  <div class="crop-name-si-sm">පොල්</div>
+                </div>
+                <div class="price-badge">
+                  <div class="price-num">Rs 65</div>
+                  <div class="price-unit">/pc</div>
+                  <div class="trend-up">▲ +5</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">ගෙදර</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-label">සොයන්න</div>
+              </div>
+              <div class="nav-item active">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">මිල</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">ගිණුම</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- ══════════════════════════════ -->
-  <!-- SCREEN 2: SELL / CREATE LISTING -->
-  <!-- ══════════════════════════════ -->
-  <div class="screen-col">
-    <div class="phone-label">🌾 Sell – Voice Listing</div>
-    <div class="phone">
-      <div class="statusbar">
-        <span>📶 LTE</span>
-        <span class="time">☀️ 6:44</span>
-        <span>🔋</span>
-      </div>
-      <div class="screen scrollable">
-
-        <div class="sell-header">
-          <div class="back-btn">←</div>
-          <div>
-            <div class="sell-title">SELL 🌾</div>
-            <div class="sell-subtitle">ඔබේ අස්වැන්න විකුණන්න</div>
-          </div>
-        </div>
-
-        <!-- Crop Picker -->
-        <div class="section-head">What are you selling?</div>
-        <div class="section-head-si" style="padding-top:0">ඔබ විකුණන්නේ කුමක්ද?</div>
-
-        <div class="crop-grid">
-          <div class="crop-chip selected">
-            <div class="crop-em">🌶️</div>
-            <div class="crop-name">Chili</div>
-            <div class="crop-name-si">මිරිස්</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🍅</div>
-            <div class="crop-name">Tomato</div>
-            <div class="crop-name-si">තක්කාලි</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🧅</div>
-            <div class="crop-name">Onion</div>
-            <div class="crop-name-si">ළූනු</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🥬</div>
-            <div class="crop-name">Okra</div>
-            <div class="crop-name-si">බණ්ඩක්කා</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🍆</div>
-            <div class="crop-name">Brinjal</div>
-            <div class="crop-name-si">වම්බටු</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🌴</div>
-            <div class="crop-name">Coconut</div>
-            <div class="crop-name-si">පොල්</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🍚</div>
-            <div class="crop-name">Rice</div>
-            <div class="crop-name-si">හාල්</div>
-          </div>
-          <div class="crop-chip">
-            <div class="crop-em">🐟</div>
-            <div class="crop-name">Fish</div>
-            <div class="crop-name-si">මාළු</div>
-          </div>
-        </div>
-
-        <!-- Quantity voice field -->
-        <div class="voice-hint">🎤 Tap mic and speak</div>
-        <div class="voice-field" style="margin-top:6px">
-          <div class="field-label">
-            <div class="field-label-en">Quantity</div>
-            <div class="field-label-si">ප්‍රමාණය</div>
-            <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px">
-              <div class="field-value">50</div>
-              <div class="field-unit">kg</div>
-            </div>
-          </div>
-          <div class="mic-btn active">🎤</div>
-        </div>
-
-        <!-- Price voice field -->
-        <div class="voice-hint" style="margin-top:8px">🎤 Market price: Rs 280/kg today</div>
-        <div class="voice-field">
-          <div class="field-label">
-            <div class="field-label-en">Your Price</div>
-            <div class="field-label-si">ඔබේ මිල</div>
-            <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px">
-              <div class="field-value" style="color:var(--harvest)">Rs 260</div>
-              <div class="field-unit">/kg</div>
-            </div>
-          </div>
-          <div class="mic-btn">🎤</div>
-        </div>
-
-        <!-- Location voice field -->
-        <div class="voice-field" style="margin-top:10px">
-          <div class="field-label">
-            <div class="field-label-en">Location</div>
-            <div class="field-label-si">ස්ථානය</div>
-            <div style="margin-top:4px">
-              <div style="font-size:16px; font-weight:800; color:var(--leaf)">📍 Jaffna</div>
-            </div>
-          </div>
-          <div class="mic-btn">🎤</div>
-        </div>
-
-        <button class="submit-btn">
-          ✅ POST LISTING &nbsp; <span class="submit-si">දැන්විම යොදන්න</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════ -->
-  <!-- SCREEN 3: PRICES -->
-  <!-- ══════════════════════════════ -->
-  <div class="screen-col">
-    <div class="phone-label">📊 Market Prices</div>
-    <div class="phone">
-      <div class="statusbar">
-        <span>📶 LTE</span>
-        <span class="time">☀️ 6:45</span>
-        <span>🔋</span>
-      </div>
-      <div class="screen">
-        <div class="prices-header">
-          <div style="display:flex; justify-content:space-between; align-items:center">
-            <div>
-              <div class="prices-title">PRICES 📊</div>
-              <div class="prices-subtitle">මිල ගණන්</div>
-            </div>
-            <div style="font-size:40px">🏪</div>
-          </div>
-          <div class="update-badge">
-            <div class="live-dot"></div>
-            Updated just now
-          </div>
-        </div>
-
-        <div class="price-list">
-          <div class="price-row">
-            <div class="crop-icon-lg">🌶️</div>
-            <div class="crop-info">
-              <div class="crop-name-en">Chili</div>
-              <div class="crop-name-si-sm">මිරිස්</div>
-            </div>
-            <div class="price-badge">
-              <div class="price-num">Rs 280</div>
-              <div class="price-unit">/kg</div>
-              <div class="trend-up">▲ +15</div>
-            </div>
-          </div>
-          <div class="price-row">
-            <div class="crop-icon-lg">🥬</div>
-            <div class="crop-info">
-              <div class="crop-name-en">Okra</div>
-              <div class="crop-name-si-sm">බණ්ඩක්කා</div>
-            </div>
-            <div class="price-badge">
-              <div class="price-num">Rs 110</div>
-              <div class="price-unit">/kg</div>
-              <div class="trend-down">▼ −5</div>
-            </div>
-          </div>
-          <div class="price-row">
-            <div class="crop-icon-lg">🍆</div>
-            <div class="crop-info">
-              <div class="crop-name-en">Brinjal</div>
-              <div class="crop-name-si-sm">වම්බටු</div>
-            </div>
-            <div class="price-badge">
-              <div class="price-num">Rs 85</div>
-              <div class="price-unit">/kg</div>
-              <div class="trend-up">▲ +8</div>
-            </div>
-          </div>
-          <div class="price-row">
-            <div class="crop-icon-lg">🍅</div>
-            <div class="crop-info">
-              <div class="crop-name-en">Tomato</div>
-              <div class="crop-name-si-sm">තක්කාලි</div>
-            </div>
-            <div class="price-badge">
-              <div class="price-num">Rs 95</div>
-              <div class="price-unit">/kg</div>
-              <div class="trend-up">▲ +3</div>
-            </div>
-          </div>
-          <div class="price-row">
-            <div class="crop-icon-lg">🧅</div>
-            <div class="crop-info">
-              <div class="crop-name-en">Red Onion</div>
-              <div class="crop-name-si-sm">රතු ළූනු</div>
-            </div>
-            <div class="price-badge">
-              <div class="price-num">Rs 120</div>
-              <div class="price-unit">/kg</div>
-              <div class="trend-down">▼ −10</div>
-            </div>
-          </div>
-          <div class="price-row">
-            <div class="crop-icon-lg">🌴</div>
-            <div class="crop-info">
-              <div class="crop-name-en">Coconut</div>
-              <div class="crop-name-si-sm">පොල්</div>
-            </div>
-            <div class="price-badge">
-              <div class="price-num">Rs 65</div>
-              <div class="price-unit">/pc</div>
-              <div class="trend-up">▲ +5</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bottom-nav">
-          <div class="nav-item">
-            <div class="nav-icon">🏠</div>
-            <div class="nav-label">ගෙදර</div>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">🔍</div>
-            <div class="nav-label">සොයන්න</div>
-          </div>
-          <div class="nav-item active">
-            <div class="nav-icon">📊</div>
-            <div class="nav-label">මිල</div>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">ගිණුම</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /screens-wrapper -->
-</body>
+    <!-- /screens-wrapper -->
+  </body>
 </html>

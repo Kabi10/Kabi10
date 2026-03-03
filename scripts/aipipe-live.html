@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>aipipe — live</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ════════════════════════════════════════════════════════════
+   §1  DESIGN TOKENS
+   ════════════════════════════════════════════════════════════ */
+      :root {
+        --text-2xs: 0.643rem;
+        --text-xs: 0.786rem;
+        --text-sm: 0.857rem;
+        --text-base: 1rem;
+        --text-md: 1.143rem;
+        --text-lg: 1.286rem;
+        --text-xl: 1.571rem;
+        --text-2xl: 2.143rem;
+
+        --sp-1: 4px;
+        --sp-2: 8px;
+        --sp-3: 12px;
+        --sp-4: 16px;
+        --sp-5: 20px;
+        --sp-6: 24px;
+        --sp-7: 28px;
+        --sp-8: 32px;
+        --sp-10: 40px;
+        --sp-12: 48px;
+
+        --surface-base: #08080d;
+        --surface-raised: #0d0e18;
+        --surface-overlay: #121420;
+        --surface-hover: #181b2c;
+
+        --border-faint: rgba(255, 255, 255, 0.04);
+        --border-subtle: rgba(255, 255, 255, 0.07);
+        --border-default: rgba(255, 255, 255, 0.1);
+        --border-strong: rgba(255, 255, 255, 0.16);
+
+        --text-primary: #dde3ef;
+        --text-secondary: #8694ae;
+        --text-muted: #7482a0;
+        --text-disabled: #303a55;
+
+        --accent: #4d8ef0;
+        --accent-subtle: rgba(77, 142, 240, 0.06);
+        --accent-border: rgba(77, 142, 240, 0.16);
+        --accent-text: #7aabf7;
+
+        --success: #3ecf8e;
+        --success-subtle: rgba(62, 207, 142, 0.06);
+        --success-border: rgba(62, 207, 142, 0.16);
+        --success-text: #5ed9a2;
+
+        --pending: #d4903a;
+        --pending-subtle: rgba(212, 144, 58, 0.06);
+        --pending-border: rgba(212, 144, 58, 0.16);
+        --pending-text: #e0a65a;
+
+        --error: #e05252;
+        --error-subtle: rgba(224, 82, 82, 0.06);
+        --error-border: rgba(224, 82, 82, 0.2);
+        --error-text: #f07878;
+
+        --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+        --shadow-sm:
+          0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        --shadow-md:
+          0 4px 20px rgba(0, 0, 0, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+        --radius-xs: 3px;
+        --radius-sm: 5px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+        --dur-fast: 100ms;
+        --dur-base: 200ms;
+        --dur-slow: 400ms;
+        --dur-xslow: 600ms;
+
+        --max-width: 1380px;
+        --gutter: var(--sp-6);
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §2  RESET & BASE
+   ════════════════════════════════════════════════════════════ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      body {
+        font-family: "Manrope", system-ui, sans-serif;
+        background-color: var(--surface-base);
+        color: var(--text-secondary);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: var(--radius-xs);
+      }
+      :focus:not(:focus-visible) {
+        outline: none;
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §3  CONTAINER
+   ════════════════════════════════════════════════════════════ */
+      .container {
+        width: 100%;
+        max-width: var(--max-width);
+        margin-inline: auto;
+        padding-inline: var(--gutter);
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §4  HEADER
+   ════════════════════════════════════════════════════════════ */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: rgba(13, 14, 24, 0.88);
+        border-bottom: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-4);
+        padding-block: var(--sp-4);
+      }
+
+      .project-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--sp-2);
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        background: var(--surface-overlay);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-sm);
+        padding: var(--sp-1) var(--sp-3);
+        white-space: nowrap;
+        flex-shrink: 0;
+        user-select: none;
+      }
+
+      .project-chip-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
+        transition: background var(--dur-base) var(--ease-out);
+      }
+
+      .header-divider {
+        width: 1px;
+        height: 28px;
+        background: var(--border-subtle);
+        flex-shrink: 0;
+      }
+      .header-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .page-title {
+        font-size: clamp(var(--text-lg), 2.5vw, var(--text-xl));
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.25;
+        letter-spacing: -0.025em;
+      }
+
+      .header-meta {
+        margin-top: var(--sp-1);
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        color: var(--text-disabled);
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+      }
+
+      .header-meta-sep {
+        opacity: 0.4;
+      }
+
+      /* Status pill in header */
+      .status-pill {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        font-weight: 500;
+        padding: 1px var(--sp-2);
+        border-radius: var(--radius-xs);
+        letter-spacing: 0.03em;
+        transition: all var(--dur-base) var(--ease-out);
+      }
+      .status-pill--idle {
+        color: var(--text-disabled);
+      }
+      .status-pill--running {
+        color: var(--pending-text);
+        background: var(--pending-subtle);
+        border: 1px solid var(--pending-border);
+      }
+      .status-pill--done {
+        color: var(--success-text);
+        background: var(--success-subtle);
+        border: 1px solid var(--success-border);
+      }
+      .status-pill--error {
+        color: var(--error-text);
+        background: var(--error-subtle);
+        border: 1px solid var(--error-border);
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §5  PIPELINE TRACKER
+   ════════════════════════════════════════════════════════════ */
+      .pipeline-bar {
+        background-color: var(--surface-raised);
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .pipeline-inner {
+        padding-block: var(--sp-5);
+      }
+
+      .pipeline-track {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        gap: 0;
+      }
+
+      .pipeline-step {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex: 1;
+      }
+
+      .step-body {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+        padding: var(--sp-2) var(--sp-3);
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+        transition:
+          background-color var(--dur-base) var(--ease-out),
+          border-color var(--dur-base) var(--ease-out);
+        cursor: default;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .step-node {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        font-weight: 600;
+        flex-shrink: 0;
+        transition:
+          background-color var(--dur-base) var(--ease-out),
+          box-shadow var(--dur-base) var(--ease-out);
+      }
+
+      .step-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-2xs);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-disabled);
+        line-height: 1;
+      }
+      .step-name {
+        font-size: var(--text-sm);
+        font-weight: 600;
+        line-height: 1.3;
+        margin-top: 2px;
+        color: var(--text-muted);
+        transition: color var(--dur-base) var(--ease-out);
+      }
+
+      .step-connector {
+        flex: 1;
+        height: 1px;
+        min-width: var(--sp-4);
+        background: var(--border-subtle);
+        position: relative;
+        overflow: hidden;
+      }
+      .step-connector::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--success);
+        opacity: 0.35;
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+      .step-connector[data-filled="true"]::after {
+        animation: connectorFill var(--dur-xslow) var(--ease-out) both;
+      }
+
+      /* ── idle ── */
+      .pipeline-step[data-status="idle"] .step-node {
+        background: var(--surface-hover);
+        border: 1.5px solid var(--border-default);
+        color: var(--text-disabled);
+      }
+      .pipeline-step[data-status="idle"] .step-name {
+        color: var(--text-disabled);
+      }
+
+      /* ── done ── */
+      .pipeline-step[data-status="done"] .step-node {
+        background: var(--success);
+        color: var(--surface-base);
+        box-shadow: 0 0 0 4px var(--success-subtle);
+      }
+      .pipeline-step[data-status="done"] .step-name {
+        color: var(--text-secondary);
+      }
+
+      /* ── pending (running) ── */
+      .pipeline-step[data-status="pending"] .step-body {
+        background: var(--pending-subtle);
+        border-color: var(--pending-border);
+      }
+      .pipeline-step[data-status="pending"] .step-node {
+        background: transparent;
+        border: 1.5px solid var(--pending-border);
+        color: var(--pending-text);
+      }
+      .pipeline-step[data-status="pending"] .step-node::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 1px solid var(--pending);
+        opacity: 0;
+        animation: nodeRing 2.4s var(--ease-out) infinite;
+      }
+      .pipeline-step[data-status="pending"] .step-name {
+        color: var(--pending-text);
+        animation: textBreathe 3s ease-in-out infinite;
+      }
+      .pipeline-step[data-status="pending"] .step-label::after {
+        content: " · Running";
+        color: var(--pending);
+        opacity: 0.7;
+      }
+
+      /* ── error ── */
+      .pipeline-step[data-status="error"] .step-node {
+        background: var(--error-subtle);
+        border: 1.5px solid var(--error-border);
+        color: var(--error-text);
+      }
+      .pipeline-step[data-status="error"] .step-name {
+        color: var(--error-text);
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §6  MAIN LAYOUT
+   ════════════════════════════════════════════════════════════ */
+      .site-main {
+        padding-block: var(--sp-6) var(--sp-10);
+      }
+
+      .output-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--sp-4);
+        margin-top: var(--sp-5);
+      }
+
+      @media (min-width: 900px) {
+        .output-grid {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
+        .pending-row {
+          grid-column: 1 / -1;
+        }
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §7  STAGE CARD
+   ════════════════════════════════════════════════════════════ */
+      .stage-card {
+        background: var(--surface-overlay);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideUp var(--dur-slow) var(--ease-out) both;
+        transition: border-color var(--dur-base) var(--ease-out);
+      }
+
+      /* ── Animated top bar for running state ── */
+      .card-run-bar {
+        height: 2px;
+        width: 100%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: transparent;
+      }
+      .stage-card--running .card-run-bar {
+        background: var(--surface-hover);
+      }
+      .stage-card--running .card-run-bar::after {
+        content: "";
+        display: block;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--pending),
+          transparent
+        );
+        animation: runBar 1.8s ease-in-out infinite;
+      }
+
+      /* ── State variants ── */
+      .stage-card--running {
+        border-color: var(--pending-border);
+      }
+      .stage-card--done {
+        border-color: var(--success-border);
+      }
+      .stage-card--error {
+        border-color: var(--error-border);
+      }
+      .stage-card--waiting {
+        border-color: var(--border-faint);
+        opacity: 0.65;
+        transition:
+          opacity var(--dur-slow) var(--ease-out),
+          border-color var(--dur-slow) var(--ease-out);
+      }
+
+      /* Card head */
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--sp-3);
+        padding: var(--sp-3) var(--sp-4);
+        background: var(--surface-raised);
+        border-bottom: 1px solid var(--border-subtle);
+        flex-shrink: 0;
+        transition: border-color var(--dur-base) var(--ease-out);
+      }
+      .stage-card--running .card-head {
+        border-bottom-color: var(--pending-border);
+      }
+      .stage-card--done .card-head {
+        border-bottom-color: var(--success-border);
+      }
+      .stage-card--error .card-head {
+        border-bottom-color: var(--error-border);
+      }
+
+      .card-head-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .card-stage-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-2xs);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-disabled);
+      }
+
+      .card-model {
+        font-size: var(--text-md);
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.015em;
+        line-height: 1.2;
+      }
+
+      /* Status badge */
+      .card-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        font-weight: 500;
+        padding: var(--sp-1) var(--sp-3);
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+        flex-shrink: 0;
+        letter-spacing: 0.03em;
+        transition: all var(--dur-base) var(--ease-out);
+      }
+      .card-badge--idle {
+        background: var(--surface-hover);
+        border: 1px solid var(--border-subtle);
+        color: var(--text-disabled);
+      }
+      .card-badge--running {
+        background: var(--pending-subtle);
+        border: 1px solid var(--pending-border);
+        color: var(--pending-text);
+      }
+      .card-badge--done {
+        background: var(--success-subtle);
+        border: 1px solid var(--success-border);
+        color: var(--success-text);
+      }
+      .card-badge--error {
+        background: var(--error-subtle);
+        border: 1px solid var(--error-border);
+        color: var(--error-text);
+      }
+
+      /* Card body */
+      .card-body {
+        padding: var(--sp-5);
+        overflow-y: auto;
+        flex: 1;
+      }
+      @media (min-width: 900px) {
+        .card-body {
+          max-height: calc(100vh - 240px);
+        }
+      }
+      .card-body::-webkit-scrollbar {
+        width: 3px;
+      }
+      .card-body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .card-body::-webkit-scrollbar-thumb {
+        background: var(--border-default);
+        border-radius: 2px;
+      }
+      .card-body {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-default) transparent;
+      }
+
+      /* Streaming cursor — shown when content is arriving live */
+      .content--streaming p:last-child::after,
+      .content--streaming > *:last-child::after {
+        content: "▋";
+        display: inline-block;
+        animation: cursorBlink 1s step-end infinite;
+        color: var(--pending);
+        font-size: 0.85em;
+        vertical-align: text-bottom;
+        margin-left: 2px;
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §8  WAITING & SKELETON STATES
+   ════════════════════════════════════════════════════════════ */
+      .skeleton-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-2);
+      }
+
+      .skeleton-line {
+        height: 10px;
+        border-radius: var(--radius-sm);
+        background: linear-gradient(
+          90deg,
+          var(--surface-hover) 0%,
+          var(--surface-overlay) 40%,
+          var(--surface-hover) 80%
+        );
+        background-size: 300% 100%;
+        animation: shimmer 2s ease-in-out infinite;
+      }
+      .skeleton-line:nth-child(2) {
+        animation-delay: 100ms;
+        width: 82%;
+      }
+      .skeleton-line:nth-child(3) {
+        animation-delay: 200ms;
+        width: 66%;
+      }
+      .skeleton-line:nth-child(4) {
+        animation-delay: 300ms;
+        width: 88%;
+      }
+      .skeleton-line:nth-child(5) {
+        animation-delay: 150ms;
+        width: 74%;
+      }
+
+      .skeleton-divider {
+        height: 1px;
+        background: var(--border-faint);
+        margin: var(--sp-3) 0;
+      }
+
+      .awaiting-message {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+        padding: var(--sp-3) var(--sp-4);
+        background: var(--pending-subtle);
+        border: 1px solid var(--pending-border);
+        border-radius: var(--radius-md);
+        margin-top: var(--sp-4);
+      }
+      .awaiting-message--idle {
+        background: var(--surface-hover);
+        border-color: var(--border-subtle);
+        margin-top: 0;
+      }
+
+      .awaiting-dot-group {
+        display: flex;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .awaiting-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--pending);
+        opacity: 0;
+        animation: dotPop 1.4s ease-in-out infinite;
+      }
+      .awaiting-dot:nth-child(2) {
+        animation-delay: 200ms;
+      }
+      .awaiting-dot:nth-child(3) {
+        animation-delay: 400ms;
+      }
+      .awaiting-dot--idle {
+        background: var(--text-disabled);
+        animation: none;
+        opacity: 0.4;
+      }
+
+      .awaiting-text {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        color: var(--pending-text);
+        letter-spacing: 0.03em;
+      }
+      .awaiting-text--idle {
+        color: var(--text-disabled);
+      }
+
+      /* Error panel */
+      .error-panel {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--sp-3);
+        padding: var(--sp-4);
+        background: var(--error-subtle);
+        border: 1px solid var(--error-border);
+        border-radius: var(--radius-md);
+      }
+      .error-icon {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-base);
+        color: var(--error-text);
+        flex-shrink: 0;
+        line-height: 1.6;
+      }
+      .error-text {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-sm);
+        color: var(--error-text);
+        line-height: 1.6;
+        word-break: break-word;
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §9  MARKDOWN CONTENT
+   ════════════════════════════════════════════════════════════ */
+      .content > :first-child {
+        margin-top: 0 !important;
+      }
+      .content h1 {
+        display: none;
+      }
+
+      .content h2 {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-2xs);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-muted);
+        margin-top: var(--sp-7);
+        margin-bottom: var(--sp-4);
+      }
+      .content h2::before {
+        content: "";
+        width: 2px;
+        height: 1em;
+        background: var(--accent);
+        border-radius: 2px;
+        opacity: 0.6;
+        flex-shrink: 0;
+      }
+      .content h2:first-of-type {
+        margin-top: 0;
+      }
+
+      .content h3 {
+        font-size: var(--text-base);
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+        margin-top: var(--sp-4);
+        margin-bottom: var(--sp-2);
+      }
+
+      .content p {
+        font-size: var(--text-base);
+        line-height: 1.78;
+        color: var(--text-secondary);
+        margin-bottom: var(--sp-3);
+      }
+
+      .content ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: var(--sp-4);
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-2);
+      }
+      .content ul li {
+        font-size: var(--text-base);
+        line-height: 1.72;
+        color: var(--text-secondary);
+        padding-left: var(--sp-5);
+        position: relative;
+      }
+      .content ul li::before {
+        content: "–";
+        position: absolute;
+        left: 0;
+        color: var(--text-disabled);
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-sm);
+      }
+      .content li > strong:first-child {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        font-weight: 500;
+        color: var(--accent-text);
+        background: var(--accent-subtle);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-xs);
+        padding: 1px var(--sp-2);
+        margin-right: var(--sp-2);
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+      }
+
+      .content ol {
+        list-style: none;
+        padding: 0;
+        margin-bottom: var(--sp-4);
+        counter-reset: md-ol;
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-3);
+      }
+      .content ol li {
+        counter-increment: md-ol;
+        font-size: var(--text-base);
+        line-height: 1.72;
+        color: var(--text-secondary);
+        padding-left: 30px;
+        position: relative;
+      }
+      .content ol li::before {
+        content: counter(md-ol);
+        position: absolute;
+        left: 0;
+        top: 2px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-2xs);
+        font-weight: 600;
+        color: var(--accent-text);
+        background: var(--accent-subtle);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-xs);
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .content strong {
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .content em {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      .content :not(pre) > code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-sm);
+        color: var(--accent-text);
+        background: var(--accent-subtle);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-xs);
+        padding: 1px var(--sp-2);
+        word-break: break-word;
+      }
+
+      .content pre {
+        background: var(--surface-base);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-md);
+        padding: var(--sp-4);
+        padding-top: var(--sp-6);
+        margin: var(--sp-4) 0;
+        overflow-x: auto;
+        box-shadow: var(--shadow-xs);
+        position: relative;
+      }
+      .content pre::before {
+        content: "code";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: var(--sp-2) var(--sp-4);
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-2xs);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: var(--surface-raised);
+        border-bottom: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+      }
+      .content pre code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-sm);
+        line-height: 1.78;
+        color: var(--text-secondary);
+        background: none;
+        border: none;
+        padding: 0;
+        display: block;
+      }
+
+      .content blockquote {
+        background: var(--surface-hover);
+        border: 1px solid var(--border-default);
+        border-left: 2px solid var(--accent);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding: var(--sp-3) var(--sp-4);
+        margin: var(--sp-4) 0;
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        line-height: 1.7;
+      }
+
+      .content a {
+        color: var(--accent-text);
+        text-decoration: none;
+        transition: opacity var(--dur-fast) var(--ease-out);
+      }
+      .content a:hover {
+        opacity: 0.7;
+        text-decoration: underline;
+      }
+      .content hr {
+        border: none;
+        border-top: 1px solid var(--border-faint);
+        margin: var(--sp-5) 0;
+      }
+
+      .content table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-sm);
+        margin: var(--sp-4) 0;
+      }
+      .content th {
+        text-align: left;
+        font-weight: 600;
+        font-size: var(--text-2xs);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        padding: var(--sp-2) var(--sp-3);
+        border-bottom: 1px solid var(--border-default);
+      }
+      .content td {
+        padding: var(--sp-2) var(--sp-3);
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-faint);
+        line-height: 1.6;
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §10  CONNECTING OVERLAY (shown before first poll succeeds)
+   ════════════════════════════════════════════════════════════ */
+      #connect-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: var(--surface-base);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--sp-4);
+        transition: opacity var(--dur-slow) var(--ease-out);
+      }
+      #connect-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .connect-spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--border-default);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spinnerRot 0.9s linear infinite;
+      }
+      .connect-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: var(--text-xs);
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §11  ANIMATIONS
+   ════════════════════════════════════════════════════════════ */
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes connectorFill {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+      @keyframes nodeRing {
+        0% {
+          transform: scale(1);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+      @keyframes textBreathe {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.55;
+        }
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      @keyframes dotPop {
+        0%,
+        60%,
+        100% {
+          opacity: 0.15;
+          transform: scale(1);
+        }
+        30% {
+          opacity: 1;
+          transform: scale(1.4);
+        }
+      }
+      @keyframes runBar {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(400%);
+        }
+      }
+      @keyframes cursorBlink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+      @keyframes spinnerRot {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ════════════════════════════════════════════════════════════
+   §12  RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
+      @media (max-width: 479px) {
+        :root {
+          --gutter: var(--sp-4);
+        }
+        .project-chip,
+        .header-divider {
+          display: none;
+        }
+        .page-title {
+          font-size: var(--text-md);
+        }
+        .step-label,
+        .step-name {
+          display: none;
+        }
+        .step-body {
+          padding: var(--sp-2);
+        }
+      }
+      @media (min-width: 480px) and (max-width: 899px) {
+        .page-title {
+          font-size: var(--text-lg);
+        }
+      }
+      @media (min-width: 900px) {
+        :root {
+          --gutter: var(--sp-8);
+        }
+      }
+      @media print {
+        .site-header {
+          position: static;
+        }
+        .card-body {
+          max-height: none;
+          overflow: visible;
+        }
+        #connect-overlay {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ── Connecting overlay — hidden once first poll succeeds ── -->
+    <div id="connect-overlay" role="status" aria-live="polite">
+      <div class="connect-spinner" aria-hidden="true"></div>
+      <span class="connect-label">Connecting to pipeline…</span>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════════ -->
+    <header class="site-header" role="banner">
+      <div class="container">
+        <div class="header-inner">
+          <span class="project-chip" aria-label="Project: aipipe, Agrimarket">
+            <span
+              class="project-chip-dot"
+              id="connection-dot"
+              title="Connecting…"
+              aria-hidden="true"
+            ></span>
+            aipipe · agrimarket
+          </span>
+
+          <div class="header-divider" aria-hidden="true"></div>
+
+          <div class="header-body">
+            <h1 class="page-title" id="page-title">Initialising pipeline…</h1>
+            <div class="header-meta">
+              <span id="meta-time">—</span>
+              <span class="header-meta-sep" aria-hidden="true">·</span>
+              <span id="meta-stages">3 stages</span>
+              <span class="header-meta-sep" aria-hidden="true">·</span>
+              <span class="status-pill status-pill--idle" id="meta-status"
+                >Waiting</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════════════════════════════════════════════
+     PIPELINE TRACKER
+════════════════════════════════════════════════════════ -->
+    <nav class="pipeline-bar" aria-label="Pipeline stages">
+      <div class="container">
+        <div class="pipeline-inner">
+          <ol
+            class="pipeline-track"
+            id="pipeline-track"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="3"
+            aria-valuenow="0"
+            aria-label="Pipeline progress"
+          >
+            <!-- Rendered by JS after first poll -->
+          </ol>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════════════ -->
+    <main class="site-main" id="main-content">
+      <div class="container">
+        <div class="output-grid" id="output-grid">
+          <!-- Rendered by JS after first poll -->
+        </div>
+      </div>
+    </main>
+
+    <!-- ════════════════════════════════════════════════════════
+     LIVE RENDER ENGINE
+════════════════════════════════════════════════════════ -->
+    <script>
+      "use strict";
+      marked.setOptions({ gfm: true, breaks: false });
+
+      // ── Local render state ─────────────────────────────────────────────────────
+      const local = {
+        initialized: false,
+        title: null,
+        stages: [
+          { status: null, content: null, error: null },
+          { status: null, content: null, error: null },
+          { status: null, content: null, error: null },
+        ],
+      };
+
+      // ── Helpers ────────────────────────────────────────────────────────────────
+      const esc = (s) =>
+        String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+
+      function nodeChar(stage) {
+        if (stage.status === "done") return "✓";
+        if (stage.status === "error") return "✕";
+        return String(stage.id);
+      }
+
+      function stepStatus(stage) {
+        if (stage.status === "done") return "done";
+        if (stage.status === "running") return "pending"; // amber pulse
+        if (stage.status === "error") return "error";
+        return "idle";
+      }
+
+      function badgeClass(s) {
+        return (
+          {
+            running: "card-badge--running",
+            done: "card-badge--done",
+            error: "card-badge--error",
+          }[s] || "card-badge--idle"
+        );
+      }
+      function badgeText(s) {
+        return (
+          { running: "Running", done: "Complete", error: "Error" }[s] || "Idle"
+        );
+      }
+
+      function isNearBottom(el) {
+        if (!el) return true;
+        return el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+      }
+
+      // ── Card body builders ────────────────────────────────────────────────────
+      function buildWaiting() {
+        return `<div class="awaiting-message awaiting-message--idle" role="status">
+    <div class="awaiting-dot-group" aria-hidden="true">
+      <div class="awaiting-dot awaiting-dot--idle"></div>
+      <div class="awaiting-dot awaiting-dot--idle"></div>
+      <div class="awaiting-dot awaiting-dot--idle"></div>
+    </div>
+    <span class="awaiting-text awaiting-text--idle">Queued — awaiting pipeline start</span>
+  </div>`;
+      }
+
+      function buildSkeleton() {
+        return `<div class="skeleton-group">
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line"></div>
+  </div>
+  <div class="skeleton-divider" aria-hidden="true"></div>
+  <div class="skeleton-group">
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line"></div>
+  </div>
+  <div class="awaiting-message" role="status" style="margin-top:16px">
+    <div class="awaiting-dot-group" aria-hidden="true">
+      <div class="awaiting-dot"></div>
+      <div class="awaiting-dot"></div>
+      <div class="awaiting-dot"></div>
+    </div>
+    <span class="awaiting-text">Processing — output will stream here</span>
+  </div>`;
+      }
+
+      function buildError(msg) {
+        return `<div class="error-panel">
+    <span class="error-icon">✕</span>
+    <span class="error-text">${esc(msg || "Stage failed")}</span>
+  </div>`;
+      }
+
+      function cardBodyHTML(stage) {
+        if (stage.status === "error") return buildError(stage.error);
+        if (stage.content) return marked.parse(stage.content);
+        if (stage.status === "running") return buildSkeleton();
+        return buildWaiting();
+      }
+
+      // ── Initial HTML builders ─────────────────────────────────────────────────
+      function buildTracker(stages) {
+        return stages
+          .map((stage, i) => {
+            const isLast = i === stages.length - 1;
+            const ss = stepStatus(stage);
+            const filled = stage.status === "done";
+            return `<li class="pipeline-step" data-status="${ss}" id="t-step-${stage.id}">
+      <div class="step-body"${stage.status === "running" ? ' aria-current="step"' : ""}>
+        <div class="step-node" aria-hidden="true">${nodeChar(stage)}</div>
+        <div class="step-text">
+          <div class="step-label">Stage ${stage.id}</div>
+          <div class="step-name">${esc(stage.name)}</div>
+        </div>
+      </div>
+      ${!isLast ? `<div class="step-connector" data-filled="${filled}" aria-hidden="true"></div>` : ""}
+    </li>`;
+          })
+          .join("");
+      }
+
+      function buildCard(stage) {
+        const isStreaming = stage.status === "running" && stage.content;
+        return `<article
+    class="stage-card stage-card--${stage.status}"
+    id="card-${stage.id}"
+    data-status="${stage.status}"
+    aria-labelledby="card-title-${stage.id}"
+  >
+    <div class="card-run-bar" aria-hidden="true"></div>
+    <div class="card-head">
+      <div class="card-head-left">
+        <div class="card-stage-label">Stage ${stage.id} · ${esc(stage.label)}</div>
+        <div class="card-model" id="card-title-${stage.id}">${esc(stage.name)}</div>
+      </div>
+      <span class="card-badge ${badgeClass(stage.status)}" id="card-badge-${stage.id}">${badgeText(stage.status)}</span>
+    </div>
+    <div class="card-body" id="card-body-${stage.id}">
+      <div class="content${isStreaming ? " content--streaming" : ""}" id="card-content-${stage.id}">${cardBodyHTML(stage)}</div>
+    </div>
+  </article>`;
+      }
+
+      function buildGrid(stages) {
+        return [
+          buildCard(stages[0]),
+          buildCard(stages[1]),
+          `<div class="pending-row">${buildCard(stages[2])}</div>`,
+        ].join("\n");
+      }
+
+      // ── Incremental updaters ──────────────────────────────────────────────────
+      function updateTrackerStep(stage) {
+        const li = document.getElementById(`t-step-${stage.id}`);
+        if (!li) return;
+
+        li.dataset.status = stepStatus(stage);
+
+        const node = li.querySelector(".step-node");
+        if (node) node.textContent = nodeChar(stage);
+
+        const conn = li.querySelector(".step-connector");
+        if (conn) conn.dataset.filled = String(stage.status === "done");
+
+        const body = li.querySelector(".step-body");
+        if (body) {
+          if (stage.status === "running")
+            body.setAttribute("aria-current", "step");
+          else body.removeAttribute("aria-current");
+        }
+      }
+
+      function updateCard(stage) {
+        const card = document.getElementById(`card-${stage.id}`);
+        const badge = document.getElementById(`card-badge-${stage.id}`);
+        const body = document.getElementById(`card-body-${stage.id}`);
+        const content = document.getElementById(`card-content-${stage.id}`);
+        if (!card) return;
+
+        const prev = local.stages[stage.id - 1];
+        const statusChanged = prev.status !== stage.status;
+        const contentChanged = prev.content !== stage.content;
+        const errorChanged = prev.error !== stage.error;
+
+        if (!statusChanged && !contentChanged && !errorChanged) return;
+
+        if (statusChanged) {
+          card.className = `stage-card stage-card--${stage.status}`;
+          card.dataset.status = stage.status;
+          if (badge) {
+            badge.className = `card-badge ${badgeClass(stage.status)}`;
+            badge.textContent = badgeText(stage.status);
+          }
+        }
+
+        if (statusChanged || contentChanged || errorChanged) {
+          if (content) {
+            const wasNearBottom = isNearBottom(body);
+            const isStreaming = stage.status === "running" && stage.content;
+
+            content.innerHTML = cardBodyHTML(stage);
+            content.classList.toggle("content--streaming", !!isStreaming);
+
+            // Auto-scroll while streaming
+            if (stage.status === "running" && wasNearBottom && body) {
+              body.scrollTop = body.scrollHeight;
+            }
+          }
+        }
+
+        // Save new state
+        local.stages[stage.id - 1] = {
+          status: stage.status,
+          content: stage.content,
+          error: stage.error,
+        };
+      }
+
+      // ── Progress bar ──────────────────────────────────────────────────────────
+      function updateProgress(stages) {
+        const done = stages.filter((s) => s.status === "done").length;
+        const run = stages.some((s) => s.status === "running") ? 0.5 : 0;
+        const pct = Math.round(((done + run) / stages.length) * 100);
+        const tracker = document.getElementById("pipeline-track");
+        if (tracker) tracker.setAttribute("aria-valuenow", String(done));
+
+        const statusEl = document.getElementById("meta-status");
+        if (statusEl) {
+          const allDone = stages.every((s) => s.status === "done");
+          const anyError = stages.some((s) => s.status === "error");
+          const anyRunning = stages.some((s) => s.status === "running");
+          let cls = "status-pill--idle",
+            txt = "Waiting";
+          if (allDone) {
+            cls = "status-pill--done";
+            txt = "Complete";
+          } else if (anyError) {
+            cls = "status-pill--error";
+            txt = "Error";
+          } else if (anyRunning) {
+            cls = "status-pill--running";
+            txt = `Running · ${pct}%`;
+          }
+          statusEl.className = `status-pill ${cls}`;
+          statusEl.textContent = txt;
+        }
+      }
+
+      // ── Main render ───────────────────────────────────────────────────────────
+      function renderState(state) {
+        // Title
+        if (local.title !== state.title) {
+          const el = document.getElementById("page-title");
+          if (el) el.textContent = state.title;
+          document.title = `aipipe — ${state.title}`;
+          local.title = state.title;
+        }
+
+        // Meta time (once)
+        if (!local.timeSet && state.startedAt) {
+          const d = new Date(state.startedAt);
+          const fmt = d.toLocaleString(undefined, {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const el = document.getElementById("meta-time");
+          if (el) el.textContent = fmt;
+          local.timeSet = true;
+        }
+
+        // First render
+        if (!local.initialized) {
+          document.getElementById("pipeline-track").innerHTML = buildTracker(
+            state.stages,
+          );
+          document.getElementById("output-grid").innerHTML = buildGrid(
+            state.stages,
+          );
+
+          state.stages.forEach((s, i) => {
+            local.stages[i] = {
+              status: s.status,
+              content: s.content,
+              error: s.error,
+            };
+          });
+
+          local.initialized = true;
+
+          // Hide connecting overlay
+          const overlay = document.getElementById("connect-overlay");
+          if (overlay) {
+            overlay.classList.add("hidden");
+            setTimeout(() => overlay.remove(), 500);
+          }
+          setConnDot(true);
+          return;
+        }
+
+        // Incremental updates
+        state.stages.forEach((s) => {
+          updateTrackerStep(s);
+          updateCard(s);
+        });
+        updateProgress(state.stages);
+      }
+
+      // ── Connection dot ────────────────────────────────────────────────────────
+      function setConnDot(connected) {
+        const dot = document.getElementById("connection-dot");
+        if (!dot) return;
+        dot.style.background = connected ? "var(--success)" : "var(--pending)";
+        dot.title = connected ? "Connected" : "Reconnecting…";
+      }
+
+      // ── Poll loop ─────────────────────────────────────────────────────────────
+      let connected = false;
+
+      async function poll() {
+        try {
+          const r = await fetch("/api/status", { cache: "no-store" });
+          if (r.ok) {
+            const state = await r.json();
+            renderState(state);
+            if (!connected) {
+              setConnDot(true);
+              connected = true;
+            }
+          }
+        } catch (_) {
+          if (connected) {
+            setConnDot(false);
+            connected = false;
+          }
+        }
+        setTimeout(poll, 600);
+      }
+
+      poll();
+    </script>
+  </body>
+</html>
