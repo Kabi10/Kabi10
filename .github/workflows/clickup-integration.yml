@@ -16,15 +16,15 @@ jobs:
           # Extract task ID from PR title (format: [CU-xxxxx] or similar)
           TITLE="${{ github.event.pull_request.title }}"
           BRANCH="${{ github.event.pull_request.head.ref }}"
-          
+
           # Try to extract from title first
           TASK_ID=$(echo "$TITLE" | grep -oP '\[CU-[a-zA-Z0-9]+\]' | head -1 | tr -d '[]')
-          
+
           # If not found in title, try branch name
           if [ -z "$TASK_ID" ]; then
             TASK_ID=$(echo "$BRANCH" | grep -oP 'CU-[a-zA-Z0-9]+' | head -1)
           fi
-          
+
           echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
           echo "Found ClickUp Task ID: $TASK_ID"
 
@@ -37,11 +37,11 @@ jobs:
             const prUrl = context.payload.pull_request.html_url;
             const prNumber = context.payload.pull_request.number;
             const prTitle = context.payload.pull_request.title;
-            
+
             console.log(`Linking PR #${prNumber} to ClickUp task ${taskId}`);
             console.log(`PR URL: ${prUrl}`);
             console.log(`PR Title: ${prTitle}`);
-            
+
             // This logs the information that will be used by the webhook
             // The actual linking happens via ClickUp webhook (see setup guide)
 
@@ -53,7 +53,7 @@ jobs:
             const taskId = '${{ steps.extract_task_id.outputs.task_id }}';
             const prNumber = context.payload.pull_request.number;
             const action = context.payload.action;
-            
+
             let statusMessage = '';
             switch(action) {
               case 'opened':
@@ -67,7 +67,7 @@ jobs:
                 }
                 break;
             }
-            
+
             if (statusMessage) {
               github.rest.issues.createComment({
                 issue_number: prNumber,
@@ -83,7 +83,7 @@ jobs:
       - name: Validate PR Title Format
         run: |
           TITLE="${{ github.event.pull_request.title }}"
-          
+
           # Check if title contains ClickUp task ID
           if [[ ! "$TITLE" =~ \[CU-[a-zA-Z0-9]+\] ]]; then
             echo "⚠️  Warning: PR title should include ClickUp task ID in format [CU-xxxxx]"
@@ -94,7 +94,7 @@ jobs:
       - name: Validate Branch Name Format
         run: |
           BRANCH="${{ github.event.pull_request.head.ref }}"
-          
+
           # Check if branch contains ClickUp task ID
           if [[ ! "$BRANCH" =~ CU-[a-zA-Z0-9]+ ]]; then
             echo "⚠️  Warning: Branch name should include ClickUp task ID"
@@ -113,17 +113,17 @@ jobs:
           BRANCH="${{ github.event.pull_request.head.ref }}"
           REVIEW_STATE="${{ github.event.review.state }}"
           REVIEWER="${{ github.event.review.user.login }}"
-          
+
           # Extract task ID
           TASK_ID=$(echo "$TITLE" | grep -oP '\[CU-[a-zA-Z0-9]+\]' | head -1 | tr -d '[]')
           if [ -z "$TASK_ID" ]; then
             TASK_ID=$(echo "$BRANCH" | grep -oP 'CU-[a-zA-Z0-9]+' | head -1)
           fi
-          
+
           echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
           echo "review_state=$REVIEW_STATE" >> $GITHUB_OUTPUT
           echo "reviewer=$REVIEWER" >> $GITHUB_OUTPUT
-          
+
           echo "Review sync info:"
           echo "  Task ID: $TASK_ID"
           echo "  Review State: $REVIEW_STATE"
@@ -133,4 +133,3 @@ jobs:
         if: steps.sync_review.outputs.task_id != ''
         run: |
           echo "Review from ${{ steps.sync_review.outputs.reviewer }} (${{ steps.sync_review.outputs.review_state }}) will be synced to task ${{ steps.sync_review.outputs.task_id }}"
-

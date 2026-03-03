@@ -4,11 +4,11 @@ on:
   push:
     branches: [master, main]
     paths:
-      - 'backend/**'
+      - "backend/**"
   pull_request:
     branches: [master, main]
     paths:
-      - 'backend/**'
+      - "backend/**"
 
 concurrency:
   group: backend-${{ github.ref }}
@@ -29,8 +29,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
@@ -42,5 +42,5 @@ jobs:
       - name: Run Tests
         run: npm test
         env:
-          MOCK_DB: 'true'
-          NODE_ENV: 'test'
+          MOCK_DB: "true"
+          NODE_ENV: "test"

@@ -8,20 +8,20 @@ jobs:
   validate-pr:
     runs-on: ubuntu-latest
     name: Validate Pull Request
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Check for deleted critical files
         run: |
           echo "🔍 Checking for deleted critical files..."
-          
+
           # Get list of deleted files in this PR
           DELETED_FILES=$(git diff --name-status origin/${{ github.base_ref }}...HEAD | grep "^D" | awk '{print $2}')
-          
+
           # Define critical files that should never be deleted
           CRITICAL_FILES=(
             "KNOWN_ISSUES.md"
@@ -34,7 +34,7 @@ jobs:
             "app/google-services.json.template"
             "local.properties.template"
           )
-          
+
           # Check if any critical files were deleted
           ERRORS=0
           for file in "${CRITICAL_FILES[@]}"; do
@@ -43,76 +43,75 @@ jobs:
               ERRORS=$((ERRORS + 1))
             fi
           done
-          
+
           # Check for deleted UI components
           if echo "$DELETED_FILES" | grep -q "app/src/main/java/com/senthapps/slagrimarket/ui/components/"; then
             echo "❌ ERROR: UI component files were deleted!"
             echo "$DELETED_FILES" | grep "app/src/main/java/com/senthapps/slagrimarket/ui/components/"
             ERRORS=$((ERRORS + 1))
           fi
-          
+
           if [ $ERRORS -gt 0 ]; then
             echo ""
             echo "❌ PR validation failed: $ERRORS critical file(s) deleted"
             echo "Please restore these files or provide justification in the PR description."
             exit 1
           fi
-          
+
           echo "✅ No critical files deleted"
-      
+
       - name: Check PR size
         run: |
           echo "📊 Analyzing PR size..."
-          
+
           # Get diff statistics
           STATS=$(git diff --shortstat origin/${{ github.base_ref }}...HEAD)
           echo "Changes: $STATS"
-          
+
           # Extract numbers
           INSERTIONS=$(echo "$STATS" | grep -oP '\d+(?= insertion)' || echo "0")
           DELETIONS=$(echo "$STATS" | grep -oP '\d+(?= deletion)' || echo "0")
-          
+
           echo "Insertions: $INSERTIONS"
           echo "Deletions: $DELETIONS"
-          
+
           # Warn if PR is very large (>2000 lines changed)
           TOTAL=$((INSERTIONS + DELETIONS))
           if [ $TOTAL -gt 2000 ]; then
             echo "⚠️  WARNING: Large PR detected ($TOTAL lines changed)"
             echo "Consider breaking this into smaller PRs for easier review."
           fi
-          
+
           # Error if massive deletions without corresponding additions
           if [ $DELETIONS -gt 1000 ] && [ $INSERTIONS -lt 100 ]; then
             echo "❌ ERROR: Suspicious PR - many deletions ($DELETIONS) with few additions ($INSERTIONS)"
             echo "This might indicate accidental file deletion. Please review carefully."
             exit 1
           fi
-          
+
           echo "✅ PR size check passed"
-      
+
       - name: Validate commit message
         run: |
           echo "📝 Validating commit messages..."
-          
+
           # Get commit messages in this PR
           COMMITS=$(git log --pretty=format:"%s" origin/${{ github.base_ref }}...HEAD)
-          
+
           # Check for empty commit messages
           if [ -z "$COMMITS" ]; then
             echo "❌ ERROR: No commits found in PR"
             exit 1
           fi
-          
+
           echo "Commits in this PR:"
           echo "$COMMITS"
           echo ""
           echo "✅ Commit message validation passed"
-      
+
       - name: Summary
         if: success()
         run: |
           echo "✅ All PR validation checks passed!"
           echo ""
           echo "This PR is ready for human review."
-

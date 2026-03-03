@@ -3,7 +3,7 @@ name: "🌟 Good First Issue: Add Unit Tests for ViewModels"
 about: Write unit tests for ViewModel business logic (Medium - Learn testing!)
 title: "[Medium] Add unit tests for ListingsViewModel"
 labels: good first issue, testing, enhancement
-assignees: ''
+assignees: ""
 ---
 
 ## 🎯 Issue Description
@@ -24,6 +24,7 @@ The app currently has comprehensive testing infrastructure (JUnit, MockK, Turbin
 ## 🔍 Current State
 
 The project has only placeholder tests:
+
 - `ExampleUnitTest.kt` - Only tests `2 + 2 = 4`
 - `ExampleInstrumentedTest.kt` - Only tests package name
 
@@ -77,25 +78,25 @@ class ListingsViewModelTest {
 
     // Test dispatcher for coroutines
     private val testDispatcher = StandardTestDispatcher()
-    
+
     // Mock repository
     private lateinit var repository: ListingRepository
-    
+
     // ViewModel under test
     private lateinit var viewModel: ListingsViewModel
-    
+
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk()
         viewModel = ListingsViewModel(repository)
     }
-    
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()
     }
-    
+
     // TODO: Add test methods here
 }
 ```
@@ -105,14 +106,15 @@ class ListingsViewModelTest {
 Here are the key scenarios to test:
 
 #### Test 1: Initial State
+
 ```kotlin
 @Test
 fun `initial state should be empty with no loading`() {
     // Given: ViewModel is created
-    
+
     // When: We check initial state
     val state = viewModel.uiState.value
-    
+
     // Then: State should be empty
     assertTrue(state.listings.isEmpty())
     assertFalse(state.isLoading)
@@ -121,6 +123,7 @@ fun `initial state should be empty with no loading`() {
 ```
 
 #### Test 2: Loading Listings Success
+
 ```kotlin
 @Test
 fun `loadListings should emit loading then success state`() = runTest {
@@ -135,20 +138,20 @@ fun `loadListings should emit loading then success state`() = runTest {
             // ... other fields
         )
     )
-    
+
     coEvery { repository.getAllActiveListings(any()) } returns flowOf(
         Resource.Loading(),
         Resource.Success(mockListings)
     )
-    
+
     // When: We load listings
     viewModel.uiState.test {
         viewModel.loadListings()
-        
+
         // Then: Should emit loading state
         val loadingState = awaitItem()
         assertTrue(loadingState.isLoading)
-        
+
         // Then: Should emit success state with data
         val successState = awaitItem()
         assertFalse(successState.isLoading)
@@ -159,24 +162,25 @@ fun `loadListings should emit loading then success state`() = runTest {
 ```
 
 #### Test 3: Loading Listings Error
+
 ```kotlin
 @Test
 fun `loadListings should emit error state on failure`() = runTest {
     // Given: Repository returns error
     val errorMessage = "Network error"
-    
+
     coEvery { repository.getAllActiveListings(any()) } returns flowOf(
         Resource.Loading(),
         Resource.Error(errorMessage)
     )
-    
+
     // When: We load listings
     viewModel.uiState.test {
         viewModel.loadListings()
-        
+
         // Then: Should emit loading state
         awaitItem() // loading state
-        
+
         // Then: Should emit error state
         val errorState = awaitItem()
         assertFalse(errorState.isLoading)
@@ -187,20 +191,21 @@ fun `loadListings should emit error state on failure`() = runTest {
 ```
 
 #### Test 4: Refresh Listings
+
 ```kotlin
 @Test
 fun `refreshListings should force refresh from repository`() = runTest {
     // Given: Repository is mocked
     val mockListings = listOf(/* ... */)
-    
+
     coEvery { repository.getAllActiveListings(forceRefresh = true) } returns flowOf(
         Resource.Success(mockListings)
     )
-    
+
     // When: We refresh listings
     viewModel.refreshListings()
     advanceUntilIdle()
-    
+
     // Then: Repository should be called with forceRefresh = true
     coVerify { repository.getAllActiveListings(forceRefresh = true) }
 }
@@ -259,6 +264,7 @@ fun `refreshListings should force refresh from repository`() = runTest {
 **Medium** - Estimated time: 4-6 hours
 
 This is a great learning issue because:
+
 - ✅ Learn industry-standard testing practices
 - ✅ Understand ViewModel behavior deeply
 - ✅ Practice mocking and dependency injection
@@ -277,6 +283,7 @@ This is a great learning issue because:
 ## 🔄 Bonus Challenges
 
 Once you complete `ListingsViewModel`, consider testing:
+
 - `HomeViewModel`
 - `TransactionsViewModel`
 - `SearchViewModel`
@@ -290,4 +297,3 @@ Once you complete `ListingsViewModel`, consider testing:
 - Reference the helpful resources above
 
 Good luck! 🧪✨
-

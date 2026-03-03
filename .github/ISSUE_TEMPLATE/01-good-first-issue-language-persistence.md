@@ -3,7 +3,7 @@ name: "🌟 Good First Issue: Implement Language Preference Persistence"
 about: Add DataStore persistence for language selection (Easy - Good for beginners!)
 title: "[Easy] Implement language preference persistence"
 labels: good first issue, enhancement, beginner-friendly
-assignees: ''
+assignees: ""
 ---
 
 ## 🎯 Issue Description
@@ -69,12 +69,12 @@ class LanguagePreferences @Inject constructor(
         private val LANGUAGE_KEY = stringPreferencesKey("selected_language")
         const val DEFAULT_LANGUAGE = "ta" // Tamil
     }
-    
+
     // TODO: Implement saveLanguage() function
     suspend fun saveLanguage(language: String) {
         // Use dataStore.edit { preferences -> ... }
     }
-    
+
     // TODO: Implement getLanguage() function
     fun getLanguage(): Flow<String> {
         // Use dataStore.data.map { preferences -> ... }
@@ -91,7 +91,7 @@ You may need to create a `PreferencesModule.kt` or add to existing module:
 @Module
 @InstallIn(SingletonComponent::class)
 object PreferencesModule {
-    
+
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
@@ -108,7 +108,7 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 class LanguageToggleViewModel @Inject constructor(
     private val languagePreferences: LanguagePreferences
 ) : ViewModel() {
-    
+
     init {
         // TODO: Load saved language on initialization
         viewModelScope.launch {
@@ -117,7 +117,7 @@ class LanguageToggleViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun setLanguage(language: String) {
         _selectedLanguage.value = language
         // TODO: Save language to DataStore
@@ -159,6 +159,7 @@ class LanguageToggleViewModel @Inject constructor(
 **Easy** - Estimated time: 2-4 hours
 
 This is a great first issue because:
+
 - ✅ Small, focused scope
 - ✅ Clear acceptance criteria
 - ✅ Existing code to reference
@@ -173,4 +174,3 @@ This is a great first issue because:
 - Reference the helpful resources above
 
 Good luck! 🚀
-

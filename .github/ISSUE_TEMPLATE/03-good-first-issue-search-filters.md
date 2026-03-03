@@ -3,7 +3,7 @@ name: "🌟 Good First Issue: Add Search Filters to Listings Screen"
 about: Implement filtering by crop type, price range, and location (Hard - Feature development!)
 title: "[Hard] Add search filters to listings screen"
 labels: good first issue, enhancement, feature, ui
-assignees: ''
+assignees: ""
 ---
 
 ## 🎯 Issue Description
@@ -85,33 +85,33 @@ data class ListingsUiState(
 class ListingsViewModel @Inject constructor(
     private val repository: ListingRepository
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(ListingsUiState())
     val uiState: StateFlow<ListingsUiState> = _uiState.asStateFlow()
-    
+
     fun applyFilters(filters: ListingFilters) {
         _uiState.update { currentState ->
             val filtered = currentState.listings.filter { listing ->
                 // TODO: Implement filter logic
-                val matchesCrop = filters.cropType == null || 
+                val matchesCrop = filters.cropType == null ||
                     listing.cropName.equals(filters.cropType, ignoreCase = true)
-                
+
                 val matchesPrice = (filters.minPrice == null || listing.pricePerUnit >= filters.minPrice) &&
                     (filters.maxPrice == null || listing.pricePerUnit <= filters.maxPrice)
-                
-                val matchesLocation = filters.location == null || 
+
+                val matchesLocation = filters.location == null ||
                     listing.location.contains(filters.location, ignoreCase = true)
-                
+
                 matchesCrop && matchesPrice && matchesLocation
             }
-            
+
             currentState.copy(
                 filteredListings = filtered,
                 activeFilters = filters
             )
         }
     }
-    
+
     fun clearFilters() {
         _uiState.update { it.copy(
             filteredListings = it.listings,
@@ -137,7 +137,7 @@ fun FilterBottomSheet(
     var minPrice by remember { mutableStateOf(currentFilters.minPrice?.toString() ?: "") }
     var maxPrice by remember { mutableStateOf(currentFilters.maxPrice?.toString() ?: "") }
     var selectedLocation by remember { mutableStateOf(currentFilters.location) }
-    
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState()
@@ -151,20 +151,20 @@ fun FilterBottomSheet(
                 text = stringResource(R.string.filter_listings),
                 style = MaterialTheme.typography.headlineSmall
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Crop Type Dropdown
             // TODO: Implement dropdown
-            
+
             // Price Range Inputs
             // TODO: Implement min/max price fields
-            
+
             // Location Dropdown
             // TODO: Implement dropdown
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Apply and Clear Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -179,7 +179,7 @@ fun FilterBottomSheet(
                 ) {
                     Text(stringResource(R.string.clear_filters))
                 }
-                
+
                 Button(
                     onClick = {
                         onApplyFilters(
@@ -213,7 +213,7 @@ fun ListingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showFilterSheet by remember { mutableStateOf(false) }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -237,7 +237,7 @@ fun ListingsScreen(
         } else {
             uiState.listings
         }
-        
+
         // Show active filters chip
         if (uiState.activeFilters != ListingFilters()) {
             ActiveFiltersChip(
@@ -245,7 +245,7 @@ fun ListingsScreen(
                 onClearFilters = { viewModel.clearFilters() }
             )
         }
-        
+
         // Listings list
         LazyColumn {
             items(displayListings) { listing ->
@@ -256,7 +256,7 @@ fun ListingsScreen(
             }
         }
     }
-    
+
     // Filter bottom sheet
     if (showFilterSheet) {
         FilterBottomSheet(
@@ -334,6 +334,7 @@ Add to `values/strings.xml`, `values-ta/strings.xml`, `values-si/strings.xml`:
 **Hard** - Estimated time: 6-10 hours
 
 This is a challenging issue because:
+
 - ⚠️ Multiple UI components to implement
 - ⚠️ Complex state management
 - ⚠️ Trilingual support required
@@ -366,4 +367,3 @@ This is a challenging issue because:
 - Break the task into smaller PRs if needed
 
 Good luck! 🚀✨
-
