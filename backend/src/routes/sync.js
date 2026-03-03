@@ -1,8 +1,8 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
-const logger = require('../utils/logger');
-const { validateUUID } = require('../utils/helpers');
+const express = require("express");
+const { body, validationResult } = require("express-validator");
+const db = require("../database/connection");
+const logger = require("../utils/logger");
+const { validateUUID } = require("../utils/helpers");
 
 const router = express.Router();
 
@@ -11,14 +11,14 @@ const router = express.Router();
  * Process batch of local operations from client
  * Matches Android SyncApiService.syncOperations()
  */
-router.post('/operations', async (req, res) => {
+router.post("/operations", async (req, res) => {
   try {
     const { operations, lastSyncAt } = req.body;
 
     if (!Array.isArray(operations)) {
       return res.status(400).json({
         success: false,
-        message: 'Operations must be an array',
+        message: "Operations must be an array",
       });
     }
 
@@ -38,7 +38,8 @@ router.post('/operations', async (req, res) => {
             results.appliedOps.push(op.opId);
 
             // Store the operation in local_ops table for tracking
-            await client.query(`
+            await client.query(
+              `
               INSERT INTO local_ops (
                 op_id, user_id, type, payload, client_ts, 
                 synced, client_id, entity_id
@@ -46,15 +47,17 @@ router.post('/operations', async (req, res) => {
               ON CONFLICT (op_id) DO UPDATE SET
                 synced = true,
                 server_ts = NOW()
-            `, [
-              op.opId,
-              req.user.userId,
-              op.type,
-              JSON.stringify(op.payload),
-              op.clientTs,
-              op.clientId,
-              result.entityId,
-            ]);
+            `,
+              [
+                op.opId,
+                req.user.userId,
+                op.type,
+                JSON.stringify(op.payload),
+                op.clientTs,
+                op.clientId,
+                result.entityId,
+              ],
+            );
           } else if (result.conflict) {
             results.conflicts.push({
               opId: op.opId,
@@ -69,7 +72,7 @@ router.post('/operations', async (req, res) => {
           }
         });
       } catch (error) {
-        logger.error('Operation processing error:', { opId: op.opId, error });
+        logger.error("Operation processing error:", { opId: op.opId, error });
         results.errors.push({
           opId: op.opId,
           error: error.message,
@@ -80,7 +83,7 @@ router.post('/operations', async (req, res) => {
     // Get updated data since last sync
     const updatedData = await getUpdatedDataSince(lastSyncAt, req.user.userId);
 
-    logger.info('Sync operations processed', {
+    logger.info("Sync operations processed", {
       userId: req.user.userId,
       totalOps: operations.length,
       applied: results.appliedOps.length,
@@ -97,10 +100,10 @@ router.post('/operations', async (req, res) => {
       serverTimestamp: new Date().toISOString(),
     });
   } catch (error) {
-    logger.error('Sync operations error:', error);
+    logger.error("Sync operations error:", error);
     res.status(500).json({
       success: false,
-      message: 'Sync failed',
+      message: "Sync failed",
     });
   }
 });
@@ -109,7 +112,7 @@ router.post('/operations', async (req, res) => {
  * GET /api/v1/sync/data
  * Get updated data since last sync timestamp
  */
-router.get('/data', async (req, res) => {
+router.get("/data", async (req, res) => {
   try {
     const {
       lastSyncAt,
@@ -132,10 +135,10 @@ router.get('/data', async (req, res) => {
       serverTimestamp: new Date().toISOString(),
     });
   } catch (error) {
-    logger.error('Get sync data error:', error);
+    logger.error("Get sync data error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get sync data',
+      message: "Failed to get sync data",
     });
   }
 });
@@ -144,28 +147,31 @@ router.get('/data', async (req, res) => {
  * Process individual operation based on type
  */
 async function processOperation(client, operation, userId) {
-  const {
-    type, payload, opId, clientId,
-  } = operation;
+  const { type, payload, opId, clientId } = operation;
 
   try {
     switch (type) {
-      case 'CREATE_LISTING':
+      case "CREATE_LISTING":
         return await processCreateListing(client, payload, userId, clientId);
 
-      case 'UPDATE_LISTING':
+      case "UPDATE_LISTING":
         return await processUpdateListing(client, payload, userId);
 
-      case 'DELETE_LISTING':
+      case "DELETE_LISTING":
         return await processDeleteListing(client, payload, userId);
 
-      case 'CREATE_TRANSACTION':
-        return await processCreateTransaction(client, payload, userId, clientId);
+      case "CREATE_TRANSACTION":
+        return await processCreateTransaction(
+          client,
+          payload,
+          userId,
+          clientId,
+        );
 
-      case 'UPDATE_TRANSACTION':
+      case "UPDATE_TRANSACTION":
         return await processUpdateTransaction(client, payload, userId);
 
-      case 'UPDATE_USER':
+      case "UPDATE_USER":
         return await processUpdateUser(client, payload, userId);
 
       default:
@@ -175,7 +181,7 @@ async function processOperation(client, operation, userId) {
         };
     }
   } catch (error) {
-    logger.error('Operation processing error:', { type, opId, error });
+    logger.error("Operation processing error:", { type, opId, error });
     return {
       success: false,
       error: error.message,
@@ -190,7 +196,7 @@ async function processCreateListing(client, payload, userId, clientId) {
   // Check if listing already exists (conflict resolution)
   if (clientId) {
     const existing = await client.query(
-      'SELECT id FROM listings WHERE client_id = $1',
+      "SELECT id FROM listings WHERE client_id = $1",
       [clientId],
     );
 
@@ -203,41 +209,43 @@ async function processCreateListing(client, payload, userId, clientId) {
   }
 
   // Validate user is a farmer
-  const user = await client.query(
-    'SELECT user_type FROM users WHERE id = $1',
-    [userId],
-  );
+  const user = await client.query("SELECT user_type FROM users WHERE id = $1", [
+    userId,
+  ]);
 
-  if (user.rows.length === 0 || user.rows[0].user_type !== 'FARMER') {
+  if (user.rows.length === 0 || user.rows[0].user_type !== "FARMER") {
     return {
       success: false,
-      error: 'Only farmers can create listings',
+      error: "Only farmers can create listings",
     };
   }
 
   // Create listing
-  const result = await client.query(`
+  const result = await client.query(
+    `
     INSERT INTO listings (
       farmer_id, crop_type, quantity, unit, price_per_unit,
       quality, location, pickup_locations, available_from,
       available_until, description, images, client_id
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     RETURNING id
-  `, [
-    userId,
-    payload.cropType,
-    payload.quantity,
-    payload.unit,
-    payload.pricePerUnit,
-    payload.quality,
-    payload.location,
-    payload.pickupLocations || [],
-    payload.availableFrom,
-    payload.availableUntil,
-    payload.description,
-    payload.images || [],
-    clientId,
-  ]);
+  `,
+    [
+      userId,
+      payload.cropType,
+      payload.quantity,
+      payload.unit,
+      payload.pricePerUnit,
+      payload.quality,
+      payload.location,
+      payload.pickupLocations || [],
+      payload.availableFrom,
+      payload.availableUntil,
+      payload.description,
+      payload.images || [],
+      clientId,
+    ],
+  );
 
   return {
     success: true,
@@ -253,41 +261,45 @@ async function processUpdateListing(client, payload, userId) {
 
   // Check if listing exists and belongs to user
   const existing = await client.query(
-    'SELECT farmer_id, updated_at FROM listings WHERE id = $1',
+    "SELECT farmer_id, updated_at FROM listings WHERE id = $1",
     [listingId],
   );
 
   if (existing.rows.length === 0) {
     return {
       success: false,
-      error: 'Listing not found',
+      error: "Listing not found",
     };
   }
 
   if (existing.rows[0].farmer_id !== userId) {
     return {
       success: false,
-      error: 'You can only update your own listings',
+      error: "You can only update your own listings",
     };
   }
 
   // Check for conflicts (server version newer than client)
-  if (payload.lastUpdated && existing.rows[0].updated_at > new Date(payload.lastUpdated)) {
+  if (
+    payload.lastUpdated &&
+    existing.rows[0].updated_at > new Date(payload.lastUpdated)
+  ) {
     const serverListing = await client.query(
-      'SELECT * FROM listings WHERE id = $1',
+      "SELECT * FROM listings WHERE id = $1",
       [listingId],
     );
 
     return {
       success: false,
       conflict: true,
-      reason: 'Server version is newer',
+      reason: "Server version is newer",
       serverObject: JSON.stringify(serverListing.rows[0]),
     };
   }
 
   // Update listing
-  await client.query(`
+  await client.query(
+    `
     UPDATE listings SET
       crop_type = COALESCE($2, crop_type),
       quantity = COALESCE($3, quantity),
@@ -302,20 +314,22 @@ async function processUpdateListing(client, payload, userId) {
       images = COALESCE($12, images),
       updated_at = NOW()
     WHERE id = $1
-  `, [
-    listingId,
-    updateData.cropType,
-    updateData.quantity,
-    updateData.unit,
-    updateData.pricePerUnit,
-    updateData.quality,
-    updateData.location,
-    updateData.pickupLocations,
-    updateData.availableFrom,
-    updateData.availableUntil,
-    updateData.description,
-    updateData.images,
-  ]);
+  `,
+    [
+      listingId,
+      updateData.cropType,
+      updateData.quantity,
+      updateData.unit,
+      updateData.pricePerUnit,
+      updateData.quality,
+      updateData.location,
+      updateData.pickupLocations,
+      updateData.availableFrom,
+      updateData.availableUntil,
+      updateData.description,
+      updateData.images,
+    ],
+  );
 
   return {
     success: true,
@@ -331,27 +345,27 @@ async function processDeleteListing(client, payload, userId) {
 
   // Check if listing exists and belongs to user
   const existing = await client.query(
-    'SELECT farmer_id FROM listings WHERE id = $1',
+    "SELECT farmer_id FROM listings WHERE id = $1",
     [listingId],
   );
 
   if (existing.rows.length === 0) {
     return {
       success: false,
-      error: 'Listing not found',
+      error: "Listing not found",
     };
   }
 
   if (existing.rows[0].farmer_id !== userId) {
     return {
       success: false,
-      error: 'You can only delete your own listings',
+      error: "You can only delete your own listings",
     };
   }
 
   // Soft delete
   await client.query(
-    'UPDATE listings SET is_active = false, updated_at = NOW() WHERE id = $1',
+    "UPDATE listings SET is_active = false, updated_at = NOW() WHERE id = $1",
     [listingId],
   );
 
@@ -368,7 +382,7 @@ async function processCreateTransaction(client, payload, userId, clientId) {
   // Check if transaction already exists
   if (clientId) {
     const existing = await client.query(
-      'SELECT id FROM transactions WHERE client_id = $1',
+      "SELECT id FROM transactions WHERE client_id = $1",
       [clientId],
     );
 
@@ -382,14 +396,14 @@ async function processCreateTransaction(client, payload, userId, clientId) {
 
   // Validate listing exists and is available with locking
   const listing = await client.query(
-    'SELECT farmer_id, quantity, is_active FROM listings WHERE id = $1 FOR UPDATE',
+    "SELECT farmer_id, quantity, is_active FROM listings WHERE id = $1 FOR UPDATE",
     [payload.listingId],
   );
 
   if (listing.rows.length === 0 || !listing.rows[0].is_active) {
     return {
       success: false,
-      error: 'Listing not found or not available',
+      error: "Listing not found or not available",
     };
   }
 
@@ -397,29 +411,32 @@ async function processCreateTransaction(client, payload, userId, clientId) {
   if (payload.quantity > listing.rows[0].quantity) {
     return {
       success: false,
-      error: 'Requested quantity exceeds available quantity',
+      error: "Requested quantity exceeds available quantity",
     };
   }
 
   // Create transaction
-  const result = await client.query(`
+  const result = await client.query(
+    `
     INSERT INTO transactions (
       listing_id, farmer_id, buyer_id, quantity, total_amount,
       pickup_location, pickup_date, buyer_contact, notes, client_id
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING id
-  `, [
-    payload.listingId,
-    listing.rows[0].farmer_id,
-    userId,
-    payload.quantity,
-    payload.totalAmount,
-    payload.pickupLocation,
-    payload.pickupDate,
-    payload.buyerContact,
-    payload.notes,
-    clientId,
-  ]);
+  `,
+    [
+      payload.listingId,
+      listing.rows[0].farmer_id,
+      userId,
+      payload.quantity,
+      payload.totalAmount,
+      payload.pickupLocation,
+      payload.pickupDate,
+      payload.buyerContact,
+      payload.notes,
+      clientId,
+    ],
+  );
 
   return {
     success: true,
@@ -435,14 +452,14 @@ async function processUpdateTransaction(client, payload, userId) {
 
   // Check if transaction exists and user has permission
   const existing = await client.query(
-    'SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1',
+    "SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1",
     [transactionId],
   );
 
   if (existing.rows.length === 0) {
     return {
       success: false,
-      error: 'Transaction not found',
+      error: "Transaction not found",
     };
   }
 
@@ -453,15 +470,15 @@ async function processUpdateTransaction(client, payload, userId) {
   if (!isFarmer && !isBuyer) {
     return {
       success: false,
-      error: 'You can only update your own transactions',
+      error: "You can only update your own transactions",
     };
   }
 
   // Validate status transition
   const validTransitions = {
-    PENDING: ['CONFIRMED', 'CANCELLED'],
-    CONFIRMED: ['IN_PROGRESS', 'CANCELLED'],
-    IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+    PENDING: ["CONFIRMED", "CANCELLED"],
+    CONFIRMED: ["IN_PROGRESS", "CANCELLED"],
+    IN_PROGRESS: ["COMPLETED", "CANCELLED"],
     COMPLETED: [],
     CANCELLED: [],
   };
@@ -483,10 +500,10 @@ async function processUpdateTransaction(client, payload, userId) {
     updateValues.push(status);
     paramIndex++;
 
-    if (status === 'COMPLETED') {
-      updateFields.push('completed_at = NOW()');
-    } else if (status === 'CANCELLED') {
-      updateFields.push('cancelled_at = NOW()');
+    if (status === "COMPLETED") {
+      updateFields.push("completed_at = NOW()");
+    } else if (status === "CANCELLED") {
+      updateFields.push("cancelled_at = NOW()");
       if (notes) {
         updateFields.push(`cancellation_reason = $${paramIndex}`);
         updateValues.push(notes);
@@ -495,18 +512,21 @@ async function processUpdateTransaction(client, payload, userId) {
     }
   }
 
-  if (notes && status !== 'CANCELLED') {
+  if (notes && status !== "CANCELLED") {
     updateFields.push(`notes = $${paramIndex}`);
     updateValues.push(notes);
     paramIndex++;
   }
 
-  updateFields.push('updated_at = NOW()');
+  updateFields.push("updated_at = NOW()");
 
-  await client.query(`
-    UPDATE transactions SET ${updateFields.join(', ')}
+  await client.query(
+    `
+    UPDATE transactions SET ${updateFields.join(", ")}
     WHERE id = $1
-  `, updateValues);
+  `,
+    updateValues,
+  );
 
   return {
     success: true,
@@ -542,12 +562,15 @@ async function processUpdateUser(client, payload, userId) {
     paramIndex++;
   }
 
-  updateFields.push('updated_at = NOW()');
+  updateFields.push("updated_at = NOW()");
 
-  await client.query(`
-    UPDATE users SET ${updateFields.join(', ')}
+  await client.query(
+    `
+    UPDATE users SET ${updateFields.join(", ")}
     WHERE id = $1
-  `, updateValues);
+  `,
+    updateValues,
+  );
 
   return {
     success: true,
@@ -576,14 +599,15 @@ async function getUpdatedDataSince(lastSyncAt, userId, options = {}) {
 
   // 1. Get updated users (only current user - no pagination needed for 1 record)
   const users = await db.query(
-    'SELECT * FROM users WHERE id = $1 AND updated_at > $2',
+    "SELECT * FROM users WHERE id = $1 AND updated_at > $2",
     [userId, syncTimestamp],
   );
   data.users = users.rows;
 
   // 2. Get updated listings (paginated)
   const listingOffset = (listingPage - 1) * listingLimit;
-  const listingsResult = await db.query(`
+  const listingsResult = await db.query(
+    `
     SELECT l.*, u.name as farmer_name 
     FROM listings l
     JOIN users u ON l.farmer_id = u.id
@@ -591,12 +615,17 @@ async function getUpdatedDataSince(lastSyncAt, userId, options = {}) {
     AND l.updated_at > $2
     ORDER BY l.updated_at DESC
     LIMIT $3 OFFSET $4
-  `, [userId, syncTimestamp, listingLimit, listingOffset]);
+  `,
+    [userId, syncTimestamp, listingLimit, listingOffset],
+  );
 
-  const listingsCount = await db.query(`
+  const listingsCount = await db.query(
+    `
     SELECT COUNT(*) as total FROM listings 
     WHERE (farmer_id = $1 OR is_active = true) AND updated_at > $2
-  `, [userId, syncTimestamp]);
+  `,
+    [userId, syncTimestamp],
+  );
 
   data.listings = {
     data: listingsResult.rows,
@@ -607,17 +636,23 @@ async function getUpdatedDataSince(lastSyncAt, userId, options = {}) {
 
   // 3. Get updated transactions (paginated)
   const transactionOffset = (transactionPage - 1) * transactionLimit;
-  const transactionsResult = await db.query(`
+  const transactionsResult = await db.query(
+    `
     SELECT * FROM transactions 
     WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2
     ORDER BY updated_at DESC
     LIMIT $3 OFFSET $4
-  `, [userId, syncTimestamp, transactionLimit, transactionOffset]);
+  `,
+    [userId, syncTimestamp, transactionLimit, transactionOffset],
+  );
 
-  const transactionsCount = await db.query(`
+  const transactionsCount = await db.query(
+    `
     SELECT COUNT(*) as total FROM transactions 
     WHERE (farmer_id = $1 OR buyer_id = $1) AND updated_at > $2
-  `, [userId, syncTimestamp]);
+  `,
+    [userId, syncTimestamp],
+  );
 
   data.transactions = {
     data: transactionsResult.rows,

@@ -1,4 +1,4 @@
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require("@supabase/supabase-js");
 
 // Supabase configuration
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -7,14 +7,18 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Missing Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) in production');
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Missing Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) in production",
+    );
   }
-  console.warn('Missing Supabase environment variables (BYPASSED - Using Mocks)');
+  console.warn(
+    "Missing Supabase environment variables (BYPASSED - Using Mocks)",
+  );
 }
 
-const finalSupabaseUrl = supabaseUrl || 'https://example.supabase.co';
-const finalSupabaseAnonKey = supabaseAnonKey || 'mock-key';
+const finalSupabaseUrl = supabaseUrl || "https://example.supabase.co";
+const finalSupabaseAnonKey = supabaseAnonKey || "mock-key";
 
 /**
  * Supabase Client Configuration for Vercel Serverless
@@ -44,11 +48,11 @@ const supabase = createClient(finalSupabaseUrl, finalSupabaseAnonKey, {
   },
   global: {
     headers: {
-      'x-application-name': 'agrimarket-mobile', // Helps identify traffic in Supabase dashboard
+      "x-application-name": "agrimarket-mobile", // Helps identify traffic in Supabase dashboard
     },
   },
   db: {
-    schema: 'public',
+    schema: "public",
   },
 });
 
@@ -56,20 +60,20 @@ const supabase = createClient(finalSupabaseUrl, finalSupabaseAnonKey, {
 // Used for backend operations that need full database access
 const supabaseAdmin = supabaseServiceKey
   ? createClient(finalSupabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false, // Service key doesn't need refresh
-      persistSession: false, // Serverless optimization
-      detectSessionInUrl: false,
-    },
-    global: {
-      headers: {
-        'x-application-name': 'agrimarket-backend', // Helps identify traffic in Supabase dashboard
+      auth: {
+        autoRefreshToken: false, // Service key doesn't need refresh
+        persistSession: false, // Serverless optimization
+        detectSessionInUrl: false,
       },
-    },
-    db: {
-      schema: 'public',
-    },
-  })
+      global: {
+        headers: {
+          "x-application-name": "agrimarket-backend", // Helps identify traffic in Supabase dashboard
+        },
+      },
+      db: {
+        schema: "public",
+      },
+    })
   : null;
 
 /**
@@ -87,23 +91,24 @@ const supabaseAdmin = supabaseServiceKey
  * Note: Replication is asynchronous, so there may be slight delay
  * (typically <1 second) for data to appear on replicas.
  */
-const supabaseReadReplica = supabaseReadReplicaUrl && supabaseServiceKey
-  ? createClient(supabaseReadReplicaUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-    global: {
-      headers: {
-        'x-application-name': 'agrimarket-read-replica',
-      },
-    },
-    db: {
-      schema: 'public',
-    },
-  })
-  : null;
+const supabaseReadReplica =
+  supabaseReadReplicaUrl && supabaseServiceKey
+    ? createClient(supabaseReadReplicaUrl, supabaseServiceKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false,
+        },
+        global: {
+          headers: {
+            "x-application-name": "agrimarket-read-replica",
+          },
+        },
+        db: {
+          schema: "public",
+        },
+      })
+    : null;
 
 /**
  * Get the appropriate client for read operations.

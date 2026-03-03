@@ -1,18 +1,18 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
-const DatabaseService = require('../services/database');
-const AuthService = require('../services/auth');
+const DatabaseService = require("../services/database");
+const AuthService = require("../services/auth");
 
 // Example: Get all products
-router.get('/products', async (req, res) => {
+router.get("/products", async (req, res) => {
   try {
     const { category, location, available } = req.query;
     const filters = {};
 
     if (category) filters.category = category;
     if (location) filters.location = location;
-    if (available !== undefined) filters.available = available === 'true';
+    if (available !== undefined) filters.available = available === "true";
 
     const products = await DatabaseService.getProducts(filters);
 
@@ -30,7 +30,7 @@ router.get('/products', async (req, res) => {
 });
 
 // Example: Create a new product
-router.post('/products', async (req, res) => {
+router.post("/products", async (req, res) => {
   try {
     // In a real app, you'd get user_id from JWT token
     const productData = {
@@ -53,24 +53,24 @@ router.post('/products', async (req, res) => {
 });
 
 // Example: Send OTP for login
-router.post('/auth/send-otp', async (req, res) => {
+router.post("/auth/send-otp", async (req, res) => {
   try {
     const { phone } = req.body;
 
     if (!phone) {
       return res.status(400).json({
         success: false,
-        error: 'Phone number is required',
+        error: "Phone number is required",
       });
     }
 
-    const result = await AuthService.sendOTP(phone, 'login');
+    const result = await AuthService.sendOTP(phone, "login");
 
     res.json({
       success: true,
-      message: 'OTP sent successfully',
+      message: "OTP sent successfully",
       // Remove this in production:
-      ...(process.env.NODE_ENV === 'development' && { otp: result.otp }),
+      ...(process.env.NODE_ENV === "development" && { otp: result.otp }),
     });
   } catch (error) {
     res.status(500).json({
@@ -81,19 +81,19 @@ router.post('/auth/send-otp', async (req, res) => {
 });
 
 // Example: Verify OTP and login
-router.post('/auth/verify-otp', async (req, res) => {
+router.post("/auth/verify-otp", async (req, res) => {
   try {
     const { phone, otp } = req.body;
 
     if (!phone || !otp) {
       return res.status(400).json({
         success: false,
-        error: 'Phone and OTP are required',
+        error: "Phone and OTP are required",
       });
     }
 
     // Verify OTP
-    await AuthService.verifyOTP(phone, otp, 'login');
+    await AuthService.verifyOTP(phone, otp, "login");
 
     // Login user
     const result = await AuthService.loginWithPhone(phone);
@@ -111,7 +111,7 @@ router.post('/auth/verify-otp', async (req, res) => {
 });
 
 // Example: Upload product image
-router.post('/products/:id/images', async (req, res) => {
+router.post("/products/:id/images", async (req, res) => {
   try {
     const { id } = req.params;
     const file = req.file; // Assuming you're using multer
@@ -119,14 +119,14 @@ router.post('/products/:id/images', async (req, res) => {
     if (!file) {
       return res.status(400).json({
         success: false,
-        error: 'No file uploaded',
+        error: "No file uploaded",
       });
     }
 
     // Upload to Supabase Storage
     const fileName = `${id}/${Date.now()}-${file.originalname}`;
     const uploadResult = await DatabaseService.uploadFile(
-      'product-images',
+      "product-images",
       fileName,
       file.buffer,
       {
@@ -136,7 +136,10 @@ router.post('/products/:id/images', async (req, res) => {
     );
 
     // Get public URL
-    const publicUrl = await DatabaseService.getFileUrl('product-images', fileName);
+    const publicUrl = await DatabaseService.getFileUrl(
+      "product-images",
+      fileName,
+    );
 
     res.json({
       success: true,
@@ -154,13 +157,13 @@ router.post('/products/:id/images', async (req, res) => {
 });
 
 // Example: Real-time subscription setup (for WebSocket or SSE)
-router.get('/products/subscribe', (req, res) => {
+router.get("/products/subscribe", (req, res) => {
   // Set up Server-Sent Events
   res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    Connection: 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
   });
 
   // Subscribe to product changes
@@ -169,7 +172,7 @@ router.get('/products/subscribe', (req, res) => {
   });
 
   // Clean up on client disconnect
-  req.on('close', () => {
+  req.on("close", () => {
     subscription.unsubscribe();
   });
 });

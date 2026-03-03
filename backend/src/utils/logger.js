@@ -1,5 +1,5 @@
-const winston = require('winston');
-const path = require('path');
+const winston = require("winston");
+const path = require("path");
 
 // Define log levels
 const levels = {
@@ -12,11 +12,11 @@ const levels = {
 
 // Define colors for each level
 const colors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  http: 'magenta',
-  debug: 'white',
+  error: "red",
+  warn: "yellow",
+  info: "green",
+  http: "magenta",
+  debug: "white",
 };
 
 // Tell winston that you want to link the colors
@@ -24,17 +24,17 @@ winston.addColors(colors);
 
 // Define which level to log based on environment
 const level = () => {
-  const env = process.env.NODE_ENV || 'development';
-  const isDevelopment = env === 'development';
-  return isDevelopment ? 'debug' : 'warn';
+  const env = process.env.NODE_ENV || "development";
+  const isDevelopment = env === "development";
+  return isDevelopment ? "debug" : "warn";
 };
 
 // Detect if running on Vercel
-const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
+const isVercel = process.env.VERCEL === "1" || !!process.env.VERCEL;
 
 // Define format for logs
 const format = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
     (info) => `${info.timestamp} ${info.level}: ${info.message}`,
@@ -43,7 +43,7 @@ const format = winston.format.combine(
 
 // Define format for file logs (without colors)
 const fileFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
   winston.format.errors({ stack: true }),
   winston.format.json(),
 );
@@ -59,10 +59,10 @@ const transports = [
 
 // Add file transports in production ONLY if not running on Vercel
 // Vercel has a read-only filesystem which causes fs.mkdirSync to fail
-if (process.env.NODE_ENV === 'production' && !isVercel) {
+if (process.env.NODE_ENV === "production" && !isVercel) {
   // Ensure logs directory exists
-  const fs = require('fs');
-  const logsDir = path.join(process.cwd(), 'logs');
+  const fs = require("fs");
+  const logsDir = path.join(process.cwd(), "logs");
   if (!fs.existsSync(logsDir)) {
     try {
       fs.mkdirSync(logsDir, { recursive: true });
@@ -70,8 +70,8 @@ if (process.env.NODE_ENV === 'production' && !isVercel) {
       // Error log file
       transports.push(
         new winston.transports.File({
-          filename: path.join(logsDir, 'error.log'),
-          level: 'error',
+          filename: path.join(logsDir, "error.log"),
+          level: "error",
           format: fileFormat,
           maxsize: 5242880, // 5MB
           maxFiles: 5,
@@ -81,14 +81,14 @@ if (process.env.NODE_ENV === 'production' && !isVercel) {
       // Combined log file
       transports.push(
         new winston.transports.File({
-          filename: path.join(logsDir, 'combined.log'),
+          filename: path.join(logsDir, "combined.log"),
           format: fileFormat,
           maxsize: 5242880, // 5MB
           maxFiles: 5,
         }),
       );
     } catch (err) {
-      console.error('Failed to initialize file logging:', err);
+      console.error("Failed to initialize file logging:", err);
     }
   }
 }
@@ -127,7 +127,7 @@ logger.logRequest = (req, res, responseTime) => {
     url: req.originalUrl,
     statusCode: res.statusCode,
     responseTime: `${responseTime}ms`,
-    userAgent: req.get('User-Agent'),
+    userAgent: req.get("User-Agent"),
     ip: req.ip || req.connection.remoteAddress,
   };
 
@@ -136,7 +136,7 @@ logger.logRequest = (req, res, responseTime) => {
     logData.userType = req.user.userType;
   }
 
-  logger.http('HTTP Request', logData);
+  logger.http("HTTP Request", logData);
 };
 
 logger.logError = (error, context = {}) => {
@@ -146,23 +146,31 @@ logger.logError = (error, context = {}) => {
     ...context,
   };
 
-  logger.error('Application Error', errorData);
+  logger.error("Application Error", errorData);
 };
 
-logger.logAuth = (action, userId, phoneNumber, success = true, details = {}) => {
+logger.logAuth = (
+  action,
+  userId,
+  phoneNumber,
+  success = true,
+  details = {},
+) => {
   const logData = {
     action,
     userId,
-    phoneNumber: phoneNumber ? phoneNumber.replace(/(\+94)(\d{2})(\d{3})(\d{4})/, '$1 $2 *** $4') : null,
+    phoneNumber: phoneNumber
+      ? phoneNumber.replace(/(\+94)(\d{2})(\d{3})(\d{4})/, "$1 $2 *** $4")
+      : null,
     success,
     timestamp: new Date().toISOString(),
     ...details,
   };
 
   if (success) {
-    logger.info('Auth Success', logData);
+    logger.info("Auth Success", logData);
   } else {
-    logger.warn('Auth Failure', logData);
+    logger.warn("Auth Failure", logData);
   }
 };
 
@@ -173,7 +181,7 @@ logger.logBusiness = (event, data = {}) => {
     ...data,
   };
 
-  logger.info('Business Event', logData);
+  logger.info("Business Event", logData);
 };
 
 logger.logPerformance = (operation, duration, details = {}) => {
@@ -185,13 +193,13 @@ logger.logPerformance = (operation, duration, details = {}) => {
   };
 
   if (duration > 1000) {
-    logger.warn('Slow Operation', logData);
+    logger.warn("Slow Operation", logData);
   } else {
-    logger.debug('Performance', logData);
+    logger.debug("Performance", logData);
   }
 };
 
-logger.logSecurity = (event, severity = 'medium', details = {}) => {
+logger.logSecurity = (event, severity = "medium", details = {}) => {
   const logData = {
     securityEvent: event,
     severity,
@@ -199,19 +207,19 @@ logger.logSecurity = (event, severity = 'medium', details = {}) => {
     ...details,
   };
 
-  if (severity === 'high') {
-    logger.error('Security Alert', logData);
-  } else if (severity === 'medium') {
-    logger.warn('Security Warning', logData);
+  if (severity === "high") {
+    logger.error("Security Alert", logData);
+  } else if (severity === "medium") {
+    logger.warn("Security Warning", logData);
   } else {
-    logger.info('Security Info', logData);
+    logger.info("Security Info", logData);
   }
 };
 
 // Log startup information
-logger.info('Logger initialized', {
+logger.info("Logger initialized", {
   level: level(),
-  environment: process.env.NODE_ENV || 'development',
+  environment: process.env.NODE_ENV || "development",
   transports: transports.map((t) => t.constructor.name),
 });
 

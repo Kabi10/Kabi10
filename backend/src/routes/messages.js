@@ -1,9 +1,9 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
-const logger = require('../utils/logger');
-const { validateUUID } = require('../utils/helpers');
-const { createNotification } = require('../utils/notifications');
+const express = require("express");
+const { body, validationResult } = require("express-validator");
+const db = require("../database/connection");
+const logger = require("../utils/logger");
+const { validateUUID } = require("../utils/helpers");
+const { createNotification } = require("../utils/notifications");
 
 const router = express.Router();
 
@@ -11,13 +11,14 @@ const router = express.Router();
  * GET /api/v1/messages/conversations
  * List user's conversations (paginated, ordered by last_message_at)
  */
-router.get('/conversations', async (req, res) => {
+router.get("/conversations", async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const userId = req.user.userId;
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT
         c.*,
         u1.name as participant_1_name,
@@ -34,12 +35,14 @@ router.get('/conversations', async (req, res) => {
       WHERE c.participant_1_id = $1 OR c.participant_2_id = $1
       ORDER BY c.last_message_at DESC NULLS LAST
       LIMIT $2 OFFSET $3
-    `, [userId, parseInt(limit), offset]);
+    `,
+      [userId, parseInt(limit), offset],
+    );
 
     const countResult = await db.query(
       `SELECT COUNT(*) as total FROM conversations
        WHERE participant_1_id = $1 OR participant_2_id = $1`,
-      [userId]
+      [userId],
     );
     const total = parseInt(countResult.rows[0].total);
 
@@ -49,8 +52,12 @@ router.get('/conversations', async (req, res) => {
         id: row.id,
         otherParticipant: {
           id: isParticipant1 ? row.participant_2_id : row.participant_1_id,
-          name: isParticipant1 ? row.participant_2_name : row.participant_1_name,
-          phone: isParticipant1 ? row.participant_2_phone : row.participant_1_phone,
+          name: isParticipant1
+            ? row.participant_2_name
+            : row.participant_1_name,
+          phone: isParticipant1
+            ? row.participant_2_phone
+            : row.participant_1_phone,
         },
         listingId: row.listing_id,
         listingCropType: row.listing_crop_type,
@@ -72,8 +79,10 @@ router.get('/conversations', async (req, res) => {
       hasPrevious: parseInt(page) > 1,
     });
   } catch (error) {
-    logger.error('Get conversations error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch conversations' });
+    logger.error("Get conversations error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch conversations" });
   }
 });
 
@@ -81,14 +90,17 @@ router.get('/conversations', async (req, res) => {
  * GET /api/v1/messages/conversations/:id
  * Get conversation detail
  */
-router.get('/conversations/:id', async (req, res) => {
+router.get("/conversations/:id", async (req, res) => {
   try {
     const { id } = req.params;
     if (!validateUUID(id)) {
-      return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid conversation ID" });
     }
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT
         c.*,
         u1.name as participant_1_name,
@@ -101,10 +113,14 @@ router.get('/conversations/:id', async (req, res) => {
       JOIN users u2 ON c.participant_2_id = u2.id
       LEFT JOIN listings l ON c.listing_id = l.id
       WHERE c.id = $1 AND (c.participant_1_id = $2 OR c.participant_2_id = $2)
-    `, [id, req.user.userId]);
+    `,
+      [id, req.user.userId],
+    );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Conversation not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Conversation not found" });
     }
 
     const row = result.rows[0];
@@ -117,8 +133,12 @@ router.get('/conversations/:id', async (req, res) => {
         id: row.id,
         otherParticipant: {
           id: isParticipant1 ? row.participant_2_id : row.participant_1_id,
-          name: isParticipant1 ? row.participant_2_name : row.participant_1_name,
-          phone: isParticipant1 ? row.participant_2_phone : row.participant_1_phone,
+          name: isParticipant1
+            ? row.participant_2_name
+            : row.participant_1_name,
+          phone: isParticipant1
+            ? row.participant_2_phone
+            : row.participant_1_phone,
         },
         listingId: row.listing_id,
         listingCropType: row.listing_crop_type,
@@ -128,8 +148,10 @@ router.get('/conversations/:id', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Get conversation error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch conversation' });
+    logger.error("Get conversation error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch conversation" });
   }
 });
 
@@ -137,20 +159,28 @@ router.get('/conversations/:id', async (req, res) => {
  * POST /api/v1/messages/conversations
  * Create or get existing conversation
  */
-router.post('/conversations',
-  [body('participantId').isUUID().withMessage('Invalid participant ID')],
+router.post(
+  "/conversations",
+  [body("participantId").isUUID().withMessage("Invalid participant ID")],
   async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        });
       }
 
       const { participantId, listingId } = req.body;
       const userId = req.user.userId;
 
       if (userId === participantId) {
-        return res.status(400).json({ success: false, message: 'Cannot start conversation with yourself' });
+        return res.status(400).json({
+          success: false,
+          message: "Cannot start conversation with yourself",
+        });
       }
 
       // Ensure ordered participants for unique constraint
@@ -160,67 +190,83 @@ router.post('/conversations',
       // Try to find existing conversation
       let result = await db.query(
         `SELECT id FROM conversations WHERE participant_1_id = $1 AND participant_2_id = $2`,
-        [p1, p2]
+        [p1, p2],
       );
 
       if (result.rows.length > 0) {
-        return res.json({ success: true, data: { id: result.rows[0].id, created: false } });
+        return res.json({
+          success: true,
+          data: { id: result.rows[0].id, created: false },
+        });
       }
 
       // Create new conversation
       result = await db.query(
         `INSERT INTO conversations (participant_1_id, participant_2_id, listing_id)
          VALUES ($1, $2, $3) RETURNING id, created_at`,
-        [p1, p2, listingId || null]
+        [p1, p2, listingId || null],
       );
 
       res.status(201).json({
         success: true,
-        data: { id: result.rows[0].id, created: true, createdAt: result.rows[0].created_at },
+        data: {
+          id: result.rows[0].id,
+          created: true,
+          createdAt: result.rows[0].created_at,
+        },
       });
     } catch (error) {
-      logger.error('Create conversation error:', error);
-      res.status(500).json({ success: false, message: 'Failed to create conversation' });
+      logger.error("Create conversation error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to create conversation" });
     }
-  }
+  },
 );
 
 /**
  * GET /api/v1/messages/conversations/:id/messages
  * Get messages in conversation (paginated, newest first)
  */
-router.get('/conversations/:id/messages', async (req, res) => {
+router.get("/conversations/:id/messages", async (req, res) => {
   try {
     const { id } = req.params;
     const { page = 1, limit = 50 } = req.query;
 
     if (!validateUUID(id)) {
-      return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid conversation ID" });
     }
 
     // Verify user is participant
     const conv = await db.query(
       `SELECT id FROM conversations WHERE id = $1 AND (participant_1_id = $2 OR participant_2_id = $2)`,
-      [id, req.user.userId]
+      [id, req.user.userId],
     );
     if (conv.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Conversation not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Conversation not found" });
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT m.*, u.name as sender_name
       FROM messages m
       JOIN users u ON m.sender_id = u.id
       WHERE m.conversation_id = $1
       ORDER BY m.created_at DESC
       LIMIT $2 OFFSET $3
-    `, [id, parseInt(limit), offset]);
+    `,
+      [id, parseInt(limit), offset],
+    );
 
     const countResult = await db.query(
-      'SELECT COUNT(*) as total FROM messages WHERE conversation_id = $1',
-      [id]
+      "SELECT COUNT(*) as total FROM messages WHERE conversation_id = $1",
+      [id],
     );
     const total = parseInt(countResult.rows[0].total);
 
@@ -245,8 +291,10 @@ router.get('/conversations/:id/messages', async (req, res) => {
       hasPrevious: parseInt(page) > 1,
     });
   } catch (error) {
-    logger.error('Get messages error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch messages' });
+    logger.error("Get messages error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch messages" });
   }
 });
 
@@ -254,59 +302,76 @@ router.get('/conversations/:id/messages', async (req, res) => {
  * POST /api/v1/messages/conversations/:id/messages
  * Send a message
  */
-router.post('/conversations/:id/messages',
-  [body('content').isLength({ min: 1, max: 2000 }).withMessage('Message content required (max 2000 chars)')],
+router.post(
+  "/conversations/:id/messages",
+  [
+    body("content")
+      .isLength({ min: 1, max: 2000 })
+      .withMessage("Message content required (max 2000 chars)"),
+  ],
   async (req, res) => {
     try {
       const { id } = req.params;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        });
       }
 
       if (!validateUUID(id)) {
-        return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid conversation ID" });
       }
 
       const userId = req.user.userId;
-      const { content, messageType = 'TEXT' } = req.body;
+      const { content, messageType = "TEXT" } = req.body;
 
       // Verify user is participant and get other participant
       const conv = await db.query(
         `SELECT participant_1_id, participant_2_id FROM conversations
          WHERE id = $1 AND (participant_1_id = $2 OR participant_2_id = $2)`,
-        [id, userId]
+        [id, userId],
       );
       if (conv.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Conversation not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: "Conversation not found" });
       }
 
-      const otherUserId = conv.rows[0].participant_1_id === userId
-        ? conv.rows[0].participant_2_id
-        : conv.rows[0].participant_1_id;
+      const otherUserId =
+        conv.rows[0].participant_1_id === userId
+          ? conv.rows[0].participant_2_id
+          : conv.rows[0].participant_1_id;
 
       // Insert message
       const result = await db.query(
         `INSERT INTO messages (conversation_id, sender_id, content, message_type)
          VALUES ($1, $2, $3, $4) RETURNING *`,
-        [id, userId, content, messageType]
+        [id, userId, content, messageType],
       );
 
       // Update conversation's last message
       await db.query(
         `UPDATE conversations SET last_message_text = $1, last_message_at = NOW() WHERE id = $2`,
-        [content.substring(0, 100), id]
+        [content.substring(0, 100), id],
       );
 
       // Create notification for recipient
-      const senderName = await db.query('SELECT name FROM users WHERE id = $1', [userId]);
-      const name = senderName.rows[0]?.name || 'Someone';
+      const senderName = await db.query(
+        "SELECT name FROM users WHERE id = $1",
+        [userId],
+      );
+      const name = senderName.rows[0]?.name || "Someone";
       await createNotification(
         otherUserId,
-        'NEW_MESSAGE',
+        "NEW_MESSAGE",
         `New message from ${name}`,
         content.substring(0, 100),
-        id
+        id,
       );
 
       const msg = result.rows[0];
@@ -323,33 +388,39 @@ router.post('/conversations/:id/messages',
         },
       });
     } catch (error) {
-      logger.error('Send message error:', error);
-      res.status(500).json({ success: false, message: 'Failed to send message' });
+      logger.error("Send message error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to send message" });
     }
-  }
+  },
 );
 
 /**
  * PATCH /api/v1/messages/conversations/:id/read
  * Mark all messages in conversation as read
  */
-router.patch('/conversations/:id/read', async (req, res) => {
+router.patch("/conversations/:id/read", async (req, res) => {
   try {
     const { id } = req.params;
     if (!validateUUID(id)) {
-      return res.status(400).json({ success: false, message: 'Invalid conversation ID' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid conversation ID" });
     }
 
     const result = await db.query(
       `UPDATE messages SET is_read = TRUE
        WHERE conversation_id = $1 AND sender_id != $2 AND is_read = FALSE`,
-      [id, req.user.userId]
+      [id, req.user.userId],
     );
 
     res.json({ success: true, markedCount: result.rowCount });
   } catch (error) {
-    logger.error('Mark messages read error:', error);
-    res.status(500).json({ success: false, message: 'Failed to mark messages as read' });
+    logger.error("Mark messages read error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to mark messages as read" });
   }
 });
 
@@ -357,23 +428,28 @@ router.patch('/conversations/:id/read', async (req, res) => {
  * GET /api/v1/messages/unread-count
  * Get total unread message count for user
  */
-router.get('/unread-count', async (req, res) => {
+router.get("/unread-count", async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT COUNT(*) as count
       FROM messages m
       JOIN conversations c ON m.conversation_id = c.id
       WHERE (c.participant_1_id = $1 OR c.participant_2_id = $1)
         AND m.sender_id != $1
         AND m.is_read = FALSE
-    `, [userId]);
+    `,
+      [userId],
+    );
 
     res.json({ success: true, count: parseInt(result.rows[0].count) });
   } catch (error) {
-    logger.error('Get unread count error:', error);
-    res.status(500).json({ success: false, message: 'Failed to get unread count' });
+    logger.error("Get unread count error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to get unread count" });
   }
 });
 

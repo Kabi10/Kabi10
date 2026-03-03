@@ -1,4 +1,4 @@
-const { supabase, supabaseAdmin } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require("../config/supabase");
 
 class DatabaseService {
   constructor() {
@@ -9,7 +9,7 @@ class DatabaseService {
   // User operations
   async createUser(userData) {
     const { data, error } = await this.adminClient
-      .from('users')
+      .from("users")
       .insert(userData)
       .select()
       .single();
@@ -20,9 +20,9 @@ class DatabaseService {
 
   async getUserById(id) {
     const { data, error } = await this.client
-      .from('users')
-      .select('*')
-      .eq('id', id)
+      .from("users")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) throw error;
@@ -31,20 +31,20 @@ class DatabaseService {
 
   async getUserByPhone(phone) {
     const { data, error } = await this.client
-      .from('users')
-      .select('*')
-      .eq('phone', phone)
+      .from("users")
+      .select("*")
+      .eq("phone", phone)
       .single();
 
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows returned
+    if (error && error.code !== "PGRST116") throw error; // PGRST116 = no rows returned
     return data;
   }
 
   async updateUser(id, updates) {
     const { data, error } = await this.client
-      .from('users')
+      .from("users")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -55,7 +55,7 @@ class DatabaseService {
   // Product operations
   async createProduct(productData) {
     const { data, error } = await this.client
-      .from('products')
+      .from("products")
       .insert(productData)
       .select()
       .single();
@@ -65,9 +65,7 @@ class DatabaseService {
   }
 
   async getProducts(filters = {}) {
-    let query = this.client
-      .from('products')
-      .select(`
+    let query = this.client.from("products").select(`
         *,
         users:user_id (
           id,
@@ -79,20 +77,20 @@ class DatabaseService {
 
     // Apply filters
     if (filters.category) {
-      query = query.eq('category', filters.category);
+      query = query.eq("category", filters.category);
     }
     if (filters.location) {
-      query = query.ilike('location', `%${filters.location}%`);
+      query = query.ilike("location", `%${filters.location}%`);
     }
     if (filters.available) {
-      query = query.eq('available', filters.available);
+      query = query.eq("available", filters.available);
     }
     if (filters.user_id) {
-      query = query.eq('user_id', filters.user_id);
+      query = query.eq("user_id", filters.user_id);
     }
 
     // Sorting
-    query = query.order('created_at', { ascending: false });
+    query = query.order("created_at", { ascending: false });
 
     const { data, error } = await query;
     if (error) throw error;
@@ -101,8 +99,9 @@ class DatabaseService {
 
   async getProductById(id) {
     const { data, error } = await this.client
-      .from('products')
-      .select(`
+      .from("products")
+      .select(
+        `
         *,
         users:user_id (
           id,
@@ -110,8 +109,9 @@ class DatabaseService {
           phone,
           location
         )
-      `)
-      .eq('id', id)
+      `,
+      )
+      .eq("id", id)
       .single();
 
     if (error) throw error;
@@ -120,9 +120,9 @@ class DatabaseService {
 
   async updateProduct(id, updates) {
     const { data, error } = await this.client
-      .from('products')
+      .from("products")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -131,10 +131,7 @@ class DatabaseService {
   }
 
   async deleteProduct(id) {
-    const { error } = await this.client
-      .from('products')
-      .delete()
-      .eq('id', id);
+    const { error } = await this.client.from("products").delete().eq("id", id);
 
     if (error) throw error;
     return true;
@@ -143,7 +140,7 @@ class DatabaseService {
   // Transaction operations
   async createTransaction(transactionData) {
     const { data, error } = await this.client
-      .from('transactions')
+      .from("transactions")
       .insert(transactionData)
       .select()
       .single();
@@ -154,8 +151,9 @@ class DatabaseService {
 
   async getTransactionsByUser(userId) {
     const { data, error } = await this.client
-      .from('transactions')
-      .select(`
+      .from("transactions")
+      .select(
+        `
         *,
         products:product_id (
           id,
@@ -173,9 +171,10 @@ class DatabaseService {
           name,
           phone
         )
-      `)
+      `,
+      )
       .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
-      .order('created_at', { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     return data;
@@ -183,9 +182,9 @@ class DatabaseService {
 
   async updateTransaction(id, updates) {
     const { data, error } = await this.client
-      .from('transactions')
+      .from("transactions")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -204,17 +203,13 @@ class DatabaseService {
   }
 
   async getFileUrl(bucket, path) {
-    const { data } = this.client.storage
-      .from(bucket)
-      .getPublicUrl(path);
+    const { data } = this.client.storage.from(bucket).getPublicUrl(path);
 
     return data.publicUrl;
   }
 
   async deleteFile(bucket, path) {
-    const { error } = await this.client.storage
-      .from(bucket)
-      .remove([path]);
+    const { error } = await this.client.storage.from(bucket).remove([path]);
 
     if (error) throw error;
     return true;
@@ -223,10 +218,10 @@ class DatabaseService {
   // Real-time subscriptions
   subscribeToProducts(callback) {
     return this.client
-      .channel('products')
+      .channel("products")
       .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'products' },
+        "postgres_changes",
+        { event: "*", schema: "public", table: "products" },
         callback,
       )
       .subscribe();
@@ -236,11 +231,11 @@ class DatabaseService {
     return this.client
       .channel(`transactions:${userId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'transactions',
+          event: "*",
+          schema: "public",
+          table: "transactions",
           filter: `buyer_id=eq.${userId} or seller_id=eq.${userId}`,
         },
         callback,

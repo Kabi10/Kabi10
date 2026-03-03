@@ -1,29 +1,29 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
-const smsService = require('../services/smsService');
-const logger = require('../utils/logger');
-const { generateOTP, isValidSriLankanPhone } = require('../utils/helpers');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
+const db = require("../database/connection");
+const smsService = require("../services/smsService");
+const logger = require("../utils/logger");
+const { generateOTP, isValidSriLankanPhone } = require("../utils/helpers");
 
 const router = express.Router();
 
 // Validation middleware
 const validatePhoneNumber = [
-  body('phoneNumber')
+  body("phoneNumber")
     .matches(/^\+94[0-9]{9}$/)
-    .withMessage('Invalid Sri Lankan phone number format. Use +94XXXXXXXXX'),
+    .withMessage("Invalid Sri Lankan phone number format. Use +94XXXXXXXXX"),
 ];
 
 const validateOTP = [
-  body('phoneNumber')
+  body("phoneNumber")
     .matches(/^\+94[0-9]{9}$/)
-    .withMessage('Invalid phone number format'),
-  body('otp')
+    .withMessage("Invalid phone number format"),
+  body("otp")
     .isLength({ min: 6, max: 6 })
     .isNumeric()
-    .withMessage('OTP must be 6 digits'),
+    .withMessage("OTP must be 6 digits"),
 ];
 
 /**
@@ -31,14 +31,14 @@ const validateOTP = [
  * Send OTP to phone number
  * Matches Android SendOtpRequest/Response
  */
-router.post('/send-otp', validatePhoneNumber, async (req, res) => {
+router.post("/send-otp", validatePhoneNumber, async (req, res) => {
   try {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid phone number format',
+        message: "Invalid phone number format",
         errors: errors.array(),
       });
     }
@@ -49,7 +49,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     if (!isValidSriLankanPhone(phoneNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid Sri Lankan phone number',
+        message: "Invalid Sri Lankan phone number",
       });
     }
 
@@ -63,7 +63,8 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
 
     if (recentOTP.rows.length > 0) {
       const createdAt = new Date(recentOTP.rows[0].created_at);
-      const waitSeconds = 60 - Math.floor((Date.now() - createdAt.getTime()) / 1000);
+      const waitSeconds =
+        60 - Math.floor((Date.now() - createdAt.getTime()) / 1000);
       return res.status(429).json({
         success: false,
         message: `Please wait ${waitSeconds} seconds before requesting another OTP`,
@@ -91,8 +92,8 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     try {
       const smsResult = await smsService.sendSMS(phoneNumber, message, otpCode);
 
-      logger.info('OTP generated', {
-        phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, '$1****$2'),
+      logger.info("OTP generated", {
+        phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, "$1****$2"),
         otpId,
         mockMode: smsService.isMockMode(),
       });
@@ -100,7 +101,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
       // Response for Android
       const response = {
         success: true,
-        message: 'OTP sent successfully',
+        message: "OTP sent successfully",
         otpId, // Android needs this for verify-otp
       };
 
@@ -111,21 +112,21 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
 
       res.json(response);
     } catch (smsError) {
-      logger.error('Failed to send SMS:', smsError);
+      logger.error("Failed to send SMS:", smsError);
 
       // Delete the OTP record since SMS failed
-      await db.query('DELETE FROM otp_verifications WHERE id = $1', [otpId]);
+      await db.query("DELETE FROM otp_verifications WHERE id = $1", [otpId]);
 
       res.status(500).json({
         success: false,
-        message: 'Failed to send OTP. Please try again.',
+        message: "Failed to send OTP. Please try again.",
       });
     }
   } catch (error) {
-    logger.error('Send OTP error:', error);
+    logger.error("Send OTP error:", error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error',
+      message: "Internal server error",
     });
   }
 });
@@ -138,7 +139,7 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
  * Accepts both `phone` and `phoneNumber` for compatibility
  * Max 3 attempts per OTP, then must request new OTP
  */
-router.post('/verify-otp', async (req, res) => {
+router.post("/verify-otp", async (req, res) => {
   try {
     // Accept both phone and phoneNumber for Android compatibility
     const phoneNumber = req.body.phoneNumber || req.body.phone;
@@ -148,14 +149,14 @@ router.post('/verify-otp', async (req, res) => {
     if (!phoneNumber || !/^\+94[0-9]{9}$/.test(phoneNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid phone number format. Use +94XXXXXXXXX',
+        message: "Invalid phone number format. Use +94XXXXXXXXX",
       });
     }
 
     if (!otp || !/^[0-9]{6}$/.test(otp)) {
       return res.status(400).json({
         success: false,
-        message: 'OTP must be 6 digits',
+        message: "OTP must be 6 digits",
       });
     }
 
@@ -180,7 +181,7 @@ router.post('/verify-otp', async (req, res) => {
     if (existingOtp.rows.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'OTP expired or not found. Please request a new OTP.',
+        message: "OTP expired or not found. Please request a new OTP.",
       });
     }
 
@@ -191,13 +192,13 @@ router.post('/verify-otp', async (req, res) => {
     if (otpRecord.attempts >= MAX_ATTEMPTS) {
       // Mark OTP as used/invalid
       await db.query(
-        'UPDATE otp_verifications SET verified = true WHERE id = $1',
+        "UPDATE otp_verifications SET verified = true WHERE id = $1",
         [otpRecord.id],
       );
 
       return res.status(400).json({
         success: false,
-        message: 'Too many attempts. Please request a new OTP.',
+        message: "Too many attempts. Please request a new OTP.",
         attemptsExceeded: true,
       });
     }
@@ -207,7 +208,7 @@ router.post('/verify-otp', async (req, res) => {
       // Increment attempts
       const newAttempts = otpRecord.attempts + 1;
       await db.query(
-        'UPDATE otp_verifications SET attempts = $1 WHERE id = $2',
+        "UPDATE otp_verifications SET attempts = $1 WHERE id = $2",
         [newAttempts, otpRecord.id],
       );
 
@@ -215,24 +216,24 @@ router.post('/verify-otp', async (req, res) => {
 
       return res.status(400).json({
         success: false,
-        message: remainingAttempts > 0
-          ? `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining.`
-          : 'Invalid OTP. No attempts remaining. Please request a new OTP.',
+        message:
+          remainingAttempts > 0
+            ? `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? "s" : ""} remaining.`
+            : "Invalid OTP. No attempts remaining. Please request a new OTP.",
         remainingAttempts,
       });
     }
 
     // OTP is valid - mark as verified
     await db.query(
-      'UPDATE otp_verifications SET verified = true WHERE id = $1',
+      "UPDATE otp_verifications SET verified = true WHERE id = $1",
       [otpRecord.id],
     );
 
     // Check if user exists
-    let user = await db.query(
-      'SELECT * FROM users WHERE phone_number = $1',
-      [phoneNumber],
-    );
+    let user = await db.query("SELECT * FROM users WHERE phone_number = $1", [
+      phoneNumber,
+    ]);
 
     if (user.rows.length === 0) {
       // Create new user
@@ -246,7 +247,7 @@ router.post('/verify-otp', async (req, res) => {
     } else {
       // Update existing user
       await db.query(
-        'UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1',
+        "UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1",
         [user.rows[0].id],
       );
     }
@@ -261,24 +262,23 @@ router.post('/verify-otp', async (req, res) => {
         userType: userData.user_type,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
     );
 
     const refreshToken = jwt.sign(
       { userId: userData.id },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' },
+      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" },
     );
 
     // Clean up all OTPs for this phone number
-    await db.query(
-      'DELETE FROM otp_verifications WHERE phone_number = $1',
-      [phoneNumber],
-    );
+    await db.query("DELETE FROM otp_verifications WHERE phone_number = $1", [
+      phoneNumber,
+    ]);
 
-    logger.info('User authenticated successfully', {
+    logger.info("User authenticated successfully", {
       userId: userData.id,
-      phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, '$1****$2'),
+      phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, "$1****$2"),
     });
 
     // Response matches Android LoginResponse
@@ -297,10 +297,10 @@ router.post('/verify-otp', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Verify OTP error:', error);
+    logger.error("Verify OTP error:", error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error',
+      message: "Internal server error",
     });
   }
 });
@@ -309,14 +309,14 @@ router.post('/verify-otp', async (req, res) => {
  * POST /api/v1/auth/refresh-token
  * Refresh access token using refresh token
  */
-router.post('/refresh-token', async (req, res) => {
+router.post("/refresh-token", async (req, res) => {
   try {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        message: 'Refresh token is required',
+        message: "Refresh token is required",
       });
     }
 
@@ -325,14 +325,14 @@ router.post('/refresh-token', async (req, res) => {
 
     // Get user data
     const user = await db.query(
-      'SELECT * FROM users WHERE id = $1 AND is_active = true',
+      "SELECT * FROM users WHERE id = $1 AND is_active = true",
       [decoded.userId],
     );
 
     if (user.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid refresh token',
+        message: "Invalid refresh token",
       });
     }
 
@@ -346,7 +346,7 @@ router.post('/refresh-token', async (req, res) => {
         userType: userData.user_type,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
     );
 
     res.json({
@@ -354,10 +354,10 @@ router.post('/refresh-token', async (req, res) => {
       token: accessToken,
     });
   } catch (error) {
-    logger.error('Refresh token error:', error);
+    logger.error("Refresh token error:", error);
     res.status(401).json({
       success: false,
-      message: 'Invalid refresh token',
+      message: "Invalid refresh token",
     });
   }
 });
@@ -366,12 +366,12 @@ router.post('/refresh-token', async (req, res) => {
  * POST /api/v1/auth/logout
  * Logout user (invalidate tokens on client side)
  */
-router.post('/logout', async (req, res) => {
+router.post("/logout", async (req, res) => {
   // In a more sophisticated setup, you might maintain a blacklist of tokens
   // For now, we rely on client-side token removal
   res.json({
     success: true,
-    message: 'Logged out successfully',
+    message: "Logged out successfully",
   });
 });
 

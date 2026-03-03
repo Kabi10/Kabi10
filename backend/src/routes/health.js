@@ -1,7 +1,7 @@
-const express = require('express');
-const db = require('../database/connection');
-const smsService = require('../services/smsService');
-const logger = require('../utils/logger');
+const express = require("express");
+const db = require("../database/connection");
+const smsService = require("../services/smsService");
+const logger = require("../utils/logger");
 
 const router = express.Router();
 
@@ -9,17 +9,17 @@ const router = express.Router();
  * GET /health
  * Basic health check endpoint
  */
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   const startTime = Date.now();
 
   try {
     // Basic health check
     const health = {
-      status: 'healthy',
+      status: "healthy",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development',
-      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || "development",
+      version: process.env.npm_package_version || "1.0.0",
       responseTime: 0,
     };
 
@@ -27,9 +27,9 @@ router.get('/', async (req, res) => {
 
     res.json(health);
   } catch (error) {
-    logger.error('Health check error:', error);
+    logger.error("Health check error:", error);
     res.status(500).json({
-      status: 'unhealthy',
+      status: "unhealthy",
       timestamp: new Date().toISOString(),
       error: error.message,
       responseTime: Date.now() - startTime,
@@ -41,16 +41,16 @@ router.get('/', async (req, res) => {
  * GET /health/detailed
  * Detailed health check with dependencies
  */
-router.get('/detailed', async (req, res) => {
+router.get("/detailed", async (req, res) => {
   const startTime = Date.now();
 
   try {
     const health = {
-      status: 'healthy',
+      status: "healthy",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'development',
-      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || "development",
+      version: process.env.npm_package_version || "1.0.0",
       services: {},
       system: {
         memory: process.memoryUsage(),
@@ -66,47 +66,47 @@ router.get('/detailed', async (req, res) => {
       health.services.database = dbHealth;
     } catch (error) {
       health.services.database = {
-        status: 'unhealthy',
+        status: "unhealthy",
         error: error.message,
       };
-      health.status = 'degraded';
+      health.status = "degraded";
     }
 
     // Check SMS service health
     try {
       const smsHealth = smsService.getProviderInfo();
       health.services.sms = {
-        status: 'healthy',
+        status: "healthy",
         provider: smsHealth.current,
         mockMode: smsHealth.mockMode,
         configured: smsHealth.available[smsHealth.current]?.configured || false,
       };
     } catch (error) {
       health.services.sms = {
-        status: 'unhealthy',
+        status: "unhealthy",
         error: error.message,
       };
-      health.status = 'degraded';
+      health.status = "degraded";
     }
 
     // Check if any critical services are down
-    const criticalServices = ['database'];
+    const criticalServices = ["database"];
     const unhealthyServices = criticalServices.filter(
-      (service) => health.services[service]?.status === 'unhealthy',
+      (service) => health.services[service]?.status === "unhealthy",
     );
 
     if (unhealthyServices.length > 0) {
-      health.status = 'unhealthy';
+      health.status = "unhealthy";
     }
 
     health.responseTime = Date.now() - startTime;
 
-    const statusCode = health.status === 'unhealthy' ? 503 : 200;
+    const statusCode = health.status === "unhealthy" ? 503 : 200;
     res.status(statusCode).json(health);
   } catch (error) {
-    logger.error('Detailed health check error:', error);
+    logger.error("Detailed health check error:", error);
     res.status(500).json({
-      status: 'unhealthy',
+      status: "unhealthy",
       timestamp: new Date().toISOString(),
       error: error.message,
       responseTime: Date.now() - startTime,
@@ -118,19 +118,19 @@ router.get('/detailed', async (req, res) => {
  * GET /health/database
  * Database-specific health check
  */
-router.get('/database', async (req, res) => {
+router.get("/database", async (req, res) => {
   const startTime = Date.now();
 
   try {
     const dbHealth = await db.healthCheck();
     dbHealth.responseTime = Date.now() - startTime;
 
-    const statusCode = dbHealth.status === 'healthy' ? 200 : 503;
+    const statusCode = dbHealth.status === "healthy" ? 200 : 503;
     res.status(statusCode).json(dbHealth);
   } catch (error) {
-    logger.error('Database health check error:', error);
+    logger.error("Database health check error:", error);
     res.status(503).json({
-      status: 'unhealthy',
+      status: "unhealthy",
       error: error.message,
       responseTime: Date.now() - startTime,
     });
@@ -141,14 +141,14 @@ router.get('/database', async (req, res) => {
  * GET /health/sms
  * SMS service health check
  */
-router.get('/sms', async (req, res) => {
+router.get("/sms", async (req, res) => {
   const startTime = Date.now();
 
   try {
     const smsHealth = smsService.getProviderInfo();
 
     const health = {
-      status: 'healthy',
+      status: "healthy",
       provider: smsHealth.current,
       mockMode: smsHealth.mockMode,
       configured: smsHealth.available[smsHealth.current]?.configured || false,
@@ -157,16 +157,16 @@ router.get('/sms', async (req, res) => {
     };
 
     if (!health.configured && !health.mockMode) {
-      health.status = 'unhealthy';
-      health.error = 'SMS provider not configured';
+      health.status = "unhealthy";
+      health.error = "SMS provider not configured";
     }
 
-    const statusCode = health.status === 'healthy' ? 200 : 503;
+    const statusCode = health.status === "healthy" ? 200 : 503;
     res.status(statusCode).json(health);
   } catch (error) {
-    logger.error('SMS health check error:', error);
+    logger.error("SMS health check error:", error);
     res.status(503).json({
-      status: 'unhealthy',
+      status: "unhealthy",
       error: error.message,
       responseTime: Date.now() - startTime,
     });
@@ -177,27 +177,27 @@ router.get('/sms', async (req, res) => {
  * GET /health/readiness
  * Kubernetes readiness probe
  */
-router.get('/readiness', async (req, res) => {
+router.get("/readiness", async (req, res) => {
   try {
     // Check if the application is ready to serve traffic
     const dbHealth = await db.healthCheck();
 
-    if (dbHealth.status === 'healthy') {
+    if (dbHealth.status === "healthy") {
       res.status(200).json({
-        status: 'ready',
+        status: "ready",
         timestamp: new Date().toISOString(),
       });
     } else {
       res.status(503).json({
-        status: 'not ready',
-        reason: 'Database not available',
+        status: "not ready",
+        reason: "Database not available",
         timestamp: new Date().toISOString(),
       });
     }
   } catch (error) {
-    logger.error('Readiness check error:', error);
+    logger.error("Readiness check error:", error);
     res.status(503).json({
-      status: 'not ready',
+      status: "not ready",
       reason: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -208,10 +208,10 @@ router.get('/readiness', async (req, res) => {
  * GET /health/liveness
  * Kubernetes liveness probe
  */
-router.get('/liveness', (req, res) => {
+router.get("/liveness", (req, res) => {
   // Simple liveness check - if the process is running, it's alive
   res.status(200).json({
-    status: 'alive',
+    status: "alive",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
@@ -221,7 +221,7 @@ router.get('/liveness', (req, res) => {
  * GET /health/metrics
  * Basic application metrics
  */
-router.get('/metrics', async (req, res) => {
+router.get("/metrics", async (req, res) => {
   try {
     const metrics = {
       timestamp: new Date().toISOString(),
@@ -230,7 +230,7 @@ router.get('/metrics', async (req, res) => {
       cpu: process.cpuUsage(),
       platform: process.platform,
       nodeVersion: process.version,
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env.NODE_ENV || "development",
     };
 
     // Add database metrics if available
@@ -244,14 +244,14 @@ router.get('/metrics', async (req, res) => {
         };
       }
     } catch (error) {
-      metrics.database = { error: 'Unable to fetch database metrics' };
+      metrics.database = { error: "Unable to fetch database metrics" };
     }
 
     res.json(metrics);
   } catch (error) {
-    logger.error('Metrics error:', error);
+    logger.error("Metrics error:", error);
     res.status(500).json({
-      error: 'Failed to fetch metrics',
+      error: "Failed to fetch metrics",
       timestamp: new Date().toISOString(),
     });
   }

@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 /**
  * Generate random OTP code
@@ -8,7 +8,7 @@ function generateOTP(length = 6) {
     return crypto.randomInt(100000, 999999).toString();
   }
   // For non-standard lengths, generate digit by digit using crypto
-  let otp = '';
+  let otp = "";
   for (let i = 0; i < length; i++) {
     otp += crypto.randomInt(0, 10).toString();
   }
@@ -29,7 +29,8 @@ function isValidSriLankanPhone(phoneNumber) {
  * Validate UUID format
  */
 function validateUUID(uuid) {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
 
@@ -37,10 +38,10 @@ function validateUUID(uuid) {
  * Format phone number for display
  */
 function formatPhoneNumber(phoneNumber) {
-  if (!phoneNumber) return '';
+  if (!phoneNumber) return "";
 
   // Convert +94XXXXXXXXX to +94 XX XXX XXXX
-  if (phoneNumber.startsWith('+94') && phoneNumber.length === 12) {
+  if (phoneNumber.startsWith("+94") && phoneNumber.length === 12) {
     return `+94 ${phoneNumber.slice(3, 5)} ${phoneNumber.slice(5, 8)} ${phoneNumber.slice(8)}`;
   }
 
@@ -50,8 +51,11 @@ function formatPhoneNumber(phoneNumber) {
 /**
  * Mask sensitive data for logging
  */
-function maskSensitiveData(data, fields = ['password', 'token', 'otp', 'phoneNumber']) {
-  if (typeof data !== 'object' || data === null) {
+function maskSensitiveData(
+  data,
+  fields = ["password", "token", "otp", "phoneNumber"],
+) {
+  if (typeof data !== "object" || data === null) {
     return data;
   }
 
@@ -59,10 +63,10 @@ function maskSensitiveData(data, fields = ['password', 'token', 'otp', 'phoneNum
 
   fields.forEach((field) => {
     if (masked[field]) {
-      if (field === 'phoneNumber') {
+      if (field === "phoneNumber") {
         masked[field] = maskPhoneNumber(masked[field]);
       } else {
-        masked[field] = '***masked***';
+        masked[field] = "***masked***";
       }
     }
   });
@@ -78,7 +82,7 @@ function maskPhoneNumber(phoneNumber) {
 
   const start = phoneNumber.substring(0, 3);
   const end = phoneNumber.substring(phoneNumber.length - 2);
-  const middle = '*'.repeat(phoneNumber.length - 5);
+  const middle = "*".repeat(phoneNumber.length - 5);
 
   return `${start}${middle}${end}`;
 }
@@ -87,7 +91,7 @@ function maskPhoneNumber(phoneNumber) {
  * Generate secure random string
  */
 function generateSecureToken(length = 32) {
-  return crypto.randomBytes(length).toString('hex');
+  return crypto.randomBytes(length).toString("hex");
 }
 
 /**
@@ -95,10 +99,12 @@ function generateSecureToken(length = 32) {
  */
 function hashPassword(password, salt = null) {
   if (!salt) {
-    salt = crypto.randomBytes(16).toString('hex');
+    salt = crypto.randomBytes(16).toString("hex");
   }
 
-  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  const hash = crypto
+    .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+    .toString("hex");
   return { hash, salt };
 }
 
@@ -106,7 +112,9 @@ function hashPassword(password, salt = null) {
  * Verify password against hash
  */
 function verifyPassword(password, hash, salt) {
-  const verifyHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  const verifyHash = crypto
+    .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+    .toString("hex");
   return hash === verifyHash;
 }
 
@@ -118,9 +126,12 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
 
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-    + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2))
-    * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c;
@@ -147,22 +158,22 @@ function isValidEmail(email) {
  * Sanitize string for database storage
  */
 function sanitizeString(str) {
-  if (typeof str !== 'string') return str;
+  if (typeof str !== "string") return str;
 
   return str
     .trim()
-    .replace(/[<>]/g, '') // Remove potential HTML tags
+    .replace(/[<>]/g, "") // Remove potential HTML tags
     .substring(0, 1000); // Limit length
 }
 
 /**
  * Format currency for Sri Lankan Rupees
  */
-function formatCurrency(amount, currency = 'LKR') {
-  if (typeof amount !== 'number') return amount;
+function formatCurrency(amount, currency = "LKR") {
+  if (typeof amount !== "number") return amount;
 
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
+  return new Intl.NumberFormat("en-LK", {
+    style: "currency",
     currency,
     minimumFractionDigits: 2,
   }).format(amount);
@@ -177,7 +188,7 @@ function parseDate(dateString) {
   const date = new Date(dateString);
 
   if (isNaN(date.getTime())) {
-    throw new Error('Invalid date format');
+    throw new Error("Invalid date format");
   }
 
   return date;
@@ -188,7 +199,7 @@ function parseDate(dateString) {
  */
 function isFutureDate(date) {
   const now = new Date();
-  const checkDate = typeof date === 'string' ? new Date(date) : date;
+  const checkDate = typeof date === "string" ? new Date(date) : date;
 
   return checkDate > now;
 }
@@ -196,21 +207,21 @@ function isFutureDate(date) {
 /**
  * Get date range for queries
  */
-function getDateRange(period = '7d') {
+function getDateRange(period = "7d") {
   const now = new Date();
   const start = new Date();
 
   switch (period) {
-    case '1d':
+    case "1d":
       start.setDate(now.getDate() - 1);
       break;
-    case '7d':
+    case "7d":
       start.setDate(now.getDate() - 7);
       break;
-    case '30d':
+    case "30d":
       start.setDate(now.getDate() - 30);
       break;
-    case '90d':
+    case "90d":
       start.setDate(now.getDate() - 90);
       break;
     default:
@@ -281,10 +292,10 @@ async function retry(fn, maxAttempts = 3, baseDelay = 1000) {
  * Deep clone object
  */
 function deepClone(obj) {
-  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj === null || typeof obj !== "object") return obj;
   if (obj instanceof Date) return new Date(obj.getTime());
   if (obj instanceof Array) return obj.map((item) => deepClone(item));
-  if (typeof obj === 'object') {
+  if (typeof obj === "object") {
     const cloned = {};
     Object.keys(obj).forEach((key) => {
       cloned[key] = deepClone(obj[key]);
@@ -299,8 +310,8 @@ function deepClone(obj) {
 function isEmpty(obj) {
   if (obj === null || obj === undefined) return true;
   if (Array.isArray(obj)) return obj.length === 0;
-  if (typeof obj === 'object') return Object.keys(obj).length === 0;
-  if (typeof obj === 'string') return obj.trim().length === 0;
+  if (typeof obj === "object") return Object.keys(obj).length === 0;
+  if (typeof obj === "string") return obj.trim().length === 0;
   return false;
 }
 

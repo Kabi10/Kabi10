@@ -8,25 +8,25 @@
  * Created: 2026-02-16
  */
 
-const db = require('./connection');
-const fs = require('fs');
-const path = require('path');
-const logger = require('../utils/logger');
+const db = require("./connection");
+const fs = require("fs");
+const path = require("path");
+const logger = require("../utils/logger");
 
 async function migrateActivities() {
   const client = await db.connect();
 
   try {
-    logger.info('Starting activities table migration...');
+    logger.info("Starting activities table migration...");
 
     // Begin transaction
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
     // Read schema file
-    const schemaPath = path.join(__dirname, 'schema-activities.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+    const schemaPath = path.join(__dirname, "schema-activities.sql");
+    const schema = fs.readFileSync(schemaPath, "utf8");
 
-    logger.info('Executing activities schema SQL...');
+    logger.info("Executing activities schema SQL...");
     await client.query(schema);
 
     // Verify table was created
@@ -39,7 +39,7 @@ async function migrateActivities() {
     `);
 
     if (!tableCheck.rows[0].table_exists) {
-      throw new Error('Activities table was not created successfully');
+      throw new Error("Activities table was not created successfully");
     }
 
     // Verify indexes were created
@@ -53,9 +53,9 @@ async function migrateActivities() {
     logger.info(`Created ${indexCount} indexes on activities table`);
 
     // Commit transaction
-    await client.query('COMMIT');
+    await client.query("COMMIT");
 
-    logger.info('✅ Activities table migration completed successfully');
+    logger.info("✅ Activities table migration completed successfully");
     logger.info(`   - Table: activities`);
     logger.info(`   - Indexes: ${indexCount}`);
     logger.info(`   - Triggers: update_activities_updated_at`);
@@ -64,17 +64,15 @@ async function migrateActivities() {
     return {
       success: true,
       indexCount,
-      message: 'Activities table created successfully'
+      message: "Activities table created successfully",
     };
-
   } catch (error) {
     // Rollback on error
-    await client.query('ROLLBACK');
-    logger.error('❌ Activities migration failed:', error.message);
+    await client.query("ROLLBACK");
+    logger.error("❌ Activities migration failed:", error.message);
     logger.error(error.stack);
 
     throw error;
-
   } finally {
     // Release client back to pool
     client.release();
@@ -86,25 +84,23 @@ async function rollbackActivities() {
   const client = await db.connect();
 
   try {
-    logger.info('Rolling back activities table...');
+    logger.info("Rolling back activities table...");
 
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
     // Drop table (CASCADE will drop indexes and triggers automatically)
-    await client.query('DROP TABLE IF EXISTS activities CASCADE');
+    await client.query("DROP TABLE IF EXISTS activities CASCADE");
 
     // Drop function
-    await client.query('DROP FUNCTION IF EXISTS cleanup_expired_activities()');
+    await client.query("DROP FUNCTION IF EXISTS cleanup_expired_activities()");
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
 
-    logger.info('✅ Activities table rollback completed');
-
+    logger.info("✅ Activities table rollback completed");
   } catch (error) {
-    await client.query('ROLLBACK');
-    logger.error('❌ Activities rollback failed:', error.message);
+    await client.query("ROLLBACK");
+    logger.error("❌ Activities rollback failed:", error.message);
     throw error;
-
   } finally {
     client.release();
   }
@@ -113,17 +109,17 @@ async function rollbackActivities() {
 // CLI execution
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const shouldRollback = args.includes('--rollback');
+  const shouldRollback = args.includes("--rollback");
 
   const operation = shouldRollback ? rollbackActivities() : migrateActivities();
 
   operation
     .then(() => {
-      logger.info('Migration script completed');
+      logger.info("Migration script completed");
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('Migration script failed:', error.message);
+      logger.error("Migration script failed:", error.message);
       process.exit(1);
     });
 }

@@ -12,7 +12,7 @@
  * 3. Server validates signature and timestamp freshness
  */
 
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 // Configuration
 const CONFIG = {
@@ -20,13 +20,13 @@ const CONFIG = {
   MAX_REQUEST_AGE_MS: 5 * 60 * 1000,
 
   // Signature algorithm
-  ALGORITHM: 'sha256',
+  ALGORITHM: "sha256",
 
   // Header names
   HEADERS: {
-    SIGNATURE: 'x-signature',
-    TIMESTAMP: 'x-timestamp',
-    NONCE: 'x-nonce',
+    SIGNATURE: "x-signature",
+    TIMESTAMP: "x-timestamp",
+    NONCE: "x-nonce",
   },
 };
 
@@ -54,11 +54,11 @@ setInterval(() => {
  * @param {string} body - Request body (empty string for GET)
  * @returns {string} Base64-encoded HMAC signature
  */
-function generateSignature(secret, timestamp, method, path, body = '') {
+function generateSignature(secret, timestamp, method, path, body = "") {
   const payload = `${timestamp}${method.toUpperCase()}${path}${body}`;
   const hmac = crypto.createHmac(CONFIG.ALGORITHM, secret);
   hmac.update(payload);
-  return hmac.digest('base64');
+  return hmac.digest("base64");
 }
 
 /**
@@ -75,17 +75,17 @@ function validateSignature(req, secret) {
 
   // Check required headers
   if (!signature) {
-    return { valid: false, error: 'Missing X-Signature header' };
+    return { valid: false, error: "Missing X-Signature header" };
   }
 
   if (!timestamp) {
-    return { valid: false, error: 'Missing X-Timestamp header' };
+    return { valid: false, error: "Missing X-Timestamp header" };
   }
 
   // Validate timestamp format
   const requestTime = parseInt(timestamp, 10);
   if (isNaN(requestTime)) {
-    return { valid: false, error: 'Invalid X-Timestamp format' };
+    return { valid: false, error: "Invalid X-Timestamp format" };
   }
 
   // Check timestamp freshness (prevent replay attacks)
@@ -101,26 +101,39 @@ function validateSignature(req, secret) {
   // Check nonce if provided (additional replay protection)
   if (nonce) {
     if (nonceCache.has(nonce)) {
-      return { valid: false, error: 'Duplicate nonce - possible replay attack' };
+      return {
+        valid: false,
+        error: "Duplicate nonce - possible replay attack",
+      };
     }
     nonceCache.set(nonce, requestTime);
   }
 
   // Generate expected signature
-  const path = req.url || req.path || '/';
-  const body = req.body ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body)) : '';
-  const expectedSignature = generateSignature(secret, timestamp, req.method, path, body);
+  const path = req.url || req.path || "/";
+  const body = req.body
+    ? typeof req.body === "string"
+      ? req.body
+      : JSON.stringify(req.body)
+    : "";
+  const expectedSignature = generateSignature(
+    secret,
+    timestamp,
+    req.method,
+    path,
+    body,
+  );
 
   // Constant-time comparison to prevent timing attacks
-  const signatureBuffer = Buffer.from(signature, 'base64');
-  const expectedBuffer = Buffer.from(expectedSignature, 'base64');
+  const signatureBuffer = Buffer.from(signature, "base64");
+  const expectedBuffer = Buffer.from(expectedSignature, "base64");
 
   if (signatureBuffer.length !== expectedBuffer.length) {
-    return { valid: false, error: 'Invalid signature' };
+    return { valid: false, error: "Invalid signature" };
   }
 
   if (!crypto.timingSafeEqual(signatureBuffer, expectedBuffer)) {
-    return { valid: false, error: 'Invalid signature' };
+    return { valid: false, error: "Invalid signature" };
   }
 
   return { valid: true };
@@ -138,15 +151,17 @@ function requireSignedRequest(req, res) {
 
   if (!secret) {
     // In development, skip signature validation if secret not configured
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️  REQUEST_SIGNING_SECRET not configured - skipping signature validation');
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "⚠️  REQUEST_SIGNING_SECRET not configured - skipping signature validation",
+      );
       return true;
     }
 
     res.status(500).json({
       success: false,
-      message: 'Server configuration error',
-      code: 'SIGNING_NOT_CONFIGURED',
+      message: "Server configuration error",
+      code: "SIGNING_NOT_CONFIGURED",
     });
     return false;
   }
@@ -157,7 +172,7 @@ function requireSignedRequest(req, res) {
     res.status(401).json({
       success: false,
       message: result.error,
-      code: 'INVALID_SIGNATURE',
+      code: "INVALID_SIGNATURE",
     });
     return false;
   }

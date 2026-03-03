@@ -1,9 +1,9 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
-const logger = require('../utils/logger');
-const { validateUUID } = require('../utils/helpers');
-const { createNotification } = require('../utils/notifications');
+const express = require("express");
+const { body, validationResult } = require("express-validator");
+const db = require("../database/connection");
+const logger = require("../utils/logger");
+const { validateUUID } = require("../utils/helpers");
+const { createNotification } = require("../utils/notifications");
 
 const router = express.Router();
 
@@ -11,29 +11,34 @@ const router = express.Router();
  * GET /api/v1/reviews/user/:userId
  * Get reviews for a user (paginated)
  */
-router.get('/user/:userId', async (req, res) => {
+router.get("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const { page = 1, limit = 20 } = req.query;
 
     if (!validateUUID(userId)) {
-      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user ID" });
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT r.*, u.name as reviewer_name
       FROM reviews r
       JOIN users u ON r.reviewer_id = u.id
       WHERE r.reviewee_id = $1
       ORDER BY r.created_at DESC
       LIMIT $2 OFFSET $3
-    `, [userId, parseInt(limit), offset]);
+    `,
+      [userId, parseInt(limit), offset],
+    );
 
     const countResult = await db.query(
-      'SELECT COUNT(*) as total FROM reviews WHERE reviewee_id = $1',
-      [userId]
+      "SELECT COUNT(*) as total FROM reviews WHERE reviewee_id = $1",
+      [userId],
     );
     const total = parseInt(countResult.rows[0].total);
 
@@ -60,8 +65,10 @@ router.get('/user/:userId', async (req, res) => {
       hasPrevious: parseInt(page) > 1,
     });
   } catch (error) {
-    logger.error('Get reviews error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch reviews' });
+    logger.error("Get reviews error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch reviews" });
   }
 });
 
@@ -69,15 +76,18 @@ router.get('/user/:userId', async (req, res) => {
  * GET /api/v1/reviews/user/:userId/summary
  * Get average rating + count + distribution
  */
-router.get('/user/:userId/summary', async (req, res) => {
+router.get("/user/:userId/summary", async (req, res) => {
   try {
     const { userId } = req.params;
 
     if (!validateUUID(userId)) {
-      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user ID" });
     }
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT
         COUNT(*) as total_reviews,
         COALESCE(AVG(rating), 0) as average_rating,
@@ -87,7 +97,9 @@ router.get('/user/:userId/summary', async (req, res) => {
         COUNT(*) FILTER (WHERE rating = 4) as rating_4,
         COUNT(*) FILTER (WHERE rating = 5) as rating_5
       FROM reviews WHERE reviewee_id = $1
-    `, [userId]);
+    `,
+      [userId],
+    );
 
     const row = result.rows[0];
     res.json({
@@ -105,8 +117,10 @@ router.get('/user/:userId/summary', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Get review summary error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch review summary' });
+    logger.error("Get review summary error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch review summary" });
   }
 });
 
@@ -114,17 +128,25 @@ router.get('/user/:userId/summary', async (req, res) => {
  * POST /api/v1/reviews
  * Create review (validates transaction exists and is COMPLETED)
  */
-router.post('/',
+router.post(
+  "/",
   [
-    body('transactionId').isUUID().withMessage('Invalid transaction ID'),
-    body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be 1-5'),
-    body('comment').optional().isLength({ max: 1000 }).withMessage('Comment too long'),
+    body("transactionId").isUUID().withMessage("Invalid transaction ID"),
+    body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be 1-5"),
+    body("comment")
+      .optional()
+      .isLength({ max: 1000 })
+      .withMessage("Comment too long"),
   ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        });
       }
 
       const { transactionId, rating, comment } = req.body;
@@ -133,42 +155,53 @@ router.post('/',
       // Verify transaction exists, is COMPLETED, and reviewer is participant
       const transaction = await db.query(
         `SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1`,
-        [transactionId]
+        [transactionId],
       );
 
       if (transaction.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Transaction not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: "Transaction not found" });
       }
 
       const tx = transaction.rows[0];
-      if (tx.status !== 'COMPLETED') {
-        return res.status(400).json({ success: false, message: 'Can only review completed transactions' });
+      if (tx.status !== "COMPLETED") {
+        return res.status(400).json({
+          success: false,
+          message: "Can only review completed transactions",
+        });
       }
 
       if (tx.farmer_id !== reviewerId && tx.buyer_id !== reviewerId) {
-        return res.status(403).json({ success: false, message: 'You are not a participant in this transaction' });
+        return res.status(403).json({
+          success: false,
+          message: "You are not a participant in this transaction",
+        });
       }
 
       // Determine review type and reviewee
       const isBuyer = tx.buyer_id === reviewerId;
-      const reviewType = isBuyer ? 'BUYER_TO_FARMER' : 'FARMER_TO_BUYER';
+      const reviewType = isBuyer ? "BUYER_TO_FARMER" : "FARMER_TO_BUYER";
       const revieweeId = isBuyer ? tx.farmer_id : tx.buyer_id;
 
       const result = await db.query(
         `INSERT INTO reviews (transaction_id, reviewer_id, reviewee_id, rating, comment, review_type)
          VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [transactionId, reviewerId, revieweeId, rating, comment, reviewType]
+        [transactionId, reviewerId, revieweeId, rating, comment, reviewType],
       );
 
       // Notify reviewee
-      const reviewerName = await db.query('SELECT name FROM users WHERE id = $1', [reviewerId]);
-      const name = reviewerName.rows[0]?.name || 'Someone';
+      const reviewerName = await db.query(
+        "SELECT name FROM users WHERE id = $1",
+        [reviewerId],
+      );
+      const name = reviewerName.rows[0]?.name || "Someone";
       await createNotification(
         revieweeId,
-        'NEW_REVIEW',
+        "NEW_REVIEW",
         `${name} left you a ${rating}-star review`,
-        comment ? comment.substring(0, 100) : '',
-        result.rows[0].id
+        comment ? comment.substring(0, 100) : "",
+        result.rows[0].id,
       );
 
       const review = result.rows[0];
@@ -186,42 +219,69 @@ router.post('/',
         },
       });
     } catch (error) {
-      if (error.code === '23505') { // unique_violation
-        return res.status(409).json({ success: false, message: 'You have already reviewed this transaction' });
+      if (error.code === "23505") {
+        // unique_violation
+        return res.status(409).json({
+          success: false,
+          message: "You have already reviewed this transaction",
+        });
       }
-      logger.error('Create review error:', error);
-      res.status(500).json({ success: false, message: 'Failed to create review' });
+      logger.error("Create review error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to create review" });
     }
-  }
+  },
 );
 
 /**
  * PUT /api/v1/reviews/:id
  * Update own review
  */
-router.put('/:id',
+router.put(
+  "/:id",
   [
-    body('rating').optional().isInt({ min: 1, max: 5 }).withMessage('Rating must be 1-5'),
-    body('comment').optional().isLength({ max: 1000 }).withMessage('Comment too long'),
+    body("rating")
+      .optional()
+      .isInt({ min: 1, max: 5 })
+      .withMessage("Rating must be 1-5"),
+    body("comment")
+      .optional()
+      .isLength({ max: 1000 })
+      .withMessage("Comment too long"),
   ],
   async (req, res) => {
     try {
       const { id } = req.params;
       if (!validateUUID(id)) {
-        return res.status(400).json({ success: false, message: 'Invalid review ID' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid review ID" });
       }
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        });
       }
 
-      const existing = await db.query('SELECT reviewer_id FROM reviews WHERE id = $1', [id]);
+      const existing = await db.query(
+        "SELECT reviewer_id FROM reviews WHERE id = $1",
+        [id],
+      );
       if (existing.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Review not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: "Review not found" });
       }
       if (existing.rows[0].reviewer_id !== req.user.userId) {
-        return res.status(403).json({ success: false, message: 'You can only update your own reviews' });
+        return res.status(403).json({
+          success: false,
+          message: "You can only update your own reviews",
+        });
       }
 
       const { rating, comment } = req.body;
@@ -241,12 +301,14 @@ router.put('/:id',
       }
 
       if (updates.length === 0) {
-        return res.status(400).json({ success: false, message: 'Nothing to update' });
+        return res
+          .status(400)
+          .json({ success: false, message: "Nothing to update" });
       }
 
       const result = await db.query(
-        `UPDATE reviews SET ${updates.join(', ')}, updated_at = NOW() WHERE id = $1 RETURNING *`,
-        params
+        `UPDATE reviews SET ${updates.join(", ")}, updated_at = NOW() WHERE id = $1 RETURNING *`,
+        params,
       );
 
       const review = result.rows[0];
@@ -265,36 +327,50 @@ router.put('/:id',
         },
       });
     } catch (error) {
-      logger.error('Update review error:', error);
-      res.status(500).json({ success: false, message: 'Failed to update review' });
+      logger.error("Update review error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to update review" });
     }
-  }
+  },
 );
 
 /**
  * DELETE /api/v1/reviews/:id
  * Delete own review
  */
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     if (!validateUUID(id)) {
-      return res.status(400).json({ success: false, message: 'Invalid review ID' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid review ID" });
     }
 
-    const existing = await db.query('SELECT reviewer_id FROM reviews WHERE id = $1', [id]);
+    const existing = await db.query(
+      "SELECT reviewer_id FROM reviews WHERE id = $1",
+      [id],
+    );
     if (existing.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Review not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
     }
     if (existing.rows[0].reviewer_id !== req.user.userId) {
-      return res.status(403).json({ success: false, message: 'You can only delete your own reviews' });
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own reviews",
+      });
     }
 
-    await db.query('DELETE FROM reviews WHERE id = $1', [id]);
-    res.json({ success: true, message: 'Review deleted' });
+    await db.query("DELETE FROM reviews WHERE id = $1", [id]);
+    res.json({ success: true, message: "Review deleted" });
   } catch (error) {
-    logger.error('Delete review error:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete review' });
+    logger.error("Delete review error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete review" });
   }
 });
 

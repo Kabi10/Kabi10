@@ -32,35 +32,36 @@ const RATE_LIMITS = {
   auth: {
     windowMs: 15 * 60 * 1000, // 15 minutes
     maxRequests: 10, // 10 requests per window
-    message: 'Too many authentication attempts. Please try again in 15 minutes.',
+    message:
+      "Too many authentication attempts. Please try again in 15 minutes.",
   },
 
   // OTP endpoints - very strict to prevent abuse
   otp: {
     windowMs: 60 * 60 * 1000, // 1 hour
     maxRequests: 5, // 5 OTP requests per hour
-    message: 'Too many OTP requests. Please try again later.',
+    message: "Too many OTP requests. Please try again later.",
   },
 
   // General API endpoints
   api: {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 60, // 60 requests per minute
-    message: 'Too many requests. Please slow down.',
+    message: "Too many requests. Please slow down.",
   },
 
   // Write operations (create, update, delete)
   write: {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 20, // 20 writes per minute
-    message: 'Too many write operations. Please slow down.',
+    message: "Too many write operations. Please slow down.",
   },
 
   // Search/filter operations
   search: {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 30, // 30 searches per minute
-    message: 'Too many search requests. Please slow down.',
+    message: "Too many search requests. Please slow down.",
   },
 };
 
@@ -69,13 +70,11 @@ const RATE_LIMITS = {
  * Handles Vercel's x-forwarded-for header
  */
 function getClientIP(req) {
-  const forwardedFor = req.headers['x-forwarded-for'];
+  const forwardedFor = req.headers["x-forwarded-for"];
   if (forwardedFor) {
-    return forwardedFor.split(',')[0].trim();
+    return forwardedFor.split(",")[0].trim();
   }
-  return req.headers['x-real-ip']
-         || req.connection?.remoteAddress
-         || 'unknown';
+  return req.headers["x-real-ip"] || req.connection?.remoteAddress || "unknown";
 }
 
 /**
@@ -86,7 +85,7 @@ function getClientIP(req) {
  * @param {string} limitType - Type of rate limit to apply ('auth', 'otp', 'api', 'write', 'search')
  * @returns {Object} { allowed: boolean, remaining: number, resetTime: number }
  */
-function checkRateLimit(req, limitType = 'api') {
+function checkRateLimit(req, limitType = "api") {
   const config = RATE_LIMITS[limitType] || RATE_LIMITS.api;
   const clientIP = getClientIP(req);
   const key = `${limitType}:${clientIP}`;
@@ -131,9 +130,12 @@ function checkRateLimit(req, limitType = 'api') {
  * Apply rate limit headers to response
  */
 function setRateLimitHeaders(res, rateLimitResult) {
-  res.setHeader('X-RateLimit-Limit', rateLimitResult.limit);
-  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
-  res.setHeader('X-RateLimit-Reset', Math.ceil(rateLimitResult.resetTime / 1000));
+  res.setHeader("X-RateLimit-Limit", rateLimitResult.limit);
+  res.setHeader("X-RateLimit-Remaining", rateLimitResult.remaining);
+  res.setHeader(
+    "X-RateLimit-Reset",
+    Math.ceil(rateLimitResult.resetTime / 1000),
+  );
 }
 
 /**
@@ -143,7 +145,7 @@ function setRateLimitHeaders(res, rateLimitResult) {
  * @param {string} limitType - Type of rate limit ('auth', 'otp', 'api', 'write', 'search')
  * @returns {Function} Middleware function
  */
-function rateLimit(limitType = 'api') {
+function rateLimit(limitType = "api") {
   return (req, res) => {
     const result = checkRateLimit(req, limitType);
     setRateLimitHeaders(res, result);
