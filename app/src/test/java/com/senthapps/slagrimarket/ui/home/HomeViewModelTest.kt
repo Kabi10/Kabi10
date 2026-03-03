@@ -8,10 +8,12 @@ import com.senthapps.slagrimarket.data.model.User
 import com.senthapps.slagrimarket.data.model.UserType
 import com.senthapps.slagrimarket.data.repository.*
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -181,6 +183,72 @@ class HomeViewModelTest {
 
         // Then: Error should be null
         assertNull(viewModel.uiState.value.error)
+    }
+
+    @Test
+    fun `loadListings emitsSuccess onNetworkSuccess`() = runTest {
+        // Given: Flow returns a distinct listing to verify correct data is loaded
+        val specificListings = listOf(
+            Listing(
+                id = "99",
+                farmerId = "farmer99",
+                cropType = "Onions",
+                quantity = 75.0,
+                unit = "kg",
+                pricePerUnit = 40.0,
+                quality = QualityGrade.A,
+                harvestDate = "2025-11-22",
+                location = "Kandy",
+                isActive = true,
+                createdAt = "2025-11-22T10:00:00Z",
+                updatedAt = "2025-11-22T10:00:00Z"
+            )
+        )
+        coEvery { listingRepository.getAllActiveListingsFlow() } returns flowOf(specificListings)
+
+        // When: ViewModel is created and coroutines run
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: uiState reflects the loaded listings data
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoadingListings)
+        assertEquals(1, state.recentListings.size)
+        assertEquals("Onions", state.recentListings.first().cropType)
+        assertEquals(1, state.activeListingCount)
+    }
+
+    @Test
+    fun `loadListings emitsError onNetworkFailure`() = runTest {
+        // Given: Flow throws during emission — caught by .catch{} in ViewModel
+        coEvery { listingRepository.getAllActiveListingsFlow() } returns flow {
+            throw RuntimeException("Network connection lost")
+        }
+
+        // When: ViewModel is created and coroutines run
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: error is set from the .catch block, listings remain empty
+        val state = viewModel.uiState.value
+        assertEquals("Failed to load listings", state.error)
+        assertFalse(state.isLoadingListings)
+        assertTrue(state.recentListings.isEmpty())
+    }
+
+    @Test
+    fun `refreshData callsRepositoryRefresh`() = runTest {
+        // Given: ViewModel initialised
+        viewModel = HomeViewModel(authRepository, listingRepository, marketPriceRepository, activityRepository, transactionRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // When: refreshData is called
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: marketPriceRepository.refreshMarketPrices() called exactly once and refresh flag cleared
+        coVerify(exactly = 1) { marketPriceRepository.refreshMarketPrices() }
+        assertFalse(viewModel.uiState.value.isRefreshing)
     }
 }
 

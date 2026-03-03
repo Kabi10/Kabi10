@@ -5,11 +5,13 @@ import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.QualityGrade
 import com.senthapps.slagrimarket.data.model.User
 import com.senthapps.slagrimarket.data.model.UserType
+import com.senthapps.slagrimarket.data.preferences.LastUsedPreferences
 import com.senthapps.slagrimarket.data.repository.AuthRepository
 import com.senthapps.slagrimarket.data.repository.ListingRepository
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -26,6 +28,7 @@ class CreateListingViewModelTest {
     private lateinit var listingRepository: ListingRepository
     private lateinit var authRepository: AuthRepository
     private lateinit var context: Context
+    private lateinit var lastUsedPreferences: LastUsedPreferences
     private lateinit var viewModel: CreateListingViewModel
 
     private val mockUser = User(
@@ -59,11 +62,16 @@ class CreateListingViewModelTest {
         listingRepository = mockk(relaxed = true)
         authRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
+        lastUsedPreferences = mockk(relaxed = true)
 
         // Mock context string resources
         every { context.getString(any()) } returns "Error message"
+        // Provide non-empty flows so .first() in the ViewModel init block doesn't throw
+        every { lastUsedPreferences.getLastCropType() } returns flowOf("")
+        every { lastUsedPreferences.getLastPrice() } returns flowOf("")
+        every { lastUsedPreferences.getLastLocation() } returns flowOf("")
 
-        viewModel = CreateListingViewModel(listingRepository, authRepository, context)
+        viewModel = CreateListingViewModel(listingRepository, authRepository, context, lastUsedPreferences)
     }
 
     @After

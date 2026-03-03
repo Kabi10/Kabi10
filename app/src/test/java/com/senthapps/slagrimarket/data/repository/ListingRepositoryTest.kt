@@ -7,6 +7,7 @@ import com.senthapps.slagrimarket.data.dao.LocalOpDao
 import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.QualityGrade
 import com.squareup.moshi.Moshi
+import app.cash.turbine.test
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -17,6 +18,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListingRepositoryTest {
@@ -226,6 +228,92 @@ class ListingRepositoryTest {
         // Then: Should return locations
         assertEquals(3, result.size)
         assertTrue(result.contains("Jaffna"))
+    }
+
+    @Test
+    fun `getListings emitsCachedDataFirst thenNetworkData`() = runTest {
+        // Given: Cache has one listing, network returns a larger set (both 2 items)
+        val cachedListings = listOf(mockListings[0])
+        val networkListings = mockListings // both listings from network
+        val networkResponse = ListingsResponse(
+            listings = networkListings,
+            totalCount = networkListings.size,
+            page = 1,
+            totalPages = 1,
+            hasNext = false,
+            hasPrevious = false,
+            lastUpdated = "2025-11-20T10:00:00Z"
+        )
+        coEvery { listingDao.getAllActiveListings() } returns cachedListings
+        // Match the exact params used in getAllActiveListings(): limit=100, isActive=true
+        coEvery { listingApiService.getListings(limit = 100, isActive = true) } returns Response.success(networkResponse)
+
+        // When/Then: Turbine verifies Loading → Success(cached 1) → Success(network 2)
+        repository.getAllActiveListings(forceRefresh = true).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+
+            val cachedSuccess = awaitItem()
+            assertTrue(cachedSuccess is Resource.Success)
+            assertEquals(1, (cachedSuccess as Resource.Success).data?.size)
+
+            val networkSuccess = awaitItem()
+            assertTrue(networkSuccess is Resource.Success)
+            assertEquals(2, (networkSuccess as Resource.Success).data?.size)
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `createListing writesToDaoAndCreatesLocalOp`() = runTest {
+        // Given: DAO methods ready to accept calls
+        coEvery { listingDao.insertListing(any()) } just Runs
+        coEvery { localOpDao.insertOp(any()) } just Runs
+
+        // When: createListing is called with specific test data
+        val result = repository.createListing(
+            cropType = "Onions",
+            quantity = 50.0,
+            unit = "kg",
+            pricePerUnit = 30.0,
+            quality = "A",
+            harvestDate = "2025-11-22",
+            location = "Kandy",
+            farmerId = "farmer3"
+        )
+
+        // Then: Both DAOs called exactly once and returned listing has correct data
+        assertTrue(result.isSuccess)
+        val createdListing = result.getOrNull()
+        assertNotNull(createdListing)
+        assertEquals("Onions", createdListing?.cropType)
+        assertEquals(50.0, createdListing?.quantity)
+        assertEquals("farmer3", createdListing?.farmerId)
+        coVerify(exactly = 1) { listingDao.insertListing(any()) }
+        coVerify(exactly = 1) { localOpDao.insertOp(any()) }
+    }
+
+    @Test
+    fun `getListings emitsError whenNetworkFails`() = runTest {
+        // Given: Empty cache and network throws IOException (offline scenario)
+        coEvery { listingDao.getAllActiveListings() } returns emptyList()
+        // Match exact params used in getAllActiveListings(): limit=100, isActive=true
+        coEvery { listingApiService.getListings(limit = 100, isActive = true) } throws IOException("No internet connection")
+
+        // When/Then: Turbine verifies Loading → Error (cached data was empty)
+        repository.getAllActiveListings(forceRefresh = true).test {
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+
+            val error = awaitItem()
+            assertTrue(error is Resource.Error)
+            assertTrue((error as Resource.Error).message?.contains("internet") == true ||
+                    error.message?.contains("connection") == true ||
+                    error.message?.isNotEmpty() == true)
+
+            awaitComplete()
+        }
     }
 }
 

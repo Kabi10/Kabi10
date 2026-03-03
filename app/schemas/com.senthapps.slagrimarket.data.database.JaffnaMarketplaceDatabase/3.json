@@ -53,9 +53,7 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
+          "columnNames": ["id"]
         },
         "indices": [],
         "foreignKeys": []
@@ -241,71 +239,55 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
+          "columnNames": ["id"]
         },
         "indices": [
           {
             "name": "index_listings_farmerId",
             "unique": false,
-            "columnNames": [
-              "farmerId"
-            ],
+            "columnNames": ["farmerId"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_farmerId` ON `${TABLE_NAME}` (`farmerId`)"
           },
           {
             "name": "index_listings_cropType",
             "unique": false,
-            "columnNames": [
-              "cropType"
-            ],
+            "columnNames": ["cropType"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_cropType` ON `${TABLE_NAME}` (`cropType`)"
           },
           {
             "name": "index_listings_quality",
             "unique": false,
-            "columnNames": [
-              "quality"
-            ],
+            "columnNames": ["quality"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_quality` ON `${TABLE_NAME}` (`quality`)"
           },
           {
             "name": "index_listings_syncStatus",
             "unique": false,
-            "columnNames": [
-              "syncStatus"
-            ],
+            "columnNames": ["syncStatus"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_syncStatus` ON `${TABLE_NAME}` (`syncStatus`)"
           },
           {
             "name": "index_listings_isActive",
             "unique": false,
-            "columnNames": [
-              "isActive"
-            ],
+            "columnNames": ["isActive"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_isActive` ON `${TABLE_NAME}` (`isActive`)"
           },
           {
             "name": "index_listings_harvestDate",
             "unique": false,
-            "columnNames": [
-              "harvestDate"
-            ],
+            "columnNames": ["harvestDate"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_harvestDate` ON `${TABLE_NAME}` (`harvestDate`)"
           },
           {
             "name": "index_listings_createdAt",
             "unique": false,
-            "columnNames": [
-              "createdAt"
-            ],
+            "columnNames": ["createdAt"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
           }
@@ -315,12 +297,8 @@
             "table": "users",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
-            "columns": [
-              "farmerId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
+            "columns": ["farmerId"],
+            "referencedColumns": ["id"]
           }
         ]
       },
@@ -481,71 +459,55 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
+          "columnNames": ["id"]
         },
         "indices": [
           {
             "name": "index_transactions_listingId",
             "unique": false,
-            "columnNames": [
-              "listingId"
-            ],
+            "columnNames": ["listingId"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_listingId` ON `${TABLE_NAME}` (`listingId`)"
           },
           {
             "name": "index_transactions_farmerId",
             "unique": false,
-            "columnNames": [
-              "farmerId"
-            ],
+            "columnNames": ["farmerId"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_farmerId` ON `${TABLE_NAME}` (`farmerId`)"
           },
           {
             "name": "index_transactions_buyerId",
             "unique": false,
-            "columnNames": [
-              "buyerId"
-            ],
+            "columnNames": ["buyerId"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_buyerId` ON `${TABLE_NAME}` (`buyerId`)"
           },
           {
             "name": "index_transactions_status",
             "unique": false,
-            "columnNames": [
-              "status"
-            ],
+            "columnNames": ["status"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_status` ON `${TABLE_NAME}` (`status`)"
           },
           {
             "name": "index_transactions_paymentMethod",
             "unique": false,
-            "columnNames": [
-              "paymentMethod"
-            ],
+            "columnNames": ["paymentMethod"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_paymentMethod` ON `${TABLE_NAME}` (`paymentMethod`)"
           },
           {
             "name": "index_transactions_pickupDate",
             "unique": false,
-            "columnNames": [
-              "pickupDate"
-            ],
+            "columnNames": ["pickupDate"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_pickupDate` ON `${TABLE_NAME}` (`pickupDate`)"
           },
           {
             "name": "index_transactions_createdAt",
             "unique": false,
-            "columnNames": [
-              "createdAt"
-            ],
+            "columnNames": ["createdAt"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
           }
@@ -555,34 +517,22 @@
             "table": "listings",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
-            "columns": [
-              "listingId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
+            "columns": ["listingId"],
+            "referencedColumns": ["id"]
           },
           {
             "table": "users",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
-            "columns": [
-              "farmerId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
+            "columns": ["farmerId"],
+            "referencedColumns": ["id"]
           },
           {
             "table": "users",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
-            "columns": [
-              "buyerId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
+            "columns": ["buyerId"],
+            "referencedColumns": ["id"]
           }
         ]
       },
@@ -653,9 +603,7 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "opId"
-          ]
+          "columnNames": ["opId"]
         },
         "indices": [],
         "foreignKeys": []
@@ -775,44 +723,34 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
+          "columnNames": ["id"]
         },
         "indices": [
           {
             "name": "index_market_prices_cropType",
             "unique": false,
-            "columnNames": [
-              "cropType"
-            ],
+            "columnNames": ["cropType"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_cropType` ON `${TABLE_NAME}` (`cropType`)"
           },
           {
             "name": "index_market_prices_trend",
             "unique": false,
-            "columnNames": [
-              "trend"
-            ],
+            "columnNames": ["trend"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_trend` ON `${TABLE_NAME}` (`trend`)"
           },
           {
             "name": "index_market_prices_location",
             "unique": false,
-            "columnNames": [
-              "location"
-            ],
+            "columnNames": ["location"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_location` ON `${TABLE_NAME}` (`location`)"
           },
           {
             "name": "index_market_prices_lastUpdated",
             "unique": false,
-            "columnNames": [
-              "lastUpdated"
-            ],
+            "columnNames": ["lastUpdated"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_lastUpdated` ON `${TABLE_NAME}` (`lastUpdated`)"
           }
@@ -940,62 +878,48 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
+          "columnNames": ["id"]
         },
         "indices": [
           {
             "name": "index_activities_userId",
             "unique": false,
-            "columnNames": [
-              "userId"
-            ],
+            "columnNames": ["userId"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_userId` ON `${TABLE_NAME}` (`userId`)"
           },
           {
             "name": "index_activities_activityType",
             "unique": false,
-            "columnNames": [
-              "activityType"
-            ],
+            "columnNames": ["activityType"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_activityType` ON `${TABLE_NAME}` (`activityType`)"
           },
           {
             "name": "index_activities_status",
             "unique": false,
-            "columnNames": [
-              "status"
-            ],
+            "columnNames": ["status"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_status` ON `${TABLE_NAME}` (`status`)"
           },
           {
             "name": "index_activities_timestamp",
             "unique": false,
-            "columnNames": [
-              "timestamp"
-            ],
+            "columnNames": ["timestamp"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
           },
           {
             "name": "index_activities_relatedEntityId",
             "unique": false,
-            "columnNames": [
-              "relatedEntityId"
-            ],
+            "columnNames": ["relatedEntityId"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_relatedEntityId` ON `${TABLE_NAME}` (`relatedEntityId`)"
           },
           {
             "name": "index_activities_priority",
             "unique": false,
-            "columnNames": [
-              "priority"
-            ],
+            "columnNames": ["priority"],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_priority` ON `${TABLE_NAME}` (`priority`)"
           }
@@ -1005,12 +929,8 @@
             "table": "users",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
-            "columns": [
-              "userId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
+            "columns": ["userId"],
+            "referencedColumns": ["id"]
           }
         ]
       },
@@ -1069,9 +989,7 @@
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
+          "columnNames": ["id"]
         },
         "indices": [],
         "foreignKeys": []

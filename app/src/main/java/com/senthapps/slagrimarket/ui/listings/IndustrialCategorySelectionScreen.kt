@@ -32,25 +32,26 @@ import com.senthapps.slagrimarket.ui.theme.industrialClickable
 // ============================================================================
 
 /**
- * Category data class with multilingual support
+ * Category data class with multilingual support and emoji
  */
 data class Category(
     val id: String,
+    val emoji: String,
     val sinhala: String,
     val tamil: String,
     val english: String
 )
 
 /**
- * All 6 categories per UI plan spec
+ * All 6 categories per UI plan spec with emojis
  */
 val CATEGORIES = listOf(
-    Category("VEGETABLES", "එළවළු", "காய்கறிகள்", "VEGETABLES"),
-    Category("COCONUT", "පොල්", "தேங்காய்", "COCONUT"),
-    Category("PADDY_AND_GRAIN", "වී සහ ධාන්‍ය", "நெல் மற்றும் தானியங்கள்", "PADDY AND GRAIN"),
-    Category("FRUIT", "පලතුරු", "பழங்கள்", "FRUIT"),
-    Category("FISH", "මාළු", "மீன்", "FISH"),
-    Category("LIVESTOCK", "සතුන්", "கால்நடை", "LIVESTOCK")
+    Category("VEGETABLES", "🥬", "එළවළු", "காய்கறிகள்", "VEGETABLES"),
+    Category("COCONUT", "🥥", "පොල්", "தேங்காය்", "COCONUT"),
+    Category("PADDY_AND_GRAIN", "🌾", "වී සහ ධාන්‍ය", "நெல் மற்றும் தானியங்கள்", "PADDY AND GRAIN"),
+    Category("FRUIT", "🍎", "පලතුරු", "பழங்கள்", "FRUIT"),
+    Category("FISH", "🐟", "මාළු", "மீන்", "FISH"),
+    Category("LIVESTOCK", "🐄", "සතුන்", "கால்நடை", "LIVESTOCK")
 )
 
 /**
@@ -201,12 +202,22 @@ private fun CategoryRow(
             .industrialClickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = categoryText,
-            style = HumanIndustrialType.productName, // 20sp Bold
-            color = HumanIndustrial.Ink,
-            textAlign = TextAlign.Center
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = category.emoji,
+                style = HumanIndustrialType.productName, // 20sp Bold
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = categoryText,
+                style = HumanIndustrialType.productName, // 20sp Bold
+                color = HumanIndustrial.Ink,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
