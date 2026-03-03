@@ -106,4 +106,49 @@ router.post("/upload", handleUpload, async (req, res) => {
   }
 });
 
+/**
+ * DELETE /delete
+ * Deletes an image from Supabase Storage.
+ * Body: { path: "userId/uuid.jpg" }
+ * Only the owning user can delete their own images.
+ */
+router.delete("/delete", async (req, res) => {
+  try {
+    const { path } = req.body;
+
+    if (!path || typeof path !== "string") {
+      return res
+        .status(400)
+        .json({ success: false, message: "path is required" });
+    }
+
+    const userId = req.user.userId;
+    if (!path.startsWith(userId + "/")) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: cannot delete another user's image",
+      });
+    }
+
+    if (!supabaseAdmin) {
+      logger.error("supabaseAdmin not configured – cannot delete from storage");
+      return res
+        .status(500)
+        .json({ success: false, message: "Storage service unavailable" });
+    }
+
+    const { error } = await supabaseAdmin.storage.from(BUCKET).remove([path]);
+
+    if (error) {
+      logger.error("Supabase storage delete failed:", error.message);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+
+    res.json({ success: true, message: "Image deleted" });
+  } catch (error) {
+    logger.error("Storage delete error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 module.exports = router;

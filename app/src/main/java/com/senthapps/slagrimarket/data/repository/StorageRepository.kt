@@ -3,6 +3,7 @@ package com.senthapps.slagrimarket.data.repository
 import android.content.Context
 import android.net.Uri
 import com.senthapps.slagrimarket.data.api.StorageApiService
+import com.senthapps.slagrimarket.data.api.StorageDeleteRequest
 import com.senthapps.slagrimarket.util.ImageUploadUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -92,20 +93,51 @@ class StorageRepository @Inject constructor(
     }
 
     /**
-     * Delete an image from storage
-     * TODO: Implement backend delete endpoint
+     * Delete an image from storage by its public URL.
+     * Extracts the Supabase storage path from the URL and calls the backend delete endpoint.
      */
     suspend fun deleteImage(imageUrl: String): Result<Unit> {
-        Timber.d("Image deletion not yet implemented for: $imageUrl")
-        return Result.success(Unit)
+        return try {
+            val marker = "listing-images/"
+            val markerIndex = imageUrl.indexOf(marker)
+            if (markerIndex < 0) {
+                Timber.w("Cannot extract storage path from URL: $imageUrl")
+                return Result.failure(Exception("Invalid image URL format"))
+            }
+            val path = imageUrl.substring(markerIndex + marker.length)
+
+            val response = storageApiService.deleteImage(StorageDeleteRequest(path))
+            if (response.isSuccessful && response.body()?.success == true) {
+                Timber.d("Image deleted: $path")
+                Result.success(Unit)
+            } else {
+                val msg = response.body()?.message ?: "Delete failed (${response.code()})"
+                Timber.w("Delete failed for $path: $msg")
+                Result.failure(Exception(msg))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to delete image: $imageUrl")
+            Result.failure(e)
+        }
     }
 
     /**
-     * Delete all images for a listing
-     * TODO: Implement backend bulk delete endpoint
+     * Delete all images for a listing by their public URLs.
+     * Logs warnings for individual failures but succeeds if at least one deletion succeeds.
      */
-    suspend fun deleteListingImages(listingId: String): Result<Unit> {
-        Timber.d("Listing image deletion not yet implemented for: $listingId")
-        return Result.success(Unit)
+    suspend fun deleteListingImages(listingId: String, imageUrls: List<String>): Result<Unit> {
+        if (imageUrls.isEmpty()) return Result.success(Unit)
+        var anyFailure = false
+        for (url in imageUrls) {
+            deleteImage(url).onFailure {
+                Timber.w("Failed to delete image for listing $listingId: ${it.message}")
+                anyFailure = true
+            }
+        }
+        return if (anyFailure && imageUrls.size == 1) {
+            Result.failure(Exception("Failed to delete image for listing $listingId"))
+        } else {
+            Result.success(Unit)
+        }
     }
 }
