@@ -8,6 +8,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
 import com.senthapps.slagrimarket.data.dao.ActivityDao
+import com.senthapps.slagrimarket.data.dao.DoaCropDao
 import com.senthapps.slagrimarket.data.dao.FavoriteDao
 import com.senthapps.slagrimarket.data.dao.ListingDao
 import com.senthapps.slagrimarket.data.dao.LocalOpDao
@@ -18,6 +19,8 @@ import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.Activity
 import com.senthapps.slagrimarket.data.model.ActivityConverters
 import com.senthapps.slagrimarket.data.model.Conversation
+import com.senthapps.slagrimarket.data.model.DoaCropCategoryEntity
+import com.senthapps.slagrimarket.data.model.DoaCropEntity
 import com.senthapps.slagrimarket.data.model.Favorite
 import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.ListingConverters
@@ -44,9 +47,11 @@ import com.senthapps.slagrimarket.data.model.User
         com.senthapps.slagrimarket.data.model.Review::class,
         com.senthapps.slagrimarket.data.model.Message::class,
         com.senthapps.slagrimarket.data.model.Conversation::class,
-        com.senthapps.slagrimarket.data.model.Favorite::class
+        com.senthapps.slagrimarket.data.model.Favorite::class,
+        DoaCropCategoryEntity::class,
+        DoaCropEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 @TypeConverters(
@@ -66,7 +71,8 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
     abstract fun reviewDao(): com.senthapps.slagrimarket.data.dao.ReviewDao
     abstract fun messageDao(): com.senthapps.slagrimarket.data.dao.MessageDao
     abstract fun favoriteDao(): com.senthapps.slagrimarket.data.dao.FavoriteDao
-    
+    abstract fun doaCropDao(): DoaCropDao
+
     companion object {
         private const val DATABASE_NAME = "jaffna_marketplace_database"
 
@@ -313,6 +319,37 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
         }
 
         /**
+         * Migration from version 6 to 7
+         * Adds DoA CROPIX crop cache tables (doa_crop_categories, doa_crops)
+         */
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `doa_crop_categories` (
+                        `id` INTEGER NOT NULL,
+                        `categoryId` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `cachedAt` INTEGER NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `doa_crops` (
+                        `id` INTEGER NOT NULL,
+                        `cropId` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `cropType` TEXT,
+                        `scientificName` TEXT,
+                        `categoryId` TEXT,
+                        `cachedAt` INTEGER NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+            }
+        }
+
+        /**
          * Database callback for prepopulating data
          */
         private val databaseCallback = object : RoomDatabase.Callback() {
@@ -352,7 +389,7 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
                     JaffnaMarketplaceDatabase::class.java,
                     DATABASE_NAME
                 )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_6)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_6, MIGRATION_6_7)
                 .fallbackToDestructiveMigration()
                 .addCallback(databaseCallback)
                 .build()

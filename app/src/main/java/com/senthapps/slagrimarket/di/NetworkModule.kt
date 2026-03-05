@@ -3,6 +3,7 @@ package com.senthapps.slagrimarket.di
 import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.ActivityApiService
 import com.senthapps.slagrimarket.data.api.AuthApiService
+import com.senthapps.slagrimarket.data.api.CropixApiService
 import com.senthapps.slagrimarket.data.api.FavoriteApiService
 import com.senthapps.slagrimarket.data.api.ListingApiService
 import com.senthapps.slagrimarket.data.api.MarketPriceApiService
@@ -25,6 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -153,5 +155,21 @@ object NetworkModule {
     @Singleton
     fun provideStorageApiService(retrofit: Retrofit): StorageApiService {
         return retrofit.create(StorageApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("cropix")
+    fun provideCropixRetrofit(moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://digital.doa.gov.lk/")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCropixApiService(@Named("cropix") retrofit: Retrofit): CropixApiService {
+        return retrofit.create(CropixApiService::class.java)
     }
 }

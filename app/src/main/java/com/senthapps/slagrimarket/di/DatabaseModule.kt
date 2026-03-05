@@ -3,6 +3,7 @@ package com.senthapps.slagrimarket.di
 import android.content.Context
 import androidx.room.Room
 import com.senthapps.slagrimarket.data.dao.ActivityDao
+import com.senthapps.slagrimarket.data.dao.DoaCropDao
 import com.senthapps.slagrimarket.data.dao.ListingDao
 import com.senthapps.slagrimarket.data.dao.LocalOpDao
 import com.senthapps.slagrimarket.data.dao.MarketPriceDao
@@ -79,5 +80,10 @@ object DatabaseModule {
     @Provides
     fun provideFavoriteDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.FavoriteDao {
         return database.favoriteDao()
+    }
+
+    @Provides
+    fun provideDoaCropDao(database: JaffnaMarketplaceDatabase): DoaCropDao {
+        return database.doaCropDao()
     }
 }

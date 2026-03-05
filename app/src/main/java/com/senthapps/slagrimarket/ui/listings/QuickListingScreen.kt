@@ -16,13 +16,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel
+import com.senthapps.slagrimarket.ui.theme.FieldMode
 import com.senthapps.slagrimarket.data.model.CropTypes
 import com.senthapps.slagrimarket.ui.components.DistrictPickerDialog
 import com.senthapps.slagrimarket.ui.components.IndustrialFormDropdown
@@ -71,11 +78,13 @@ import java.time.format.DateTimeFormatter
 fun QuickListingScreen(
     onNavigateBack: () -> Unit,
     onListingCreated: () -> Unit,
-    viewModel: CreateListingViewModel = hiltViewModel()
+    viewModel: CreateListingViewModel = hiltViewModel(),
+    accessibilityViewModel: AccessibilityViewModel = hiltViewModel()
 ) {
     val language = LocalAppLanguage.current
     val textScale = LocalTextScale.current
     val uiState by viewModel.uiState.collectAsState()
+    val isFieldMode by accessibilityViewModel.isFieldModeEnabled.collectAsState()
     var step by remember { mutableIntStateOf(1) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -141,6 +150,7 @@ fun QuickListingScreen(
             1 -> PhotoStep(
                 language = language,
                 photoUri = photoUri,
+                isFieldMode = isFieldMode,
                 onTakePhoto = {
                     try {
                         val photoFile = File.createTempFile("listing_", ".jpg", context.cacheDir)
@@ -162,6 +172,7 @@ fun QuickListingScreen(
                 photoUri = photoUri,
                 viewModel = viewModel,
                 uiState = uiState,
+                isFieldMode = isFieldMode,
                 onSubmit = {
                     if (uiState.unit.isBlank()) viewModel.updateUnit("kg")
                     if (uiState.quality.isBlank()) viewModel.updateQuality("GRADE_A")
@@ -225,6 +236,7 @@ private fun QuickListingHeader(
 private fun PhotoStep(
     language: AppLanguage,
     photoUri: Uri?,
+    isFieldMode: Boolean = false,
     onTakePhoto: () -> Unit,
     onNext: () -> Unit
 ) {
@@ -236,13 +248,14 @@ private fun PhotoStep(
         verticalArrangement = Arrangement.Center
     ) {
         if (photoUri != null) {
-            // Show taken photo
+            // Show taken photo — half-screen in field mode for easier review
             AsyncImage(
                 model = photoUri,
                 contentDescription = "Product photo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
+                modifier = if (isFieldMode)
+                    Modifier.fillMaxWidth().fillMaxHeight(0.5f)
+                else
+                    Modifier.fillMaxWidth().height(300.dp),
                 contentScale = ContentScale.Crop
             )
 
@@ -300,6 +313,7 @@ private fun DetailsStep(
     photoUri: Uri?,
     viewModel: CreateListingViewModel,
     uiState: CreateListingUiState,
+    isFieldMode: Boolean = false,
     onSubmit: () -> Unit
 ) {
     // Dialog state
@@ -335,19 +349,21 @@ private fun DetailsStep(
             .padding(Spacing.lg.dp),
         verticalArrangement = Arrangement.spacedBy(Spacing.md.dp)
     ) {
-        // Small photo preview
+        // Small photo preview — taller in field mode for better visibility
         if (photoUri != null) {
             AsyncImage(
                 model = photoUri,
                 contentDescription = "Product photo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
+                modifier = if (isFieldMode)
+                    Modifier.fillMaxWidth().fillMaxHeight(0.5f)
+                else
+                    Modifier.fillMaxWidth().height(120.dp),
                 contentScale = ContentScale.Crop
             )
         }
 
-        // Crop type dropdown
+        // Crop type dropdown — options from DoA registry, fallback to hardcoded list
+        val cropOptions by viewModel.cropSuggestions.collectAsState()
         IndustrialFormDropdown(
             label = when (language) {
                 AppLanguage.SINHALA -> "බෝගය"
@@ -355,9 +371,69 @@ private fun DetailsStep(
                 AppLanguage.ENGLISH -> "CROP"
             },
             selectedOption = uiState.cropType,
-            options = CropTypes.ALL_CROPS,
+            options = cropOptions,
             onOptionSelected = viewModel::updateCropType
         )
+
+        // Yield tip banner — static tips for common Sri Lanka crops
+        val yieldTips = remember {
+            mapOf(
+                "tomato" to "Best yield Apr–Jun. Water 2× daily.",
+                "red onion" to "Harvest after 90 days. Reduce water last 2 weeks.",
+                "chili" to "Space 45 cm apart. Peak yield Aug–Oct.",
+                "brinjal" to "Needs well-drained soil. Harvest every 5 days.",
+                "okra" to "Germinates best above 25°C. Harvest at 8 cm."
+            )
+        }
+        val tipKey = uiState.cropType.lowercase()
+        val tip = yieldTips.entries.firstOrNull { tipKey.contains(it.key) }?.value
+        AnimatedVisibility(visible = tip != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text("🌱", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = tip ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+        }
+
+        // Grade chips — 72dp tall in field mode for sweaty outdoor fingers
+        val chipHeight = if (isFieldMode) 72.dp else 56.dp
+        val grades = listOf("GRADE_A" to "A", "GRADE_B" to "B", "GRADE_C" to "C")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm.dp)
+        ) {
+            grades.forEach { (gradeKey, gradeLabel) ->
+                val isSelected = uiState.quality == gradeKey
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(chipHeight)
+                        .background(if (isSelected) HumanIndustrial.Gold else HumanIndustrial.Dust)
+                        .industrialClickable(onClick = { viewModel.updateQuality(gradeKey) }),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = gradeLabel,
+                        style = HumanIndustrialType.sectionLabel,
+                        color = if (isSelected) HumanIndustrial.Rice else HumanIndustrial.Stone
+                    )
+                }
+            }
+        }
 
         // Voice crop confirmation chip — shown after fuzzy match
         voiceCropSuggestion?.let { (emoji, cropName) ->
@@ -546,10 +622,11 @@ private fun DetailsStep(
             }
         } else {
             PrimaryButton(
-                text = when (language) {
-                    AppLanguage.SINHALA -> "දැන් විකුණන්න"
-                    AppLanguage.TAMIL -> "இப்போது விற்கவும்"
-                    AppLanguage.ENGLISH -> "SELL NOW"
+                text = when {
+                    isFieldMode && language == AppLanguage.TAMIL -> "இப்போது அனுப்பு"
+                    language == AppLanguage.SINHALA -> "දැන් විකුණන්න"
+                    language == AppLanguage.TAMIL -> "இப்போது விற்கவும்"
+                    else -> "SELL NOW"
                 },
                 onClick = onSubmit
             )

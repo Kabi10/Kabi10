@@ -6,12 +6,16 @@ import com.senthapps.slagrimarket.data.model.CropTypes
 import com.senthapps.slagrimarket.data.model.QualityGrades
 import com.senthapps.slagrimarket.data.model.Units
 import com.senthapps.slagrimarket.data.repository.AuthRepository
+import com.senthapps.slagrimarket.data.repository.CropixRepository
 import com.senthapps.slagrimarket.data.repository.ListingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -24,13 +28,26 @@ class CreateListingViewModel @Inject constructor(
     private val listingRepository: ListingRepository,
     private val authRepository: AuthRepository,
     @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
-    private val lastUsedPreferences: com.senthapps.slagrimarket.data.preferences.LastUsedPreferences
+    private val lastUsedPreferences: com.senthapps.slagrimarket.data.preferences.LastUsedPreferences,
+    private val cropixRepository: CropixRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateListingUiState())
     val uiState: StateFlow<CreateListingUiState> = _uiState.asStateFlow()
 
+    val cropSuggestions: StateFlow<List<String>> = cropixRepository.getCrops()
+        .map { crops ->
+            if (crops.isNotEmpty()) crops.map { it.description }
+            else CropTypes.ALL_CROPS
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CropTypes.ALL_CROPS
+        )
+
     init {
+        viewModelScope.launch { cropixRepository.syncCrops() }
         viewModelScope.launch {
             val lastCrop = lastUsedPreferences.getLastCropType().first()
             val lastPrice = lastUsedPreferences.getLastPrice().first()

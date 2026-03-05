@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,16 +24,20 @@ import com.senthapps.slagrimarket.data.model.MarketPrice
 import com.senthapps.slagrimarket.data.model.SampleMarketPrices
 import com.senthapps.slagrimarket.ui.common.LanguageToggleButton
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel
+import com.senthapps.slagrimarket.ui.theme.FieldMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketPricesScreen(
     onNavigateBack: () -> Unit,
-    languageViewModel: LanguageToggleViewModel = hiltViewModel()
+    languageViewModel: LanguageToggleViewModel = hiltViewModel(),
+    accessibilityViewModel: AccessibilityViewModel = hiltViewModel()
 ) {
     val currentLanguage by languageViewModel.currentLanguage.collectAsState()
+    val isFieldMode by accessibilityViewModel.isFieldModeEnabled.collectAsState()
     val marketPrices = SampleMarketPrices.SAMPLE_PRICES
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,11 +71,25 @@ fun MarketPricesScreen(
             )
         }
     ) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            // DoA source badge
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "🌿 DoA Verified",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(if (isFieldMode) 1 else 2),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -78,10 +97,12 @@ fun MarketPricesScreen(
             items(marketPrices) { marketPrice ->
                 MarketPriceDetailCard(
                     marketPrice = marketPrice,
-                    currentLanguage = currentLanguage
+                    currentLanguage = currentLanguage,
+                    isFieldMode = isFieldMode
                 )
             }
         }
+        } // end Column
     }
 }
 
@@ -89,13 +110,14 @@ fun MarketPricesScreen(
 private fun MarketPriceDetailCard(
     marketPrice: MarketPrice,
     currentLanguage: String,
+    isFieldMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = if (isFieldMode) FieldMode.Surface else MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -112,9 +134,10 @@ private fun MarketPriceDetailCard(
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Start,
+                color = if (isFieldMode) FieldMode.Text else MaterialTheme.colorScheme.onSurface
             )
-            
+
             // Price section
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -122,11 +145,12 @@ private fun MarketPriceDetailCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
+                    // 40sp price — large enough for bright sun + aging eyes
                     Text(
-                        text = "LKR ${String.format("%.2f", marketPrice.pricePerKg)}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        text = "LKR ${String.format("%.0f", marketPrice.pricePerKg)}",
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Black,
+                        color = if (isFieldMode) FieldMode.Accent else MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = when (currentLanguage) {
@@ -136,63 +160,81 @@ private fun MarketPriceDetailCard(
                             else -> "per kg"
                         },
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (isFieldMode) FieldMode.Text.copy(alpha = 0.7f)
+                               else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
-                // Trend indicator
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = SampleMarketPrices.getTrendColor(marketPrice.trend).copy(alpha = 0.1f)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+
+                // Trend — simple bold arrow in field mode, full chip otherwise
+                if (isFieldMode) {
+                    Text(
+                        text = when (marketPrice.trend.name) {
+                            "UP" -> "↑"; "DOWN" -> "↓"; else -> "→"
+                        },
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Black,
+                        color = when (marketPrice.trend.name) {
+                            "UP" -> Color(0xFF2D5016)
+                            "DOWN" -> Color(0xFFA63D2F)
+                            else -> Color(0xFF6B6B6B)
+                        }
+                    )
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = SampleMarketPrices.getTrendColor(marketPrice.trend).copy(alpha = 0.1f)
                     ) {
-                        Text(
-                            text = SampleMarketPrices.getTrendIcon(marketPrice.trend),
-                            fontSize = 16.sp
-                        )
-                        Text(
-                            text = when (marketPrice.trend.name) {
-                                "UP" -> when (currentLanguage) {
-                                    "en" -> "Rising"
-                                    "ta" -> "உயர்வு"
-                                    "si" -> "ඉහළ යමින්"
-                                    else -> "Rising"
-                                }
-                                "DOWN" -> when (currentLanguage) {
-                                    "en" -> "Falling"
-                                    "ta" -> "வீழ்ச்சி"
-                                    "si" -> "පහත වැටෙමින්"
-                                    else -> "Falling"
-                                }
-                                else -> when (currentLanguage) {
-                                    "en" -> "Stable"
-                                    "ta" -> "நிலையான"
-                                    "si" -> "ස්ථාවර"
-                                    else -> "Stable"
-                                }
-                            },
-                            style = MaterialTheme.typography.labelMedium,
-                            color = SampleMarketPrices.getTrendColor(marketPrice.trend),
-                            fontWeight = FontWeight.Medium
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = SampleMarketPrices.getTrendIcon(marketPrice.trend),
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = when (marketPrice.trend.name) {
+                                    "UP" -> when (currentLanguage) {
+                                        "en" -> "Rising"
+                                        "ta" -> "உயர்வு"
+                                        "si" -> "ඉහළ යමින්"
+                                        else -> "Rising"
+                                    }
+                                    "DOWN" -> when (currentLanguage) {
+                                        "en" -> "Falling"
+                                        "ta" -> "வீழ்ச்சி"
+                                        "si" -> "පහත වැටෙමින්"
+                                        else -> "Falling"
+                                    }
+                                    else -> when (currentLanguage) {
+                                        "en" -> "Stable"
+                                        "ta" -> "நிலையான"
+                                        "si" -> "ස්ථාවර"
+                                        else -> "Stable"
+                                    }
+                                },
+                                style = MaterialTheme.typography.labelMedium,
+                                color = SampleMarketPrices.getTrendColor(marketPrice.trend),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
-            
+
             // Location
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.secondaryContainer,
+                color = if (isFieldMode) FieldMode.Background
+                       else MaterialTheme.colorScheme.secondaryContainer,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = SampleMarketPrices.getLocationName(marketPrice.location, currentLanguage),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    color = if (isFieldMode) FieldMode.Text.copy(alpha = 0.8f)
+                           else MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Medium
