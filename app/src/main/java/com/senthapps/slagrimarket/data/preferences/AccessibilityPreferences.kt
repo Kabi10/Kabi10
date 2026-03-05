@@ -16,6 +16,7 @@ class AccessibilityPreferences @Inject constructor(
         private val LARGE_TEXT_KEY = booleanPreferencesKey("large_text_enabled")
         private val TEXT_SCALE_KEY = floatPreferencesKey("text_scale_factor")
         private val HIGH_CONTRAST_KEY = booleanPreferencesKey("high_contrast_enabled")
+        private val FIELD_MODE_KEY = booleanPreferencesKey("field_mode_enabled")
 
         const val DEFAULT_SCALE = 1.0f
         const val LARGE_SCALE = 1.35f
@@ -42,4 +43,11 @@ class AccessibilityPreferences @Inject constructor(
 
     fun isHighContrastEnabled(): Flow<Boolean> =
         dataStore.data.map { it[HIGH_CONTRAST_KEY] ?: false }
+
+    suspend fun setFieldModeEnabled(enabled: Boolean) {
+        dataStore.edit { it[FIELD_MODE_KEY] = enabled }
+    }
+
+    fun isFieldModeEnabled(): Flow<Boolean> =
+        dataStore.data.map { it[FIELD_MODE_KEY] ?: false }
 }

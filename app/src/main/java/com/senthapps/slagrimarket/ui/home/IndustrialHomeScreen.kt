@@ -23,6 +23,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import com.senthapps.slagrimarket.ui.theme.Spacing
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,11 +32,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.ui.theme.BorderWidth
+import com.senthapps.slagrimarket.ui.theme.FieldMode
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrial
 import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.industrialClickable
 import com.senthapps.slagrimarket.data.model.PriceTrend
+import com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel
 
 // ============================================================================
 // HUMAN INDUSTRIAL HOME SCREEN v3.0
@@ -81,12 +86,15 @@ fun IndustrialHomeScreen(
     farmerDistrict: String = "",
     marketPrices: List<TickerPriceItem> = emptyList(),
     activeListingCount: Int = 0,
-    onToggleTextSize: () -> Unit = {}
+    onToggleTextSize: () -> Unit = {},
+    accessibilityViewModel: AccessibilityViewModel = hiltViewModel()
 ) {
+    val isFieldMode by accessibilityViewModel.isFieldModeEnabled.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(HumanIndustrial.Rice)
+            .background(if (isFieldMode) FieldMode.Background else HumanIndustrial.Rice)
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -96,7 +104,9 @@ fun IndustrialHomeScreen(
                 farmerName = farmerName,
                 farmerDistrict = farmerDistrict,
                 onNavigateToSettings = onNavigateToSettings,
-                onToggleTextSize = onToggleTextSize
+                onToggleTextSize = onToggleTextSize,
+                isFieldMode = isFieldMode,
+                onToggleFieldMode = { accessibilityViewModel.toggleFieldMode(!isFieldMode) }
             )
 
             // Thick Earth divider
@@ -135,10 +145,11 @@ fun IndustrialHomeScreen(
                     },
                     secondaryText = when (language) {
                         AppLanguage.SINHALA -> "මිලට ගන්න"
-                        AppLanguage.TAMIL -> "வாங்க"
+                        AppLanguage.TAMIL -> "வாங்கு"
                         AppLanguage.ENGLISH -> null
                     },
                     onClick = onNavigateToBuy,
+                    isFieldMode = isFieldMode,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
@@ -171,6 +182,7 @@ fun IndustrialHomeScreen(
                             AppLanguage.ENGLISH -> null
                         },
                         onClick = onNavigateToSell,
+                        isFieldMode = isFieldMode,
                         modifier = Modifier.fillMaxSize()
                     )
                     // Active listing count badge
@@ -220,6 +232,7 @@ fun IndustrialHomeScreen(
                         AppLanguage.ENGLISH -> null
                     },
                     onClick = onNavigateToPrices,
+                    isFieldMode = isFieldMode,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
@@ -247,6 +260,7 @@ fun IndustrialHomeScreen(
                         AppLanguage.ENGLISH -> null
                     },
                     onClick = onNavigateToOrders,
+                    isFieldMode = isFieldMode,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
@@ -266,7 +280,9 @@ private fun GreetingHeader(
     farmerName: String,
     farmerDistrict: String,
     onNavigateToSettings: () -> Unit,
-    onToggleTextSize: () -> Unit
+    onToggleTextSize: () -> Unit,
+    isFieldMode: Boolean = false,
+    onToggleFieldMode: () -> Unit = {}
 ) {
     val greeting = when (language) {
         AppLanguage.SINHALA -> "ආයුබෝවන්! 👋"
@@ -318,11 +334,21 @@ private fun GreetingHeader(
                     }
                 }
 
-                // Right-side controls: AA + Settings
+                // Right-side controls: ☀️ Field Mode + AA + Settings
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
                 ) {
+                    // ☀️ Field mode toggle — 72dp for sweaty outdoor fingers
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .background(if (isFieldMode) FieldMode.Accent else HumanIndustrial.Dust)
+                            .industrialClickable(onClick = onToggleFieldMode),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("☀️", fontSize = 28.sp)
+                    }
                     // AA text size cycle button
                     Box(
                         modifier = Modifier
@@ -444,12 +470,16 @@ private fun HomeQuadrant(
     primaryText: String,
     secondaryText: String?,
     onClick: () -> Unit,
+    isFieldMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val bgColor = if (isFieldMode) FieldMode.Surface else HumanIndustrial.Rice
+    val textColor = if (isFieldMode) FieldMode.Text else HumanIndustrial.Ink
+
     Box(
         modifier = modifier
             .industrialClickable(onClick = onClick)
-            .background(HumanIndustrial.Rice),
+            .background(bgColor),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -464,14 +494,14 @@ private fun HomeQuadrant(
             Text(
                 text = primaryText,
                 style = HumanIndustrialType.homeTile,
-                color = HumanIndustrial.Ink,
+                color = textColor,
                 textAlign = TextAlign.Center
             )
             secondaryText?.let { secondary ->
                 Text(
                     text = secondary,
                     style = HumanIndustrialType.homeTile,
-                    color = HumanIndustrial.Ink,
+                    color = textColor,
                     textAlign = TextAlign.Center
                 )
             }

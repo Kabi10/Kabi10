@@ -29,6 +29,17 @@ object HumanIndustrial {
     val LivestockBackground = Earth    // #8B4513
 }
 
+// ============================================================================
+// FIELD MODE PALETTE - High-visibility for outdoor use (bright sun, sweaty hands)
+// Warm dark background, cream text, golden accent — easy on aging eyes
+// ============================================================================
+object FieldMode {
+    val Background = Color(0xFF2E2A1F)  // Deep warm brown — no glare
+    val Text = Color(0xFFF5E8C7)        // Cream — maximum contrast on dark
+    val Accent = Color(0xFFD4A017)      // Golden yellow — action buttons
+    val Surface = Color(0xFF3D3526)     // Slightly lighter brown — cards/tiles
+}
+
 // NOTE: Spacing values are defined in Shape.kt as part of the Spacing object
 // Use Spacing.xs, Spacing.sm, Spacing.md, Spacing.lg, Spacing.xl with .dp extension
 

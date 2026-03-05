@@ -5,8 +5,10 @@ import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.QualityGrade
 import com.senthapps.slagrimarket.data.model.User
 import com.senthapps.slagrimarket.data.model.UserType
+import com.senthapps.slagrimarket.data.model.DoaCropEntity
 import com.senthapps.slagrimarket.data.preferences.LastUsedPreferences
 import com.senthapps.slagrimarket.data.repository.AuthRepository
+import com.senthapps.slagrimarket.data.repository.CropixRepository
 import com.senthapps.slagrimarket.data.repository.ListingRepository
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,7 @@ class CreateListingViewModelTest {
     private lateinit var authRepository: AuthRepository
     private lateinit var context: Context
     private lateinit var lastUsedPreferences: LastUsedPreferences
+    private lateinit var cropixRepository: CropixRepository
     private lateinit var viewModel: CreateListingViewModel
 
     private val mockUser = User(
@@ -63,6 +66,7 @@ class CreateListingViewModelTest {
         authRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
         lastUsedPreferences = mockk(relaxed = true)
+        cropixRepository = mockk(relaxed = true)
 
         // Mock context string resources
         every { context.getString(any()) } returns "Error message"
@@ -70,8 +74,9 @@ class CreateListingViewModelTest {
         every { lastUsedPreferences.getLastCropType() } returns flowOf("")
         every { lastUsedPreferences.getLastPrice() } returns flowOf("")
         every { lastUsedPreferences.getLastLocation() } returns flowOf("")
+        every { cropixRepository.getCrops() } returns flowOf(emptyList<DoaCropEntity>())
 
-        viewModel = CreateListingViewModel(listingRepository, authRepository, context, lastUsedPreferences)
+        viewModel = CreateListingViewModel(listingRepository, authRepository, context, lastUsedPreferences, cropixRepository)
     }
 
     @After

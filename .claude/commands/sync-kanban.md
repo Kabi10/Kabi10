@@ -11,6 +11,7 @@ Audit the Vibe Kanban board: surface stale issues, close completed work, and ide
    - **Done**: verify corresponding commits exist (`git log --oneline | grep KAB-N`)
 3. **Cross-check with git** — run `git log --oneline -20` and map commits to KAB issues
 4. **Report board state**:
+
    ```
    IN PROGRESS:
      KAB-3: SMS/OTP Auth [urgent] — active
@@ -24,6 +25,7 @@ Audit the Vibe Kanban board: surface stale issues, close completed work, and ide
 
    NEXT RECOMMENDED: KAB-3 (urgent, in progress)
    ```
+
 5. **Update stale issues** — move any wrongly-marked issues to correct status
 6. **Close confirmed-done issues** — `mcp__vibe_kanban__update_issue` → `"Done"` for verified work
 

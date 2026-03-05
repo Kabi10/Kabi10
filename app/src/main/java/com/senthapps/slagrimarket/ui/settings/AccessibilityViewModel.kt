@@ -23,6 +23,9 @@ class AccessibilityViewModel @Inject constructor(
     val isHighContrastEnabled = accessibilityPreferences.isHighContrastEnabled()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isFieldModeEnabled = accessibilityPreferences.isFieldModeEnabled()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun toggleLargeText(enabled: Boolean) {
         viewModelScope.launch {
             accessibilityPreferences.setLargeTextEnabled(enabled)
@@ -32,6 +35,12 @@ class AccessibilityViewModel @Inject constructor(
     fun toggleHighContrast(enabled: Boolean) {
         viewModelScope.launch {
             accessibilityPreferences.setHighContrastEnabled(enabled)
+        }
+    }
+
+    fun toggleFieldMode(enabled: Boolean) {
+        viewModelScope.launch {
+            accessibilityPreferences.setFieldModeEnabled(enabled)
         }
     }
 }

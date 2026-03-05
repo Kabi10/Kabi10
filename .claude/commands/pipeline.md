@@ -7,11 +7,13 @@ Token-efficient 3-stage AI pipeline for complex tasks. Use this before coding wh
 ## Stage 1: Gemini Analysis (codebase exploration)
 
 Use `mcp__gemini-bridge-mcp__gemini_execute` with `model: "gemini-2.5-pro"` to:
+
 - Read and analyze relevant source files
 - Identify gaps, patterns, and constraints
 - Produce a structured findings report
 
 Example prompt for Gemini:
+
 ```
 Analyze the Agrimarket codebase for [task].
 Read these files: [list relevant files].
@@ -59,10 +61,10 @@ Live dashboard: `node scripts/aipipe-server.js` → http://localhost:4242
 
 ## When to use pipeline vs direct coding
 
-| Situation | Approach |
-|-----------|----------|
-| Single-file bug fix | Code directly |
-| New feature, clear spec | Code directly |
-| Multi-file feature, unclear scope | `/pipeline` first |
-| Architectural decision needed | `/pipeline` + plan mode |
-| Need to explore unfamiliar area | `/pipeline` Gemini-only |
+| Situation                         | Approach                |
+| --------------------------------- | ----------------------- |
+| Single-file bug fix               | Code directly           |
+| New feature, clear spec           | Code directly           |
+| Multi-file feature, unclear scope | `/pipeline` first       |
+| Architectural decision needed     | `/pipeline` + plan mode |
+| Need to explore unfamiliar area   | `/pipeline` Gemini-only |

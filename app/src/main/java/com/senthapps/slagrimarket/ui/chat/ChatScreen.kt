@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.data.model.Message
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.VoiceInputButton
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -237,7 +238,18 @@ private fun MessageInputBar(
                 ),
                 maxLines = 4
             )
-            
+
+            // Voice mic — fills text field, user taps Send to confirm (no auto-send)
+            VoiceInputButton(
+                onVoiceResult = { recognized -> onMessageChange(recognized) },
+                language = when (currentLanguage) {
+                    "ta" -> "ta"
+                    "si" -> "si"
+                    else -> "en"
+                },
+                modifier = Modifier.size(56.dp)
+            )
+
             IconButton(
                 onClick = onSendMessage,
                 enabled = message.isNotBlank() && !isLoading,
