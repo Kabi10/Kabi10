@@ -33,6 +33,7 @@ class SyncSettingsViewModel @Inject constructor(
                     pendingOperations = syncState.pendingOperations,
                     successfulOperations = syncState.successfulOperations,
                     failedOperations = syncState.failedOperations,
+                    conflictCount = syncState.conflictCount,
                     error = syncState.error
                 )
             }
@@ -112,6 +113,7 @@ data class SyncSettingsUiState(
     val pendingOperations: Int = 0,
     val successfulOperations: Int = 0,
     val failedOperations: Int = 0,
+    val conflictCount: Int = 0,
     val autoSyncEnabled: Boolean = true,
     val syncInterval: Long = 30_000L, // 30 seconds
     val error: String? = null

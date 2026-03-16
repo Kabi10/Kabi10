@@ -83,4 +83,7 @@ interface LocalOpDao {
 
     @Query("UPDATE local_ops SET attempts = 0, errorMessage = NULL WHERE opId = :opId")
     suspend fun resetOpStatus(opId: String)
+
+    @Query("DELETE FROM local_ops WHERE synced = 1 AND clientTs < :cutoffTs")
+    suspend fun deleteOldSyncedOps(cutoffTs: String)
 }

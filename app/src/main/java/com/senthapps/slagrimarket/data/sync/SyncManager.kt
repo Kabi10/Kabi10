@@ -24,6 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -67,7 +69,7 @@ class SyncManager @Inject constructor(
             while (isAutoSyncEnabled) {
                 try {
                     if (authRepository.isUserLoggedIn()) {
-                        performSync()
+                        performSyncWithBackoff()
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Auto sync failed")
@@ -110,6 +112,7 @@ class SyncManager @Inject constructor(
             }
 
             updateSyncState(successCount = totalSuccess, failureCount = totalFailures, conflictCount = allConflicts.size)
+            cleanupStaleOps()
             Result.success(Unit)
         } catch (e: Exception) {
             Timber.e(e, "Sync failed")
@@ -383,6 +386,18 @@ class SyncManager @Inject constructor(
             lastSyncTime = state.lastSyncTime,
             isSyncing = state.isSyncing
         )
+    }
+
+    private suspend fun cleanupStaleOps() {
+        try {
+            // Remove ops that have exhausted all retries
+            localOpDao.deleteFailedOps(maxAttempts = 5)
+            // Remove synced ops older than 7 days
+            val cutoffTs = Instant.now().minus(7, ChronoUnit.DAYS).toString()
+            localOpDao.deleteOldSyncedOps(cutoffTs)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to cleanup stale ops")
+        }
     }
 
     // ============================================================================

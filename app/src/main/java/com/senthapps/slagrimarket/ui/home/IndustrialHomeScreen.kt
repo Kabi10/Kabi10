@@ -40,6 +40,7 @@ import com.senthapps.slagrimarket.ui.theme.HumanIndustrialType
 import com.senthapps.slagrimarket.ui.theme.industrialClickable
 import com.senthapps.slagrimarket.data.model.PriceTrend
 import com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel
+import com.senthapps.slagrimarket.ui.sync.SyncStatusDot
 
 // ============================================================================
 // HUMAN INDUSTRIAL HOME SCREEN v3.0
@@ -334,11 +335,14 @@ private fun GreetingHeader(
                     }
                 }
 
-                // Right-side controls: ☀️ Field Mode + AA + Settings
+                // Right-side controls: sync dot + ☀️ Field Mode + AA + Settings
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(Spacing.xs.dp)
                 ) {
+                    // Sync status dot — shows live sync state
+                    SyncStatusDot(modifier = Modifier.align(Alignment.End))
+
                     // ☀️ Field mode toggle — 72dp for sweaty outdoor fingers
                     Box(
                         modifier = Modifier

@@ -17,6 +17,36 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Composable
+private fun ConflictBanner(conflictCount: Int) {
+    var dismissed by remember(conflictCount) { mutableStateOf(false) }
+    if (conflictCount > 0 && !dismissed) {
+        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "$conflictCount edit(s) conflicted with server — server version kept",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                TextButton(onClick = { dismissed = true }) {
+                    Text("Dismiss")
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncSettingsScreen(
@@ -98,11 +128,15 @@ fun SyncSettingsScreen(
                 hasFailedOps = uiState.failedOperations > 0
             )
             
+            // Conflict banner
+            ConflictBanner(conflictCount = uiState.conflictCount)
+
             // Sync Statistics Card
             SyncStatisticsCard(
                 pendingOperations = uiState.pendingOperations,
                 successfulOperations = uiState.successfulOperations,
-                failedOperations = uiState.failedOperations
+                failedOperations = uiState.failedOperations,
+                conflictCount = uiState.conflictCount
             )
         }
     }
@@ -310,7 +344,8 @@ private fun SyncActionsCard(
 private fun SyncStatisticsCard(
     pendingOperations: Int,
     successfulOperations: Int,
-    failedOperations: Int
+    failedOperations: Int,
+    conflictCount: Int = 0
 ) {
     Card {
         Column(
@@ -353,7 +388,19 @@ private fun SyncStatisticsCard(
                 Text("Failed Operations")
                 Text(
                     text = failedOperations.toString(),
-                    color = if (failedOperations > 0) MaterialTheme.colorScheme.error 
+                    color = if (failedOperations > 0) MaterialTheme.colorScheme.error
+                           else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Conflicts (server won)")
+                Text(
+                    text = conflictCount.toString(),
+                    color = if (conflictCount > 0) MaterialTheme.colorScheme.error
                            else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
