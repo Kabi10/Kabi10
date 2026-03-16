@@ -98,6 +98,34 @@ class AuthViewModel @Inject constructor(
         )
     }
 
+    fun loginWithPassword(phoneNumber: String, password: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            authRepository.loginWithPassword(phoneNumber, password).fold(
+                onSuccess = { user ->
+                    _uiState.value = _uiState.value.copy(isLoading = false, isAuthenticated = true, user = user)
+                },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = error.message ?: "Login failed")
+                }
+            )
+        }
+    }
+
+    fun registerWithPassword(phoneNumber: String, password: String, userType: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            authRepository.registerWithPassword(phoneNumber, password, userType).fold(
+                onSuccess = { user ->
+                    _uiState.value = _uiState.value.copy(isLoading = false, isAuthenticated = true, user = user)
+                },
+                onFailure = { error ->
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = error.message ?: "Registration failed")
+                }
+            )
+        }
+    }
+
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()

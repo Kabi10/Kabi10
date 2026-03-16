@@ -375,4 +375,194 @@ router.post("/logout", async (req, res) => {
   });
 });
 
+/**
+ * POST /api/v1/auth/register
+ * Register a new user with phone number + password
+ */
+router.post(
+  "/register",
+  [
+    body("phoneNumber")
+      .matches(/^\+94[0-9]{9}$/)
+      .withMessage("Invalid Sri Lankan phone number format. Use +94XXXXXXXXX"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters"),
+    body("userType")
+      .optional()
+      .isIn(["FARMER", "BUYER"])
+      .withMessage("userType must be FARMER or BUYER"),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(400)
+          .json({ success: false, message: errors.array()[0].msg });
+      }
+
+      const { phoneNumber, password, userType = "BUYER" } = req.body;
+
+      // Check if user already exists
+      const existing = await db.query(
+        "SELECT id FROM users WHERE phone_number = $1",
+        [phoneNumber],
+      );
+      if (existing.rows.length > 0) {
+        return res.status(409).json({
+          success: false,
+          message: "Phone number already registered. Please login.",
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const result = await db.query(
+        `INSERT INTO users (phone_number, password_hash, verified, user_type)
+         VALUES ($1, $2, true, $3)
+         RETURNING *`,
+        [phoneNumber, passwordHash, userType],
+      );
+
+      const userData = result.rows[0];
+
+      const accessToken = jwt.sign(
+        {
+          userId: userData.id,
+          phoneNumber: userData.phone_number,
+          userType: userData.user_type,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
+      );
+      const refreshToken = jwt.sign(
+        { userId: userData.id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" },
+      );
+
+      logger.info("New user registered", { userId: userData.id });
+
+      res.status(201).json({
+        success: true,
+        token: accessToken,
+        refreshToken,
+        user: {
+          id: userData.id,
+          phoneNumber: userData.phone_number,
+          name: userData.name,
+          userType: userData.user_type,
+          location: userData.location,
+          verified: userData.verified,
+          createdAt: userData.created_at,
+        },
+      });
+    } catch (error) {
+      logger.error("Register error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  },
+);
+
+/**
+ * POST /api/v1/auth/login
+ * Login with phone number + password
+ */
+router.post(
+  "/login",
+  [
+    body("phoneNumber")
+      .matches(/^\+94[0-9]{9}$/)
+      .withMessage("Invalid Sri Lankan phone number format. Use +94XXXXXXXXX"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(400)
+          .json({ success: false, message: errors.array()[0].msg });
+      }
+
+      const { phoneNumber, password } = req.body;
+
+      const result = await db.query(
+        "SELECT * FROM users WHERE phone_number = $1 AND is_active = true",
+        [phoneNumber],
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(401).json({
+          success: false,
+          message: "Phone number not registered. Please sign up.",
+        });
+      }
+
+      const userData = result.rows[0];
+
+      if (!userData.password_hash) {
+        return res.status(401).json({
+          success: false,
+          message: "No password set for this account. Please register again.",
+        });
+      }
+
+      const passwordMatch = await bcrypt.compare(
+        password,
+        userData.password_hash,
+      );
+      if (!passwordMatch) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Incorrect password." });
+      }
+
+      await db.query("UPDATE users SET last_login_at = NOW() WHERE id = $1", [
+        userData.id,
+      ]);
+
+      const accessToken = jwt.sign(
+        {
+          userId: userData.id,
+          phoneNumber: userData.phone_number,
+          userType: userData.user_type,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
+      );
+      const refreshToken = jwt.sign(
+        { userId: userData.id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" },
+      );
+
+      logger.info("User logged in", { userId: userData.id });
+
+      res.json({
+        success: true,
+        token: accessToken,
+        refreshToken,
+        user: {
+          id: userData.id,
+          phoneNumber: userData.phone_number,
+          name: userData.name,
+          userType: userData.user_type,
+          location: userData.location,
+          verified: userData.verified,
+          createdAt: userData.created_at,
+        },
+      });
+    } catch (error) {
+      logger.error("Login error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  },
+);
+
 module.exports = router;

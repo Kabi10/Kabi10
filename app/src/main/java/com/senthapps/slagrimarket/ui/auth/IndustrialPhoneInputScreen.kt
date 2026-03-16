@@ -17,7 +17,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,13 +63,6 @@ fun IndustrialPhoneInputScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var phoneNumber by remember { mutableStateOf("") }
-
-    // Navigate to OTP screen when OTP is sent
-    LaunchedEffect(uiState.otpSent) {
-        if (uiState.otpSent && uiState.otpId != null) {
-            onNavigateToOtpVerification(phoneNumber, uiState.otpId!!)
-        }
-    }
 
     // Outer container with safe drawing insets
     Box(
@@ -226,14 +218,14 @@ fun IndustrialPhoneInputScreen(
 
             Spacer(modifier = Modifier.height(Spacing.Double))
 
-            // Send OTP button
+            // Continue button — navigate directly to password screen
             IndustrialButton(
-                text = if (uiState.isLoading) "SENDING OTP..." else "SEND CODE",
+                text = "CONTINUE",
                 onClick = {
                     keyboardController?.hide()
-                    viewModel.sendOtp(phoneNumber)
+                    onNavigateToOtpVerification(phoneNumber, "")
                 },
-                enabled = isValidSriLankanPhone(phoneNumber) && !uiState.isLoading,
+                enabled = isValidSriLankanPhone(phoneNumber),
                 modifier = Modifier.fillMaxWidth()
             )
 

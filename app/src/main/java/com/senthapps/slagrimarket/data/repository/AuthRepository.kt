@@ -2,6 +2,8 @@ package com.senthapps.slagrimarket.data.repository
 
 import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.AuthApiService
+import com.senthapps.slagrimarket.data.api.LoginRequest
+import com.senthapps.slagrimarket.data.api.RegisterRequest
 import com.senthapps.slagrimarket.data.api.SendOtpRequest
 import com.senthapps.slagrimarket.data.api.UpdateProfileRequest
 import com.senthapps.slagrimarket.data.api.UserApiService
@@ -171,6 +173,50 @@ class AuthRepository @Inject constructor(
         }
     }
     
+    suspend fun loginWithPassword(phoneNumber: String, password: String): Result<User> {
+        return try {
+            val normalizedPhone = normalizePhoneNumber(phoneNumber)
+            val response = authApiService.login(LoginRequest(normalizedPhone, password))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                if (body.token == null || body.refreshToken == null || body.user == null) {
+                    return Result.failure(Exception("Incomplete server response"))
+                }
+                authPreferences.saveTokens(body.token, body.refreshToken)
+                authPreferences.saveUser(body.user)
+                userDao.insertUser(body.user)
+                Result.success(body.user)
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Login failed"))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Login error")
+            Result.failure(e)
+        }
+    }
+
+    suspend fun registerWithPassword(phoneNumber: String, password: String, userType: String): Result<User> {
+        return try {
+            val normalizedPhone = normalizePhoneNumber(phoneNumber)
+            val response = authApiService.register(RegisterRequest(normalizedPhone, password, userType))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                if (body.token == null || body.refreshToken == null || body.user == null) {
+                    return Result.failure(Exception("Incomplete server response"))
+                }
+                authPreferences.saveTokens(body.token, body.refreshToken)
+                authPreferences.saveUser(body.user)
+                userDao.insertUser(body.user)
+                Result.success(body.user)
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Registration failed"))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Register error")
+            Result.failure(e)
+        }
+    }
+
     suspend fun logout() {
         try {
             authPreferences.clearAuth()

@@ -23,6 +23,7 @@ import com.senthapps.slagrimarket.ui.home.HomeViewModel
 import com.senthapps.slagrimarket.util.RelativeTimeUtil
 import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
 import com.senthapps.slagrimarket.ui.auth.IndustrialOtpVerificationScreen
+import com.senthapps.slagrimarket.ui.auth.IndustrialPasswordScreen
 import com.senthapps.slagrimarket.ui.auth.IndustrialPhoneInputScreen
 import com.senthapps.slagrimarket.ui.chat.ChatScreen
 import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
@@ -80,8 +81,21 @@ fun JaffnaMarketplaceNavigation(
         // Authentication screens - INDUSTRIAL STYLE
         composable(Screen.PhoneInput.route) {
             IndustrialPhoneInputScreen(
-                onNavigateToOtpVerification = { phoneNumber, otpId ->
-                    navController.navigate(Screen.OtpVerification.createRoute(phoneNumber, otpId))
+                onNavigateToOtpVerification = { phoneNumber, _ ->
+                    navController.navigate(Screen.PasswordAuth.createRoute(phoneNumber))
+                }
+            )
+        }
+
+        composable(Screen.PasswordAuth.route) { backStackEntry ->
+            val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+            IndustrialPasswordScreen(
+                phoneNumber = phoneNumber,
+                onNavigateBack = { navController.popBackStack() },
+                onAuthSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.PhoneInput.route) { inclusive = true }
+                    }
                 }
             )
         }
@@ -699,6 +713,9 @@ sealed class Screen(val route: String) {
     object PhoneInput : Screen("phone_input")
     object OtpVerification : Screen("otp_verification/{phoneNumber}/{otpId}") {
         fun createRoute(phoneNumber: String, otpId: String) = "otp_verification/$phoneNumber/$otpId"
+    }
+    object PasswordAuth : Screen("password_auth/{phoneNumber}") {
+        fun createRoute(phoneNumber: String) = "password_auth/$phoneNumber"
     }
     
     // Main app screens
