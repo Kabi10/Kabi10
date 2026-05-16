@@ -1,0 +1,200 @@
+**Full Cannabis Production Pipeline Documentation for Health Canada Licensed Processors (Standard and Micro)**
+
+This response provides exhaustive, regulation-based detail tailored to your mobile-first digital batch record tool for Health Canada-licensed processors under the *Cannabis Act*, *Cannabis Regulations* (SOR/2018-144, as amended), Part 5 (Good Production Practices/GPP), and Part 11 (Retention of Documents and Information). All requirements stem from the official *Good Production Practices Guide for Cannabis* (Health Canada, updated as of 2025 references) and the Regulations themselves.
+
+**Core GPP/Record-Keeping Principles (Applies to All Stages)**  
+- **SOPs required (s. 80)**: All activities (receiving, production, processing, etc.) must follow written SOPs designed to ensure Part 5/6 compliance. QAP (Quality Assurance Person, s. 88) must approve SOPs/methods before use.  
+- **Batch/Lot Records (s. 231(1)(a) & (2)(a))**: For every lot/batch (or portion sold/exported), retain documents showing production, packaging, labelling, distribution, storage, sampling, and testing per Parts 5/6. Records must enable full traceability (lot genealogy) and be retained ≥2 years after last sale/export of any portion.  
+- **QA Role (s. 88)**: QAP approves methods/procedures, investigates deviations/complaints, and approves lots before sale. Preventive control plan required for extracts/edibles (s. 88.93–88.94).  
+- **Quarantine/Holds (s. 82, 88.4–88.5)**: Incoming/quarantined/held/rejected materials must be physically or effectively separated from approved product to prevent contamination.  
+- **Equipment/Sanitation (s. 86–87, 87.1)**: Clean/validated equipment; line clearance between batches; sanitation program with records.  
+- **Traceability**: Internal lot genealogy (parent → child lots) via batch records (not fully in CTLS; CTLS is high-level inventory). Health Canada inspectors request full batch records + genealogy during audits to verify one-step-back/one-step-forward traceability. Blends create multi-parent lots.  
+- **Deviations**: Document reason, impact, corrective actions; investigate OOS results.  
+- **CTLS Monthly Reporting**: High-level inventory (unpackaged/packaged). Receiving biomass = “Additions to inventory – Quantity received – domestic”. Yields/losses reconciled internally; unexplained variances trigger deviations.  
+- **Retention**: ≥2 years post-last sale (or longer for specific items like adverse reactions). Good documentation practices (ALCOA+: Attributable, Legible, Contemporaneous, Original, Accurate, plus Complete, Consistent, Enduring, Available).  
+- **2025 Amendments (effective Mar 12, 2025; SOR/2025-43)**: Streamlining changes (e.g., reduced some retention); labelling updates below.
+
+**STAGE 1: RECEIVING**  
+**Health Canada Requirements**: Incoming cannabis (biomass) and ingredients must be received per SOPs (s. 80, 83) maintaining quality; inspected for damage/contamination; quarantined until QA release (s. 82, 88.4). Non-cannabis ingredients (terpenes, MCT oil, flavourings, packaging) treated as “anything used as an ingredient” – verify supplier COA, suitability, no allergens/contaminants (s. 88.5). GPP requires separation of quarantined vs. released materials. Discrepancies (shipped vs. received weight) = deviation investigation (s. 88). Records per s. 231. COA reference required; visual/weight verification mandatory. Incoming QC per SOP (foreign matter, moisture, potency spot-check vs. COA). Feeds CTLS “Quantity received – domestic” (unpackaged biomass).
+
+**Typical Batch Card Fields (Production Worker)**: Supplier/LP name & licence #; Incoming lot/batch #; Cannabis class/subclass (e.g., dried cannabis); Weight received (gross/net, scale ID); Date/time received; Received by (name/signature); Vehicle/shipment condition; COA reference #/date; Visual inspection (foreign matter, mould, damage); Weight verification (discrepancy %); Quarantine tag applied (Y/N); Initial QC notes (moisture, appearance).
+
+**QA Reviewer Checks Before Release**: Review COA vs. received specs; verify discrepancy investigation (if > tolerance, e.g., 1–2%); confirm quarantine separation; approve release or hold (document rationale); sign/date batch record; ensure traceability to supplier lot.
+
+**Traceability Linkage**: Input supplier lot → new internal receiving lot/ID (parent lot for all downstream). Links to previous (supplier CTLS transfer) and next (milling input lot).
+
+**Common Mistakes/Inspection Findings**: Undocumented discrepancies; failure to quarantine incoming materials; missing COA or incomplete supplier verification; no deviation for weight variances; poor vehicle inspection records.
+
+**Calculations (Auto-Compute)**: Weight variance % = [(shipped – received)/shipped] × 100. Flag > threshold as deviation. Mass balance starts here.
+
+**Non-Cannabis Ingredients**: Same fields + supplier COA, allergen declaration, lot #, quantity; quarantine until QA release.
+
+**STAGE 2: MILLING / SIZE REDUCTION**  
+**Health Canada Requirements**: Per SOPs (s. 80); equipment designed/preventing contamination (s. 86); cleaning/line clearance between lots to prevent cross-contamination (s. 87). Waste tracked as contaminated material (s. 88.9). Records demonstrate process per s. 231.
+
+**Typical Batch Card Fields**: Input lot #/weight; Equipment ID (mill/grinder); Mesh/screen size; Operator name/signature; Start/end time; Output weight & new lot #; Yield %; Visual inspection of output; Cleaning verification (previous lot cleared?); Waste weight.
+
+**QA Reviewer Checks**: Input/output weights reconcile; cleaning/line clearance signed; no cross-contamination risk; yield within SOP limits; approve for next step or hold.
+
+**Traceability Linkage**: Input receiving/milling lot → new milled output lot (1:1 or split). Waste lot tracked separately for destruction.
+
+**Common Mistakes/Inspection Findings**: Inadequate cleaning between lots (cross-contamination); undocumented equipment cleaning; yield losses not investigated; no line clearance checklist.
+
+**Calculations**: Yield % = (output weight / input weight) × 100. Waste % tracked. Auto-flag low yield for deviation.
+
+**STAGE 3: EXTRACTION (Ethanol)**  
+**Health Canada Requirements**: Organic solvent use authorized (s. 1 definitions/activities); SOPs (s. 80); equipment/solvent handling to prevent contamination (s. 86); full mass balance implied via records (s. 231). Residual solvents tested per s. 91 (contaminants on final form or post-concentration step); limits no longer reference old document post-2020 transition but follow pharmacopoeia/ICH standards in practice. Ethanol reporting via CTLS inventory if applicable; waste/destruction tracked (s. 88.9). Preventive controls for hazards (s. 88.93).
+
+**Typical Batch Card Fields**: Input biomass lot/weight; Ethanol volume in (type, lot #); Extraction time/temp/# washes; Crude extract output weight & lot #; Ethanol recovered volume; Ethanol to waste/destruction; Operator/equipment ID; In-process notes (pressure, agitation).
+
+**QA Reviewer Checks**: Mass balance closes (ethanol in ≈ recovered + in product + destroyed + loss); cleaning verification; residual solvent results (post-testing); yield/COA alignment; approve or hold.
+
+**Traceability Linkage**: Biomass input lot(s) → crude extract output lot. Ethanol lots tracked separately.
+
+**Common Mistakes/Inspection Findings**: Incomplete solvent mass balance; undocumented ethanol recovery/waste; cross-contamination from poor cleaning; residual solvent failures without investigation.
+
+**Calculations**: Ethanol recovery rate % = (recovered / in) × 100 (industry ~90–95% typical). Full balance: Ethanol in = recovered + product + destroyed/denatured + lost. Crude yield % = (crude wt / biomass wt) × 100. Auto-compute losses; flag variances.
+
+**STAGE 4: FILTRATION (Winterization)**  
+**Health Canada Requirements**: Part of processing/extraction SOPs (s. 80); filtration equipment validated (s. 86); filter changes/cleaning documented to prevent contamination (s. 87). Often integrated with extraction but can be separate batch step if distinct lot created.
+
+**Typical Batch Card Fields**: Input crude lot/weight; Filtration method (e.g., plate/frame, depth); Filter type/size/media; Temp/time; Output filtered oil weight & lot #; Waste weight; Yield %; Operator/equipment ID.
+
+**QA Reviewer Checks**: Yield vs. SOP; filter integrity/change logs; cleaning/line clearance; no visible contaminants; approve for evaporation.
+
+**Traceability Linkage**: Crude input lot → filtered output lot (or continues as same lot).
+
+**Common Mistakes**: Undocumented filter changes; inadequate cleaning; yield losses not explained.
+
+**Calculations**: Yield % = (filtered wt / crude wt) × 100. Waste %.
+
+**STAGE 5: EVAPORATION (Rotary / Falling Film)**  
+**Health Canada Requirements**: Equipment calibrated/maintained (s. 86); SOPs for parameters to ensure consistent quality (s. 80); ethanol recovery tracked as part of solvent balance.
+
+**Typical Batch Card Fields**: Input lot/weight; Equipment ID; Temp/vacuum/RPM (if rotovap); Duration; Ethanol recovered; Output concentrate weight & lot #; Yield %.
+
+**QA Reviewer Checks**: Parameters within validated ranges; calibration records current; ethanol recovery documented; yield review; cleaning verification.
+
+**Traceability Linkage**: Filtered input → concentrate output lot.
+
+**Common Mistakes**: Uncalibrated equipment; undocumented vacuum/temp deviations; solvent losses not accounted.
+
+**Calculations**: Yield %; ethanol recovered at this stage contributes to overall balance.
+
+**STAGE 6: DECARBOXYLATION**  
+**Health Canada Requirements**: SOPs (s. 80); temp/time control for potency conversion (no specific section but part of processing consistency, s. 88.2 temp/humidity if applicable). In-process testing optional but potency change often verified.
+
+**Typical Batch Card Fields**: Input lot/weight; Equipment ID; Temp/time; Output weight & lot #; Yield %; Pre/post potency notes (if tested).
+
+**QA Reviewer Checks**: Parameters met; weight loss consistent with decarboxylation; any in-process potency/COA alignment.
+
+**Traceability Linkage**: Concentrate input → decarbed output lot.
+
+**Common Mistakes**: Inconsistent heating leading to incomplete conversion; undocumented parameters.
+
+**Calculations**: Yield % (mass loss expected ~10–15% from CO2). Potency shift (THCA → THC) can be estimated/verified.
+
+**STAGE 7–8: DISTILLATION (Light Cut / Heavy Cut / Tails)**  
+**Health Canada Requirements**: SOPs/validated methods (s. 88, 90); equipment (s. 86). Light cut (heads/terpenes) classified as cannabis extract or waste (destruction or reprocess); main body (hearts) as distillate intermediate. Tails/residue tracked for destruction (s. 88.9). COA testing (potency, residuals, metals, pesticides) on final distillate (s. 91). “Pure intermediate” vs. finished extract per internal specs/CTLS inventory category.
+
+**Typical Batch Card Fields** (often continuous run): Input lot/weight; Equipment ID; Vacuum/ temp ranges (heads vs. hearts vs. tails); Condenser temp/feed rate; Output weights per fraction & lots; Colour/clarity; Yield %; Operator.
+
+**QA Reviewer Checks**: Fraction separation per SOP; COA on main distillate; waste fractions disposition approved; cleaning.
+
+**Traceability Linkage**: Decarbed input → multiple output lots (heads, hearts, tails). Multi-stage linkage.
+
+**Common Mistakes**: Poor fraction cuts (off-spec potency); undocumented tails destruction; equipment cleaning gaps.
+
+**Calculations**: Yield % per fraction; overall recovery.
+
+**STAGE 9: FORMULATION**  
+**Health Canada Requirements**: SOPs for blending (s. 80); homogeneity testing if required (preventive controls s. 88.93); terpene/carrier/additive tracking (source, lot, %); multi-input blends create new lot with parent linkage (s. 231). Ingredients tested/approved (s. 91 if applicable).
+
+**Typical Batch Card Fields**: Distillate lot(s)/weight(s); Terpene source/lot/weight/% (cannabis-derived vs. botanical); Carrier oil if used; Blend ratios; Mixing time/temp; Output formulated weight & lot #; Target potency; Homogeneity samples.
+
+**QA Reviewer Checks**: Input approvals; blend calculations; homogeneity results; final potency projection; multi-lot parent traceability documented.
+
+**Traceability Linkage**: Multiple input lots → single formulated output lot (genealogy tree). Critical for recalls.
+
+**Common Mistakes**: Incomplete ingredient lot tracking; poor homogeneity documentation; unapproved additives.
+
+**Calculations**: Target potency = weighted average; total mass balance; blend ratios auto-verified.
+
+**STAGE 10: VAPE FILLING**  
+**Health Canada Requirements**: SOPs (s. 80); in-process checks; cartridge/hardware lot tracking (as accessories/ingredients). Yield/weight verification (s. 231).
+
+**Typical Batch Card Fields**: Formulated lot; Target/actual fill weight per cartridge (range); # carts filled; Equipment ID; Leak/clog/underfill checks (sampling plan); Cartridge/hardware lot #; Yield %.
+
+**QA Reviewer Checks**: In-process weight checks (# per SOP, e.g., every X units); defect rates; cleaning; approve or rework.
+
+**Traceability Linkage**: Formulated input → filled cartridge lot.
+
+**Common Mistakes**: Insufficient in-process checks; undocumented defects; hardware lot not traced.
+
+**Calculations**: Fill yield % = (filled units × target wt / input wt) × 100. Auto-flag OOS fills.
+
+**STAGE 11: VAPE PACKAGING**  
+**Health Canada Requirements**: Transition to “packaged” in CTLS (s. 231); child-resistant/secure packaging (Part 6); integrity checks (s. 80).
+
+**Typical Batch Card Fields**: Filled lot; Packaging material lot(s) (inner/outer); Units packaged; Integrity/child-resistant verification; Operator.
+
+**QA Reviewer Checks**: Packaging lots approved; integrity results; transition to packaged status documented.
+
+**Traceability Linkage**: Filled lot → packaged lot. CTLS inventory shift.
+
+**Common Mistakes**: Missing packaging lot records; failed integrity not investigated.
+
+**STAGE 12: LABELLING**  
+**Health Canada Requirements (Cannabis Regulations ss. 122–132+; Packaging & Labelling Guide)**: Mandatory elements: brand/product name, class, net wt/vol, THC/CBD (total, mg/g or per unit), lot #, packaging/expiry date, health warning, standardized symbol, LP name/licence #, etc. 2025 amendments (Mar 12, 2025): QR codes permitted (for info/tracking, compliant content only); transparent windows/cut-outs allowed for dried/fresh/seed; peel-back/accordion labels; CID removal; simplified potency (bold font transition ends Mar 2026). Label reconciliation required (printed/applied/destroyed).
+
+**Typical Batch Card Fields**: Packaged lot; Label version #/artwork approval; Labels printed/applied/destroyed counts; Worker verification checklist (all elements present/correct); Reconciliation.
+
+**QA Reviewer Checks**: 100% or AQL label check; reconciliation balances; artwork approved; no obsolete labels.
+
+**Common Mistakes/Inspection Findings**: Missing/misleading info; unapproved labels; poor reconciliation (common audit flag); QR linking to non-compliant content.
+
+**Traceability Linkage**: Packaged lot → labelled lot (same lot usually).
+
+**STAGE 13: EXCISE STAMPING**  
+**Health Canada Requirements**: None direct (CRA jurisdiction under *Excise Act, 2001*). Stamps supplied by CRA; must affix to all packaged products before duty-paid market entry. Document stamp serials received/applied/destroyed/spoiled/on-hand. Monthly reconciliation on Form B300 (Cannabis Duty and Information Return). Provincial duty stamps in some jurisdictions (e.g., coordinated in ON, BC, etc. – colour-coded). Connects to CTLS via packaged inventory. Service agreements allowed for contract stamping.
+
+**Typical Batch Card Fields**: Packaged lot; Stamp serial range received/applied; # stamps used/destroyed; Reconciliation (on-hand); Application verification (seals package, conspicuous); Operator.
+
+**QA Reviewer Checks**: Stamp inventory balances; proper placement; destruction witnessed; Form B300 alignment.
+
+**Traceability Linkage**: Labelled/packaged lot → stamped (duty-paid) status. Links to shipping/CTLS.
+
+**Common Mistakes**: Unreconciled stamps (penalties); improper storage/transfer; failure to file B300; missing provincial stamps where required.
+
+**STAGE 14: MASTERCASING**  
+**Health Canada Requirements**: SOPs for final packaging/shipping (s. 80, 83); bill of lading/manifest for inter-LP transfers (CTLS transfer documentation). Case/pallet IDs for traceability.
+
+**Typical Batch Card Fields**: Packaged/stamped units per case; Case lot/ID/dimensions/weight; Pallet config; Units per pallet; Shipping docs reference; Operator.
+
+**QA Reviewer Checks**: Case counts reconcile; integrity; manifests complete.
+
+**Traceability Linkage**: Stamped units → case/pallet lots → shipping/transfer. Full genealogy to biomass.
+
+**Common Mistakes**: Incomplete manifests; count discrepancies.
+
+**CROSS-CUTTING TOPICS**  
+**Full Lot Traceability**: Demonstrated via batch records showing parent-child lot linkages at every stage (s. 231). Genealogy tree (one-to-many or many-to-one at formulation). Inspectors request: full batch records, deviation logs, test results, approval signatures, inventory reconciliation. Spreadsheets common but error-prone; digital tools preferred for audit readiness. Blends: output lot references all input lots.
+
+**In-Process QC Holds/Releases**: QA can hold at any stage (receiving, post-processing, pre-packaging). Documented via hold tag + deviation/investigation record; release requires QAP sign-off (s. 88).
+
+**Equipment Cleaning/Line Clearance**: Mandatory between changeovers (s. 87); checklist (previous product cleared, cleaning verified, visual inspection). Records retained.
+
+**Yield Reconciliation**: Calculated at key stages (milling, extraction, formulation, filling, packaging). Acceptable variance per internal SOP (e.g., 5–10%); > threshold = deviation + investigation (root cause, CAPA). Unexplained losses documented as waste/destruction.
+
+**Environmental Monitoring**: Processors must maintain temp/humidity per s. 88.2 (systems to control where needed for quality). Records of monitoring (frequency per SOP; continuous or periodic). Not strictly continuous unless critical (e.g., extraction rooms).
+
+**PAIN POINTS (from Industry Forums, Inspections, Operator Feedback)**  
+Production workers frequently complain about:  
+- Manual batch cards/paperwork being tedious/time-consuming (double-entry, illegible handwriting, chasing signatures) – “batch record takes longer than the actual run.”  
+- Traceability/reconciliation at formulation (multi-lot blends) and excise stamping (serial tracking).  
+- Frequent deviations for minor weight/yield variances or cleaning logs.  
+- QA review bottlenecks delaying release.  
+- Inspection findings: incomplete records, undocumented deviations/cleaning, quarantine breaches, label/stamp reconciliation gaps (common in Health Canada reports; e.g., CannTrust-style issues with unapproved activities/records).  
+Biggest time sinks: yield/mass balance calculations, label reconciliation, stamp inventory, CTLS prep from floor data. Automation (auto-calc yields, lot linking, one-click reports) directly addresses these.
+
+This level of detail (with auto-linked genealogy, calculated yields/mass balances, deviation flagging, and CTLS export) enables 14 tablet-friendly batch card templates. All data feeds one-click reports for inspectors/CRA/CTLS. If you need sample template JSON schemas, SOP outlines, or further customization (e.g., specific equipment integration), provide more details on your system.

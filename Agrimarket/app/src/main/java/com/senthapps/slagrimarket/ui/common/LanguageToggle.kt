@@ -6,21 +6,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.senthapps.slagrimarket.data.preferences.LanguagePreferences
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Composable
 fun LanguageToggleButton(
@@ -29,9 +19,8 @@ fun LanguageToggleButton(
     modifier: Modifier = Modifier
 ) {
     var showDropdown by remember { mutableStateOf(false) }
-    
+
     Box(modifier = modifier) {
-        // Language toggle button
         OutlinedButton(
             onClick = { showDropdown = true },
             modifier = Modifier.size(48.dp),
@@ -44,13 +33,16 @@ fun LanguageToggleButton(
             border = ButtonDefaults.outlinedButtonBorder
         ) {
             Text(
-                text = LanguagePreferences.LANGUAGE_CODES[currentLanguage] ?: "EN",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+                text = when (currentLanguage) {
+                    "en" -> "E"
+                    "ta" -> "த"
+                    "si" -> "සි"
+                    else -> "E"
+                },
+                fontSize = 16.sp
             )
         }
-        
-        // Dropdown menu
+
         DropdownMenu(
             expanded = showDropdown,
             onDismissRequest = { showDropdown = false },
@@ -58,23 +50,7 @@ fun LanguageToggleButton(
         ) {
             LanguagePreferences.SUPPORTED_LANGUAGES.forEach { language ->
                 DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = LanguagePreferences.LANGUAGE_CODES[language] ?: language.uppercase(),
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = LanguagePreferences.LANGUAGE_NAMES[language] ?: language,
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
+                    text = { Text(text = language.uppercase(), fontSize = 14.sp) },
                     onClick = {
                         onLanguageChange(language)
                         showDropdown = false
@@ -96,34 +72,12 @@ fun LanguageToggleButton(
 }
 
 @Composable
-fun LanguageToggleViewModel(
+fun LanguageToggleView(
     viewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
     val currentLanguage by viewModel.currentLanguage.collectAsState()
-    
     LanguageToggleButton(
         currentLanguage = currentLanguage,
         onLanguageChange = viewModel::setLanguage
     )
-}
-
-// ViewModel for Language Toggle
-
-@HiltViewModel
-class LanguageToggleViewModel @Inject constructor(
-    private val languagePreferences: LanguagePreferences
-) : ViewModel() {
-    
-    val currentLanguage: StateFlow<String> = languagePreferences.selectedLanguage
-        .stateIn(
-            scope = viewModelScope,
-            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            initialValue = LanguagePreferences.TAMIL
-        )
-    
-    fun setLanguage(language: String) {
-        viewModelScope.launch {
-            languagePreferences.setLanguage(language)
-        }
-    }
 }

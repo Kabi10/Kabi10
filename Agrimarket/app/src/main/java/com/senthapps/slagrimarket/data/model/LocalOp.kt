@@ -103,7 +103,47 @@ data class ServerStateItem(
 data class SyncRequest(
     @Json(name = "lastSyncAt")
     val lastSyncAt: String?,
-    
-    @Json(name = "ops")
-    val ops: List<LocalOp>
+
+    @Json(name = "operations")
+    val operations: List<LocalOp>
+)
+
+// Batch sync response from backend /api/v1/sync/operations
+@JsonClass(generateAdapter = true)
+data class BatchSyncResponse(
+    @Json(name = "success") val success: Boolean,
+    @Json(name = "appliedOps") val appliedOps: List<String>,
+    @Json(name = "conflicts") val conflicts: List<ConflictInfo>,
+    @Json(name = "errors") val errors: List<OperationError>,
+    @Json(name = "serverData") val serverData: ServerData,
+    @Json(name = "serverTimestamp") val serverTimestamp: String
+)
+
+@JsonClass(generateAdapter = true)
+data class OperationError(
+    @Json(name = "opId") val opId: String,
+    @Json(name = "error") val error: String
+)
+
+@JsonClass(generateAdapter = true)
+data class ServerData(
+    @Json(name = "users") val users: List<User>,
+    @Json(name = "listings") val listings: PaginatedListings,
+    @Json(name = "transactions") val transactions: PaginatedTransactions
+)
+
+@JsonClass(generateAdapter = true)
+data class PaginatedListings(
+    @Json(name = "data") val data: List<Listing>,
+    @Json(name = "total") val total: Int,
+    @Json(name = "page") val page: Int,
+    @Json(name = "limit") val limit: Int
+)
+
+@JsonClass(generateAdapter = true)
+data class PaginatedTransactions(
+    @Json(name = "data") val data: List<Transaction>,
+    @Json(name = "total") val total: Int,
+    @Json(name = "page") val page: Int,
+    @Json(name = "limit") val limit: Int
 )

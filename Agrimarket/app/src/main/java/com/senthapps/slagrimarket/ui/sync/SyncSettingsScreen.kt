@@ -11,11 +11,42 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.senthapps.slagrimarket.R
 import java.text.SimpleDateFormat
 import java.util.*
+
+@Composable
+private fun ConflictBanner(conflictCount: Int, onDismiss: () -> Unit) {
+    if (conflictCount > 0) {
+        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.sync_conflict_message, conflictCount),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.action_dismiss))
+                }
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,24 +60,17 @@ fun SyncSettingsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = "ஒத்திசைவு அமைப்புகள்",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Sync Settings",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.sync_settings_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.action_back)
                         )
                     }
                 },
@@ -57,7 +81,7 @@ fun SyncSettingsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Sync Now"
+                            contentDescription = stringResource(R.string.sync_action_now)
                         )
                     }
                 }
@@ -72,6 +96,12 @@ fun SyncSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Conflict banner — shown immediately when conflicts exist
+            ConflictBanner(
+                conflictCount = uiState.conflictCount,
+                onDismiss = viewModel::dismissConflicts
+            )
+
             // Sync Status Card
             SyncStatusCard(
                 isSyncing = uiState.isSyncing,
@@ -80,7 +110,7 @@ fun SyncSettingsScreen(
                 failedOperations = uiState.failedOperations,
                 error = uiState.error
             )
-            
+
             // Sync Settings Card
             SyncSettingsCard(
                 autoSyncEnabled = uiState.autoSyncEnabled,
@@ -88,7 +118,7 @@ fun SyncSettingsScreen(
                 syncInterval = uiState.syncInterval,
                 onSyncIntervalChange = viewModel::updateSyncInterval
             )
-            
+
             // Sync Actions Card
             SyncActionsCard(
                 onForceSyncNow = viewModel::forceSyncNow,
@@ -97,12 +127,13 @@ fun SyncSettingsScreen(
                 isSyncing = uiState.isSyncing,
                 hasFailedOps = uiState.failedOperations > 0
             )
-            
+
             // Sync Statistics Card
             SyncStatisticsCard(
                 pendingOperations = uiState.pendingOperations,
                 successfulOperations = uiState.successfulOperations,
-                failedOperations = uiState.failedOperations
+                failedOperations = uiState.failedOperations,
+                conflictCount = uiState.conflictCount
             )
         }
     }
@@ -122,17 +153,17 @@ private fun SyncStatusCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Sync Status",
+                text = stringResource(R.string.sync_status_label),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Current Status")
+                Text(stringResource(R.string.sync_current_status))
                 if (isSyncing) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(
@@ -140,31 +171,31 @@ private fun SyncStatusCard(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Syncing...", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.sync_syncing), color = MaterialTheme.colorScheme.primary)
                     }
                 } else {
                     Text(
-                        text = if (pendingOperations > 0 || failedOperations > 0) "Pending" else "Up to date",
-                        color = if (pendingOperations > 0 || failedOperations > 0) 
+                        text = if (pendingOperations > 0 || failedOperations > 0) stringResource(R.string.sync_status_pending) else stringResource(R.string.sync_status_up_to_date),
+                        color = if (pendingOperations > 0 || failedOperations > 0)
                             MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                     )
                 }
             }
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Last Sync")
+                Text(stringResource(R.string.sync_last_sync))
                 Text(
                     text = if (lastSyncTime > 0) {
                         SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
                             .format(Date(lastSyncTime))
-                    } else "Never",
+                    } else stringResource(R.string.sync_never),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             if (error != null) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -172,7 +203,7 @@ private fun SyncStatusCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
-                        contentDescription = "Error",
+                        contentDescription = stringResource(R.string.sync_error),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(16.dp)
                     )
@@ -201,20 +232,20 @@ private fun SyncSettingsCard(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Settings",
+                text = stringResource(R.string.settings_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("Auto Sync")
+                    Text(stringResource(R.string.sync_auto_label))
                     Text(
-                        text = "Automatically sync when connected",
+                        text = stringResource(R.string.sync_auto_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -227,9 +258,9 @@ private fun SyncSettingsCard(
             
             if (autoSyncEnabled) {
                 Column {
-                    Text("Sync Interval")
+                    Text(stringResource(R.string.sync_interval_label))
                     Text(
-                        text = "How often to check for updates",
+                        text = stringResource(R.string.sync_interval_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -272,35 +303,35 @@ private fun SyncActionsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Actions",
+                text = stringResource(R.string.sync_actions_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
-            
+
             Button(
                 onClick = onForceSyncNow,
                 enabled = !isSyncing,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Sync Now")
+                Text(stringResource(R.string.sync_action_now))
             }
-            
+
             if (hasFailedOps) {
                 OutlinedButton(
                     onClick = onRetryFailedOps,
                     enabled = !isSyncing,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Retry Failed Operations")
+                    Text(stringResource(R.string.sync_retry_failed))
                 }
             }
-            
+
             OutlinedButton(
                 onClick = onClearSyncedOps,
                 enabled = !isSyncing,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Clear Synced Operations")
+                Text(stringResource(R.string.sync_clear_synced))
             }
         }
     }
@@ -310,7 +341,8 @@ private fun SyncActionsCard(
 private fun SyncStatisticsCard(
     pendingOperations: Int,
     successfulOperations: Int,
-    failedOperations: Int
+    failedOperations: Int,
+    conflictCount: Int = 0
 ) {
     Card {
         Column(
@@ -318,42 +350,54 @@ private fun SyncStatisticsCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Statistics",
+                text = stringResource(R.string.sync_statistics_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Pending Operations")
+                Text(stringResource(R.string.sync_pending_ops_label))
                 Text(
                     text = pendingOperations.toString(),
-                    color = if (pendingOperations > 0) MaterialTheme.colorScheme.secondary 
+                    color = if (pendingOperations > 0) MaterialTheme.colorScheme.secondary
                            else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Successful Operations")
+                Text(stringResource(R.string.sync_successful_ops_label))
                 Text(
                     text = successfulOperations.toString(),
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Failed Operations")
+                Text(stringResource(R.string.sync_failed_ops_label))
                 Text(
                     text = failedOperations.toString(),
-                    color = if (failedOperations > 0) MaterialTheme.colorScheme.error 
+                    color = if (failedOperations > 0) MaterialTheme.colorScheme.error
+                           else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(stringResource(R.string.sync_conflicts_label))
+                Text(
+                    text = conflictCount.toString(),
+                    color = if (conflictCount > 0) MaterialTheme.colorScheme.error
                            else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

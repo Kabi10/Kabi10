@@ -16,15 +16,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.data.model.Listing
+import com.senthapps.slagrimarket.data.model.CropTypes
+import com.senthapps.slagrimarket.data.model.QualityGrade
+import com.senthapps.slagrimarket.data.model.Units
+import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.EnhancedListingCard
+import com.senthapps.slagrimarket.ui.components.EmptyListingsState
+import com.senthapps.slagrimarket.ui.components.ErrorState
+import com.senthapps.slagrimarket.ui.components.ListingCardSkeleton
+import com.senthapps.slagrimarket.ui.theme.Spacing
+import com.senthapps.slagrimarket.util.TranslationUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToSearch: () -> Unit,
-    viewModel: ListingsViewModel = hiltViewModel()
+    onListingClick: (String) -> Unit = {},
+    viewModel: ListingsViewModel = hiltViewModel(),
+    languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -32,15 +45,22 @@ fun ListingsScreen(
                 title = {
                     Column {
                         Text(
-                            text = "பட்டியல்கள்",
+                            text = when (currentLanguage) {
+                                "en" -> "Listings"
+                                "ta" -> "பட்டியல்கள்"
+                                "si" -> "ලැයිස්තු"
+                                else -> "Listings"
+                            },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = "Listings",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (currentLanguage !in listOf("en", "ta", "si")) {
+                            Text(
+                                text = "Listings",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 },
                 navigationIcon = {
@@ -62,63 +82,71 @@ fun ListingsScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.listings.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "பட்டியல்கள் இல்லை",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "No listings available",
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                Text(
-                    text = "புதிய பட்டியல்கள் விரைவில் கிடைக்கும்",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Text(
-                    text = "New listings will be available soon",
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(uiState.listings) { listing ->
-                    ListingCard(
-                        listing = listing,
-                        onClick = { /* TODO: Navigate to listing detail */ }
+        val errorMessage = uiState.error
+        when {
+            // Error state
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorState(
+                        errorMessage = errorMessage,
+                        currentLanguage = currentLanguage,
+                        onRetry = viewModel::refreshListings
                     )
+                }
+            }
+
+            // Loading state with shimmer skeletons
+            uiState.isLoading -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(Spacing.Large),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
+                ) {
+                    items(5) {
+                        ListingCardSkeleton()
+                    }
+                }
+            }
+
+            // Empty state
+            uiState.listings.isEmpty() -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    EmptyListingsState(
+                        currentLanguage = currentLanguage,
+                        onCreateListing = null // Can be connected to create listing action
+                    )
+                }
+            }
+
+            // Content state
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentPadding = PaddingValues(Spacing.Large),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
+                ) {
+                    items(uiState.listings) { listing ->
+                        EnhancedListingCard(
+                            listing = listing,
+                            onClick = { onListingClick(listing.id) },
+                            currentLanguage = currentLanguage,
+                            showPriceTrend = false // Can be enabled when market prices are available
+                        )
+                    }
                 }
             }
         }
@@ -126,10 +154,39 @@ fun ListingsScreen(
 }
 
 @Composable
-private fun ListingCard(
+fun ListingCard(
     listing: Listing,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    currentLanguage: String = "en"
 ) {
+    // Get translated values
+    val cropName = CropTypes.getCropName(listing.cropType, currentLanguage)
+    val locationName = TranslationUtil.getLocationName(listing.location, currentLanguage)
+    val unitName = Units.getUnitName(listing.unit, currentLanguage)
+    val qualityGrade = listing.quality.getDisplayString(currentLanguage)
+
+    // Get labels in the selected language
+    val quantityLabel = when (currentLanguage) {
+        "en" -> "Quantity"
+        "ta" -> "அளவு"
+        "si" -> "ප්‍රමාණය"
+        else -> "Quantity"
+    }
+
+    val gradeLabel = when (currentLanguage) {
+        "en" -> "Grade"
+        "ta" -> "தரம்"
+        "si" -> "ශ්‍රේණිය"
+        else -> "Grade"
+    }
+
+    val perLabel = when (currentLanguage) {
+        "en" -> "per"
+        "ta" -> "ஒரு"
+        "si" -> "එක්"
+        else -> "per"
+    }
+
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
@@ -144,12 +201,12 @@ private fun ListingCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = listing.cropType.replace("_", " ").capitalize(),
+                        text = cropName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = listing.location,
+                        text = locationName,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -163,7 +220,7 @@ private fun ListingCard(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "per ${listing.unit}",
+                        text = "$perLabel $unitName",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -177,11 +234,11 @@ private fun ListingCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Quantity: ${listing.quantity} ${listing.unit}",
+                    text = "$quantityLabel: ${listing.quantity} $unitName",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Grade ${listing.quality}",
+                    text = "$gradeLabel $qualityGrade",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )

@@ -1,92 +1,111 @@
-const jwt = require('jsonwebtoken');
-const { supabaseAdmin } = require('../config/supabase');
-const logger = require('../utils/logger');
+const jwt = require("jsonwebtoken");
+const { supabaseAdmin } = require("../config/supabase");
+const db = require("../database/connection");
+const logger = require("../utils/logger");
+
+// Check if we're in mock DB mode
+const MOCK_DB = process.env.MOCK_DB === "true";
 
 /**
  * JWT Authentication Middleware for Serverless Functions
- * Validates JWT tokens and returns user info
+ * Validates JWT tokens and attaches user info to request
  */
-const authenticateToken = async (req) => {
+const authenticateToken = async (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 
     if (!token) {
-      return {
+      return res.status(401).json({
         success: false,
-        message: 'Access token required',
-        code: 'TOKEN_MISSING'
-      };
+        message: "Access token required",
+        code: "TOKEN_MISSING",
+      });
     }
 
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Get user from Supabase to ensure they still exist and are active
-    const { data: userData, error } = await supabaseAdmin
-      .from('users')
-      .select('id, phone_number, user_type, is_active, verified')
-      .eq('id', decoded.userId)
-      .single();
+    let userData;
 
-    if (error || !userData) {
-      return {
+    if (MOCK_DB || !supabaseAdmin) {
+      // Use mock DB or PostgreSQL connection
+      const result = await db.query(
+        "SELECT id, phone_number, user_type, is_active, verified FROM users WHERE id = $1",
+        [decoded.userId],
+      );
+      userData = result.rows[0];
+    } else {
+      // Get user from Supabase to ensure they still exist and are active
+      const { data, error } = await supabaseAdmin
+        .from("users")
+        .select("id, phone_number, user_type, is_active, verified")
+        .eq("id", decoded.userId)
+        .single();
+
+      if (error) {
+        logger.error("Supabase user lookup error:", error);
+      }
+      userData = data;
+    }
+
+    if (!userData) {
+      return res.status(401).json({
         success: false,
-        message: 'User not found',
-        code: 'USER_NOT_FOUND'
-      };
+        message: "User not found",
+        code: "USER_NOT_FOUND",
+      });
     }
 
     if (!userData.is_active) {
-      return {
+      return res.status(403).json({
         success: false,
-        message: 'Account is deactivated',
-        code: 'ACCOUNT_DEACTIVATED'
-      };
+        message: "Account is deactivated",
+        code: "ACCOUNT_DEACTIVATED",
+      });
     }
 
     if (!userData.verified) {
-      return {
+      return res.status(403).json({
         success: false,
-        message: 'Account not verified',
-        code: 'ACCOUNT_NOT_VERIFIED'
-      };
+        message: "Account not verified",
+        code: "ACCOUNT_NOT_VERIFIED",
+      });
     }
 
-    // Return user info
-    return {
-      success: true,
-      user: {
-        userId: userData.id,
-        phoneNumber: userData.phone_number,
-        userType: userData.user_type,
-        isActive: userData.is_active,
-        verified: userData.verified
-      }
+    // Attach user info to request
+    req.user = {
+      userId: userData.id,
+      phoneNumber: userData.phone_number,
+      userType: userData.user_type,
+      isActive: userData.is_active,
+      verified: userData.verified,
     };
+
+    next();
   } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      return {
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
         success: false,
-        message: 'Invalid token',
-        code: 'TOKEN_INVALID'
-      };
+        message: "Invalid token",
+        code: "TOKEN_INVALID",
+      });
     }
 
-    if (error.name === 'TokenExpiredError') {
-      return {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
         success: false,
-        message: 'Token expired',
-        code: 'TOKEN_EXPIRED'
-      };
+        message: "Token expired",
+        code: "TOKEN_EXPIRED",
+      });
     }
 
-    logger.error('Authentication error:', error);
-    return {
+    logger.error("Authentication error:", error);
+    return res.status(500).json({
       success: false,
-      message: 'Authentication failed',
-      code: 'AUTH_ERROR'
-    };
+      message: "Authentication failed",
+      code: "AUTH_ERROR",
+    });
   }
 };
 
@@ -94,40 +113,38 @@ const authenticateToken = async (req) => {
  * Role-based authorization middleware
  * Ensures user has required role(s)
  */
-const requireRole = (roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required',
-        code: 'AUTH_REQUIRED'
-      });
-    }
+const requireRole = (roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required",
+      code: "AUTH_REQUIRED",
+    });
+  }
 
-    const userRole = req.user.userType;
-    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+  const userRole = req.user.userType;
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
 
-    if (!allowedRoles.includes(userRole)) {
-      return res.status(403).json({
-        success: false,
-        message: `Access denied. Required role: ${allowedRoles.join(' or ')}`,
-        code: 'INSUFFICIENT_PERMISSIONS'
-      });
-    }
+  if (!allowedRoles.includes(userRole)) {
+    return res.status(403).json({
+      success: false,
+      message: `Access denied. Required role: ${allowedRoles.join(" or ")}`,
+      code: "INSUFFICIENT_PERMISSIONS",
+    });
+  }
 
-    next();
-  };
+  next();
 };
 
 /**
  * Farmer-only middleware
  */
-const requireFarmer = requireRole('FARMER');
+const requireFarmer = requireRole("FARMER");
 
 /**
  * Buyer-only middleware
  */
-const requireBuyer = requireRole('BUYER');
+const requireBuyer = requireRole("BUYER");
 
 /**
  * Optional authentication middleware
@@ -135,28 +152,32 @@ const requireBuyer = requireRole('BUYER');
  */
 const optionalAuth = async (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
       return next(); // No token, continue without user info
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     const user = await db.query(
-      'SELECT id, phone_number, user_type, is_active, verified FROM users WHERE id = $1',
-      [decoded.userId]
+      "SELECT id, phone_number, user_type, is_active, verified FROM users WHERE id = $1",
+      [decoded.userId],
     );
 
-    if (user.rows.length > 0 && user.rows[0].is_active && user.rows[0].verified) {
+    if (
+      user.rows.length > 0 &&
+      user.rows[0].is_active &&
+      user.rows[0].verified
+    ) {
       const userData = user.rows[0];
       req.user = {
         userId: userData.id,
         phoneNumber: userData.phone_number,
         userType: userData.user_type,
         isActive: userData.is_active,
-        verified: userData.verified
+        verified: userData.verified,
       };
     }
 
@@ -171,37 +192,38 @@ const optionalAuth = async (req, res, next) => {
  * Resource ownership middleware
  * Ensures user can only access their own resources
  */
-const requireOwnership = (resourceType, idParam = 'id') => {
-  return async (req, res, next) => {
+const requireOwnership =
+  (resourceType, idParam = "id") =>
+  async (req, res, next) => {
     try {
       const resourceId = req.params[idParam];
       const userId = req.user.userId;
 
       let query;
-      let params = [resourceId];
+      const params = [resourceId];
 
       switch (resourceType) {
-        case 'listing':
-          query = 'SELECT farmer_id FROM listings WHERE id = $1';
+        case "listing":
+          query = "SELECT farmer_id FROM listings WHERE id = $1";
           break;
-        case 'transaction':
-          query = 'SELECT farmer_id, buyer_id FROM transactions WHERE id = $1';
+        case "transaction":
+          query = "SELECT farmer_id, buyer_id FROM transactions WHERE id = $1";
           break;
-        case 'user':
+        case "user":
           // For user resources, just check if the ID matches
           if (resourceId !== userId) {
             return res.status(403).json({
               success: false,
-              message: 'Access denied',
-              code: 'RESOURCE_ACCESS_DENIED'
+              message: "Access denied",
+              code: "RESOURCE_ACCESS_DENIED",
             });
           }
           return next();
         default:
           return res.status(500).json({
             success: false,
-            message: 'Unknown resource type',
-            code: 'UNKNOWN_RESOURCE_TYPE'
+            message: "Unknown resource type",
+            code: "UNKNOWN_RESOURCE_TYPE",
           });
       }
 
@@ -210,8 +232,8 @@ const requireOwnership = (resourceType, idParam = 'id') => {
       if (result.rows.length === 0) {
         return res.status(404).json({
           success: false,
-          message: 'Resource not found',
-          code: 'RESOURCE_NOT_FOUND'
+          message: "Resource not found",
+          code: "RESOURCE_NOT_FOUND",
         });
       }
 
@@ -219,54 +241,54 @@ const requireOwnership = (resourceType, idParam = 'id') => {
       let hasAccess = false;
 
       switch (resourceType) {
-        case 'listing':
+        case "listing":
           hasAccess = resource.farmer_id === userId;
           break;
-        case 'transaction':
-          hasAccess = resource.farmer_id === userId || resource.buyer_id === userId;
+        case "transaction":
+          hasAccess =
+            resource.farmer_id === userId || resource.buyer_id === userId;
           break;
       }
 
       if (!hasAccess) {
         return res.status(403).json({
           success: false,
-          message: 'Access denied',
-          code: 'RESOURCE_ACCESS_DENIED'
+          message: "Access denied",
+          code: "RESOURCE_ACCESS_DENIED",
         });
       }
 
       next();
     } catch (error) {
-      logger.error('Ownership check error:', error);
+      logger.error("Ownership check error:", error);
       return res.status(500).json({
         success: false,
-        message: 'Access check failed',
-        code: 'ACCESS_CHECK_ERROR'
+        message: "Access check failed",
+        code: "ACCESS_CHECK_ERROR",
       });
     }
   };
-};
 
 /**
  * API key authentication for internal services
  */
 const authenticateApiKey = (req, res, next) => {
-  const apiKey = req.headers['x-api-key'];
+  const apiKey = req.headers["x-api-key"];
   const validApiKey = process.env.INTERNAL_API_KEY;
 
   if (!validApiKey) {
     return res.status(500).json({
       success: false,
-      message: 'API key authentication not configured',
-      code: 'API_KEY_NOT_CONFIGURED'
+      message: "API key authentication not configured",
+      code: "API_KEY_NOT_CONFIGURED",
     });
   }
 
   if (!apiKey || apiKey !== validApiKey) {
     return res.status(401).json({
       success: false,
-      message: 'Invalid API key',
-      code: 'INVALID_API_KEY'
+      message: "Invalid API key",
+      code: "INVALID_API_KEY",
     });
   }
 
@@ -280,5 +302,5 @@ module.exports = {
   requireBuyer,
   optionalAuth,
   requireOwnership,
-  authenticateApiKey
+  authenticateApiKey,
 };

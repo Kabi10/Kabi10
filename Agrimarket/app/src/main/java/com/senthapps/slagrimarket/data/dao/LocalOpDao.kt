@@ -64,6 +64,9 @@ interface LocalOpDao {
     
     @Query("DELETE FROM local_ops WHERE attempts >= :maxAttempts")
     suspend fun deleteFailedOps(maxAttempts: Int = 5)
+
+    @Query("DELETE FROM local_ops WHERE attempts >= :maxAttempts AND (errorMessage IS NULL OR errorMessage NOT LIKE 'Conflict:%')")
+    suspend fun deleteFailedNonConflictOps(maxAttempts: Int = 3)
     
     @Query("DELETE FROM local_ops")
     suspend fun deleteAllOps()
@@ -83,4 +86,13 @@ interface LocalOpDao {
 
     @Query("UPDATE local_ops SET attempts = 0, errorMessage = NULL WHERE opId = :opId")
     suspend fun resetOpStatus(opId: String)
+
+    @Query("DELETE FROM local_ops WHERE synced = 1 AND clientTs < :cutoffTs")
+    suspend fun deleteOldSyncedOps(cutoffTs: String)
+
+    @Query("SELECT COUNT(*) FROM local_ops WHERE errorMessage LIKE 'Conflict:%'")
+    suspend fun getConflictOpsCount(): Int
+
+    @Query("DELETE FROM local_ops WHERE errorMessage LIKE 'Conflict:%'")
+    suspend fun deleteConflictOps()
 }

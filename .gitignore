@@ -1,0 +1,142 @@
+# ===================================================================
+# WORKSPACE-LEVEL .GITIGNORE FOR DEVELOPMENT WORKSPACE
+# ===================================================================
+
+# Security - Never commit these
+**/credentials.*
+**/*.key
+**/*.pem
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.template
+**/secrets.*
+**/config/private.*
+
+# ===================================================================
+# IDE AND EDITOR FILES
+# ===================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# ===================================================================
+# LANGUAGE-SPECIFIC BUILD ARTIFACTS
+# ===================================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+venv/
+env/
+ENV/
+.env/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Node.js / JavaScript / TypeScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.eslintcache
+*.tsbuildinfo
+next-env.d.ts
+
+# Next.js
+.next/
+out/
+
+# React
+build/
+
+# Java/Android
+*.class
+*.jar
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+
+# .NET
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# ===================================================================
+# BUILD OUTPUTS AND ARTIFACTS
+# ===================================================================
+dist/
+build/
+out/
+target/
+deploy/
+.output/
+coverage/
+reports/
+.cache/
+
+# ===================================================================
+# LOGS AND DATABASES
+# ===================================================================
+*.log
+logs/
+*.sqlite
+*.sqlite3
+*.db
+
+# ===================================================================
+# TEMPORARY AND CACHE FILES
+# ===================================================================
+*.tmp
+*.temp
+.cache/
+.npm/
+.yarn/
+temp/
+tmp/
+
+# ===================================================================
+# DEPLOYMENT AND CLOUD
+# ===================================================================
+.vercel/
+.netlify/
+.aws/
+.gcp/
+
+# ===================================================================
+# BACKUP AND ARCHIVE FILES
+# ===================================================================
+workspace-backup-*/
+*.backup
+*.bak
+*.old
+
+# ===================================================================
+# KEEP THESE IMPORTANT FILES
+# ===================================================================
+!shared/common/config/example.env
+!shared/common/config/template.*
+!**/README.md
+!**/package.json
+!**/package-lock.json
+!**/tsconfig.json
+.aider*

@@ -277,6 +277,9 @@ interface ListingDao {
 
     @Query("UPDATE listings SET id = :serverId WHERE id = :localId")
     suspend fun updateListingServerId(localId: String, serverId: String)
+
+    @Query("SELECT MAX(datetime(updatedAt)) FROM listings WHERE isActive = 1")
+    suspend fun getLastUpdateTime(): String?
 }
 
 /**

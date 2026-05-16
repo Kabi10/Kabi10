@@ -1,0 +1,50 @@
+# CODEOWNERS - Require review from repository owner for critical files
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: Repository owner reviews all changes
+* @Kabi10
+
+# Critical Documentation - Require explicit approval
+/KNOWN_ISSUES.md @Kabi10
+/QUICKSTART.md @Kabi10
+/SETUP.md @Kabi10
+/README.md @Kabi10
+/ARCHITECTURE.md @Kabi10
+/CONTRIBUTING.md @Kabi10
+/ROADMAP.md @Kabi10
+
+# Critical Configuration Files
+/build.gradle.kts @Kabi10
+/settings.gradle.kts @Kabi10
+/app/build.gradle.kts @Kabi10
+/gradle/libs.versions.toml @Kabi10
+
+# UI Components - Prevent accidental deletion
+/app/src/main/java/com/senthapps/slagrimarket/ui/components/ @Kabi10
+
+# Core Application Files
+/app/src/main/AndroidManifest.xml @Kabi10
+/app/src/main/java/com/senthapps/slagrimarket/MainActivity.kt @Kabi10
+/app/src/main/java/com/senthapps/slagrimarket/JaffnaMarketplaceApplication.kt @Kabi10
+
+# Database and Data Layer
+/app/src/main/java/com/senthapps/slagrimarket/data/database/ @Kabi10
+/app/src/main/java/com/senthapps/slagrimarket/di/ @Kabi10
+
+# Backend Configuration
+/backend/vercel.json @Kabi10
+/backend/package.json @Kabi10
+
+# Supabase Migrations
+/supabase/migrations/ @Kabi10
+/supabase/config.toml @Kabi10
+
+# GitHub Workflows and Templates
+/.github/workflows/ @Kabi10
+/.github/ISSUE_TEMPLATE/ @Kabi10
+
+# Security and Environment Templates
+/app/google-services.json.template @Kabi10
+/local.properties.template @Kabi10
+/backend/.env.example @Kabi10
+

@@ -356,9 +356,28 @@ class TransactionRepository @Inject constructor(
      * Check if transactions need refresh (older than 15 minutes)
      */
     private suspend fun shouldRefreshTransactions(userId: String): Boolean {
-        // For now, always refresh if forced or if no cached data
-        // TODO: Implement proper timestamp checking when DAO method is available
-        return true
+        val lastUpdateTime = transactionDao.getLastUpdateTimeForUser(userId)
+        if (lastUpdateTime == null) return true
+
+        return try {
+            // Try to parse the timestamp - handle both ISO format and SQLite datetime format
+            val lastUpdated = try {
+                Instant.parse(lastUpdateTime)
+            } catch (e: Exception) {
+                // If ISO parsing fails, try SQLite datetime format: "2025-10-02 19:36:33"
+                // Convert to ISO format by replacing space with 'T' and adding 'Z'
+                val isoFormat = lastUpdateTime.replace(" ", "T") + "Z"
+                Instant.parse(isoFormat)
+            }
+
+            val now = Instant.now()
+            val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+
+            minutesSinceUpdate >= 15 // Refresh if older than 15 minutes
+        } catch (e: Exception) {
+            // If parsing fails, assume we need to refresh
+            true
+        }
     }
 
     /**
@@ -388,8 +407,11 @@ class TransactionRepository @Inject constructor(
      */
     suspend fun clearOldTransactions(userId: String, daysToKeep: Int = 90) {
         try {
-            // TODO: Implement when DAO method is available
-            Timber.d("Clear old transactions requested for user: $userId, days: $daysToKeep")
+            // Clean up old cancelled transactions
+            transactionDao.cleanupCancelledTransactions(daysToKeep)
+            // Clean up old completed transactions (keep for longer)
+            transactionDao.cleanupOldCompletedTransactions(daysToKeep * 4) // 1 year for completed
+            Timber.d("Cleared old transactions for user: $userId, days: $daysToKeep")
         } catch (e: Exception) {
             Timber.e(e, "Error clearing old transaction data")
         }
@@ -416,8 +438,16 @@ class TransactionRepository @Inject constructor(
      */
     suspend fun getTransactionStatisticsResource(userId: String): Resource<Map<String, Any>> {
         return try {
-            // TODO: Implement when DAO method is available
-            val stats = emptyMap<String, Any>()
+            // Get stats - userId could be a farmer or buyer, try farmer stats first
+            val farmerStats = transactionDao.getFarmerTransactionStats(userId)
+            val stats: Map<String, Any> = mapOf(
+                "total" to farmerStats.total,
+                "completed" to farmerStats.completed,
+                "pending" to farmerStats.pending,
+                "cancelled" to farmerStats.cancelled,
+                "totalValue" to farmerStats.totalValue,
+                "avgValue" to (farmerStats.avgValue ?: 0.0)
+            )
             Resource.Success(stats)
         } catch (e: Exception) {
             Timber.e(e, "Error getting transaction statistics")
@@ -430,8 +460,11 @@ class TransactionRepository @Inject constructor(
      */
     suspend fun getRecentTransactionsResource(userId: String, limit: Int = 10): Resource<List<Transaction>> {
         return try {
-            // TODO: Implement when DAO method is available
-            val transactions = emptyList<Transaction>()
+            // Get recent transactions for user (as farmer or buyer)
+            val transactions = transactionDao.getTransactionsForUser(
+                userId = userId,
+                limit = limit
+            )
             Resource.Success(transactions)
         } catch (e: Exception) {
             Timber.e(e, "Error getting recent transactions")

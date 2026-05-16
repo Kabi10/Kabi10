@@ -1,6 +1,6 @@
-const { supabase, supabaseAdmin } = require('../config/supabase');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { supabase, supabaseAdmin } = require("../config/supabase");
 
 class AuthService {
   constructor() {
@@ -10,22 +10,24 @@ class AuthService {
 
   // Generate OTP
   generateOTP(length = 6) {
-    return Math.floor(Math.random() * Math.pow(10, length)).toString().padStart(length, '0');
+    return Math.floor(Math.random() * 10 ** length)
+      .toString()
+      .padStart(length, "0");
   }
 
   // Send OTP (integrate with your SMS service)
-  async sendOTP(phone, purpose = 'login') {
+  async sendOTP(phone, purpose = "login") {
     const otp = this.generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
     // Store OTP in database
     const { data, error } = await this.adminClient
-      .from('otp_verifications')
+      .from("otp_verifications")
       .insert({
         phone,
         otp_code: otp,
         purpose,
-        expires_at: expiresAt.toISOString()
+        expires_at: expiresAt.toISOString(),
       })
       .select()
       .single();
@@ -34,7 +36,7 @@ class AuthService {
 
     // TODO: Integrate with your SMS service here
     // For now, return OTP for testing (remove in production)
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.log(`OTP for ${phone}: ${otp}`);
       return { success: true, otp }; // Remove this in production
     }
@@ -43,28 +45,28 @@ class AuthService {
   }
 
   // Verify OTP
-  async verifyOTP(phone, otp, purpose = 'login') {
+  async verifyOTP(phone, otp, purpose = "login") {
     const { data, error } = await this.adminClient
-      .from('otp_verifications')
-      .select('*')
-      .eq('phone', phone)
-      .eq('otp_code', otp)
-      .eq('purpose', purpose)
-      .eq('verified', false)
-      .gte('expires_at', new Date().toISOString())
-      .order('created_at', { ascending: false })
+      .from("otp_verifications")
+      .select("*")
+      .eq("phone", phone)
+      .eq("otp_code", otp)
+      .eq("purpose", purpose)
+      .eq("verified", false)
+      .gte("expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false })
       .limit(1)
       .single();
 
     if (error || !data) {
-      throw new Error('Invalid or expired OTP');
+      throw new Error("Invalid or expired OTP");
     }
 
     // Mark OTP as verified
     await this.adminClient
-      .from('otp_verifications')
+      .from("otp_verifications")
       .update({ verified: true })
-      .eq('id', data.id);
+      .eq("id", data.id);
 
     return true;
   }
@@ -75,25 +77,26 @@ class AuthService {
       // Check if user already exists
       const existingUser = await this.getUserByPhone(phone);
       if (existingUser) {
-        throw new Error('User already exists');
+        throw new Error("User already exists");
       }
 
       // Create user in Supabase Auth (using phone as email for compatibility)
-      const { data: authData, error: authError } = await this.adminClient.auth.admin.createUser({
-        phone,
-        phone_confirmed: true,
-        user_metadata: userData
-      });
+      const { data: authData, error: authError } =
+        await this.adminClient.auth.admin.createUser({
+          phone,
+          phone_confirmed: true,
+          user_metadata: userData,
+        });
 
       if (authError) throw authError;
 
       // Create user profile
       const { data: profileData, error: profileError } = await this.adminClient
-        .from('users')
+        .from("users")
         .insert({
           id: authData.user.id,
           phone,
-          ...userData
+          ...userData,
         })
         .select()
         .single();
@@ -102,7 +105,7 @@ class AuthService {
 
       return {
         user: profileData,
-        session: authData.session
+        session: authData.session,
       };
     } catch (error) {
       throw error;
@@ -115,24 +118,24 @@ class AuthService {
       // Get user profile
       const user = await this.getUserByPhone(phone);
       if (!user) {
-        throw new Error('User not found');
+        throw new Error("User not found");
       }
 
       // Generate custom JWT token
       const token = jwt.sign(
-        { 
+        {
           sub: user.id,
           phone: user.phone,
-          role: 'authenticated'
+          role: "authenticated",
         },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
       );
 
       return {
         user,
         token,
-        expires_in: 24 * 60 * 60 // 24 hours in seconds
+        expires_in: 24 * 60 * 60, // 24 hours in seconds
       };
     } catch (error) {
       throw error;
@@ -142,21 +145,21 @@ class AuthService {
   // Get user by phone
   async getUserByPhone(phone) {
     const { data, error } = await this.adminClient
-      .from('users')
-      .select('*')
-      .eq('phone', phone)
+      .from("users")
+      .select("*")
+      .eq("phone", phone)
       .single();
 
-    if (error && error.code !== 'PGRST116') throw error;
+    if (error && error.code !== "PGRST116") throw error;
     return data;
   }
 
   // Get user by ID
   async getUserById(id) {
     const { data, error } = await this.adminClient
-      .from('users')
-      .select('*')
-      .eq('id', id)
+      .from("users")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) throw error;
@@ -168,54 +171,56 @@ class AuthService {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await this.getUserById(decoded.sub);
-      
+
       if (!user || !user.is_active) {
-        throw new Error('User not found or inactive');
+        throw new Error("User not found or inactive");
       }
 
       return { user, decoded };
     } catch (error) {
-      throw new Error('Invalid token');
+      throw new Error("Invalid token");
     }
   }
 
   // Refresh token
   async refreshToken(token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+      const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+        ignoreExpiration: true,
+      });
       const user = await this.getUserById(decoded.sub);
-      
+
       if (!user || !user.is_active) {
-        throw new Error('User not found or inactive');
+        throw new Error("User not found or inactive");
       }
 
       // Generate new token
       const newToken = jwt.sign(
-        { 
+        {
           sub: user.id,
           phone: user.phone,
-          role: 'authenticated'
+          role: "authenticated",
         },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
       );
 
       return {
         user,
         token: newToken,
-        expires_in: 24 * 60 * 60
+        expires_in: 24 * 60 * 60,
       };
     } catch (error) {
-      throw new Error('Invalid refresh token');
+      throw new Error("Invalid refresh token");
     }
   }
 
   // Update user profile
   async updateProfile(userId, updates) {
     const { data, error } = await this.adminClient
-      .from('users')
+      .from("users")
       .update(updates)
-      .eq('id', userId)
+      .eq("id", userId)
       .select()
       .single();
 
@@ -226,9 +231,9 @@ class AuthService {
   // Deactivate user
   async deactivateUser(userId) {
     const { data, error } = await this.adminClient
-      .from('users')
+      .from("users")
       .update({ is_active: false })
-      .eq('id', userId)
+      .eq("id", userId)
       .select()
       .single();
 

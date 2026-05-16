@@ -14,17 +14,20 @@ data class User(
     val id: String,
     
     @Json(name = "name")
-    val name: String,
+    val name: String? = null,
     
     @Json(name = "phone")
-    val phone: String,
+    val phone: String? = null,
     
     @Json(name = "userType")
-    val userType: UserType,
+    val userType: UserType? = UserType.BUYER,
     
+    @Json(name = "location")
+    val location: String? = null,
+
     @Json(name = "verified")
     val verified: Boolean = false,
-    
+
     @Json(name = "language")
     val language: String = "ta", // Tamil by default
     

@@ -3,13 +3,13 @@ package com.senthapps.slagrimarket.di
 import android.content.Context
 import androidx.room.Room
 import com.senthapps.slagrimarket.data.dao.ActivityDao
+import com.senthapps.slagrimarket.data.dao.DoaCropDao
 import com.senthapps.slagrimarket.data.dao.ListingDao
 import com.senthapps.slagrimarket.data.dao.LocalOpDao
 import com.senthapps.slagrimarket.data.dao.MarketPriceDao
 import com.senthapps.slagrimarket.data.dao.TransactionDao
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.database.JaffnaMarketplaceDatabase
-import com.senthapps.slagrimarket.data.preferences.LanguagePreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -63,10 +63,27 @@ object DatabaseModule {
     }
 
     @Provides
-    @Singleton
-    fun provideLanguagePreferences(
-        @ApplicationContext context: Context
-    ): LanguagePreferences {
-        return LanguagePreferences(context)
+    fun provideNotificationDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.NotificationDao {
+        return database.notificationDao()
+    }
+
+    @Provides
+    fun provideReviewDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.ReviewDao {
+        return database.reviewDao()
+    }
+
+    @Provides
+    fun provideMessageDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.MessageDao {
+        return database.messageDao()
+    }
+
+    @Provides
+    fun provideFavoriteDao(database: JaffnaMarketplaceDatabase): com.senthapps.slagrimarket.data.dao.FavoriteDao {
+        return database.favoriteDao()
+    }
+
+    @Provides
+    fun provideDoaCropDao(database: JaffnaMarketplaceDatabase): DoaCropDao {
+        return database.doaCropDao()
     }
 }

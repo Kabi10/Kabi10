@@ -1,0 +1,75 @@
+# Android build files
+app/build/
+app/.gradle/
+.gradle/
+*.apk
+*.aab
+*.dex
+*.class
+
+# Android IDE files
+.idea/
+*.iml
+local.properties
+
+# Node modules
+**/node_modules/
+
+# Screenshots and logs
+screenshots/
+*.log
+*.txt
+
+# Documentation
+*.md
+!README.md
+
+# Git files
+.git/
+.gitignore
+
+# Test files
+**/__tests__/
+**/*.test.js
+**/tests/
+
+# Keystore (security)
+keystore/
+
+# Claude files
+.claude/
+
+# NotebookLM
+notebooklm/
+
+# Scripts
+*.sh
+*.ps1
+
+# Environment files (except example)
+.env
+.env.local
+.env.production
+.env.development
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# iOS (if any)
+ios/
+Pods/
+*.xcworkspace
+*.xcodeproj
+
+# Web build (will be rebuilt by Vercel)
+web/node_modules/
+web/dist/
+web/build/
+
+# Backend development files
+backend/node_modules/
+backend/coverage/
+backend/dist/
+backend/.env

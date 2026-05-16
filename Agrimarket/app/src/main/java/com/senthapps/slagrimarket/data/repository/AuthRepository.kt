@@ -2,7 +2,11 @@ package com.senthapps.slagrimarket.data.repository
 
 import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.AuthApiService
+import com.senthapps.slagrimarket.data.api.LoginRequest
+import com.senthapps.slagrimarket.data.api.RegisterRequest
 import com.senthapps.slagrimarket.data.api.SendOtpRequest
+import com.senthapps.slagrimarket.data.api.UpdateProfileRequest
+import com.senthapps.slagrimarket.data.api.UserApiService
 import com.senthapps.slagrimarket.data.api.VerifyOtpRequest
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.User
@@ -13,78 +17,107 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
     private val authApiService: AuthApiService,
+    private val userApiService: UserApiService,
     private val authPreferences: AuthPreferences,
     private val userDao: UserDao
 ) {
+    // Debug mode uses BuildConfig.DEBUG directly
+    private val isDebugMode: Boolean = BuildConfig.DEBUG
 
-    // MVP: Provide mock user for demonstration
-    private val mockUser = User(
-        id = "mvp_user_001",
-        phone = "0771234567",
-        name = "Demo User",
-        userType = UserType.FARMER,
-        verified = true,
-        language = "ta",
-        createdAt = java.time.Instant.now().toString()
-    )
-
-    // MVP: Use AuthPreferences for consistent authentication state
-    val currentUser: Flow<User?> = authPreferences.currentUser
-    val isLoggedIn: Flow<Boolean> = authPreferences.isLoggedIn
-
-    init {
-        // MVP: Initialize mock authentication state on app start
-        initializeMockAuthState()
+    // Production: Use AuthPreferences for consistent authentication state
+    // DEBUG BYPASS: Return fake user flow in debug builds
+    val currentUser: Flow<User?> = if (isDebugMode) {
+        kotlinx.coroutines.flow.flowOf(
+            User(
+                id = "debug_user_123",
+                name = "Debug Farmer",
+                phone = "+94771234567",
+                userType = UserType.FARMER,
+                verified = true,
+                language = "en",
+                createdAt = "2025-01-04T00:00:00Z"
+            )
+        )
+    } else {
+        authPreferences.currentUser
     }
 
-    private fun initializeMockAuthState() {
+    val isLoggedIn: Flow<Boolean> = if (isDebugMode) {
+        kotlinx.coroutines.flow.flowOf(true)
+    } else {
+        authPreferences.isLoggedIn
+    }
+
+    init {
+        // DEBUG: Persist fake user to database to satisfy FK constraints
+        if (isDebugMode) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val debugUser = User(
+                        id = "debug_user_123",
+                        name = "Debug Farmer",
+                        phone = "+94771234567",
+                        userType = UserType.FARMER,
+                        verified = true,
+                        language = "en",
+                        createdAt = "2025-01-04T00:00:00Z"
+                    )
+                    userDao.insertUser(debugUser)
+                    Timber.d("🔧 DEBUG: Persisted debug user to database for FK constraints")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to persist debug user (may already exist)")
+                }
+            }
+        }
+
+        // Log authentication state on app start for debugging
+        logAuthenticationState()
+    }
+
+    private fun logAuthenticationState() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Check if user is already authenticated
                 val existingUser = authPreferences.getCurrentUser()
-                val existingToken = authPreferences.getAccessToken()
+                val hasToken = !authPreferences.getAccessToken().isNullOrBlank()
 
-                if (existingUser == null || existingToken.isNullOrBlank()) {
-                    // Initialize mock authentication state
-                    val mockAccessToken = "mvp_access_token_${System.currentTimeMillis()}"
-                    val mockRefreshToken = "mvp_refresh_token_${System.currentTimeMillis()}"
-
-                    // Save mock authentication data
-                    authPreferences.saveTokens(mockAccessToken, mockRefreshToken)
-                    authPreferences.saveUser(mockUser)
-                    userDao.insertUser(mockUser)
-
-                    Timber.d("🚀 MVP: Mock authentication state initialized - User: ${mockUser.name}")
+                if (existingUser != null && hasToken) {
+                    Timber.d("✅ Authenticated user found: ${existingUser.name}")
                 } else {
-                    Timber.d("🚀 MVP: Existing authentication state found - User: ${existingUser.name}")
+                    Timber.d("⚠️ No authenticated user - login required")
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Error initializing mock authentication state")
+                Timber.e(e, "Error checking authentication state")
             }
         }
     }
     
-    suspend fun sendOtp(phoneNumber: String): Result<String> {
+    data class OtpResult(val otpId: String, val otp: String?)
+
+    suspend fun sendOtp(phoneNumber: String): Result<OtpResult> {
         return try {
-            val response = authApiService.sendOtp(SendOtpRequest(phoneNumber))
+            // Normalize phone number to +94XXXXXXXXX format
+            val normalizedPhone = normalizePhoneNumber(phoneNumber)
+            Timber.d("Sending OTP to: $normalizedPhone (original: $phoneNumber)")
+            
+            val response = authApiService.sendOtp(SendOtpRequest(normalizedPhone))
             if (response.isSuccessful && response.body()?.success == true) {
                 val responseBody = response.body()!!
                 val otpId = responseBody.otpId ?: ""
+                val otpCode = responseBody.otp
 
                 // Log OTP for development testing
-                responseBody.otp?.let { otp ->
-                    Timber.d("🔑 DEVELOPMENT OTP: $otp (Phone: $phoneNumber)")
-                    android.util.Log.d("AUTH_OTP", "🔑 OTP CODE: $otp for $phoneNumber")
+                otpCode?.let { otp ->
+                    Timber.d("🔑 DEVELOPMENT OTP: $otp (Phone: $normalizedPhone)")
+                    android.util.Log.d("AUTH_OTP", "🔑 OTP CODE: $otp for $normalizedPhone")
                 }
 
-                Result.success(otpId)
+                Result.success(OtpResult(otpId, otpCode))
             } else {
                 val errorMessage = response.body()?.message ?: "Failed to send OTP"
                 Result.failure(Exception(errorMessage))
@@ -95,14 +128,34 @@ class AuthRepository @Inject constructor(
         }
     }
     
+    /**
+     * Normalize phone number to +94XXXXXXXXX format required by backend
+     */
+    private fun normalizePhoneNumber(phone: String): String {
+        val cleaned = phone.replace(Regex("[^0-9+]"), "")
+        return when {
+            cleaned.startsWith("+94") -> cleaned
+            cleaned.startsWith("94") -> "+$cleaned"
+            cleaned.startsWith("0") -> "+94${cleaned.substring(1)}"
+            else -> "+94$cleaned"
+        }
+    }
+    
     suspend fun verifyOtp(phoneNumber: String, otp: String, otpId: String? = null): Result<User> {
         return try {
-            val response = authApiService.verifyOtp(VerifyOtpRequest(phoneNumber, otp, otpId))
+            val normalizedPhone = normalizePhoneNumber(phoneNumber)
+            val response = authApiService.verifyOtp(VerifyOtpRequest(normalizedPhone, otp, otpId))
             if (response.isSuccessful && response.body()?.success == true) {
                 val body = response.body()!!
-                val accessToken = body.token!!
-                val refreshToken = body.refreshToken!!
-                val user = body.user!!
+                val accessToken = body.token
+                val refreshToken = body.refreshToken
+                val user = body.user
+                
+                // Check for null values
+                if (accessToken == null || refreshToken == null || user == null) {
+                    Timber.e("Verify OTP response missing required fields: token=${accessToken != null}, refreshToken=${refreshToken != null}, user=${user != null}")
+                    return Result.failure(Exception("Authentication failed - incomplete server response"))
+                }
                 
                 // Save tokens and user data
                 authPreferences.saveTokens(accessToken, refreshToken)
@@ -120,6 +173,50 @@ class AuthRepository @Inject constructor(
         }
     }
     
+    suspend fun loginWithPassword(phoneNumber: String, password: String): Result<User> {
+        return try {
+            val normalizedPhone = normalizePhoneNumber(phoneNumber)
+            val response = authApiService.login(LoginRequest(normalizedPhone, password))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                if (body.token == null || body.refreshToken == null || body.user == null) {
+                    return Result.failure(Exception("Incomplete server response"))
+                }
+                authPreferences.saveTokens(body.token, body.refreshToken)
+                authPreferences.saveUser(body.user)
+                userDao.insertUser(body.user)
+                Result.success(body.user)
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Login failed"))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Login error")
+            Result.failure(e)
+        }
+    }
+
+    suspend fun registerWithPassword(phoneNumber: String, password: String, userType: String): Result<User> {
+        return try {
+            val normalizedPhone = normalizePhoneNumber(phoneNumber)
+            val response = authApiService.register(RegisterRequest(normalizedPhone, password, userType))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                if (body.token == null || body.refreshToken == null || body.user == null) {
+                    return Result.failure(Exception("Incomplete server response"))
+                }
+                authPreferences.saveTokens(body.token, body.refreshToken)
+                authPreferences.saveUser(body.user)
+                userDao.insertUser(body.user)
+                Result.success(body.user)
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Registration failed"))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Register error")
+            Result.failure(e)
+        }
+    }
+
     suspend fun logout() {
         try {
             authPreferences.clearAuth()
@@ -131,75 +228,97 @@ class AuthRepository @Inject constructor(
     }
     
     suspend fun getCurrentUser(): User? {
-        // MVP: Return mock user for demonstration
-        return mockUser
+        // DEBUG BYPASS: Return fake authenticated user to skip auth flow
+        if (isDebugMode) {
+            Timber.d("🔧 DEBUG: Returning fake authenticated user to bypass auth")
+            return User(
+                id = "debug_user_123",
+                name = "Debug Farmer",
+                phone = "+94771234567",
+                userType = UserType.FARMER,
+                verified = true,
+                language = "en",
+                createdAt = "2025-01-04T00:00:00Z"
+            )
+        }
+
+        // Return authenticated user from preferences
+        return authPreferences.getCurrentUser()
     }
-    
+
     suspend fun refreshToken(): Result<String> {
         return try {
             val refreshToken = authPreferences.getRefreshToken()
             if (refreshToken.isNullOrBlank()) {
                 return Result.failure(Exception("No refresh token available"))
             }
-            
-            // TODO: Implement refresh token API call
-            // For now, just return failure to trigger re-login
-            Result.failure(Exception("Token refresh not implemented"))
+
+            val response = authApiService.refreshToken(com.senthapps.slagrimarket.data.api.RefreshTokenRequest(refreshToken))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val body = response.body()!!
+                val newToken = body.token
+                val newRefreshToken = body.refreshToken ?: refreshToken // Use new one if provided, else keep old
+
+                if (newToken == null) {
+                    return Result.failure(Exception("Token refresh failed - missing access token"))
+                }
+
+                // Save new tokens
+                authPreferences.saveTokens(newToken, newRefreshToken)
+                Result.success(newToken)
+            } else {
+                val errorMessage = response.body()?.toString() ?: "Token refresh failed"
+                Result.failure(Exception(errorMessage))
+            }
         } catch (e: Exception) {
             Timber.e(e, "Error refreshing token")
             Result.failure(e)
         }
     }
-    
+
     suspend fun isUserLoggedIn(): Boolean {
         val token = authPreferences.getAccessToken()
         return !token.isNullOrBlank()
     }
 
-    /**
-     * 🚨 TEMPORARY DEVELOPMENT BYPASS METHOD 🚨
-     * This method bypasses OTP verification for development and testing purposes.
-     * It creates a mock user and authentication state without server verification.
-     *
-     * ⚠️ WARNING: This should NEVER be enabled in production builds!
-     *
-     * @param phoneNumber The phone number to associate with the mock user
-     * @param name The name for the mock user
-     * @param userType The type of user (FARMER or BUYER)
-     * @return Result containing the mock user data
-     */
-    suspend fun bypassOtpWithMockUser(phoneNumber: String, name: String, userType: UserType): Result<User> {
+    suspend fun updateUserProfile(
+        userId: String,
+        name: String,
+        location: String
+    ): Result<User> {
         return try {
-            // MVP: Always allow bypass for demonstration
-            Timber.d("Creating mock user for MVP demonstration")
+            val currentUser = getCurrentUser()
+            if (currentUser == null) {
+                return Result.failure(Exception("User not found"))
+            }
 
-            Timber.w("🚨 CREATING MOCK USER FOR DEVELOPMENT BYPASS 🚨")
+            // Update via API first
+            try {
+                val response = userApiService.updateProfile(
+                    UpdateProfileRequest(name = name, location = location)
+                )
+                if (response.isSuccessful && response.body()?.success == true) {
+                    Timber.d("Profile updated on server: $name, $location")
+                }
+            } catch (e: Exception) {
+                Timber.w(e, "Failed to update profile on API, updating locally")
+            }
 
-            // Create mock user data
-            val mockUser = User(
-                id = UUID.randomUUID().toString(),
-                phone = phoneNumber,
+            val updatedUser = currentUser.copy(
                 name = name,
-                userType = userType,
-                verified = true,
-                language = "ta", // Tamil by default
-                createdAt = java.time.Instant.now().toString()
+                location = location
             )
 
-            // Generate mock tokens for development
-            val mockAccessToken = "dev_access_token_${System.currentTimeMillis()}"
-            val mockRefreshToken = "dev_refresh_token_${System.currentTimeMillis()}"
+            // Update in local database
+            userDao.updateUser(updatedUser)
 
-            // Save mock authentication data
-            authPreferences.saveTokens(mockAccessToken, mockRefreshToken)
-            authPreferences.saveUser(mockUser)
-            userDao.insertUser(mockUser)
+            // Update in preferences
+            authPreferences.saveUser(updatedUser)
 
-            Timber.d("🚨 BYPASS: Mock user created successfully - Name: ${mockUser.name}, Type: ${mockUser.userType}")
-
-            Result.success(mockUser)
+            Timber.d("Profile updated: $name, $location")
+            Result.success(updatedUser)
         } catch (e: Exception) {
-            Timber.e(e, "Error creating mock user for bypass")
+            Timber.e(e, "Error updating profile")
             Result.failure(e)
         }
     }

@@ -1,17 +1,18 @@
 <resources>
     <string name="app_name">SL Agrimarket</string>
-    
+
     <!-- App Title -->
     <string name="app_title_tamil">யாழ்ப்பாணம் விவசாயிகள் சந்தை</string>
     <string name="app_title_english">Jaffna Farmers Marketplace</string>
-    
+    <string name="app_title_sinhala">යාපනය ගොවි වෙළඳපොළ</string>
+
     <!-- Navigation -->
     <string name="nav_home">முகப்பு</string>
     <string name="nav_listings">பட்டியல்கள்</string>
     <string name="nav_profile">சுயவிவரம்</string>
     <string name="nav_transactions">பரிவர்த்தனைகள்</string>
     <string name="nav_search">தேடல்</string>
-    
+
     <!-- Common Actions -->
     <string name="action_back">பின்செல்</string>
     <string name="action_logout">வெளியேறு</string>
@@ -19,7 +20,38 @@
     <string name="action_browse">பார்க்கவும்</string>
     <string name="action_sell">விற்கவும்</string>
     <string name="action_add">சேர்க்க</string>
-    
+    <string name="action_send">அனுப்பு</string>
+    <string name="action_cancel">ரத்து செய்</string>
+    <string name="action_confirm">உறுதிப்படுத்து</string>
+    <string name="action_delete">நீக்கு</string>
+    <string name="action_edit">திருத்து</string>
+    <string name="action_save">சேமி</string>
+    <string name="action_retry">மீண்டும் முயற்சி</string>
+    <string name="action_close">மூடு</string>
+    <string name="action_ok">சரி</string>
+    <string name="action_dismiss">நிராகரி</string>
+    <string name="action_clear">அழி</string>
+    <string name="action_share">பகிர்</string>
+    <string name="action_favorite">விருப்பம்</string>
+    <string name="action_continue">தொடரவும்</string>
+
+    <!-- Auth Screens -->
+    <string name="auth_app_subtitle">விவசாயிகளையும் வாங்குபவர்களையும் நேரடியாக இணைக்கிறது</string>
+    <string name="auth_phone_label">உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்</string>
+    <string name="auth_phone_hint">சரிபார்ப்புக் குறியீட்டை அனுப்புவோம்</string>
+    <string name="auth_phone_field_label">தொலைபேசி எண்</string>
+    <string name="auth_phone_placeholder">+94771234567</string>
+    <string name="auth_error_invalid_phone">சரியான தொலைபேசி எண்ணை உள்ளிடவும்</string>
+    <string name="auth_terms_agreement">தொடர்வதன் மூலம், எங்கள் சேவை விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள்</string>
+    <string name="auth_verify">சரிபார்</string>
+    <string name="auth_resend_otp">குறியீட்டை மீண்டும் அனுப்பு</string>
+    <string name="auth_enter_otp">சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்</string>
+    <string name="auth_otp_sent">%1$s க்கு சரிபார்ப்புக் குறியீடு அனுப்பப்பட்டது</string>
+    <string name="auth_password_label">உங்கள் கடவுச்சொல்லை உள்ளிடவும்</string>
+    <string name="auth_password_hint">கடவுச்சொல்</string>
+    <string name="auth_forgot_password">கடவுச்சொல் மறந்துவிட்டதா?</string>
+    <string name="auth_login">உள்நுழை</string>
+
     <!-- Home Screen -->
     <string name="home_welcome">வணக்கம் %1$s!</string>
     <string name="home_farmer_subtitle">உங்கள் விளைபொருட்களை விற்க தயாராகுங்கள்</string>
@@ -29,11 +61,11 @@
     <string name="home_recent_listings">சமீபத்திய பட்டியல்கள்</string>
     <string name="home_market_prices">சந்தை விலைகள்</string>
     <string name="home_no_listings">பட்டியல்கள் இல்லை</string>
-    
+
     <!-- Profile Screen -->
     <string name="profile_title">சுயவிவரம்</string>
-    <string name="profile_verified">✓ சரிபார்க்கப்பட்டது</string>
-    <string name="profile_verification_pending">⚠ சரிபார்ப்பு நிலுவையில்</string>
+    <string name="profile_verified">சரிபார்க்கப்பட்டது</string>
+    <string name="profile_verification_pending">சரிபார்ப்பு நிலுவையில்</string>
     <string name="profile_loading">பயனர் தகவல் ஏற்றப்படுகிறது…</string>
     <string name="profile_farmer">விவசாயி</string>
     <string name="profile_buyer">வாங்குபவர்</string>
@@ -44,7 +76,15 @@
     <string name="profile_completed_orders">நிறைவேற்றப்பட்ட ஆர்டர்கள்</string>
     <string name="profile_active_listings">செயலில் உள்ள பட்டியல்கள்</string>
     <string name="profile_view_details">விவரங்கள் பார்க்க</string>
-    
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">சுயவிவரத்தைத் திருத்து</string>
+    <string name="edit_profile_save">மாற்றங்களைச் சேமி</string>
+    <string name="edit_profile_name">முழுப் பெயர்</string>
+    <string name="edit_profile_phone">தொலைபேசி எண்</string>
+    <string name="edit_profile_location">இடம்</string>
+    <string name="edit_profile_success">சுயவிவரம் வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது</string>
+
     <!-- Market Prices -->
     <string name="market_prices_title">சந்தை விலைகள்</string>
     <string name="market_price_per_kg">LKR %1$.2f ஒரு கிலோ</string>
@@ -53,7 +93,12 @@
     <string name="market_trend_up">↗️</string>
     <string name="market_trend_down">↘️</string>
     <string name="market_trend_stable">➡️</string>
-    
+    <string name="market_doa_badge">விவசாய திணைக்களம் சரிபார்ப்பு</string>
+    <string name="market_per_kg">ஒரு கிலோ</string>
+    <string name="market_trend_rising">உயர்வு</string>
+    <string name="market_trend_falling">வீழ்ச்சி</string>
+    <string name="market_trend_stable_text">நிலையானது</string>
+
     <!-- Crops -->
     <string name="crop_red_onion">வெங்காயம்</string>
     <string name="crop_chili">மிளகாய்</string>
@@ -65,7 +110,7 @@
     <string name="crop_banana">வாழைப்பழம்</string>
     <string name="crop_rice">அரிசி</string>
     <string name="crop_potato">உருளைக்கிழங்கு</string>
-    
+
     <!-- Language -->
     <string name="language_english">ஆங்கிலம்</string>
     <string name="language_tamil">தமிழ்</string>
@@ -87,6 +132,27 @@
     <string name="create_listing_success">பட்டியல் வெற்றிகரமாக உருவாக்கப்பட்டது!</string>
     <string name="create_listing_error">பட்டியல் உருவாக்க முடியவில்லை</string>
 
+    <!-- Quick Listing -->
+    <string name="quick_listing_camera_denied">கேமரா அனுமதி மறுக்கப்பட்டது — கேலரியைப் பயன்படுத்தவும்</string>
+    <string name="quick_listing_camera_unavailable">கேமரா கிடைக்கவில்லை — கேலரியைப் பயன்படுத்தவும்</string>
+    <string name="quick_listing_photo_desc">பொருள் புகைப்படம்</string>
+    <string name="quick_listing_tip_tomato">சிறந்த விளைச்சல் ஏப்–ஜூன். தினமும் 2 முறை நீர் ஊற்றவும்.</string>
+    <string name="quick_listing_tip_red_onion">90 நாட்களுக்குப் பிறகு அறுவடை. கடைசி 2 வாரம் நீர் குறைக்கவும்.</string>
+    <string name="quick_listing_tip_chili">45 செ.மீ இடைவெளி. சிறந்த விளைச்சல் ஆக–அக்.</string>
+    <string name="quick_listing_tip_brinjal">நல்ல வடிகால் மண் தேவை. ஒவ்வொரு 5 நாளும் அறுவடை.</string>
+    <string name="quick_listing_tip_okra">25°C க்கு மேல் முளைக்கும். 8 செ.மீ இல் அறுவடை.</string>
+
+    <!-- Listing Detail -->
+    <string name="listing_share_intro">Agrimarket இல் இந்த பட்டியலைப் பாருங்கள்!</string>
+    <string name="listing_share_price">விலை: LKR %1$s</string>
+    <string name="listing_share_quantity">அளவு: %1$s</string>
+    <string name="listing_share_location">இடம்: %1$s</string>
+    <string name="listing_share_quality">தரம்: தரம் %1$s</string>
+    <string name="listing_share_via">பட்டியலைப் பகிரவும்</string>
+    <string name="listing_unknown_farmer">அறியப்படாத விவசாயி</string>
+    <string name="listing_contact_seller">விற்பனையாளரைத் தொடர்பு கொள்ளவும்</string>
+    <string name="listing_buy_now">இப்போது வாங்கவும்</string>
+
     <!-- Quality Grades -->
     <string name="quality_grade_a">தரம் A</string>
     <string name="quality_grade_b">தரம் B</string>
@@ -98,6 +164,27 @@
     <string name="error_quantity_range">அளவு 0 மற்றும் 100,000 இடையே இருக்க வேண்டும்</string>
     <string name="error_price_range">விலை 0 மற்றும் 1,000,000 இடையே இருக்க வேண்டும்</string>
     <string name="error_future_date">தேதி எதிர்காலத்தில் இருக்க முடியாது</string>
+    <string name="error_select_crop_type">பயிர் வகையைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="error_quantity_required">அளவு தேவை</string>
+    <string name="error_quantity_positive">அளவு 0 விட அதிகமாக இருக்க வேண்டும்</string>
+    <string name="error_quantity_max">அளவு 100,000 ஐ மீற முடியாது</string>
+    <string name="error_select_unit">அலகைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="error_price_required">விலை தேவை</string>
+    <string name="error_invalid_price">சரியான விலையை உள்ளிடவும்</string>
+    <string name="error_price_positive">விலை 0 விட அதிகமாக இருக்க வேண்டும்</string>
+    <string name="error_price_max">விலை 1,000,000 ஐ மீற முடியாது</string>
+    <string name="error_select_quality">தர தரத்தைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="error_harvest_date_required">அறுவடை தேதி தேவை</string>
+    <string name="error_location_required">இடம் தேவை</string>
+    <string name="error_name_required">பெயர் தேவை</string>
+    <string name="error_name_min_length">பெயர் குறைந்தது 2 எழுத்துக்களாக இருக்க வேண்டும்</string>
+    <string name="error_user_not_found">பயனர் கண்டுபிடிக்கப்படவில்லை</string>
+    <string name="error_update_profile_failed">சுயவிவரத்தைப் புதுப்பிக்க முடியவில்லை</string>
+    <string name="error_unexpected">எதிர்பாராத பிழை ஏற்பட்டது</string>
+    <string name="error_fill_required_fields">தேவையான அனைத்து புலங்களையும் சரியாக நிரப்பவும்</string>
+    <string name="error_user_not_authenticated">பயனர் அங்கீகரிக்கப்படவில்லை</string>
+    <string name="error_send_otp_failed">OTP அனுப்ப முடியவில்லை. மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="error_invalid_otp">தவறான OTP. மீண்டும் முயற்சிக்கவும்.</string>
 
     <!-- Profile Settings -->
     <string name="settings_title">அமைப்புகள் &amp; விருப்பத்தேர்வுகள்</string>
@@ -109,6 +196,9 @@
     <string name="settings_help_subtitle">உதவி பெறவும் மற்றும் ஆதரவை தொடர்பு கொள்ளவும்</string>
     <string name="settings_about">பற்றி</string>
     <string name="settings_about_subtitle">பயன்பாட்டு பதிப்பு மற்றும் தகவல்</string>
+    <string name="settings_legal">சட்டம்</string>
+    <string name="settings_privacy">தனியுரிமைக் கொள்கை</string>
+    <string name="settings_terms">சேவை விதிமுறைகள்</string>
 
     <!-- Logout Confirmation -->
     <string name="logout_confirm_title">வெளியேறுவதை உறுதிப்படுத்தவும்</string>
@@ -142,6 +232,31 @@
     <string name="sync_success">ஒத்திசைவு வெற்றிகரமாக முடிந்தது</string>
     <string name="sync_failed">ஒத்திசைவு தோல்வியடைந்தது</string>
     <string name="sync_pending_ops">%1$d நிலுவையில் உள்ள செயல்பாடுகள்</string>
+    <string name="sync_settings_title">ஒத்திசைவு அமைப்புகள்</string>
+    <string name="sync_status_label">ஒத்திசைவு நிலை</string>
+    <string name="sync_current_status">தற்போதைய நிலை</string>
+    <string name="sync_syncing">ஒத்திசைக்கப்படுகிறது…</string>
+    <string name="sync_status_pending">நிலுவையில்</string>
+    <string name="sync_status_up_to_date">புதுப்பிக்கப்பட்டது</string>
+    <string name="sync_last_sync">கடைசி ஒத்திசைவு</string>
+    <string name="sync_never">இதுவரை இல்லை</string>
+    <string name="sync_action_now">இப்போது ஒத்திசை</string>
+    <string name="sync_conflict_message">%1$d திருத்தங்கள் சேவையகத்துடன் முரண்பட்டன — சேவையக பதிப்பு வைக்கப்பட்டது</string>
+    <string name="sync_pending_count">நிலுவையில் உள்ள மாற்றங்கள்</string>
+    <string name="sync_auto_label">தானியங்கி ஒத்திசைவு</string>
+    <string name="sync_wifi_only">Wi-Fi மட்டும்</string>
+    <string name="sync_auto_desc">இணைக்கப்பட்டவுடன் தானாகவே ஒத்திசை</string>
+    <string name="sync_interval_label">ஒத்திசைவு இடைவெளி</string>
+    <string name="sync_interval_desc">புதுப்பிப்புகளை எவ்வளவு அடிக்கடி சரிபார்க்க வேண்டும்</string>
+    <string name="sync_actions_title">செயல்கள்</string>
+    <string name="sync_retry_failed">தோல்வியடைந்த செயல்பாடுகளை மீண்டும் முயற்சி</string>
+    <string name="sync_clear_synced">ஒத்திசைக்கப்பட்ட செயல்பாடுகளை அழி</string>
+    <string name="sync_statistics_title">புள்ளிவிவரங்கள்</string>
+    <string name="sync_pending_ops_label">நிலுவையில் உள்ள செயல்பாடுகள்</string>
+    <string name="sync_successful_ops_label">வெற்றிகரமான செயல்பாடுகள்</string>
+    <string name="sync_failed_ops_label">தோல்வியடைந்த செயல்பாடுகள்</string>
+    <string name="sync_conflicts_label">முரண்பாடுகள் (சேவையகம் வென்றது)</string>
+    <string name="sync_error">பிழை</string>
 
     <!-- Empty States -->
     <string name="empty_no_data">தரவு இல்லை</string>
@@ -163,4 +278,156 @@
     <string name="unit_kg">கிலோ</string>
     <string name="unit_ton">டன்</string>
     <string name="unit_units">அலகுகள்</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">பயிர்கள், இடங்களைத் தேடுங்கள்…</string>
+    <string name="search_filters">வடிகட்டிகள்</string>
+    <string name="search_clear_all">அனைத்தையும் அழி</string>
+    <string name="search_crop_types">பயிர் வகைகள்</string>
+    <string name="search_locations">இடங்கள்</string>
+    <string name="search_results_count">%1$d முடிவுகள் கிடைத்தன</string>
+    <string name="search_no_results">தேடல் முடிவுகள் இல்லை</string>
+    <string name="search_no_results_subtitle">வெவ்வேறு முக்கிய வார்த்தைகளைத் தேட முயற்சிக்கவும் அல்லது உங்கள் எழுத்துப்பிழையைச் சரிபார்க்கவும்</string>
+    <string name="search_popular">பிரபலமான தேடல்கள்</string>
+    <string name="search_advanced">மேம்பட்ட தேடல்</string>
+
+    <!-- Transactions Screen -->
+    <string name="transactions_title">பரிவர்த்தனைகள்</string>
+    <string name="transactions_filter_status">நிலையின்படி வடிகட்டவும்</string>
+    <string name="transactions_all">அனைத்தும்</string>
+    <string name="transactions_pending">நிலுவையில்</string>
+    <string name="transactions_confirmed">உறுதிப்படுத்தப்பட்டது</string>
+    <string name="transactions_in_progress">செயல்பாட்டில்</string>
+    <string name="transactions_completed">முடிந்தது</string>
+    <string name="transactions_cancelled">ரத்து செய்யப்பட்டது</string>
+    <string name="transactions_id">பரிவர்த்தனை #%1$s</string>
+    <string name="transactions_quantity">அளவு</string>
+    <string name="transactions_total_amount">மொத்த தொகை</string>
+    <string name="transactions_pickup">எடுத்துச் செல்லும் இடம்: %1$s</string>
+    <string name="transactions_date">தேதி: %1$s</string>
+    <string name="transactions_contact">தொடர்பு கொள்ளவும்</string>
+    <string name="transactions_units">%1$s அலகுகள்</string>
+
+    <!-- Listings Screen -->
+    <string name="listings_title">பட்டியல்கள்</string>
+    <string name="listings_quantity_label">அளவு: %1$s %2$s</string>
+    <string name="listings_grade">தரம் %1$s</string>
+    <string name="listings_per_unit">ஒரு %1$s</string>
+    <string name="listings_coming_soon">புதிய பட்டியல்கள் விரைவில் கிடைக்கும்</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_message_placeholder">செய்தி தட்டச்சு செய்யுங்கள்…</string>
+    <string name="chat_empty_state">இன்னும் செய்திகள் இல்லை</string>
+    <string name="chat_empty_subtitle">விவசாயி அல்லது வாங்குபவருடன் உரையாடலைத் தொடங்குங்கள்</string>
+
+    <!-- Conversations Screen -->
+    <string name="conversations_title">செய்திகள்</string>
+    <string name="conversations_empty">இன்னும் உரையாடல்கள் இல்லை</string>
+    <string name="conversations_empty_subtitle">விவசாயி அல்லது வாங்குபவருடன் உரையாடலைத் தொடங்குங்கள்</string>
+
+    <!-- Help & Support -->
+    <string name="help_title">நாங்கள் எவ்வாறு உதவலாம்?</string>
+    <string name="help_subtitle">பொதுவான கேள்விகளுக்கான பதில்களைக் கண்டறியுங்கள் அல்லது எங்கள் ஆதரவுக் குழுவைத் தொடர்பு கொள்ளுங்கள்</string>
+    <string name="help_quick_links">விரைவு இணைப்புகள்</string>
+    <string name="help_faq_title">அடிக்கடி கேட்கப்படும் கேள்விகள்</string>
+    <string name="help_faq_desc">பொதுவான கேள்விகளுக்கான பதில்களைக் காணுங்கள்</string>
+    <string name="help_contact_title">ஆதரவைத் தொடர்பு கொள்ளவும்</string>
+    <string name="help_contact_desc">எங்கள் ஆதரவுக் குழுவிடமிருந்து உதவி பெறுங்கள்</string>
+    <string name="help_terms_title">விதிமுறைகள் &amp; நிபந்தனைகள்</string>
+    <string name="help_terms_desc">எங்கள் சேவை விதிமுறைகளைப் படிக்கவும்</string>
+    <string name="help_privacy_title">தனியுரிமைக் கொள்கை</string>
+    <string name="help_privacy_desc">உங்கள் தரவை நாங்கள் எவ்வாறு பாதுகாக்கிறோம் என்பதை அறியுங்கள்</string>
+    <string name="help_app_info_title">பயன்பாட்டுத் தகவல்</string>
+    <string name="help_version">பதிப்பு</string>
+    <string name="help_email">மின்னஞ்சல்</string>
+    <string name="help_phone">தொலைபேசி</string>
+
+    <!-- FAQ Screen -->
+    <string name="faq_title">அடிக்கடி கேட்கப்படும் கேள்விகள்</string>
+    <string name="faq_q1">பட்டியலை எவ்வாறு உருவாக்குவது?</string>
+    <string name="faq_a1">முகப்பு திரைக்குச் செல்லவும், \'+\' பொத்தானைத் தட்டவும், விவரங்களை நிரப்பவும், புகைப்படங்களைச் சேர்க்கவும், சமர்ப்பிக்கவும்.</string>
+    <string name="faq_q2">ஆர்டரை எவ்வாறு வைப்பது?</string>
+    <string name="faq_a2">பட்டியல்களை உலாவவும், ஒரு தயாரிப்பைத் தேர்ந்தெடுக்கவும், \'ஆர்டர் செய்யவும்\' என்பதைத் தட்டவும், அளவை உள்ளிடவும், உறுதிப்படுத்தவும்.</string>
+    <string name="faq_q3">விற்பனையாளரை எவ்வாறு தொடர்பு கொள்வது?</string>
+    <string name="faq_a3">பட்டியலைத் திறக்கவும், அரட்டை உரையாடலைத் தொடங்க \'விற்பனையாளரைத் தொடர்பு கொள்ளவும்\' என்பதைத் தட்டவும்.</string>
+    <string name="faq_q4">எனது ஆர்டரை எவ்வாறு கண்காணிப்பது?</string>
+    <string name="faq_a4">பரிவர்த்தனைகள் திரைக்குச் செல்லவும், நிலை மற்றும் விவரங்களைக் காண உங்கள் ஆர்டரைத் தேர்ந்தெடுக்கவும்.</string>
+    <string name="faq_q5">நான் ஆஃப்லைனில் இருந்தால் என்ன?</string>
+    <string name="faq_a5">பயன்பாடு ஆஃப்லைனில் வேலை செய்கிறது. நீங்கள் மீண்டும் ஆன்லைனில் இருக்கும்போது உங்கள் மாற்றங்கள் தானாகவே ஒத்திசைக்கப்படும்.</string>
+
+    <!-- Contact Screen -->
+    <string name="contact_title">எங்களை தொடர்பு கொள்ளுங்கள்</string>
+    <string name="contact_get_in_touch">தொடர்பில் இருங்கள்</string>
+    <string name="contact_subtitle">நாங்கள் உதவ இங்கே இருக்கிறோம்! இந்த சேனல்கள் மூலம் எங்களை தொடர்பு கொள்ளுங்கள்.</string>
+    <string name="contact_email_label">மின்னஞ்சல்</string>
+    <string name="contact_email_desc">எந்த நேரத்திலும் மின்னஞ்சல் அனுப்புங்கள்</string>
+    <string name="contact_phone_label">தொலைபேசி</string>
+    <string name="contact_phone_desc">திங்கள் முதல் வெள்ளி, காலை 9 - மாலை 5</string>
+    <string name="contact_address_label">முகவரி</string>
+    <string name="contact_address_value">கொழும்பு, இலங்கை</string>
+    <string name="contact_address_desc">எங்கள் அலுவலகத்திற்கு வாருங்கள்</string>
+    <string name="contact_response_time">நாங்கள் பொதுவாக 24 மணி நேரத்திற்குள் பதிலளிப்போம்.</string>
+
+    <!-- Privacy Screen -->
+    <string name="privacy_title">தனியுரிமைக் கொள்கை</string>
+    <string name="privacy_last_updated">கடைசியாக புதுப்பிக்கப்பட்டது: ஜனவரி 2026</string>
+    <string name="privacy_info_collect_title">நாங்கள் சேகரிக்கும் தகவல்</string>
+    <string name="privacy_info_collect_content">உங்கள் தொலைபேசி எண், பெயர், இருப்பிடம் மற்றும் பட்டியல் விவரங்கள் உள்ளிட்ட நேரடியாக வழங்கும் தகவல்களை நாங்கள் சேகரிக்கிறோம். எங்கள் சேவைகளை மேம்படுத்த பயன்பாட்டு தரவையும் சேகரிக்கிறோம்.</string>
+    <string name="privacy_info_use_title">உங்கள் தகவலை நாங்கள் எவ்வாறு பயன்படுத்துகிறோம்</string>
+    <string name="privacy_info_use_content">உங்கள் தகவல் பின்வருவனவற்றுக்கு பயன்படுத்தப்படுகிறது: எங்கள் சேவைகளை வழங்க மற்றும் பராமரிக்க, விவசாயிகளை வாங்குபவர்களுடன் இணைக்க, பரிவர்த்தனைகள் பற்றிய அறிவிப்புகளை அனுப்ப, பயனர் அனுபவத்தை மேம்படுத்த.</string>
+    <string name="privacy_data_security_title">தரவு பாதுகாப்பு</string>
+    <string name="privacy_data_security_content">உங்கள் தரவைப் பாதுகாக்க தொழில்துறை-தரமான பாதுகாப்பு நடவடிக்கைகளை செயல்படுத்துகிறோம். இதில் முக்கியமான தகவல்களின் குறியாக்கம் மற்றும் பாதுகாப்பான தரவு சேமிப்பு நடைமுறைகள் அடங்கும்.</string>
+    <string name="privacy_data_sharing_title">தரவு பகிர்வு</string>
+    <string name="privacy_data_sharing_content">உங்கள் தனிப்பட்ட தகவல்களை விற்க மாட்டோம். பரிவர்த்தனைகளுக்கு தேவையான அளவு மற்ற பயனர்களுடன் உங்கள் தகவலைப் பகிரலாம் (எ.கா., வாங்குபவர்கள்/விற்பனையாளர்களுடன் தொடர்பு விவரங்களைப் பகிர்வது).</string>
+    <string name="privacy_your_rights_title">உங்கள் உரிமைகள்</string>
+    <string name="privacy_your_rights_content">உங்கள் தனிப்பட்ட தகவல்களை அணுக, புதுப்பிக்க அல்லது நீக்க உங்களுக்கு உரிமை உள்ளது. பயன்பாட்டு அமைப்புகள் மூலம் அல்லது எங்கள் ஆதரவு குழுவை தொடர்பு கொண்டு உங்கள் தரவை நிர்வகிக்கலாம்.</string>
+    <string name="privacy_contact_title">எங்களை தொடர்பு கொள்ளுங்கள்</string>
+    <string name="privacy_contact_content">தனியுரிமை தொடர்பான கேள்விகள் அல்லது கவலைகளுக்கு, privacy@agrimarket.lk இல் எங்களை தொடர்பு கொள்ளுங்கள்</string>
+
+    <!-- Terms Screen -->
+    <string name="terms_title">சேவை விதிமுறைகள்</string>
+    <string name="terms_last_updated">கடைசியாக புதுப்பிக்கப்பட்டது: ஜனவரி 2026</string>
+    <string name="terms_acceptance_title">1. விதிமுறைகளை ஏற்றுக்கொள்ளுதல்</string>
+    <string name="terms_acceptance_content">Agrimarket ஐ பயன்படுத்துவதன் மூலம், இந்த சேவை விதிமுறைகளை ஏற்றுக்கொள்கிறீர்கள். நீங்கள் ஒப்புக்கொள்ளவில்லை என்றால், பயன்பாட்டை பயன்படுத்த வேண்டாம்.</string>
+    <string name="terms_accounts_title">2. பயனர் கணக்குகள்</string>
+    <string name="terms_accounts_content">கணக்கை உருவாக்கும் போது நீங்கள் துல்லியமான தகவல்களை வழங்க வேண்டும். உங்கள் கணக்கின் பாதுகாப்பையும், உங்கள் கணக்கின் கீழ் நடக்கும் அனைத்து செயல்பாடுகளுக்கும் நீங்கள் பொறுப்பு.</string>
+    <string name="terms_conduct_title">3. சந்தை நடத்தை</string>
+    <string name="terms_conduct_content">பயனர்கள் விற்பனை செய்ய உரிமை உள்ள விவசாய தயாரிப்புகளை மட்டுமே பட்டியலிட ஒப்புக்கொள்கின்றனர். அனைத்து பட்டியல்களும் துல்லியமாகவும் தவறாக வழிநடத்தாததாகவும் இருக்க வேண்டும். மோசடி செயல்பாடு கணக்கு நிறுத்தத்தில் விளையும்.</string>
+    <string name="terms_transactions_title">4. பரிவர்த்தனைகள்</string>
+    <string name="terms_transactions_content">Agrimarket விவசாயிகள் மற்றும் வாங்குபவர்களுக்கு இடையே இணைப்புகளை எளிதாக்குகிறது ஆனால் உண்மையான பரிவர்த்தனைகளுக்கு பொறுப்பல்ல. பயனர்கள் தங்கள் சொந்த ஆபத்தில் பரிவர்த்தனை செய்கிறார்கள், கவனமாக இருக்க வேண்டும்.</string>
+    <string name="terms_liability_title">5. பொறுப்பின் வரம்பு</string>
+    <string name="terms_liability_content">Agrimarket உத்தரவாதங்கள் இல்லாமல் "அப்படியே" வழங்கப்படுகிறது. தளத்தின் பயன்பாட்டிலிருந்து எழும் மறைமுக, தற்செயல் அல்லது விளைவு சேதங்களுக்கு நாங்கள் பொறுப்பல்ல.</string>
+    <string name="terms_contact_title">6. தொடர்பு</string>
+    <string name="terms_contact_content">இந்த விதிமுறைகள் பற்றிய கேள்விகளுக்கு, எங்களை support@agrimarket.lk இல் தொடர்பு கொள்ளுங்கள்</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">அறிவிப்புகள்</string>
+    <string name="notifications_empty">இன்னும் அறிவிப்புகள் இல்லை</string>
+    <string name="notifications_empty_subtitle">உங்கள் பட்டியல்கள் மற்றும் ஆர்டர்களைப் பற்றிய புதுப்பிப்புகளை இங்கே காணலாம்</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">விருப்பங்கள்</string>
+    <string name="favorites_empty">இன்னும் விருப்பங்கள் இல்லை</string>
+    <string name="favorites_empty_subtitle">நீங்கள் ஆர்வமுள்ள பட்டியல்களைச் சேமிக்கவும்</string>
+
+    <!-- Reviews -->
+    <string name="review_title">விமர்சனம் எழுது</string>
+    <string name="review_placeholder">உங்கள் அனுபவத்தைப் பகிரவும்…</string>
+    <string name="review_submit">விமர்சனத்தை சமர்ப்பி</string>
+    <string name="review_rating">மதிப்பீடு</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">பகுப்பாய்வு</string>
+    <string name="analytics_revenue">வருவாய்</string>
+    <string name="analytics_orders">ஆர்டர்கள்</string>
+    <string name="analytics_views">பார்வைகள்</string>
+
+    <!-- Voice Input -->
+    <string name="voice_permission_title">ஒலிவாங்கி அனுமதி தேவை</string>
+    <string name="voice_permission_message">குரல் உள்ளீட்டைப் பயன்படுத்த ஒலிவாங்கி அனுமதி தேவை</string>
+    <string name="voice_prompt">தயவுசெய்து பேசுங்கள்…</string>
+
+    <!-- Map -->
+    <string name="map_title">பட்டியல்கள் வரைபடம்</string>
+    <string name="map_select_location">இடத்தைத் தேர்ந்தெடுக்கவும்</string>
 </resources>

@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const db = require('./connection');
-const logger = require('../utils/logger');
+const fs = require("fs");
+const path = require("path");
+const db = require("./connection");
+const logger = require("../utils/logger");
 
 /**
  * Database migration script
@@ -9,17 +9,17 @@ const logger = require('../utils/logger');
  */
 async function migrate() {
   try {
-    logger.info('Starting database migration...');
+    logger.info("Starting database migration...");
 
     // Read the schema file
-    const schemaPath = path.join(__dirname, 'schema.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+    const schemaPath = path.join(__dirname, "schema.sql");
+    const schema = fs.readFileSync(schemaPath, "utf8");
 
     // Execute the schema
     await db.query(schema);
 
-    logger.info('Database migration completed successfully');
-    
+    logger.info("Database migration completed successfully");
+
     // Verify tables were created
     const tables = await db.query(`
       SELECT table_name 
@@ -28,10 +28,12 @@ async function migrate() {
       ORDER BY table_name
     `);
 
-    logger.info('Created tables:', tables.rows.map(row => row.table_name));
-
+    logger.info(
+      "Created tables:",
+      tables.rows.map((row) => row.table_name),
+    );
   } catch (error) {
-    logger.error('Database migration failed:', error);
+    logger.error("Database migration failed:", error);
     throw error;
   } finally {
     await db.end();
@@ -42,11 +44,11 @@ async function migrate() {
 if (require.main === module) {
   migrate()
     .then(() => {
-      console.log('Migration completed successfully');
+      console.log("Migration completed successfully");
       process.exit(0);
     })
     .catch((error) => {
-      console.error('Migration failed:', error);
+      console.error("Migration failed:", error);
       process.exit(1);
     });
 }

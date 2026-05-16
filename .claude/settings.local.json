@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.runmaestro.ai)",
+      "Bash(npx vibe-kanban:*)",
+      "Bash(npm install:*)",
+      "Bash(vibe-kanban:*)",
+      "Bash(env:*)",
+      "Bash(tasklist:*)",
+      "Bash(claude:*)",
+      "WebSearch",
+      "WebFetch(domain:vibekanban.com)",
+      "mcp__vibe_kanban__list_organizations",
+      "mcp__vibe_kanban__list_projects",
+      "mcp__vibe_kanban__list_issues",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat -ano)",
+      "Bash(all the commands from earlier)",
+      "mcp__gemini-bridge-mcp__gemini_execute",
+      "Bash(xargs kill -9)",
+      "Bash(cp:*)",
+      "Bash(do taskkill:*)",
+      "WebFetch(domain:novita.ai)",
+      "Bash(curl:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true,
+    "learn@agentskill-sh": true
+  }
+}

@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Rules for the devices collection
+    match /devices/{deviceId} {
+      // Allow read if user is authenticated and owns the device
+      allow read: if request.auth != null && 
+                     request.auth.uid == resource.data.userId;
+      
+      // Allow write if user is authenticated and:
+      // - Creating a new device with their own userId
+      // - Updating their own existing device
+      allow write: if request.auth != null && 
+                      request.auth.uid == request.resource.data.userId &&
+                      (
+                        // New device creation
+                        !exists(/databases/$(database)/documents/devices/$(deviceId)) ||
+                        // Updating existing device they own
+                        request.auth.uid == resource.data.userId
+                      );
+    }
+    
+    // Deny access to all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// Security Rules for Firestore:
+//
+// 1. Device Collection Security:
+//    - Users can only read/write their own device documents
+//    - Device document ID should be the Android device ID
+//    - userId field must match the authenticated user's UID
+//
+// 2. Data Validation:
+//    - Only authenticated users can access the database
+//    - Users cannot access other users' device data
+//    - Device updates must maintain the original userId
+//
+// 3. Best Practices:
+//    - Use device-specific document IDs for uniqueness
+//    - Include timestamp validation if needed
+//    - Consider adding field-level validation for required fields

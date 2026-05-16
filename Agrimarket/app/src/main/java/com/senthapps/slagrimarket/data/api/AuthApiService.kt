@@ -8,14 +8,20 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthApiService {
-    
-    @POST("auth/send-otp.js")
+
+    @POST("v1/auth/send-otp")
     suspend fun sendOtp(@Body request: SendOtpRequest): Response<SendOtpResponse>
 
-    @POST("auth/verify-otp-simple.js")
+    @POST("v1/auth/verify-otp")
     suspend fun verifyOtp(@Body request: VerifyOtpRequest): Response<VerifyOtpResponse>
 
-    @POST("auth/refresh-token.js")
+    @POST("v1/auth/register")
+    suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
+
+    @POST("v1/auth/login")
+    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
+
+    @POST("v1/auth/refresh-token")
     suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<RefreshTokenResponse>
 }
 
@@ -58,7 +64,7 @@ data class VerifyOtpResponse(
     val success: Boolean,
     
     @Json(name = "message")
-    val message: String,
+    val message: String? = null,
     
     @Json(name = "token")
     val token: String? = null,
@@ -68,6 +74,28 @@ data class VerifyOtpResponse(
     
     @Json(name = "user")
     val user: User? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class RegisterRequest(
+    @Json(name = "phoneNumber") val phoneNumber: String,
+    @Json(name = "password") val password: String,
+    @Json(name = "userType") val userType: String = "BUYER"
+)
+
+@JsonClass(generateAdapter = true)
+data class LoginRequest(
+    @Json(name = "phoneNumber") val phoneNumber: String,
+    @Json(name = "password") val password: String
+)
+
+@JsonClass(generateAdapter = true)
+data class AuthResponse(
+    @Json(name = "success") val success: Boolean,
+    @Json(name = "message") val message: String? = null,
+    @Json(name = "token") val token: String? = null,
+    @Json(name = "refreshToken") val refreshToken: String? = null,
+    @Json(name = "user") val user: com.senthapps.slagrimarket.data.model.User? = null
 )
 
 @JsonClass(generateAdapter = true)

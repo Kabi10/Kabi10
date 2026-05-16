@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__vibe_kanban__list_workspaces",
+      "mcp__gemini-bridge-mcp__gemini_execute"
+    ]
+  }
+}

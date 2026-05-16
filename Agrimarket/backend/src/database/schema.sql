@@ -22,7 +22,8 @@ CREATE TABLE users (
     last_login_at TIMESTAMP WITH TIME ZONE,
     is_active BOOLEAN DEFAULT TRUE,
     profile_image_url TEXT,
-    
+    can_sell BOOLEAN DEFAULT FALSE, -- Non-farmer users allowed to sell
+
     -- Indexes
     CONSTRAINT valid_phone_format CHECK (phone_number ~ '^\+94[0-9]{9}$')
 );
@@ -46,11 +47,19 @@ CREATE TABLE listings (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
+    -- Extended listing details
+    story TEXT,
+    farming_methods TEXT[], -- Array of farming methods
+    certifications JSONB DEFAULT '[]'::jsonb,
+    harvested_at DATE,
+    sustainability_practices TEXT[], -- Array of sustainability practices
+    deleted_at TIMESTAMP WITH TIME ZONE, -- Soft delete
+
     -- Additional fields for backend
     view_count INTEGER DEFAULT 0,
     inquiry_count INTEGER DEFAULT 0,
     client_id UUID, -- For sync purposes
-    
+
     -- Constraints
     CONSTRAINT valid_date_range CHECK (available_until >= available_from),
     CONSTRAINT valid_crop_type CHECK (crop_type IN (
@@ -155,6 +164,7 @@ CREATE INDEX idx_listings_location ON listings(location);
 CREATE INDEX idx_listings_active ON listings(is_active);
 CREATE INDEX idx_listings_available_dates ON listings(available_from, available_until);
 CREATE INDEX idx_listings_created_at ON listings(created_at DESC);
+CREATE INDEX idx_listings_deleted_at ON listings(deleted_at) WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_transactions_listing_id ON transactions(listing_id);
 CREATE INDEX idx_transactions_farmer_id ON transactions(farmer_id);
@@ -203,3 +213,121 @@ BEGIN
     UPDATE listings SET view_count = view_count + 1 WHERE id = listing_uuid;
 END;
 $$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- PHASE 2: New tables for chat, favorites, reviews, notifications, market prices
+-- ============================================================================
+
+-- Conversations table (for chat/messaging)
+CREATE TABLE conversations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    participant_1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    participant_2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id UUID REFERENCES listings(id) ON DELETE SET NULL,
+    last_message_text TEXT,
+    last_message_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT ordered_participants CHECK (participant_1_id < participant_2_id),
+    CONSTRAINT unique_conversation UNIQUE (participant_1_id, participant_2_id)
+);
+
+-- Messages table
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    message_type VARCHAR(20) DEFAULT 'TEXT' CHECK (message_type IN ('TEXT', 'IMAGE', 'SYSTEM')),
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Favorites table
+CREATE TABLE favorites (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT unique_favorite UNIQUE (user_id, listing_id)
+);
+
+-- Reviews table
+CREATE TABLE reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    transaction_id UUID NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+    reviewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reviewee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    review_type VARCHAR(20) NOT NULL CHECK (review_type IN ('BUYER_TO_FARMER', 'FARMER_TO_BUYER')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+
+    CONSTRAINT unique_review UNIQUE (transaction_id, reviewer_id)
+);
+
+-- Notifications table
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    related_id UUID,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Market prices table (currently queried by route but missing from schema)
+CREATE TABLE market_prices (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    crop_type VARCHAR(100) NOT NULL,
+    crop_name_tamil VARCHAR(255),
+    crop_name_english VARCHAR(255),
+    crop_name_sinhala VARCHAR(255),
+    current_price DECIMAL(10,2),
+    previous_price DECIMAL(10,2),
+    unit VARCHAR(20) DEFAULT 'kg',
+    trend VARCHAR(20),
+    change_percentage DECIMAL(10,2),
+    change_amount DECIMAL(10,2),
+    location VARCHAR(255),
+    location_tamil VARCHAR(255),
+    location_sinhala VARCHAR(255),
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_active BOOLEAN DEFAULT TRUE,
+    source VARCHAR(50) DEFAULT 'MARKET',
+    reliability DECIMAL(3,2) DEFAULT 0.80
+);
+
+-- Indexes for new tables
+CREATE INDEX idx_conversations_participant_1 ON conversations(participant_1_id);
+CREATE INDEX idx_conversations_participant_2 ON conversations(participant_2_id);
+CREATE INDEX idx_conversations_last_message ON conversations(last_message_at DESC);
+
+CREATE INDEX idx_messages_conversation ON messages(conversation_id);
+CREATE INDEX idx_messages_sender ON messages(sender_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX idx_messages_unread ON messages(conversation_id, is_read) WHERE is_read = FALSE;
+
+CREATE INDEX idx_favorites_user ON favorites(user_id);
+CREATE INDEX idx_favorites_listing ON favorites(listing_id);
+
+CREATE INDEX idx_reviews_reviewee ON reviews(reviewee_id);
+CREATE INDEX idx_reviews_reviewer ON reviews(reviewer_id);
+CREATE INDEX idx_reviews_transaction ON reviews(transaction_id);
+
+CREATE INDEX idx_notifications_user ON notifications(user_id);
+CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC);
+
+CREATE INDEX idx_market_prices_crop ON market_prices(crop_type);
+CREATE INDEX idx_market_prices_location ON market_prices(location);
+CREATE INDEX idx_market_prices_active ON market_prices(is_active);
+
+-- Triggers for new tables with updated_at
+CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

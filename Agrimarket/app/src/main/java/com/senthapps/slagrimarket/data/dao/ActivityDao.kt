@@ -322,6 +322,9 @@ interface ActivityDao {
     
     @Query("SELECT COUNT(*) FROM activities WHERE datetime(timestamp) > datetime('now', '-1 hour')")
     suspend fun getRecentActivityCount(): Int
+
+    @Query("SELECT MAX(datetime(timestamp)) FROM activities WHERE userId = :userId AND status = 'ACTIVE'")
+    suspend fun getLastUpdateTimeForUser(userId: String): String?
 }
 
 /**

@@ -1,0 +1,35 @@
+{
+  "extends": "airbnb-base",
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "rules": {
+    "no-console": "off",
+    "import/extensions": "off",
+    "prefer-destructuring": "off",
+    "no-underscore-dangle": "off",
+    "no-plusplus": "off",
+    "radix": "off",
+    "no-unused-vars": "warn",
+    "consistent-return": "off",
+    "no-use-before-define": "off",
+    "no-await-in-loop": "off",
+    "no-restricted-syntax": "off",
+    "class-methods-use-this": "off",
+    "no-promise-executor-return": "off",
+    "default-case": "off",
+    "no-undef": "warn",
+    "no-shadow": "off",
+    "no-param-reassign": "off",
+    "global-require": "off",
+    "no-useless-catch": "off",
+    "no-else-return": "off",
+    "no-nested-ternary": "off",
+    "no-restricted-globals": "off",
+    "max-len": "off"
+  }
+}

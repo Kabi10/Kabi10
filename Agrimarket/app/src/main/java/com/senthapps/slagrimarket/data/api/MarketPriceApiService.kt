@@ -16,7 +16,7 @@ interface MarketPriceApiService {
     /**
      * Get all market prices with optional filtering
      */
-    @GET("v1/market-prices")
+    @GET("market-prices")
     suspend fun getMarketPrices(
         @Query("cropType") cropType: String? = null,
         @Query("location") location: String? = null,

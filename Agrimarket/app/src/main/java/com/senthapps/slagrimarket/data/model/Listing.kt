@@ -50,6 +50,13 @@ data class Listing(
     @Json(name = "farmerId")
     val farmerId: String,
 
+    @Json(name = "farmerName")
+    val farmerName: String? = null,
+
+    // farmerPhone populated by backend via JOIN with users table
+    @Json(name = "farmerPhone")
+    val farmerPhone: String = "",
+
     @Json(name = "cropType")
     val cropType: String,
 
@@ -126,7 +133,23 @@ data class Listing(
     val viewCount: Int = 0,
 
     @Json(name = "inquiryCount")
-    val inquiryCount: Int = 0
+    val inquiryCount: Int = 0,
+
+    @Json(name = "story")
+    val story: String = "",
+
+    @Json(name = "farmingMethods")
+    val farmingMethods: List<String> = emptyList(),
+
+    // Stored as JSON string in Room, parsed via Moshi in API
+    @Json(name = "certifications")
+    val certifications: List<Certification> = emptyList(),
+
+    @Json(name = "harvestedAt")
+    val harvestedAt: String = "",
+
+    @Json(name = "sustainabilityPractices")
+    val sustainabilityPractices: List<String> = emptyList()
 ) {
     /**
      * Validation rules for listing data
@@ -197,6 +220,14 @@ data class Listing(
         const val MAX_AVAILABILITY_DAYS = 30 // Maximum availability period
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class Certification(
+    @Json(name = "name") val name: String,
+    @Json(name = "issuer") val issuer: String,
+    @Json(name = "numericId") val numericId: String? = null,
+    @Json(name = "imageUrl") val imageUrl: String? = null
+)
 
 /**
  * Enhanced Quality Grade enum with trilingual support
@@ -328,12 +359,16 @@ class ListingConverters {
 
     @TypeConverter
     fun toStringList(value: String): List<String> {
-        return adapter.fromJson(value) ?: emptyList()
+        return try {
+            adapter.fromJson(value) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     @TypeConverter
-    fun fromQualityGrade(value: QualityGrade): String {
-        return value.name
+    fun fromQualityGrade(value: QualityGrade?): String {
+        return value?.name ?: QualityGrade.C.name
     }
 
     @TypeConverter
@@ -346,8 +381,8 @@ class ListingConverters {
     }
 
     @TypeConverter
-    fun fromSyncStatus(value: SyncStatus): String {
-        return value.name
+    fun fromSyncStatus(value: SyncStatus?): String {
+        return value?.name ?: SyncStatus.PENDING.name
     }
 
     @TypeConverter
@@ -356,6 +391,23 @@ class ListingConverters {
             SyncStatus.valueOf(value)
         } catch (e: Exception) {
             SyncStatus.PENDING // Default to pending
+        }
+    }
+
+    private val certificationListType = Types.newParameterizedType(List::class.java, Certification::class.java)
+    private val certificationAdapter = moshi.adapter<List<Certification>>(certificationListType)
+
+    @TypeConverter
+    fun fromCertificationList(value: List<Certification>): String {
+        return certificationAdapter.toJson(value)
+    }
+
+    @TypeConverter
+    fun toCertificationList(value: String): List<Certification> {
+        return try {
+            certificationAdapter.fromJson(value) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }
@@ -539,6 +591,23 @@ object CropTypes {
         RED_ONION, CHILI, TOMATO, BRINJAL, OKRA,
         COCONUT, PALMYRA, MANGO, BANANA, RICE
     )
+
+    /**
+     * Get crop emoji
+     */
+    fun getCropEmoji(cropType: String): String = when (cropType) {
+        RED_ONION -> "🧅"
+        CHILI -> "🌶️"
+        TOMATO -> "🍅"
+        BRINJAL -> "🍆"
+        OKRA -> "🥒"
+        COCONUT -> "🥥"
+        PALMYRA -> "🌴"
+        MANGO -> "🥭"
+        BANANA -> "🍌"
+        RICE -> "🌾"
+        else -> "🌱"
+    }
 
     /**
      * Get crop name in specified language

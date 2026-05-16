@@ -1,0 +1,8 @@
+Contact: mailto:security@kabilan.io
+Contact: https://kabilan.io/#contact
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://kabilan.io/pgp-key.txt
+Acknowledgments: https://kabilan.io/security-acknowledgments
+Preferred-Languages: en
+Canonical: https://kabilan.io/.well-known/security.txt
+Policy: https://kabilan.io/security-policy

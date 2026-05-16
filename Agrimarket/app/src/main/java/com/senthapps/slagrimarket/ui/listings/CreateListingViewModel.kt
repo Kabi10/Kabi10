@@ -6,11 +6,17 @@ import com.senthapps.slagrimarket.data.model.CropTypes
 import com.senthapps.slagrimarket.data.model.QualityGrades
 import com.senthapps.slagrimarket.data.model.Units
 import com.senthapps.slagrimarket.data.repository.AuthRepository
+import com.senthapps.slagrimarket.data.repository.CropixRepository
 import com.senthapps.slagrimarket.data.repository.ListingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -20,12 +26,42 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateListingViewModel @Inject constructor(
     private val listingRepository: ListingRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
+    private val lastUsedPreferences: com.senthapps.slagrimarket.data.preferences.LastUsedPreferences,
+    private val cropixRepository: CropixRepository
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(CreateListingUiState())
     val uiState: StateFlow<CreateListingUiState> = _uiState.asStateFlow()
-    
+
+    val cropSuggestions: StateFlow<List<String>> = cropixRepository.getCrops()
+        .map { crops ->
+            if (crops.isNotEmpty()) crops.map { it.description }
+            else CropTypes.ALL_CROPS
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CropTypes.ALL_CROPS
+        )
+
+    init {
+        viewModelScope.launch { cropixRepository.syncCrops() }
+        viewModelScope.launch {
+            val lastCrop = lastUsedPreferences.getLastCropType().first()
+            val lastPrice = lastUsedPreferences.getLastPrice().first()
+            val lastLoc = lastUsedPreferences.getLastLocation().first()
+            _uiState.update { current ->
+                current.copy(
+                    cropType = if (lastCrop.isNotBlank()) lastCrop else current.cropType,
+                    pricePerUnit = if (lastPrice.isNotBlank()) lastPrice else current.pricePerUnit,
+                    location = if (lastLoc.isNotBlank()) lastLoc else current.location
+                )
+            }
+        }
+    }
+
     fun updateCropType(cropType: String) {
         _uiState.value = _uiState.value.copy(
             cropType = cropType,
@@ -75,6 +111,30 @@ class CreateListingViewModel @Inject constructor(
         )
     }
 
+    fun updateStory(story: String) {
+        _uiState.value = _uiState.value.copy(story = story)
+    }
+
+    fun toggleFarmingMethod(method: String) {
+        val currentMethods = _uiState.value.farmingMethods.toMutableList()
+        if (currentMethods.contains(method)) {
+            currentMethods.remove(method)
+        } else {
+            currentMethods.add(method)
+        }
+        _uiState.value = _uiState.value.copy(farmingMethods = currentMethods)
+    }
+
+    fun toggleSustainabilityPractice(practice: String) {
+        val currentPractices = _uiState.value.sustainabilityPractices.toMutableList()
+        if (currentPractices.contains(practice)) {
+            currentPractices.remove(practice)
+        } else {
+            currentPractices.add(practice)
+        }
+        _uiState.value = _uiState.value.copy(sustainabilityPractices = currentPractices)
+    }
+
     fun setHarvestDateError(error: String) {
         _uiState.value = _uiState.value.copy(harvestDateError = error)
     }
@@ -98,12 +158,12 @@ class CreateListingViewModel @Inject constructor(
         }
 
         val state = _uiState.value
-        val quantityValue = state.quantity.toDoubleOrNull()!!
-        val priceValue = state.pricePerUnit.toDoubleOrNull()!!
+        val quantityValue = state.quantity.toDoubleOrNull() ?: 0.0
+        val priceValue = state.pricePerUnit.toDoubleOrNull() ?: 0.0
 
         viewModelScope.launch {
             _uiState.value = state.copy(isLoading = true)
-            
+
             try {
                 val currentUser = authRepository.getCurrentUser()
                 if (currentUser == null) {
@@ -113,23 +173,43 @@ class CreateListingViewModel @Inject constructor(
                     )
                     return@launch
                 }
-                
+
+                // Upload images first if any
+                val imageUrls = if (state.images.isNotEmpty()) {
+                    listingRepository.uploadImages("temp", state.images, context).getOrElse {
+                        Timber.e(it, "Failed to upload images")
+                        emptyList()
+                    }
+                } else {
+                    emptyList()
+                }
+
                 listingRepository.createListing(
                     cropType = state.cropType,
-                    quantity = quantityValue!!,
+                    quantity = quantityValue,
                     unit = state.unit,
-                    pricePerUnit = priceValue!!,
+                    pricePerUnit = priceValue,
                     quality = state.quality,
                     harvestDate = state.harvestDate,
                     location = state.location,
-                    farmerId = currentUser.id
+                    farmerId = currentUser.id,
+                    imageUrls = imageUrls,
+                    story = state.story,
+                    farmingMethods = state.farmingMethods,
+                    harvestedAt = state.harvestDate, // Re-using harvest date for now, ideally separate logic if needed
+                    sustainabilityPractices = state.sustainabilityPractices
                 ).fold(
                     onSuccess = { listing ->
                         _uiState.value = state.copy(
                             isLoading = false,
                             isSuccess = true
                         )
-                        Timber.d("Listing created successfully: ${listing.id}")
+                        lastUsedPreferences.saveLastListing(
+                            cropType = state.cropType,
+                            price = state.pricePerUnit,
+                            location = state.location
+                        )
+                        Timber.d("Listing created successfully: ${listing.id} with ${imageUrls.size} images")
                     },
                     onFailure = { error ->
                         _uiState.value = state.copy(
@@ -158,6 +238,8 @@ class CreateListingViewModel @Inject constructor(
     fun getAvailableCropTypes(): List<String> = CropTypes.ALL_CROPS
     fun getAvailableUnits(): List<String> = Units.ALL_UNITS
     fun getAvailableQualityGrades(): List<String> = QualityGrades.ALL_GRADES
+    fun getAvailableFarmingMethods(): List<String> = listOf("Organic", "Traditional", "Hydroponic", "Greenhouse", "Open Field")
+    fun getAvailableSustainabilityPractices(): List<String> = listOf("No Pesticides", "Water Conservation", "Plastic Free", "Composting", "Renewable Energy")
     
     fun getTodayDate(): String {
         return LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -201,7 +283,7 @@ class CreateListingViewModel @Inject constructor(
 
         // Validate crop type
         if (state.cropType.isBlank()) {
-            _uiState.value = _uiState.value.copy(cropTypeError = "Please select a crop type")
+            _uiState.value = _uiState.value.copy(cropTypeError = context.getString(com.senthapps.slagrimarket.R.string.error_select_crop_type))
             isValid = false
         }
 
@@ -209,26 +291,26 @@ class CreateListingViewModel @Inject constructor(
         val quantityValue = state.quantity.toDoubleOrNull()
         when {
             state.quantity.isBlank() -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Quantity is required")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_quantity_required))
                 isValid = false
             }
             quantityValue == null -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Please enter a valid number")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_invalid_number))
                 isValid = false
             }
             quantityValue <= 0 -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Quantity must be greater than 0")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_quantity_positive))
                 isValid = false
             }
             quantityValue > 100000 -> {
-                _uiState.value = _uiState.value.copy(quantityError = "Quantity cannot exceed 100,000")
+                _uiState.value = _uiState.value.copy(quantityError = context.getString(com.senthapps.slagrimarket.R.string.error_quantity_max))
                 isValid = false
             }
         }
 
         // Validate unit
         if (state.unit.isBlank()) {
-            _uiState.value = _uiState.value.copy(unitError = "Please select a unit")
+            _uiState.value = _uiState.value.copy(unitError = context.getString(com.senthapps.slagrimarket.R.string.error_select_unit))
             isValid = false
         }
 
@@ -236,42 +318,52 @@ class CreateListingViewModel @Inject constructor(
         val priceValue = state.pricePerUnit.toDoubleOrNull()
         when {
             state.pricePerUnit.isBlank() -> {
-                _uiState.value = _uiState.value.copy(priceError = "Price is required")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_price_required))
                 isValid = false
             }
             priceValue == null -> {
-                _uiState.value = _uiState.value.copy(priceError = "Please enter a valid price")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_invalid_price))
                 isValid = false
             }
             priceValue <= 0 -> {
-                _uiState.value = _uiState.value.copy(priceError = "Price must be greater than 0")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_price_positive))
                 isValid = false
             }
             priceValue > 1000000 -> {
-                _uiState.value = _uiState.value.copy(priceError = "Price cannot exceed 1,000,000")
+                _uiState.value = _uiState.value.copy(priceError = context.getString(com.senthapps.slagrimarket.R.string.error_price_max))
                 isValid = false
             }
         }
 
         // Validate quality
         if (state.quality.isBlank()) {
-            _uiState.value = _uiState.value.copy(qualityError = "Please select a quality grade")
+            _uiState.value = _uiState.value.copy(qualityError = context.getString(com.senthapps.slagrimarket.R.string.error_select_quality))
             isValid = false
         }
 
         // Validate harvest date
         if (state.harvestDate.isBlank()) {
-            _uiState.value = _uiState.value.copy(harvestDateError = "Harvest date is required")
+            _uiState.value = _uiState.value.copy(harvestDateError = context.getString(com.senthapps.slagrimarket.R.string.error_harvest_date_required))
             isValid = false
         }
 
         // Validate location
         if (state.location.isBlank()) {
-            _uiState.value = _uiState.value.copy(locationError = "Location is required")
+            _uiState.value = _uiState.value.copy(locationError = context.getString(com.senthapps.slagrimarket.R.string.error_location_required))
             isValid = false
         }
 
         return isValid
+    }
+
+    fun updateImages(images: List<android.net.Uri>) {
+        _uiState.value = _uiState.value.copy(images = images)
+    }
+
+    fun removeImage(imageUri: android.net.Uri) {
+        val currentImages = _uiState.value.images.toMutableList()
+        currentImages.remove(imageUri)
+        _uiState.value = _uiState.value.copy(images = currentImages)
     }
 }
 
@@ -283,6 +375,7 @@ data class CreateListingUiState(
     val quality: String = "",
     val harvestDate: String = "",
     val location: String = "",
+    val images: List<android.net.Uri> = emptyList(),
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,
@@ -292,5 +385,9 @@ data class CreateListingUiState(
     val priceError: String? = null,
     val qualityError: String? = null,
     val harvestDateError: String? = null,
-    val locationError: String? = null
+
+    val locationError: String? = null,
+    val story: String = "",
+    val farmingMethods: List<String> = emptyList(),
+    val sustainabilityPractices: List<String> = emptyList()
 )

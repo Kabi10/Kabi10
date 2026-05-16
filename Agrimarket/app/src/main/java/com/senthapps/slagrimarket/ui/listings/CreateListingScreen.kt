@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.senthapps.slagrimarket.data.model.CropTypes
 import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.components.VoiceTextField
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -42,6 +43,20 @@ fun CreateListingScreen(
     var showCropTypeDropdown by remember { mutableStateOf(false) }
     var showUnitDropdown by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+
+    // Quick Mode toggle (for elderly farmers)
+    var isQuickMode by remember { mutableStateOf(true) } // Default to quick mode
+
+    // Apply smart defaults when Quick Mode is enabled
+    LaunchedEffect(isQuickMode) {
+        if (isQuickMode && uiState.quality.isEmpty()) {
+            // Auto-fill with smart defaults
+            viewModel.updateQuality("B") // Standard quality (Grade B)
+            if (uiState.harvestDate.isEmpty()) {
+                viewModel.updateHarvestDate(viewModel.getTodayDate()) // Today
+            }
+        }
+    }
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -88,6 +103,53 @@ fun CreateListingScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Quick Mode Toggle Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isQuickMode)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = when (currentLanguage) {
+                                    "en" -> "⚡ Quick Mode"
+                                    "ta" -> "⚡ விரைவு முறை"
+                                    "si" -> "⚡ ඉක්මන් මාදිලිය"
+                                    else -> "⚡ Quick Mode"
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Text(
+                            text = when (currentLanguage) {
+                                "en" -> if (isQuickMode) "Only 3 fields needed!" else "All options available"
+                                "ta" -> if (isQuickMode) "3 புலங்கள் மட்டுமே தேவை!" else "அனைத்து விருப்பங்களும் கிடைக்கின்றன"
+                                "si" -> if (isQuickMode) "ක්ෂේත්‍ර 3ක් පමණක් අවශ්‍යයි!" else "සියලුම විකල්ප තිබේ"
+                                else -> if (isQuickMode) "Only 3 fields needed!" else "All options available"
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = isQuickMode,
+                        onCheckedChange = { isQuickMode = it }
+                    )
+                }
+            }
+
             // Crop Type
             Column {
                 ExposedDropdownMenuBox(
@@ -151,25 +213,21 @@ fun CreateListingScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        OutlinedTextField(
+                        VoiceTextField(
                             value = uiState.quantity,
-                            onValueChange = viewModel::updateQuantity,
-                            label = {
-                                Text(when (currentLanguage) {
-                                    "en" -> "Quantity *"
-                                    "ta" -> "அளவு *"
-                                    "si" -> "ප්‍රමාණය *"
-                                    else -> "Quantity *"
-                                })
+                            onValueChange = { input ->
+                                // Convert Tamil/Sinhala numbers to digits
+                                val numericValue = convertVoiceToNumber(input)
+                                viewModel.updateQuantity(numericValue)
                             },
+                            label = when (currentLanguage) {
+                                "en" -> "Quantity *"
+                                "ta" -> "அளவு *"
+                                "si" -> "ප்‍රமාណය *"
+                                else -> "Quantity *"
+                            },
+                            language = currentLanguage,
                             isError = uiState.quantityError != null,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Decimal,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onNext = { focusManager.moveFocus(FocusDirection.Next) }
-                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -271,8 +329,8 @@ fun CreateListingScreen(
                     )
                 }
             }
-            
-            // Quality Grade - Toggle Buttons
+
+            // Quality Grade - Toggle Buttons (auto-filled in Quick Mode)
             Column {
                 Text(
                     text = when (currentLanguage) {
@@ -430,30 +488,20 @@ fun CreateListingScreen(
             
             // Location
             Column {
-                OutlinedTextField(
+                VoiceTextField(
                     value = uiState.location,
                     onValueChange = viewModel::updateLocation,
-                    label = {
-                        Text(when (currentLanguage) {
-                            "en" -> "Location *"
-                            "ta" -> "இடம் *"
-                            "si" -> "ස්ථානය *"
-                            else -> "Location *"
-                        })
+                    label = when (currentLanguage) {
+                        "en" -> "Location *"
+                        "ta" -> "இடம் *"
+                        "si" -> "ස්ථානය *"
+                        else -> "Location *"
                     },
-                    placeholder = { Text("e.g., Chavakachcheri, Jaffna") },
+                    language = currentLanguage,
                     isError = uiState.locationError != null,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                            if (viewModel.isFormValid()) {
-                                viewModel.createListing()
-                            }
-                        }
-                    ),
+                    supportingText = if (uiState.locationError != null) {
+                        { Text(uiState.locationError!!, color = MaterialTheme.colorScheme.error) }
+                    } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -467,6 +515,98 @@ fun CreateListingScreen(
                     )
                 }
             }
+
+            // Story / Description (Voice input CRITICAL for elderly farmers)
+            Column {
+                VoiceTextField(
+                    value = uiState.story,
+                    onValueChange = viewModel::updateStory,
+                    label = when (currentLanguage) {
+                        "en" -> "Story / Description (Tap 🎤 to speak)"
+                        "ta" -> "கதை / விளக்கம் (🎤 அழுத்தி பேசவும்)"
+                        "si" -> "කතාව / විස්තරය (🎤 තට්ටු කර කතා කරන්න)"
+                        else -> "Story / Description (Tap 🎤 to speak)"
+                    },
+                    language = currentLanguage,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Helpful hint for elderly farmers
+                Text(
+                    text = when (currentLanguage) {
+                        "en" -> "💡 Tip: Tap the microphone and tell your story in your own words"
+                        "ta" -> "💡 குறிப்பு: மைக்கைத் தட்டி உங்கள் சொந்த வார்த்தைகளில் கதையைச் சொல்லுங்கள்"
+                        "si" -> "💡 ඉඟිය: මයික්‍රෆෝනය තට්ටු කර ඔබේම වචන වලින් කතාව කියන්න"
+                        else -> "💡 Tip: Tap the microphone and tell your story in your own words"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                )
+            }
+
+            // Farming Methods
+            Column {
+                Text(
+                    text = when (currentLanguage) {
+                        "en" -> "Farming Methods"
+                        "ta" -> "விவசாய முறைகள்"
+                        "si" -> "ගොවිතැන් ක්‍රම"
+                        else -> "Farming Methods"
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    viewModel.getAvailableFarmingMethods().forEach { method ->
+                        FilterChip(
+                            selected = uiState.farmingMethods.contains(method),
+                            onClick = { viewModel.toggleFarmingMethod(method) },
+                            label = { Text(method) }
+                        )
+                    }
+                }
+            }
+
+            // Sustainability Practices
+            Column {
+                Text(
+                    text = when (currentLanguage) {
+                        "en" -> "Sustainability Practices"
+                        "ta" -> "நிலைத்தன்மை நடைமுறைகள்"
+                        "si" -> "තිරසාර පිළිවෙත්"
+                        else -> "Sustainability Practices"
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    viewModel.getAvailableSustainabilityPractices().forEach { practice ->
+                        FilterChip(
+                            selected = uiState.sustainabilityPractices.contains(practice),
+                            onClick = { viewModel.toggleSustainabilityPractice(practice) },
+                            label = { Text(practice) }
+                        )
+                    }
+                }
+            }
+            
+            // Image picker
+            com.senthapps.slagrimarket.ui.common.ImagePicker(
+                images = uiState.images,
+                onImagesSelected = viewModel::updateImages,
+                onImageRemoved = viewModel::removeImage,
+                maxImages = 5,
+                currentLanguage = currentLanguage
+            )
             
             // Error message
             uiState.error?.let { error ->
@@ -517,4 +657,52 @@ fun CreateListingScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+/**
+ * Convert voice input to numbers
+ * Handles Tamil, Sinhala, and English number words
+ */
+private fun convertVoiceToNumber(input: String): String {
+    // If already a number, return as-is
+    if (input.toDoubleOrNull() != null) return input
+
+    val lowerInput = input.lowercase().trim()
+
+    // English number words
+    val englishNumbers = mapOf(
+        "zero" to "0", "one" to "1", "two" to "2", "three" to "3", "four" to "4",
+        "five" to "5", "six" to "6", "seven" to "7", "eight" to "8", "nine" to "9",
+        "ten" to "10", "eleven" to "11", "twelve" to "12", "thirteen" to "13",
+        "fourteen" to "14", "fifteen" to "15", "sixteen" to "16", "seventeen" to "17",
+        "eighteen" to "18", "nineteen" to "19", "twenty" to "20", "thirty" to "30",
+        "forty" to "40", "fifty" to "50", "sixty" to "60", "seventy" to "70",
+        "eighty" to "80", "ninety" to "90", "hundred" to "100", "thousand" to "1000"
+    )
+
+    // Tamil number words (common ones)
+    val tamilNumbers = mapOf(
+        "பூஜ்ஜியம்" to "0", "ஒன்று" to "1", "இரண்டு" to "2", "மூன்று" to "3",
+        "நான்கு" to "4", "ஐந்து" to "5", "ஆறு" to "6", "ஏழு" to "7",
+        "எட்டு" to "8", "ஒன்பது" to "9", "பத்து" to "10", "நூறு" to "100"
+    )
+
+    // Sinhala number words (common ones)
+    val sinhalaNumbers = mapOf(
+        "බින්ද" to "0", "එක" to "1", "දෙක" to "2", "තුන" to "3",
+        "හතර" to "4", "පහ" to "5", "හය" to "6", "හත" to "7",
+        "අට" to "8", "නවය" to "9", "දහය" to "10", "සියය" to "100"
+    )
+
+    // Try English first
+    englishNumbers[lowerInput]?.let { return it }
+
+    // Try Tamil
+    tamilNumbers[lowerInput]?.let { return it }
+
+    // Try Sinhala
+    sinhalaNumbers[lowerInput]?.let { return it }
+
+    // If no match found, return original input (user will need to correct it)
+    return input
 }

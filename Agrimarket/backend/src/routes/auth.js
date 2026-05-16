@@ -1,29 +1,29 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
-const smsService = require('../services/smsService');
-const logger = require('../utils/logger');
-const { generateOTP, isValidSriLankanPhone } = require('../utils/helpers');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
+const db = require("../database/connection");
+const smsService = require("../services/smsService");
+const logger = require("../utils/logger");
+const { generateOTP, isValidSriLankanPhone } = require("../utils/helpers");
 
 const router = express.Router();
 
 // Validation middleware
 const validatePhoneNumber = [
-  body('phoneNumber')
+  body("phoneNumber")
     .matches(/^\+94[0-9]{9}$/)
-    .withMessage('Invalid Sri Lankan phone number format. Use +94XXXXXXXXX'),
+    .withMessage("Invalid Sri Lankan phone number format. Use +94XXXXXXXXX"),
 ];
 
 const validateOTP = [
-  body('phoneNumber')
+  body("phoneNumber")
     .matches(/^\+94[0-9]{9}$/)
-    .withMessage('Invalid phone number format'),
-  body('otp')
+    .withMessage("Invalid phone number format"),
+  body("otp")
     .isLength({ min: 6, max: 6 })
     .isNumeric()
-    .withMessage('OTP must be 6 digits'),
+    .withMessage("OTP must be 6 digits"),
 ];
 
 /**
@@ -31,15 +31,15 @@ const validateOTP = [
  * Send OTP to phone number
  * Matches Android SendOtpRequest/Response
  */
-router.post('/send-otp', validatePhoneNumber, async (req, res) => {
+router.post("/send-otp", validatePhoneNumber, async (req, res) => {
   try {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid phone number format',
-        errors: errors.array()
+        message: "Invalid phone number format",
+        errors: errors.array(),
       });
     }
 
@@ -49,22 +49,26 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     if (!isValidSriLankanPhone(phoneNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid Sri Lankan phone number'
+        message: "Invalid Sri Lankan phone number",
       });
     }
 
-    // Check for recent OTP requests (rate limiting)
+    // Check for recent OTP requests (rate limiting - 60 second cooldown)
     const recentOTP = await db.query(
-      `SELECT * FROM otp_verifications 
+      `SELECT id, created_at FROM otp_verifications
        WHERE phone_number = $1 AND created_at > NOW() - INTERVAL '1 minute'
        ORDER BY created_at DESC LIMIT 1`,
-      [phoneNumber]
+      [phoneNumber],
     );
 
     if (recentOTP.rows.length > 0) {
+      const createdAt = new Date(recentOTP.rows[0].created_at);
+      const waitSeconds =
+        60 - Math.floor((Date.now() - createdAt.getTime()) / 1000);
       return res.status(429).json({
         success: false,
-        message: 'Please wait before requesting another OTP'
+        message: `Please wait ${waitSeconds} seconds before requesting another OTP`,
+        retryAfterSeconds: waitSeconds,
       });
     }
 
@@ -72,46 +76,57 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
     const otpCode = generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    // Store OTP in database
-    await db.query(
-      `INSERT INTO otp_verifications (phone_number, otp_code, expires_at)
-       VALUES ($1, $2, $3)`,
-      [phoneNumber, otpCode, expiresAt]
+    // Store OTP in database and get the ID
+    const otpResult = await db.query(
+      `INSERT INTO otp_verifications (phone_number, otp_code, expires_at, attempts)
+       VALUES ($1, $2, $3, 0)
+       RETURNING id`,
+      [phoneNumber, otpCode, expiresAt],
     );
 
-    // Send SMS
+    const otpId = otpResult.rows[0].id;
+
+    // Send SMS (or mock)
+    const message = `Your Jaffna Marketplace verification code is: ${otpCode}. Valid for 5 minutes. Do not share this code.`;
+
     try {
-      const message = `Your Jaffna Marketplace verification code is: ${otpCode}. Valid for 5 minutes. Do not share this code.`;
-      await smsService.sendSMS(phoneNumber, message);
-      
-      logger.info('OTP sent successfully', { phoneNumber, masked: true });
-      
-      res.json({
-        success: true,
-        message: 'OTP sent successfully'
+      const smsResult = await smsService.sendSMS(phoneNumber, message, otpCode);
+
+      logger.info("OTP generated", {
+        phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, "$1****$2"),
+        otpId,
+        mockMode: smsService.isMockMode(),
       });
-    } catch (smsError) {
-      logger.error('Failed to send SMS:', smsError);
-      
-      // In development, return the OTP for testing
-      if (process.env.NODE_ENV === 'development' || process.env.MOCK_SMS === 'true') {
-        res.json({
-          success: true,
-          message: 'OTP sent successfully',
-          otp: otpCode // Only in development
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          message: 'Failed to send OTP. Please try again.'
-        });
+
+      // Response for Android
+      const response = {
+        success: true,
+        message: "OTP sent successfully",
+        otpId, // Android needs this for verify-otp
+      };
+
+      // In mock mode, also return OTP for testing convenience
+      if (smsService.isMockMode()) {
+        response.otp = otpCode;
       }
+
+      res.json(response);
+    } catch (smsError) {
+      logger.error("Failed to send SMS:", smsError);
+
+      // Delete the OTP record since SMS failed
+      await db.query("DELETE FROM otp_verifications WHERE id = $1", [otpId]);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to send OTP. Please try again.",
+      });
     }
   } catch (error) {
-    logger.error('Send OTP error:', error);
+    logger.error("Send OTP error:", error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error'
+      message: "Internal server error",
     });
   }
 });
@@ -120,55 +135,105 @@ router.post('/send-otp', validatePhoneNumber, async (req, res) => {
  * POST /api/v1/auth/verify-otp
  * Verify OTP and login/register user
  * Matches Android LoginRequest/Response
+ *
+ * Accepts both `phone` and `phoneNumber` for compatibility
+ * Max 3 attempts per OTP, then must request new OTP
  */
-router.post('/verify-otp', validateOTP, async (req, res) => {
+router.post("/verify-otp", async (req, res) => {
   try {
-    // Check validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    // Accept both phone and phoneNumber for Android compatibility
+    const phoneNumber = req.body.phoneNumber || req.body.phone;
+    const { otp, otpId } = req.body;
+
+    // Validate inputs
+    if (!phoneNumber || !/^\+94[0-9]{9}$/.test(phoneNumber)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid input',
-        errors: errors.array()
+        message: "Invalid phone number format. Use +94XXXXXXXXX",
       });
     }
 
-    const { phoneNumber, otp } = req.body;
+    if (!otp || !/^[0-9]{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP must be 6 digits",
+      });
+    }
 
-    // Verify OTP
-    const otpRecord = await db.query(
-      `SELECT * FROM otp_verifications 
-       WHERE phone_number = $1 AND otp_code = $2 AND expires_at > NOW() AND verified = false
-       ORDER BY created_at DESC LIMIT 1`,
-      [phoneNumber, otp]
-    );
+    // Find the OTP record (optionally by ID if provided)
+    let otpQuery = `
+      SELECT id, otp_code, attempts, verified
+      FROM otp_verifications
+      WHERE phone_number = $1 AND expires_at > NOW() AND verified = false
+      ORDER BY created_at DESC LIMIT 1`;
+    let otpParams = [phoneNumber];
 
-    if (otpRecord.rows.length === 0) {
-      // Increment attempts for existing OTP
+    if (otpId) {
+      otpQuery = `
+        SELECT id, otp_code, attempts, verified
+        FROM otp_verifications
+        WHERE id = $1 AND phone_number = $2 AND expires_at > NOW() AND verified = false`;
+      otpParams = [otpId, phoneNumber];
+    }
+
+    const existingOtp = await db.query(otpQuery, otpParams);
+
+    if (existingOtp.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired or not found. Please request a new OTP.",
+      });
+    }
+
+    const otpRecord = existingOtp.rows[0];
+    const MAX_ATTEMPTS = 3;
+
+    // Check attempt limit FIRST
+    if (otpRecord.attempts >= MAX_ATTEMPTS) {
+      // Mark OTP as used/invalid
       await db.query(
-        `UPDATE otp_verifications 
-         SET attempts = attempts + 1 
-         WHERE phone_number = $1 AND expires_at > NOW()`,
-        [phoneNumber]
+        "UPDATE otp_verifications SET verified = true WHERE id = $1",
+        [otpRecord.id],
       );
 
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired OTP'
+        message: "Too many attempts. Please request a new OTP.",
+        attemptsExceeded: true,
       });
     }
 
-    // Mark OTP as verified
+    // Verify OTP code
+    if (otpRecord.otp_code !== otp) {
+      // Increment attempts
+      const newAttempts = otpRecord.attempts + 1;
+      await db.query(
+        "UPDATE otp_verifications SET attempts = $1 WHERE id = $2",
+        [newAttempts, otpRecord.id],
+      );
+
+      const remainingAttempts = MAX_ATTEMPTS - newAttempts;
+
+      return res.status(400).json({
+        success: false,
+        message:
+          remainingAttempts > 0
+            ? `Invalid OTP. ${remainingAttempts} attempt${remainingAttempts !== 1 ? "s" : ""} remaining.`
+            : "Invalid OTP. No attempts remaining. Please request a new OTP.",
+        remainingAttempts,
+      });
+    }
+
+    // OTP is valid - mark as verified
     await db.query(
-      `UPDATE otp_verifications SET verified = true WHERE id = $1`,
-      [otpRecord.rows[0].id]
+      "UPDATE otp_verifications SET verified = true WHERE id = $1",
+      [otpRecord.id],
     );
 
     // Check if user exists
-    let user = await db.query(
-      'SELECT * FROM users WHERE phone_number = $1',
-      [phoneNumber]
-    );
+    let user = await db.query("SELECT * FROM users WHERE phone_number = $1", [
+      phoneNumber,
+    ]);
 
     if (user.rows.length === 0) {
       // Create new user
@@ -176,14 +241,14 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
         `INSERT INTO users (phone_number, verified, user_type)
          VALUES ($1, true, 'BUYER')
          RETURNING *`,
-        [phoneNumber]
+        [phoneNumber],
       );
       user = newUser;
     } else {
       // Update existing user
       await db.query(
-        `UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1`,
-        [user.rows[0].id]
+        "UPDATE users SET verified = true, last_login_at = NOW() WHERE id = $1",
+        [user.rows[0].id],
       );
     }
 
@@ -191,37 +256,36 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
 
     // Generate JWT tokens
     const accessToken = jwt.sign(
-      { 
-        userId: userData.id, 
+      {
+        userId: userData.id,
         phoneNumber: userData.phone_number,
-        userType: userData.user_type
+        userType: userData.user_type,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
     );
 
     const refreshToken = jwt.sign(
       { userId: userData.id },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
+      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" },
     );
 
-    // Clean up old OTPs
-    await db.query(
-      'DELETE FROM otp_verifications WHERE phone_number = $1',
-      [phoneNumber]
-    );
+    // Clean up all OTPs for this phone number
+    await db.query("DELETE FROM otp_verifications WHERE phone_number = $1", [
+      phoneNumber,
+    ]);
 
-    logger.info('User authenticated successfully', { 
-      userId: userData.id, 
-      phoneNumber: userData.phone_number 
+    logger.info("User authenticated successfully", {
+      userId: userData.id,
+      phoneNumber: phoneNumber.replace(/(.{4}).*(.{2})$/, "$1****$2"),
     });
 
     // Response matches Android LoginResponse
     res.json({
       success: true,
       token: accessToken,
-      refreshToken: refreshToken,
+      refreshToken,
       user: {
         id: userData.id,
         phoneNumber: userData.phone_number,
@@ -229,14 +293,14 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
         userType: userData.user_type,
         location: userData.location,
         verified: userData.verified,
-        createdAt: userData.created_at
-      }
+        createdAt: userData.created_at,
+      },
     });
   } catch (error) {
-    logger.error('Verify OTP error:', error);
+    logger.error("Verify OTP error:", error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error'
+      message: "Internal server error",
     });
   }
 });
@@ -245,30 +309,30 @@ router.post('/verify-otp', validateOTP, async (req, res) => {
  * POST /api/v1/auth/refresh-token
  * Refresh access token using refresh token
  */
-router.post('/refresh-token', async (req, res) => {
+router.post("/refresh-token", async (req, res) => {
   try {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        message: 'Refresh token is required'
+        message: "Refresh token is required",
       });
     }
 
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    
+
     // Get user data
     const user = await db.query(
-      'SELECT * FROM users WHERE id = $1 AND is_active = true',
-      [decoded.userId]
+      "SELECT * FROM users WHERE id = $1 AND is_active = true",
+      [decoded.userId],
     );
 
     if (user.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid refresh token'
+        message: "Invalid refresh token",
       });
     }
 
@@ -276,24 +340,24 @@ router.post('/refresh-token', async (req, res) => {
 
     // Generate new access token
     const accessToken = jwt.sign(
-      { 
-        userId: userData.id, 
+      {
+        userId: userData.id,
         phoneNumber: userData.phone_number,
-        userType: userData.user_type
+        userType: userData.user_type,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
     );
 
     res.json({
       success: true,
-      token: accessToken
+      token: accessToken,
     });
   } catch (error) {
-    logger.error('Refresh token error:', error);
+    logger.error("Refresh token error:", error);
     res.status(401).json({
       success: false,
-      message: 'Invalid refresh token'
+      message: "Invalid refresh token",
     });
   }
 });
@@ -302,13 +366,203 @@ router.post('/refresh-token', async (req, res) => {
  * POST /api/v1/auth/logout
  * Logout user (invalidate tokens on client side)
  */
-router.post('/logout', async (req, res) => {
+router.post("/logout", async (req, res) => {
   // In a more sophisticated setup, you might maintain a blacklist of tokens
   // For now, we rely on client-side token removal
   res.json({
     success: true,
-    message: 'Logged out successfully'
+    message: "Logged out successfully",
   });
 });
+
+/**
+ * POST /api/v1/auth/register
+ * Register a new user with phone number + password
+ */
+router.post(
+  "/register",
+  [
+    body("phoneNumber")
+      .matches(/^\+94[0-9]{9}$/)
+      .withMessage("Invalid Sri Lankan phone number format. Use +94XXXXXXXXX"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters"),
+    body("userType")
+      .optional()
+      .isIn(["FARMER", "BUYER"])
+      .withMessage("userType must be FARMER or BUYER"),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(400)
+          .json({ success: false, message: errors.array()[0].msg });
+      }
+
+      const { phoneNumber, password, userType = "BUYER" } = req.body;
+
+      // Check if user already exists
+      const existing = await db.query(
+        "SELECT id FROM users WHERE phone_number = $1",
+        [phoneNumber],
+      );
+      if (existing.rows.length > 0) {
+        return res.status(409).json({
+          success: false,
+          message: "Phone number already registered. Please login.",
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const result = await db.query(
+        `INSERT INTO users (phone_number, password_hash, verified, user_type)
+         VALUES ($1, $2, true, $3)
+         RETURNING *`,
+        [phoneNumber, passwordHash, userType],
+      );
+
+      const userData = result.rows[0];
+
+      const accessToken = jwt.sign(
+        {
+          userId: userData.id,
+          phoneNumber: userData.phone_number,
+          userType: userData.user_type,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
+      );
+      const refreshToken = jwt.sign(
+        { userId: userData.id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" },
+      );
+
+      logger.info("New user registered", { userId: userData.id });
+
+      res.status(201).json({
+        success: true,
+        token: accessToken,
+        refreshToken,
+        user: {
+          id: userData.id,
+          phoneNumber: userData.phone_number,
+          name: userData.name,
+          userType: userData.user_type,
+          location: userData.location,
+          verified: userData.verified,
+          createdAt: userData.created_at,
+        },
+      });
+    } catch (error) {
+      logger.error("Register error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  },
+);
+
+/**
+ * POST /api/v1/auth/login
+ * Login with phone number + password
+ */
+router.post(
+  "/login",
+  [
+    body("phoneNumber")
+      .matches(/^\+94[0-9]{9}$/)
+      .withMessage("Invalid Sri Lankan phone number format. Use +94XXXXXXXXX"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res
+          .status(400)
+          .json({ success: false, message: errors.array()[0].msg });
+      }
+
+      const { phoneNumber, password } = req.body;
+
+      const result = await db.query(
+        "SELECT * FROM users WHERE phone_number = $1 AND is_active = true",
+        [phoneNumber],
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(401).json({
+          success: false,
+          message: "Phone number not registered. Please sign up.",
+        });
+      }
+
+      const userData = result.rows[0];
+
+      if (!userData.password_hash) {
+        return res.status(401).json({
+          success: false,
+          message: "No password set for this account. Please register again.",
+        });
+      }
+
+      const passwordMatch = await bcrypt.compare(
+        password,
+        userData.password_hash,
+      );
+      if (!passwordMatch) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Incorrect password." });
+      }
+
+      await db.query("UPDATE users SET last_login_at = NOW() WHERE id = $1", [
+        userData.id,
+      ]);
+
+      const accessToken = jwt.sign(
+        {
+          userId: userData.id,
+          phoneNumber: userData.phone_number,
+          userType: userData.user_type,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
+      );
+      const refreshToken = jwt.sign(
+        { userId: userData.id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d" },
+      );
+
+      logger.info("User logged in", { userId: userData.id });
+
+      res.json({
+        success: true,
+        token: accessToken,
+        refreshToken,
+        user: {
+          id: userData.id,
+          phoneNumber: userData.phone_number,
+          name: userData.name,
+          userType: userData.user_type,
+          location: userData.location,
+          verified: userData.verified,
+          createdAt: userData.created_at,
+        },
+      });
+    } catch (error) {
+      logger.error("Login error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  },
+);
 
 module.exports = router;

@@ -1,17 +1,18 @@
 <resources>
     <string name="app_name">SL Agrimarket</string>
-    
+
     <!-- App Title -->
-    <string name="app_title_tamil">යාපනය ගොවි වෙළඳපොළ</string>
+    <string name="app_title_tamil">யாழ்ப்பாணம் விவசாயிகள் சந்தை</string>
     <string name="app_title_english">Jaffna Farmers Marketplace</string>
-    
+    <string name="app_title_sinhala">යාපනය ගොවි වෙළඳපොළ</string>
+
     <!-- Navigation -->
     <string name="nav_home">මුල් පිටුව</string>
     <string name="nav_listings">ලැයිස්තු</string>
     <string name="nav_profile">පැතිකඩ</string>
     <string name="nav_transactions">ගනුදෙනු</string>
     <string name="nav_search">සෙවීම</string>
-    
+
     <!-- Common Actions -->
     <string name="action_back">ආපසු</string>
     <string name="action_logout">ඉවත් වන්න</string>
@@ -19,7 +20,38 @@
     <string name="action_browse">පිරික්සන්න</string>
     <string name="action_sell">විකුණන්න</string>
     <string name="action_add">එකතු කරන්න</string>
-    
+    <string name="action_send">යවන්න</string>
+    <string name="action_cancel">අවලංගු කරන්න</string>
+    <string name="action_confirm">තහවුරු කරන්න</string>
+    <string name="action_delete">මකන්න</string>
+    <string name="action_edit">සංස්කරණය</string>
+    <string name="action_save">සුරකින්න</string>
+    <string name="action_retry">නැවත උත්සාහ</string>
+    <string name="action_close">වසන්න</string>
+    <string name="action_ok">හරි</string>
+    <string name="action_dismiss">ඉවත් කරන්න</string>
+    <string name="action_clear">මකන්න</string>
+    <string name="action_share">බෙදා ගන්න</string>
+    <string name="action_favorite">ප්‍රියතම</string>
+    <string name="action_continue">ඉදිරියට</string>
+
+    <!-- Auth Screens -->
+    <string name="auth_app_subtitle">ගොවීන් සහ ගැනුම්කරුවන් සෘජුව සම්බන්ධ කරයි</string>
+    <string name="auth_phone_label">ඔබේ දුරකථන අංකය ඇතුළත් කරන්න</string>
+    <string name="auth_phone_hint">අපි සත්‍යාපන කේතයක් එවන්නම්</string>
+    <string name="auth_phone_field_label">දුරකථන අංකය</string>
+    <string name="auth_phone_placeholder">+94771234567</string>
+    <string name="auth_error_invalid_phone">කරුණාකර වලංගු දුරකථන අංකයක් ඇතුළත් කරන්න</string>
+    <string name="auth_terms_agreement">ඉදිරියට යාමෙන්, ඔබ අපගේ සේවා නියමයන් සහ රහස්‍යතා ප්‍රතිපත්තිය පිළිගනී</string>
+    <string name="auth_verify">සත්‍යාපනය</string>
+    <string name="auth_resend_otp">කේතය නැවත යවන්න</string>
+    <string name="auth_enter_otp">සත්‍යාපන කේතය ඇතුළත් කරන්න</string>
+    <string name="auth_otp_sent">%1$s වෙත සත්‍යාපන කේතය යවන ලදී</string>
+    <string name="auth_password_label">ඔබේ මුරපදය ඇතුළත් කරන්න</string>
+    <string name="auth_password_hint">මුරපදය</string>
+    <string name="auth_forgot_password">මුරපදය අමතකද?</string>
+    <string name="auth_login">පුරනය වන්න</string>
+
     <!-- Home Screen -->
     <string name="home_welcome">ආයුබෝවන් %1$s!</string>
     <string name="home_farmer_subtitle">ඔබේ නැවුම් නිෂ්පාදන විකිණීමට සූදානම් වන්න</string>
@@ -29,11 +61,11 @@
     <string name="home_recent_listings">මෑත ලැයිස්තු</string>
     <string name="home_market_prices">වෙළඳපොළ මිල</string>
     <string name="home_no_listings">ලැයිස්තු නොමැත</string>
-    
+
     <!-- Profile Screen -->
     <string name="profile_title">පැතිකඩ</string>
-    <string name="profile_verified">✓ සත්‍යාපිත</string>
-    <string name="profile_verification_pending">⚠ සත්‍යාපනය අපේක්ෂාවේ</string>
+    <string name="profile_verified">සත්‍යාපිත</string>
+    <string name="profile_verification_pending">සත්‍යාපනය අපේක්ෂාවේ</string>
     <string name="profile_loading">පරිශීලක තොරතුරු පූරණය වෙමින්…</string>
     <string name="profile_farmer">ගොවියා</string>
     <string name="profile_buyer">ගැනුම්කරු</string>
@@ -44,7 +76,15 @@
     <string name="profile_completed_orders">සම්පූර්ණ කළ ඇණවුම්</string>
     <string name="profile_active_listings">සක්‍රිය ලැයිස්තු</string>
     <string name="profile_view_details">විස්තර බලන්න</string>
-    
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">පැතිකඩ සංස්කරණය</string>
+    <string name="edit_profile_save">වෙනස්කම් සුරකින්න</string>
+    <string name="edit_profile_name">සම්පූර්ණ නම</string>
+    <string name="edit_profile_phone">දුරකථන අංකය</string>
+    <string name="edit_profile_location">ස්ථානය</string>
+    <string name="edit_profile_success">පැතිකඩ සාර්ථකව යාවත්කාලීන කරන ලදී</string>
+
     <!-- Market Prices -->
     <string name="market_prices_title">වෙළඳපොළ මිල</string>
     <string name="market_price_per_kg">LKR %1$.2f කිලෝ ග්‍රාමයකට</string>
@@ -53,7 +93,12 @@
     <string name="market_trend_up">↗️</string>
     <string name="market_trend_down">↘️</string>
     <string name="market_trend_stable">➡️</string>
-    
+    <string name="market_doa_badge">කෘෂිකර්ම දෙපාර්තමේන්තු සත්‍යාපිත</string>
+    <string name="market_per_kg">කිලෝ ග්‍රාමයකට</string>
+    <string name="market_trend_rising">ඉහළ යමින්</string>
+    <string name="market_trend_falling">පහළ යමින්</string>
+    <string name="market_trend_stable_text">ස්ථාවර</string>
+
     <!-- Crops -->
     <string name="crop_red_onion">රතු ළූණු</string>
     <string name="crop_chili">මිරිස්</string>
@@ -65,7 +110,7 @@
     <string name="crop_banana">කෙසෙල්</string>
     <string name="crop_rice">සහල්</string>
     <string name="crop_potato">අල</string>
-    
+
     <!-- Language -->
     <string name="language_english">ඉංග්‍රීසි</string>
     <string name="language_tamil">දෙමළ</string>
@@ -87,6 +132,27 @@
     <string name="create_listing_success">ලැයිස්තුව සාර්ථකව සාදන ලදී!</string>
     <string name="create_listing_error">ලැයිස්තුව සෑදීමට අසමත් විය</string>
 
+    <!-- Quick Listing -->
+    <string name="quick_listing_camera_denied">කැමරා අවසරය ප්‍රතික්ෂේප විය — ගැලරිය භාවිත කරන්න</string>
+    <string name="quick_listing_camera_unavailable">කැමරාව නොමැත — ගැලරිය භාවිත කරන්න</string>
+    <string name="quick_listing_photo_desc">නිෂ්පාදන ඡායාරූපය</string>
+    <string name="quick_listing_tip_tomato">හොඳම අස්වැන්න අප්‍රේල්–ජූනි. දිනකට 2 වරක් වතුර.</string>
+    <string name="quick_listing_tip_red_onion">දින 90 කට පසු අස්වනු නෙලන්න. අවසන් සති 2 ජලය අඩු කරන්න.</string>
+    <string name="quick_listing_tip_chili">සෙ.මී. 45 ක් පරතරය. හොඳම අස්වැන්න අගෝ–ඔක්.</string>
+    <string name="quick_listing_tip_brinjal">හොඳින් ජලය බැස යන පස අවශ්‍යයි. සෑම දින 5 කට වරක් අස්වනු.</string>
+    <string name="quick_listing_tip_okra">25°C ට ඉහළින් හොඳින් පැළ වේ. සෙ.මී. 8 දී අස්වනු.</string>
+
+    <!-- Listing Detail -->
+    <string name="listing_share_intro">Agrimarket හි මෙම ලැයිස්තුව බලන්න!</string>
+    <string name="listing_share_price">මිල: LKR %1$s</string>
+    <string name="listing_share_quantity">ප්‍රමාණය: %1$s</string>
+    <string name="listing_share_location">ස්ථානය: %1$s</string>
+    <string name="listing_share_quality">ගුණත්වය: ශ්‍රේණිය %1$s</string>
+    <string name="listing_share_via">ලැයිස්තුව බෙදා ගන්න</string>
+    <string name="listing_unknown_farmer">නොදන්නා ගොවියා</string>
+    <string name="listing_contact_seller">විකුණුම්කරු අමතන්න</string>
+    <string name="listing_buy_now">දැන් මිලදී ගන්න</string>
+
     <!-- Quality Grades -->
     <string name="quality_grade_a">ශ්‍රේණිය A</string>
     <string name="quality_grade_b">ශ්‍රේණිය B</string>
@@ -98,6 +164,27 @@
     <string name="error_quantity_range">ප්‍රමාණය 0 සහ 100,000 අතර විය යුතුය</string>
     <string name="error_price_range">මිල 0 සහ 1,000,000 අතර විය යුතුය</string>
     <string name="error_future_date">දිනය අනාගතයේ විය නොහැක</string>
+    <string name="error_select_crop_type">කරුණාකර බෝග වර්ගය තෝරන්න</string>
+    <string name="error_quantity_required">ප්‍රමාණය අවශ්‍යයි</string>
+    <string name="error_quantity_positive">ප්‍රමාණය 0 ට වඩා වැඩි විය යුතුය</string>
+    <string name="error_quantity_max">ප්‍රමාණය 100,000 ඉක්මවිය නොහැක</string>
+    <string name="error_select_unit">කරුණාකර ඒකකය තෝරන්න</string>
+    <string name="error_price_required">මිල අවශ්‍යයි</string>
+    <string name="error_invalid_price">කරුණාකර වලංගු මිලක් ඇතුළත් කරන්න</string>
+    <string name="error_price_positive">මිල 0 ට වඩා වැඩි විය යුතුය</string>
+    <string name="error_price_max">මිල 1,000,000 ඉක්මවිය නොහැක</string>
+    <string name="error_select_quality">කරුණාකර ගුණාත්මක ශ්‍රේණිය තෝරන්න</string>
+    <string name="error_harvest_date_required">අස්වනු නෙලීමේ දිනය අවශ්‍යයි</string>
+    <string name="error_location_required">ස්ථානය අවශ්‍යයි</string>
+    <string name="error_name_required">නම අවශ්‍යයි</string>
+    <string name="error_name_min_length">නම අවම වශයෙන් අක්ෂර 2 ක් විය යුතුය</string>
+    <string name="error_user_not_found">පරිශීලකයා හමු නොවීය</string>
+    <string name="error_update_profile_failed">පැතිකඩ යාවත්කාලීන කිරීමට අසමත් විය</string>
+    <string name="error_unexpected">අනපේක්ෂිත දෝෂයක් සිදු විය</string>
+    <string name="error_fill_required_fields">කරුණාකර අවශ්‍ය සියලුම ක්ෂේත්‍ර නිවැරදිව පුරවන්න</string>
+    <string name="error_user_not_authenticated">පරිශීලකයා සත්‍යාපනය කර නැත</string>
+    <string name="error_send_otp_failed">OTP යැවීමට අසමත් විය. කරුණාකර නැවත උත්සාහ කරන්න.</string>
+    <string name="error_invalid_otp">වලංගු නොවන OTP. කරුණාකර නැවත උත්සාහ කරන්න.</string>
 
     <!-- Profile Settings -->
     <string name="settings_title">සැකසුම් &amp; මනාපයන්</string>
@@ -109,6 +196,9 @@
     <string name="settings_help_subtitle">උදව් ලබා ගන්න සහ සහාය අමතන්න</string>
     <string name="settings_about">පිළිබඳව</string>
     <string name="settings_about_subtitle">යෙදුම් අනුවාදය සහ තොරතුරු</string>
+    <string name="settings_legal">නීතිමය</string>
+    <string name="settings_privacy">රහස්‍යතා ප්‍රතිපත්තිය</string>
+    <string name="settings_terms">සේවා නියමයන්</string>
 
     <!-- Logout Confirmation -->
     <string name="logout_confirm_title">ඉවත් වීම තහවුරු කරන්න</string>
@@ -142,6 +232,31 @@
     <string name="sync_success">සමමුහුර්තකරණය සාර්ථකව සම්පූර්ණ විය</string>
     <string name="sync_failed">සමමුහුර්තකරණය අසාර්ථක විය</string>
     <string name="sync_pending_ops">%1$d අපේක්ෂිත මෙහෙයුම්</string>
+    <string name="sync_settings_title">සමමුහුර්ත සැකසුම්</string>
+    <string name="sync_status_label">සමමුහුර්ත තත්ත්වය</string>
+    <string name="sync_current_status">වත්මන් තත්ත්වය</string>
+    <string name="sync_syncing">සමමුහුර්ත කරමින්…</string>
+    <string name="sync_status_pending">අපේක්ෂාවේ</string>
+    <string name="sync_status_up_to_date">යාවත්කාලීනයි</string>
+    <string name="sync_last_sync">අවසන් සමමුහුර්තය</string>
+    <string name="sync_never">කිසි විටෙකත් නැත</string>
+    <string name="sync_action_now">දැන් සමමුහුර්ත කරන්න</string>
+    <string name="sync_conflict_message">සංස්කරණ %1$d ක් සේවාදායකය සමඟ ගැටුණි — සේවාදායක අනුවාදය තබා ඇත</string>
+    <string name="sync_pending_count">බලාපොරොත්තු වෙනස්කම්</string>
+    <string name="sync_auto_label">ස්වයං සමමුහුර්තය</string>
+    <string name="sync_wifi_only">Wi-Fi පමණි</string>
+    <string name="sync_auto_desc">සම්බන්ධ වූ විට ස්වයංක්‍රීයව සමමුහුර්ත කරන්න</string>
+    <string name="sync_interval_label">සමමුහුර්ත කාල පරතරය</string>
+    <string name="sync_interval_desc">යාවත්කාලීන පරීක්ෂා කරන වාර ගණන</string>
+    <string name="sync_actions_title">ක්‍රියා</string>
+    <string name="sync_retry_failed">අසාර්ථක මෙහෙයුම් නැවත උත්සාහ කරන්න</string>
+    <string name="sync_clear_synced">සමමුහුර්ත මෙහෙයුම් ඉවත් කරන්න</string>
+    <string name="sync_statistics_title">සංඛ්‍යාලේඛන</string>
+    <string name="sync_pending_ops_label">අපේක්ෂිත මෙහෙයුම්</string>
+    <string name="sync_successful_ops_label">සාර්ථක මෙහෙයුම්</string>
+    <string name="sync_failed_ops_label">අසාර්ථක මෙහෙයුම්</string>
+    <string name="sync_conflicts_label">ගැටුම් (සේවාදායකය ජයග්‍රහණය)</string>
+    <string name="sync_error">දෝෂයක්</string>
 
     <!-- Empty States -->
     <string name="empty_no_data">දත්ත නොමැත</string>
@@ -163,4 +278,156 @@
     <string name="unit_kg">කිලෝ</string>
     <string name="unit_ton">ටොන්</string>
     <string name="unit_units">ඒකක</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">බෝග, ස්ථාන සොයන්න…</string>
+    <string name="search_filters">පෙරහන්</string>
+    <string name="search_clear_all">සියල්ල ඉවත් කරන්න</string>
+    <string name="search_crop_types">බෝග වර්ග</string>
+    <string name="search_locations">ස්ථාන</string>
+    <string name="search_results_count">ප්‍රතිඵල %1$d ක් හමු විය</string>
+    <string name="search_no_results">ප්‍රතිඵල හමු නොවීය</string>
+    <string name="search_no_results_subtitle">විවිධ මූල පද සෙවීමට උත්සාහ කරන්න හෝ ඔබේ අක්ෂර වින්‍යාසය පරීක්ෂා කරන්න</string>
+    <string name="search_popular">ජනප්‍රිය සෙවීම්</string>
+    <string name="search_advanced">උසස් සෙවීම</string>
+
+    <!-- Transactions Screen -->
+    <string name="transactions_title">ගනුදෙනු</string>
+    <string name="transactions_filter_status">තත්ත්වය අනුව පෙරන්න</string>
+    <string name="transactions_all">සියල්ල</string>
+    <string name="transactions_pending">අපේක්ෂාවේ</string>
+    <string name="transactions_confirmed">තහවුරු කළා</string>
+    <string name="transactions_in_progress">ක්‍රියාත්මකයි</string>
+    <string name="transactions_completed">සම්පූර්ණයි</string>
+    <string name="transactions_cancelled">අවලංගු කළා</string>
+    <string name="transactions_id">ගනුදෙනුව #%1$s</string>
+    <string name="transactions_quantity">ප්‍රමාණය</string>
+    <string name="transactions_total_amount">මුළු මුදල</string>
+    <string name="transactions_pickup">ලබා ගන්නා ස්ථානය: %1$s</string>
+    <string name="transactions_date">දිනය: %1$s</string>
+    <string name="transactions_contact">සම්බන්ධ කරන්න</string>
+    <string name="transactions_units">ඒකක %1$s</string>
+
+    <!-- Listings Screen -->
+    <string name="listings_title">ලැයිස්තු</string>
+    <string name="listings_quantity_label">ප්‍රමාණය: %1$s %2$s</string>
+    <string name="listings_grade">ශ්‍රේණිය %1$s</string>
+    <string name="listings_per_unit">එක් %1$s</string>
+    <string name="listings_coming_soon">නව ලැයිස්තු ඉක්මනින් ලබා ගත හැකිය</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_message_placeholder">පණිවිඩයක් ටයිප් කරන්න…</string>
+    <string name="chat_empty_state">තවම පණිවිඩ නැත</string>
+    <string name="chat_empty_subtitle">ගොවියෙකු හෝ ගැනුම්කරුවෙකු සමඟ සංවාදයක් ආරම්භ කරන්න</string>
+
+    <!-- Conversations Screen -->
+    <string name="conversations_title">පණිවිඩ</string>
+    <string name="conversations_empty">තවම සංවාද නැත</string>
+    <string name="conversations_empty_subtitle">ගොවියෙකු හෝ ගැනුම්කරුවෙකු සමඟ කතාබහක් ආරම්භ කරන්න</string>
+
+    <!-- Help & Support -->
+    <string name="help_title">අපට ඔබට කෙසේ උදව් කළ හැකිද?</string>
+    <string name="help_subtitle">පොදු ප්‍රශ්නවලට පිළිතුරු සොයන්න හෝ අපගේ සහාය කණ්ඩායම අමතන්න</string>
+    <string name="help_quick_links">ඉක්මන් සබැඳි</string>
+    <string name="help_faq_title">නිතර අසන ප්‍රශ්න</string>
+    <string name="help_faq_desc">පොදු ප්‍රශ්නවලට පිළිතුරු සොයන්න</string>
+    <string name="help_contact_title">සහාය අමතන්න</string>
+    <string name="help_contact_desc">අපගේ සහාය කණ්ඩායමෙන් උදව් ලබන්න</string>
+    <string name="help_terms_title">නියමයන් &amp; කොන්දේසි</string>
+    <string name="help_terms_desc">අපගේ සේවා නියමයන් කියවන්න</string>
+    <string name="help_privacy_title">රහස්‍යතා ප්‍රතිපත්තිය</string>
+    <string name="help_privacy_desc">ඔබේ දත්ත අපි කෙසේ ආරක්ෂා කරන්නේද යන්න දැන ගන්න</string>
+    <string name="help_app_info_title">යෙදුම් තොරතුරු</string>
+    <string name="help_version">අනුවාදය</string>
+    <string name="help_email">විද්‍යුත් තැපෑල</string>
+    <string name="help_phone">දුරකථනය</string>
+
+    <!-- FAQ Screen -->
+    <string name="faq_title">නිතර අසන ප්‍රශ්න</string>
+    <string name="faq_q1">ලැයිස්තුවක් නිර්මාණය කරන්නේ කෙසේද?</string>
+    <string name="faq_a1">මුල් පිටුවට යන්න, \'+\' බොත්තම ඔබන්න, විස්තර පුරවන්න, ඡායාරූප එක් කරන්න සහ ඉදිරිපත් කරන්න.</string>
+    <string name="faq_q2">ඇණවුමක් කරන්නේ කෙසේද?</string>
+    <string name="faq_a2">ලැයිස්තු බ්‍රවුස් කරන්න, නිෂ්පාදනයක් තෝරන්න, \'ඇණවුම් කරන්න\' ඔබන්න, ප්‍රමාණය ඇතුළත් කරන්න සහ තහවුරු කරන්න.</string>
+    <string name="faq_q3">විකුණුම්කරුවෙකු අමතන්නේ කෙසේද?</string>
+    <string name="faq_a3">ලැයිස්තුව විවෘත කරන්න, කතාබස් සංවාදයක් ආරම්භ කිරීමට \'විකුණුම්කරු අමතන්න\' ඔබන්න.</string>
+    <string name="faq_q4">මගේ ඇණවුම නිරීක්ෂණය කරන්නේ කෙසේද?</string>
+    <string name="faq_a4">ගනුදෙනු තිරයට යන්න, තත්ත්වය සහ විස්තර බැලීමට ඔබේ ඇණවුම තෝරන්න.</string>
+    <string name="faq_q5">මම නොබැඳි නම් කුමක් කළ යුතුද?</string>
+    <string name="faq_a5">යෙදුම නොබැඳිව ක්‍රියා කරයි. ඔබ නැවත සබැඳි වූ විට ඔබේ වෙනස්කම් ස්වයංක්‍රීයව සමමුහුර්ත වේ.</string>
+
+    <!-- Contact Screen -->
+    <string name="contact_title">අප හා සම්බන්ධ වන්න</string>
+    <string name="contact_get_in_touch">සම්බන්ධ වන්න</string>
+    <string name="contact_subtitle">අපි උදව් කිරීමට මෙහි සිටිමු! මෙම නාලිකා හරහා අප වෙත සම්බන්ධ වන්න.</string>
+    <string name="contact_email_label">විද්‍යුත් තැපෑල</string>
+    <string name="contact_email_desc">ඕනෑම වේලාවක විද්‍යුත් තැපෑලක් එවන්න</string>
+    <string name="contact_phone_label">දුරකථනය</string>
+    <string name="contact_phone_desc">සඳුදා සිට සිකුරාදා, පෙ.ව. 9 - ප.ව. 5</string>
+    <string name="contact_address_label">ලිපිනය</string>
+    <string name="contact_address_value">කොළඹ, ශ්‍රී ලංකාව</string>
+    <string name="contact_address_desc">අපගේ කාර්යාලයට පැමිණෙන්න</string>
+    <string name="contact_response_time">අපි සාමාන්‍යයෙන් පැය 24ක් ඇතුළත ප්‍රතිචාර දක්වන්නෙමු.</string>
+
+    <!-- Privacy Screen -->
+    <string name="privacy_title">රහස්‍යතා ප්‍රතිපත්තිය</string>
+    <string name="privacy_last_updated">අවසන් යාවත්කාලීන: ජනවාරි 2026</string>
+    <string name="privacy_info_collect_title">අපි එකතු කරන තොරතුරු</string>
+    <string name="privacy_info_collect_content">ඔබේ දුරකථන අංකය, නම, ස්ථානය සහ ලැයිස්තු විස්තර ඇතුළුව ඔබ සෘජුවම සපයන තොරතුරු අපි එකතු කරමු. අපගේ සේවාවන් වැඩිදියුණු කිරීමට භාවිත දත්ත ද එකතු කරමු.</string>
+    <string name="privacy_info_use_title">ඔබේ තොරතුරු අපි භාවිතා කරන ආකාරය</string>
+    <string name="privacy_info_use_content">ඔබේ තොරතුරු භාවිතා කරන්නේ: අපගේ සේවාවන් සැපයීම සහ නඩත්තු කිරීම, ගොවීන් ගැනුම්කරුවන් සමඟ සම්බන්ධ කිරීම, ගනුදෙනු පිළිබඳ දැනුම්දීම් යැවීම සහ පරිශීලක අත්දැකීම වැඩිදියුණු කිරීම සඳහාය.</string>
+    <string name="privacy_data_security_title">දත්ත ආරක්ෂාව</string>
+    <string name="privacy_data_security_content">ඔබේ දත්ත ආරක්ෂා කිරීමට අපි කර්මාන්ත-ප්‍රමිතිගත ආරක්ෂක පියවර ක්‍රියාත්මක කරමු. මෙයට සංවේදී තොරතුරු සංකේතනය සහ ආරක්ෂිත දත්ත ගබඩා කිරීමේ පිළිවෙත් ඇතුළත් වේ.</string>
+    <string name="privacy_data_sharing_title">දත්ත බෙදාගැනීම</string>
+    <string name="privacy_data_sharing_content">අපි ඔබේ පෞද්ගලික තොරතුරු විකුණන්නේ නැත. ගනුදෙනු සඳහා අවශ්‍ය පරිදි වෙනත් පරිශීලකයින් සමඟ ඔබේ තොරතුරු බෙදා ගත හැකිය (උදා: ගැනුම්කරුවන්/විකුණුම්කරුවන් සමඟ සම්බන්ධතා විස්තර බෙදාගැනීම).</string>
+    <string name="privacy_your_rights_title">ඔබේ අයිතිවාසිකම්</string>
+    <string name="privacy_your_rights_content">ඔබේ පෞද්ගලික තොරතුරු වෙත ප්‍රවේශ වීමට, යාවත්කාලීන කිරීමට හෝ මකා දැමීමට ඔබට අයිතිය ඇත. යෙදුම් සැකසීම් හරහා හෝ අපගේ සහාය කණ්ඩායම සම්බන්ධ කර ගැනීමෙන් ඔබට ඔබේ දත්ත කළමනාකරණය කළ හැකිය.</string>
+    <string name="privacy_contact_title">අප හා සම්බන්ධ වන්න</string>
+    <string name="privacy_contact_content">පෞද්ගලිකත්වය සම්බන්ධ ප්‍රශ්න හෝ ගැටළු සඳහා, privacy@agrimarket.lk හරහා අප හා සම්බන්ධ වන්න</string>
+
+    <!-- Terms Screen -->
+    <string name="terms_title">සේවා නියම</string>
+    <string name="terms_last_updated">අවසන් යාවත්කාලීන: ජනවාරි 2026</string>
+    <string name="terms_acceptance_title">1. නියම පිළිගැනීම</string>
+    <string name="terms_acceptance_content">Agrimarket භාවිතා කිරීමෙන්, ඔබ මෙම සේවා නියමවලට එකඟ වේ. ඔබ එකඟ නොවන්නේ නම්, කරුණාකර යෙදුම භාවිතා නොකරන්න.</string>
+    <string name="terms_accounts_title">2. පරිශීලක ගිණුම්</string>
+    <string name="terms_accounts_content">ගිණුමක් සාදන විට ඔබ නිවැරදි තොරතුරු සැපයිය යුතුය. ඔබේ ගිණුමේ ආරක්ෂාව සහ ඔබේ ගිණුම යටතේ සිදුවන සියලුම ක්‍රියාකාරකම් සඳහා ඔබ වගකිව යුතුය.</string>
+    <string name="terms_conduct_title">3. වෙළඳපොළ හැසිරීම</string>
+    <string name="terms_conduct_content">භාවිතාකරුවන් ඔවුන්ට විකිණීමට අයිතිය ඇති කෘෂිකාර්මික නිෂ්පාදන පමණක් ලැයිස්තුගත කිරීමට එකඟ වේ. සියලුම ලැයිස්තු නිවැරදි විය යුතු අතර නොමඟ යවන සුළු නොවිය යුතුය. වංචනික ක්‍රියාකාරකම් ගිණුම අවසන් කිරීමට හේතු වේ.</string>
+    <string name="terms_transactions_title">4. ගනුදෙනු</string>
+    <string name="terms_transactions_content">Agrimarket ගොවීන් සහ ගැනුම්කරුවන් අතර සම්බන්ධතා පහසුකම් සපයයි නමුත් සත්‍ය ගනුදෙනු සඳහා වගකිව යුතු නොවේ. භාවිතාකරුවන් තමන්ගේම අවදානමෙන් ගනුදෙනු කරන අතර නිසි පරිශීලනය අනුගමනය කළ යුතුය.</string>
+    <string name="terms_liability_title">5. වගකීම් සීමාව</string>
+    <string name="terms_liability_content">Agrimarket වගකීම් නොමැතිව "ඇති ලෙසම" සපයනු ලැබේ. වේදිකාව භාවිතයෙන් පැන නගින වක්‍ර, අහඹු හෝ ප්‍රතිඵලයක් ලෙස සිදුවන හානි සඳහා අපි වගකිව යුතු නොවේ.</string>
+    <string name="terms_contact_title">6. සම්බන්ධතා</string>
+    <string name="terms_contact_content">මෙම නියම පිළිබඳ ප්‍රශ්න සඳහා, support@agrimarket.lk හරහා අප හා සම්බන්ධ වන්න</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">දැනුම්දීම්</string>
+    <string name="notifications_empty">තවම දැනුම්දීම් නැත</string>
+    <string name="notifications_empty_subtitle">ඔබේ ලැයිස්තු සහ ඇණවුම් පිළිබඳ යාවත්කාලීන කිරීම් මෙහි දැකිය හැක</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">ප්‍රියතම</string>
+    <string name="favorites_empty">තවම ප්‍රියතම නැත</string>
+    <string name="favorites_empty_subtitle">ඔබ උනන්දුවක් දක්වන ලැයිස්තු සුරකින්න</string>
+
+    <!-- Reviews -->
+    <string name="review_title">සමාලෝචනය ලියන්න</string>
+    <string name="review_placeholder">ඔබේ අත්දැකීම බෙදා ගන්න…</string>
+    <string name="review_submit">සමාලෝචනය ඉදිරිපත් කරන්න</string>
+    <string name="review_rating">ශ්‍රේණිගත කිරීම</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">විශ්ලේෂණ</string>
+    <string name="analytics_revenue">ආදායම</string>
+    <string name="analytics_orders">ඇණවුම්</string>
+    <string name="analytics_views">බැලීම්</string>
+
+    <!-- Voice Input -->
+    <string name="voice_permission_title">මයික්‍රෆෝන අවසරය අවශ්‍යයි</string>
+    <string name="voice_permission_message">හඬ ආදානය භාවිතා කිරීමට මයික්‍රෆෝන අවසරය අවශ්‍යයි</string>
+    <string name="voice_prompt">කරුණාකර කතා කරන්න…</string>
+
+    <!-- Map -->
+    <string name="map_title">ලැයිස්තු සිතියම</string>
+    <string name="map_select_location">ස්ථානය තෝරන්න</string>
 </resources>

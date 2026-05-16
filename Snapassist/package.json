@@ -1,0 +1,33 @@
+{
+  "name": "snapassist-firebase",
+  "version": "1.0.0",
+  "description": "Firebase backend for Snapassist remote camera control",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build:functions",
+    "build:functions": "cd functions && npm run build",
+    "serve": "firebase emulators:start",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy",
+    "logs": "firebase functions:log"
+  },
+  "keywords": [
+    "firebase",
+    "functions",
+    "android",
+    "camera",
+    "fcm"
+  ],
+  "author": "Snapassist",
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@types/node": "^24.3.0",
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^4.9.0"
+  }
+}

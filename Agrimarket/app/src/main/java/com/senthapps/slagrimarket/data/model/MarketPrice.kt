@@ -262,7 +262,7 @@ fun MarketPrice.getCropName(language: String): String = when (language) {
     "ta" -> cropNameTamil
     "si" -> cropNameSinhala
     "en" -> cropNameEnglish
-    else -> "$cropNameTamil / $cropNameEnglish"
+    else -> cropNameEnglish  // Default to English if language code doesn't match
 }
 
 /**

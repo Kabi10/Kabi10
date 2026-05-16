@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+package-lock.json
+backend/node_modules/
+backend/package-lock.json
+web/node_modules/
+web/package-lock.json
+
+# Build artifacts
+build/
+dist/
+.gradle/
+app/build/
+backend/dist/
+*.apk
+*.aab
+*.aar
+
+# Generated files
+app/.cxx/
+app/schemas/
+*.log
+
+# Git and version control
+.git/
+.github/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Large assets
+app/src/main/res/drawable-xxxhdpi/
+app/src/main/res/raw/
+*.mp4
+*.mov
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# Android specific
+local.properties
+keystore/
+*.keystore
+*.jks
+
+# Test reports
+app/build/reports/
+app/build/test-results/
+coverage/
+
+# Misc
+.vercel/
+.env.local
+.env.production
+notebooklm/

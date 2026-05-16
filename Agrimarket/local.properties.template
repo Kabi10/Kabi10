@@ -1,0 +1,17 @@
+## This file must be in your local .gitignore
+## DO NOT commit this file to version control
+
+# Location of the Android SDK
+# Replace YOUR_SDK_PATH_HERE with your actual Android SDK path
+
+# Windows example:
+# sdk.dir=C\:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
+
+# macOS example:
+# sdk.dir=/Users/YourName/Library/Android/sdk
+
+# Linux example:
+# sdk.dir=/home/YourName/Android/Sdk
+
+sdk.dir=YOUR_SDK_PATH_HERE
+

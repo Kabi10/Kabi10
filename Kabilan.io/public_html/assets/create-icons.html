@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+        // Generate PWA icons programmatically
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create a simple icon with "K" letter
+        function createIcon(size) {
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#010103');
+            gradient.addColorStop(1, '#1c1c21');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Add border
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = size * 0.02;
+            ctx.strokeRect(0, 0, size, size);
+            
+            // Draw "K" letter
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('K', size / 2, size / 2);
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Generate different sizes
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        
+        sizes.forEach(size => {
+            const dataUrl = createIcon(size);
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = dataUrl;
+            link.textContent = `Download ${size}x${size}`;
+            link.style.display = 'block';
+            link.style.margin = '10px';
+            document.body.appendChild(link);
+        });
+        
+        // Auto-download the most needed ones
+        setTimeout(() => {
+            [144, 192, 512].forEach(size => {
+                const dataUrl = createIcon(size);
+                const link = document.createElement('a');
+                link.download = `icon-${size}x${size}.png`;
+                link.href = dataUrl;
+                link.click();
+            });
+        }, 1000);
+    </script>
+</body>
+</html>

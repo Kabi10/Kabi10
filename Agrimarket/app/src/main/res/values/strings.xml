@@ -4,6 +4,7 @@
     <!-- App Title -->
     <string name="app_title_tamil">Jaffna Farmers Marketplace</string>
     <string name="app_title_english">Jaffna Farmers Marketplace</string>
+    <string name="app_title_sinhala">Jaffna Farmers Marketplace</string>
 
     <!-- Navigation -->
     <string name="nav_home">Home</string>
@@ -19,6 +20,37 @@
     <string name="action_browse">Browse</string>
     <string name="action_sell">Sell</string>
     <string name="action_add">Add</string>
+    <string name="action_send">Send</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_save">Save</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_close">Close</string>
+    <string name="action_ok">OK</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_share">Share</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_continue">Continue</string>
+
+    <!-- Auth Screens -->
+    <string name="auth_app_subtitle">Connect farmers and buyers directly</string>
+    <string name="auth_phone_label">Enter your phone number</string>
+    <string name="auth_phone_hint">We\'ll send you a verification code</string>
+    <string name="auth_phone_field_label">Phone Number</string>
+    <string name="auth_phone_placeholder">+94771234567</string>
+    <string name="auth_error_invalid_phone">Please enter a valid phone number</string>
+    <string name="auth_terms_agreement">By continuing, you agree to our Terms of Service and Privacy Policy</string>
+    <string name="auth_verify">Verify</string>
+    <string name="auth_resend_otp">Resend Code</string>
+    <string name="auth_enter_otp">Enter verification code</string>
+    <string name="auth_otp_sent">Verification code sent to %1$s</string>
+    <string name="auth_password_label">Enter your password</string>
+    <string name="auth_password_hint">Password</string>
+    <string name="auth_forgot_password">Forgot Password?</string>
+    <string name="auth_login">Log In</string>
 
     <!-- Home Screen -->
     <string name="home_welcome">Welcome %1$s!</string>
@@ -32,8 +64,8 @@
 
     <!-- Profile Screen -->
     <string name="profile_title">Profile</string>
-    <string name="profile_verified">✓ Verified</string>
-    <string name="profile_verification_pending">⚠ Verification Pending</string>
+    <string name="profile_verified">Verified</string>
+    <string name="profile_verification_pending">Verification Pending</string>
     <string name="profile_loading">Loading user information…</string>
     <string name="profile_farmer">Farmer</string>
     <string name="profile_buyer">Buyer</string>
@@ -45,6 +77,14 @@
     <string name="profile_active_listings">Active Listings</string>
     <string name="profile_view_details">View Details</string>
 
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="edit_profile_save">Save Changes</string>
+    <string name="edit_profile_name">Full Name</string>
+    <string name="edit_profile_phone">Phone Number</string>
+    <string name="edit_profile_location">Location</string>
+    <string name="edit_profile_success">Profile updated successfully</string>
+
     <!-- Market Prices -->
     <string name="market_prices_title">Market Prices</string>
     <string name="market_price_per_kg">LKR %1$.2f per kg</string>
@@ -53,8 +93,13 @@
     <string name="market_trend_up">↗️</string>
     <string name="market_trend_down">↘️</string>
     <string name="market_trend_stable">➡️</string>
+    <string name="market_doa_badge">DoA Verified</string>
+    <string name="market_per_kg">per kg</string>
+    <string name="market_trend_rising">Rising</string>
+    <string name="market_trend_falling">Falling</string>
+    <string name="market_trend_stable_text">Stable</string>
 
-    <!-- Crops (Bilingual format will be handled in code) -->
+    <!-- Crops -->
     <string name="crop_red_onion">Red Onion</string>
     <string name="crop_chili">Chili</string>
     <string name="crop_tomato">Tomato</string>
@@ -87,6 +132,27 @@
     <string name="create_listing_success">Listing created successfully!</string>
     <string name="create_listing_error">Failed to create listing</string>
 
+    <!-- Quick Listing -->
+    <string name="quick_listing_camera_denied">Camera permission denied — use Gallery instead</string>
+    <string name="quick_listing_camera_unavailable">Camera unavailable — use Gallery instead</string>
+    <string name="quick_listing_photo_desc">Product photo</string>
+    <string name="quick_listing_tip_tomato">Best yield Apr–Jun. Water 2× daily.</string>
+    <string name="quick_listing_tip_red_onion">Harvest after 90 days. Reduce water last 2 weeks.</string>
+    <string name="quick_listing_tip_chili">Space 45 cm apart. Peak yield Aug–Oct.</string>
+    <string name="quick_listing_tip_brinjal">Needs well-drained soil. Harvest every 5 days.</string>
+    <string name="quick_listing_tip_okra">Germinates best above 25°C. Harvest at 8 cm.</string>
+
+    <!-- Listing Detail -->
+    <string name="listing_share_intro">Check out this listing on Agrimarket!</string>
+    <string name="listing_share_price">Price: LKR %1$s</string>
+    <string name="listing_share_quantity">Quantity: %1$s</string>
+    <string name="listing_share_location">Location: %1$s</string>
+    <string name="listing_share_quality">Quality: Grade %1$s</string>
+    <string name="listing_share_via">Share listing via</string>
+    <string name="listing_unknown_farmer">Unknown Farmer</string>
+    <string name="listing_contact_seller">Contact Seller</string>
+    <string name="listing_buy_now">Buy Now</string>
+
     <!-- Quality Grades -->
     <string name="quality_grade_a">Grade A</string>
     <string name="quality_grade_b">Grade B</string>
@@ -98,6 +164,27 @@
     <string name="error_quantity_range">Quantity must be between 0 and 100,000</string>
     <string name="error_price_range">Price must be between 0 and 1,000,000</string>
     <string name="error_future_date">Date cannot be in the future</string>
+    <string name="error_select_crop_type">Please select a crop type</string>
+    <string name="error_quantity_required">Quantity is required</string>
+    <string name="error_quantity_positive">Quantity must be greater than 0</string>
+    <string name="error_quantity_max">Quantity cannot exceed 100,000</string>
+    <string name="error_select_unit">Please select a unit</string>
+    <string name="error_price_required">Price is required</string>
+    <string name="error_invalid_price">Please enter a valid price</string>
+    <string name="error_price_positive">Price must be greater than 0</string>
+    <string name="error_price_max">Price cannot exceed 1,000,000</string>
+    <string name="error_select_quality">Please select a quality grade</string>
+    <string name="error_harvest_date_required">Harvest date is required</string>
+    <string name="error_location_required">Location is required</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_name_min_length">Name must be at least 2 characters</string>
+    <string name="error_user_not_found">User not found</string>
+    <string name="error_update_profile_failed">Failed to update profile</string>
+    <string name="error_unexpected">An unexpected error occurred</string>
+    <string name="error_fill_required_fields">Please fill all required fields correctly</string>
+    <string name="error_user_not_authenticated">User not authenticated</string>
+    <string name="error_send_otp_failed">Failed to send OTP. Please try again.</string>
+    <string name="error_invalid_otp">Invalid OTP. Please try again.</string>
 
     <!-- Profile Settings -->
     <string name="settings_title">Settings &amp; Preferences</string>
@@ -109,6 +196,9 @@
     <string name="settings_help_subtitle">Get help and contact support</string>
     <string name="settings_about">About</string>
     <string name="settings_about_subtitle">App version and information</string>
+    <string name="settings_legal">Legal</string>
+    <string name="settings_privacy">Privacy Policy</string>
+    <string name="settings_terms">Terms of Service</string>
 
     <!-- Logout Confirmation -->
     <string name="logout_confirm_title">Confirm Logout</string>
@@ -142,6 +232,31 @@
     <string name="sync_success">Sync completed successfully</string>
     <string name="sync_failed">Sync failed</string>
     <string name="sync_pending_ops">%1$d pending operations</string>
+    <string name="sync_settings_title">Sync Settings</string>
+    <string name="sync_status_label">Sync Status</string>
+    <string name="sync_current_status">Current Status</string>
+    <string name="sync_syncing">Syncing…</string>
+    <string name="sync_status_pending">Pending</string>
+    <string name="sync_status_up_to_date">Up to date</string>
+    <string name="sync_last_sync">Last Sync</string>
+    <string name="sync_never">Never</string>
+    <string name="sync_action_now">Sync Now</string>
+    <string name="sync_conflict_message">%1$d edit(s) conflicted with server — server version kept</string>
+    <string name="sync_pending_count">Pending Changes</string>
+    <string name="sync_auto_label">Auto Sync</string>
+    <string name="sync_wifi_only">Wi-Fi Only</string>
+    <string name="sync_auto_desc">Automatically sync when connected</string>
+    <string name="sync_interval_label">Sync Interval</string>
+    <string name="sync_interval_desc">How often to check for updates</string>
+    <string name="sync_actions_title">Actions</string>
+    <string name="sync_retry_failed">Retry Failed Operations</string>
+    <string name="sync_clear_synced">Clear Synced Operations</string>
+    <string name="sync_statistics_title">Statistics</string>
+    <string name="sync_pending_ops_label">Pending Operations</string>
+    <string name="sync_successful_ops_label">Successful Operations</string>
+    <string name="sync_failed_ops_label">Failed Operations</string>
+    <string name="sync_conflicts_label">Conflicts (server won)</string>
+    <string name="sync_error">Error</string>
 
     <!-- Empty States -->
     <string name="empty_no_data">No data available</string>
@@ -163,4 +278,156 @@
     <string name="unit_kg">Kg</string>
     <string name="unit_ton">Ton</string>
     <string name="unit_units">Units</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Search crops, locations…</string>
+    <string name="search_filters">Filters</string>
+    <string name="search_clear_all">Clear All</string>
+    <string name="search_crop_types">Crop Types</string>
+    <string name="search_locations">Locations</string>
+    <string name="search_results_count">%1$d results found</string>
+    <string name="search_no_results">No results found</string>
+    <string name="search_no_results_subtitle">Try searching for different keywords or check your spelling</string>
+    <string name="search_popular">Popular Searches</string>
+    <string name="search_advanced">Advanced Search</string>
+
+    <!-- Transactions Screen -->
+    <string name="transactions_title">Transactions</string>
+    <string name="transactions_filter_status">Filter by Status</string>
+    <string name="transactions_all">All</string>
+    <string name="transactions_pending">Pending</string>
+    <string name="transactions_confirmed">Confirmed</string>
+    <string name="transactions_in_progress">In Progress</string>
+    <string name="transactions_completed">Completed</string>
+    <string name="transactions_cancelled">Cancelled</string>
+    <string name="transactions_id">Transaction #%1$s</string>
+    <string name="transactions_quantity">Quantity</string>
+    <string name="transactions_total_amount">Total Amount</string>
+    <string name="transactions_pickup">Pickup: %1$s</string>
+    <string name="transactions_date">Date: %1$s</string>
+    <string name="transactions_contact">Contact</string>
+    <string name="transactions_units">%1$s units</string>
+
+    <!-- Listings Screen -->
+    <string name="listings_title">Listings</string>
+    <string name="listings_quantity_label">Quantity: %1$s %2$s</string>
+    <string name="listings_grade">Grade %1$s</string>
+    <string name="listings_per_unit">per %1$s</string>
+    <string name="listings_coming_soon">New listings will be available soon</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_message_placeholder">Type a message…</string>
+    <string name="chat_empty_state">No messages yet</string>
+    <string name="chat_empty_subtitle">Start a conversation with a farmer or buyer</string>
+
+    <!-- Conversations Screen -->
+    <string name="conversations_title">Messages</string>
+    <string name="conversations_empty">No conversations yet</string>
+    <string name="conversations_empty_subtitle">Start a chat with a farmer or buyer</string>
+
+    <!-- Help & Support -->
+    <string name="help_title">How can we help you?</string>
+    <string name="help_subtitle">Find answers to common questions or contact our support team</string>
+    <string name="help_quick_links">Quick Links</string>
+    <string name="help_faq_title">Frequently Asked Questions</string>
+    <string name="help_faq_desc">Find answers to common questions</string>
+    <string name="help_contact_title">Contact Support</string>
+    <string name="help_contact_desc">Get help from our support team</string>
+    <string name="help_terms_title">Terms &amp; Conditions</string>
+    <string name="help_terms_desc">Read our terms of service</string>
+    <string name="help_privacy_title">Privacy Policy</string>
+    <string name="help_privacy_desc">Learn how we protect your data</string>
+    <string name="help_app_info_title">App Information</string>
+    <string name="help_version">Version</string>
+    <string name="help_email">Email</string>
+    <string name="help_phone">Phone</string>
+
+    <!-- FAQ Screen -->
+    <string name="faq_title">FAQ</string>
+    <string name="faq_q1">How do I create a listing?</string>
+    <string name="faq_a1">Go to Home screen, tap the \'+\' button, fill in the details, add photos, and submit.</string>
+    <string name="faq_q2">How do I place an order?</string>
+    <string name="faq_a2">Browse listings, select a product, tap \'Place Order\', enter quantity, and confirm.</string>
+    <string name="faq_q3">How do I contact a seller?</string>
+    <string name="faq_a3">Open the listing, tap \'Contact Seller\' to start a chat conversation.</string>
+    <string name="faq_q4">How do I track my order?</string>
+    <string name="faq_a4">Go to Transactions screen, select your order to view status and details.</string>
+    <string name="faq_q5">What if I\'m offline?</string>
+    <string name="faq_a5">The app works offline. Your changes will sync automatically when you\'re back online.</string>
+
+    <!-- Contact Screen -->
+    <string name="contact_title">Contact Us</string>
+    <string name="contact_get_in_touch">Get in Touch</string>
+    <string name="contact_subtitle">We\'re here to help! Reach out to us through any of these channels.</string>
+    <string name="contact_email_label">Email</string>
+    <string name="contact_email_desc">Send us an email anytime</string>
+    <string name="contact_phone_label">Phone</string>
+    <string name="contact_phone_desc">Monday to Friday, 9 AM - 5 PM</string>
+    <string name="contact_address_label">Address</string>
+    <string name="contact_address_value">Colombo, Sri Lanka</string>
+    <string name="contact_address_desc">Visit our office</string>
+    <string name="contact_response_time">We typically respond within 24 hours.</string>
+
+    <!-- Privacy Screen -->
+    <string name="privacy_title">Privacy Policy</string>
+    <string name="privacy_last_updated">Last Updated: January 2026</string>
+    <string name="privacy_info_collect_title">Information We Collect</string>
+    <string name="privacy_info_collect_content">We collect information you provide directly, including your phone number, name, location, and listing details. We also collect usage data to improve our services.</string>
+    <string name="privacy_info_use_title">How We Use Your Information</string>
+    <string name="privacy_info_use_content">Your information is used to: provide and maintain our services, connect farmers with buyers, send notifications about transactions, and improve user experience.</string>
+    <string name="privacy_data_security_title">Data Security</string>
+    <string name="privacy_data_security_content">We implement industry-standard security measures to protect your data. This includes encryption of sensitive information and secure data storage practices.</string>
+    <string name="privacy_data_sharing_title">Data Sharing</string>
+    <string name="privacy_data_sharing_content">We do not sell your personal information. We may share your information with other users as necessary for transactions (e.g., sharing contact details with buyers/sellers).</string>
+    <string name="privacy_your_rights_title">Your Rights</string>
+    <string name="privacy_your_rights_content">You have the right to access, update, or delete your personal information. You can manage your data through the app settings or by contacting our support team.</string>
+    <string name="privacy_contact_title">Contact Us</string>
+    <string name="privacy_contact_content">For privacy-related questions or concerns, contact us at privacy@agrimarket.lk</string>
+
+    <!-- Terms Screen -->
+    <string name="terms_title">Terms of Service</string>
+    <string name="terms_last_updated">Last Updated: January 2026</string>
+    <string name="terms_acceptance_title">1. Acceptance of Terms</string>
+    <string name="terms_acceptance_content">By using Agrimarket, you agree to these Terms of Service. If you do not agree, please do not use the application.</string>
+    <string name="terms_accounts_title">2. User Accounts</string>
+    <string name="terms_accounts_content">You must provide accurate information when creating an account. You are responsible for maintaining the security of your account and for all activities that occur under your account.</string>
+    <string name="terms_conduct_title">3. Marketplace Conduct</string>
+    <string name="terms_conduct_content">Users agree to list only agricultural products they have the right to sell. All listings must be accurate and not misleading. Fraudulent activity will result in account termination.</string>
+    <string name="terms_transactions_title">4. Transactions</string>
+    <string name="terms_transactions_content">Agrimarket facilitates connections between farmers and buyers but is not responsible for the actual transactions. Users transact at their own risk and should exercise due diligence.</string>
+    <string name="terms_liability_title">5. Limitation of Liability</string>
+    <string name="terms_liability_content">Agrimarket is provided "as is" without warranties. We are not liable for any indirect, incidental, or consequential damages arising from use of the platform.</string>
+    <string name="terms_contact_title">6. Contact</string>
+    <string name="terms_contact_content">For questions about these terms, contact us at support@agrimarket.lk</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty">No notifications yet</string>
+    <string name="notifications_empty_subtitle">You\'ll see updates about your listings and orders here</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">Favorites</string>
+    <string name="favorites_empty">No favorites yet</string>
+    <string name="favorites_empty_subtitle">Save listings you\'re interested in</string>
+
+    <!-- Reviews -->
+    <string name="review_title">Write Review</string>
+    <string name="review_placeholder">Share your experience…</string>
+    <string name="review_submit">Submit Review</string>
+    <string name="review_rating">Rating</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">Analytics</string>
+    <string name="analytics_revenue">Revenue</string>
+    <string name="analytics_orders">Orders</string>
+    <string name="analytics_views">Views</string>
+
+    <!-- Voice Input -->
+    <string name="voice_permission_title">Microphone Permission Required</string>
+    <string name="voice_permission_message">Microphone permission is required to use voice input</string>
+    <string name="voice_prompt">Please speak…</string>
+
+    <!-- Map -->
+    <string name="map_title">Listings Map</string>
+    <string name="map_select_location">Select Location</string>
 </resources>

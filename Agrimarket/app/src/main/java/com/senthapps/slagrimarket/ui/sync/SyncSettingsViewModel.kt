@@ -33,6 +33,7 @@ class SyncSettingsViewModel @Inject constructor(
                     pendingOperations = syncState.pendingOperations,
                     successfulOperations = syncState.successfulOperations,
                     failedOperations = syncState.failedOperations,
+                    conflictCount = syncState.conflictCount,
                     error = syncState.error
                 )
             }
@@ -93,6 +94,17 @@ class SyncSettingsViewModel @Inject constructor(
             }
         }
     }
+
+    fun dismissConflicts() {
+        viewModelScope.launch {
+            try {
+                syncManager.dismissConflicts()
+                Timber.d("Dismissed conflicts")
+            } catch (e: Exception) {
+                Timber.e(e, "Error dismissing conflicts")
+            }
+        }
+    }
     
     fun refreshStatistics() {
         val stats = syncManager.getSyncStatistics()
@@ -100,6 +112,7 @@ class SyncSettingsViewModel @Inject constructor(
             pendingOperations = stats.pendingOperations,
             successfulOperations = stats.successfulOperations,
             failedOperations = stats.failedOperations,
+            conflictCount = stats.conflictCount,
             lastSyncTime = stats.lastSyncTime,
             isSyncing = stats.isSyncing
         )
@@ -112,6 +125,7 @@ data class SyncSettingsUiState(
     val pendingOperations: Int = 0,
     val successfulOperations: Int = 0,
     val failedOperations: Int = 0,
+    val conflictCount: Int = 0,
     val autoSyncEnabled: Boolean = true,
     val syncInterval: Long = 30_000L, // 30 seconds
     val error: String? = null

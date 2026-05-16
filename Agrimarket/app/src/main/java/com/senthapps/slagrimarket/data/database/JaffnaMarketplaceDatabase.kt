@@ -7,18 +7,27 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
+import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.dao.ActivityDao
+import com.senthapps.slagrimarket.data.dao.DoaCropDao
+import com.senthapps.slagrimarket.data.dao.FavoriteDao
 import com.senthapps.slagrimarket.data.dao.ListingDao
 import com.senthapps.slagrimarket.data.dao.LocalOpDao
 import com.senthapps.slagrimarket.data.dao.MarketPriceDao
+import com.senthapps.slagrimarket.data.dao.MessageDao
 import com.senthapps.slagrimarket.data.dao.TransactionDao
 import com.senthapps.slagrimarket.data.dao.UserDao
 import com.senthapps.slagrimarket.data.model.Activity
 import com.senthapps.slagrimarket.data.model.ActivityConverters
+import com.senthapps.slagrimarket.data.model.Conversation
+import com.senthapps.slagrimarket.data.model.DoaCropCategoryEntity
+import com.senthapps.slagrimarket.data.model.DoaCropEntity
+import com.senthapps.slagrimarket.data.model.Favorite
 import com.senthapps.slagrimarket.data.model.Listing
 import com.senthapps.slagrimarket.data.model.ListingConverters
 import com.senthapps.slagrimarket.data.model.LocalOp
 import com.senthapps.slagrimarket.data.model.MarketPrice
+import com.senthapps.slagrimarket.data.model.Message
 import com.senthapps.slagrimarket.data.model.Transaction
 import com.senthapps.slagrimarket.data.model.TransactionConverters
 import com.senthapps.slagrimarket.data.model.User
@@ -34,9 +43,16 @@ import com.senthapps.slagrimarket.data.model.User
         Transaction::class,
         LocalOp::class,
         MarketPrice::class,
-        Activity::class
+        Activity::class,
+        com.senthapps.slagrimarket.data.model.Notification::class,
+        com.senthapps.slagrimarket.data.model.Review::class,
+        com.senthapps.slagrimarket.data.model.Message::class,
+        com.senthapps.slagrimarket.data.model.Conversation::class,
+        com.senthapps.slagrimarket.data.model.Favorite::class,
+        DoaCropCategoryEntity::class,
+        DoaCropEntity::class
     ],
-    version = 2,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters(
@@ -52,7 +68,12 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
     abstract fun localOpDao(): LocalOpDao
     abstract fun marketPriceDao(): MarketPriceDao
     abstract fun activityDao(): ActivityDao
-    
+    abstract fun notificationDao(): com.senthapps.slagrimarket.data.dao.NotificationDao
+    abstract fun reviewDao(): com.senthapps.slagrimarket.data.dao.ReviewDao
+    abstract fun messageDao(): com.senthapps.slagrimarket.data.dao.MessageDao
+    abstract fun favoriteDao(): com.senthapps.slagrimarket.data.dao.FavoriteDao
+    abstract fun doaCropDao(): DoaCropDao
+
     companion object {
         private const val DATABASE_NAME = "jaffna_marketplace_database"
 
@@ -175,6 +196,171 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
         }
 
         /**
+         * Migration from version 2 to 3
+         * Adds notifications table
+         */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `notifications` (
+                        `id` TEXT NOT NULL,
+                        `userId` TEXT NOT NULL,
+                        `type` TEXT NOT NULL,
+                        `title` TEXT NOT NULL,
+                        `message` TEXT NOT NULL,
+                        `relatedId` TEXT NOT NULL,
+                        `isRead` INTEGER NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_notifications_userId` ON `notifications` (`userId`)")
+            }
+        }
+
+        /**
+         * Migration from version 3 to 4
+         * Adds reviews table
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `reviews` (
+                        `id` TEXT NOT NULL,
+                        `transactionId` TEXT NOT NULL,
+                        `reviewerId` TEXT NOT NULL,
+                        `reviewerName` TEXT NOT NULL,
+                        `revieweeId` TEXT NOT NULL,
+                        `rating` INTEGER NOT NULL,
+                        `comment` TEXT NOT NULL,
+                        `reviewType` TEXT NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_reviews_revieweeId` ON `reviews` (`revieweeId`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_reviews_transactionId` ON `reviews` (`transactionId`)")
+            }
+        }
+
+        /**
+         * Migration from version 4 to 6
+         * Adds messages, conversations, favorites tables
+         * Adds new columns to users, listings, transactions, activities
+         */
+        private val MIGRATION_4_6 = object : Migration(4, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create messages table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `messages` (
+                        `id` TEXT NOT NULL,
+                        `conversationId` TEXT NOT NULL,
+                        `senderId` TEXT NOT NULL,
+                        `senderName` TEXT NOT NULL,
+                        `receiverId` TEXT NOT NULL,
+                        `content` TEXT NOT NULL,
+                        `messageType` TEXT NOT NULL,
+                        `isRead` INTEGER NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_messages_conversationId` ON `messages` (`conversationId`)")
+
+                // Create conversations table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `conversations` (
+                        `id` TEXT NOT NULL,
+                        `listingId` TEXT,
+                        `participant1Id` TEXT NOT NULL,
+                        `participant1Name` TEXT NOT NULL,
+                        `participant2Id` TEXT NOT NULL,
+                        `participant2Name` TEXT NOT NULL,
+                        `lastMessage` TEXT,
+                        `lastMessageTime` TEXT,
+                        `unreadCount` INTEGER NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        `updatedAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_conversations_participant1Id` ON `conversations` (`participant1Id`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_conversations_participant2Id` ON `conversations` (`participant2Id`)")
+
+                // Create favorites table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `favorites` (
+                        `id` TEXT NOT NULL,
+                        `userId` TEXT NOT NULL,
+                        `listingId` TEXT NOT NULL,
+                        `createdAt` TEXT NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_favorites_userId` ON `favorites` (`userId`)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_favorites_listingId` ON `favorites` (`listingId`)")
+
+                // Add location column to users (nullable)
+                try { database.execSQL("ALTER TABLE `users` ADD COLUMN `location` TEXT") } catch (_: Exception) {}
+
+                // Add new columns to listings
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `farmerPhone` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `story` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `farmingMethods` TEXT NOT NULL DEFAULT '[]'") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `certifications` TEXT NOT NULL DEFAULT '[]'") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `harvestedAt` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `listings` ADD COLUMN `sustainabilityPractices` TEXT NOT NULL DEFAULT '[]'") } catch (_: Exception) {}
+
+                // Add new columns to transactions
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `sellerName` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `buyerName` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `sellerPhone` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+                try { database.execSQL("ALTER TABLE `transactions` ADD COLUMN `buyerPhone` TEXT NOT NULL DEFAULT ''") } catch (_: Exception) {}
+            }
+        }
+
+        /**
+         * Migration from version 6 to 7
+         * Adds DoA CROPIX crop cache tables (doa_crop_categories, doa_crops)
+         */
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `doa_crop_categories` (
+                        `id` INTEGER NOT NULL,
+                        `categoryId` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `cachedAt` INTEGER NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `doa_crops` (
+                        `id` INTEGER NOT NULL,
+                        `cropId` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `cropType` TEXT,
+                        `scientificName` TEXT,
+                        `categoryId` TEXT,
+                        `cachedAt` INTEGER NOT NULL,
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+            }
+        }
+
+        /**
+         * Migration from version 7 to 8
+         * Seeds sample listings for debug/demo use
+         */
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                if (BuildConfig.DEBUG) prepopulateListings(database)
+            }
+        }
+
+        /**
          * Database callback for prepopulating data
          */
         private val databaseCallback = object : RoomDatabase.Callback() {
@@ -182,6 +368,7 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
                 super.onCreate(db)
                 // Prepopulate market prices with sample data
                 prepopulateMarketPrices(db)
+                if (BuildConfig.DEBUG) prepopulateListings(db)
             }
         }
 
@@ -207,6 +394,33 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Prepopulate sample listings covering all 4 categories for debug/demo use
+         */
+        private fun prepopulateListings(db: SupportSQLiteDatabase) {
+            val today = "2026-03-16"
+            val sampleListings = listOf(
+                // VEGETABLES
+                "('debug_listing_tomato', 'debug_user_123', 'Tomato', 'தக்காளி', 'Tomato', 'තක්කාලි', 50.0, 'kg', 95.0, 'A', '$today', 'Jaffna', 1, datetime('now'), datetime('now'))",
+                "('debug_listing_carrot', 'debug_user_123', 'Carrot', 'கேரட்', 'Carrot', 'කැරට්', 30.0, 'kg', 80.0, 'A', '$today', 'Chavakachcheri', 1, datetime('now'), datetime('now'))",
+                "('debug_listing_onion', 'debug_user_123', 'Onion', 'வெங்காயம்', 'Red Onion', 'රතු ළූණු', 40.0, 'kg', 120.0, 'B', '$today', 'Jaffna', 1, datetime('now'), datetime('now'))",
+                // FRUITS
+                "('debug_listing_mango', 'debug_user_123', 'Mango', 'மாம்பழம்', 'Mango', 'අඹ', 20.0, 'kg', 200.0, 'A', '$today', 'Kilinochchi', 1, datetime('now'), datetime('now'))",
+                "('debug_listing_banana', 'debug_user_123', 'Banana', 'வாழைப்பழம்', 'Banana', 'කෙසෙල්', 60.0, 'kg', 60.0, 'A', '$today', 'Jaffna', 1, datetime('now'), datetime('now'))",
+                // GRAINS
+                "('debug_listing_rice', 'debug_user_123', 'Rice', 'அரிசி', 'Rice', 'හාල්', 100.0, 'kg', 150.0, 'A', '$today', 'Vavuniya', 1, datetime('now'), datetime('now'))",
+                // LIVESTOCK
+                "('debug_listing_chicken', 'debug_user_123', 'Chicken', 'கோழி', 'Chicken', 'කුකුල්', 10.0, 'kg', 700.0, 'A', '$today', 'Jaffna', 1, datetime('now'), datetime('now'))"
+            )
+            sampleListings.forEach { values ->
+                db.execSQL("""
+                    INSERT OR IGNORE INTO listings
+                    (id, farmerId, cropType, cropNameTamil, cropNameEnglish, cropNameSinhala, quantity, unit, pricePerUnit, quality, harvestDate, location, isActive, createdAt, updatedAt)
+                    VALUES $values
+                """.trimIndent())
+            }
+        }
+
         fun getDatabase(context: Context): JaffnaMarketplaceDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -214,7 +428,8 @@ abstract class JaffnaMarketplaceDatabase : RoomDatabase() {
                     JaffnaMarketplaceDatabase::class.java,
                     DATABASE_NAME
                 )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_6, MIGRATION_6_7, MIGRATION_7_8)
+                .fallbackToDestructiveMigration()
                 .addCallback(databaseCallback)
                 .build()
                 INSTANCE = instance

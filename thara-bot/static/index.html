@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sanctum Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #17212b;
+      --surface:  #1c2733;
+      --sidebar:  #232e3c;
+      --border:   #0d1117;
+      --hover:    #2b3a4a;
+      --active:   #2b5278;
+      --text:     #e8f0f7;
+      --muted:    #708999;
+      --accent:   #5288c1;
+      --green:    #4cd964;
+      --bubble-user: #2b5278;
+      --bubble-bot:  #182533;
+      --radius:   12px;
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 14px; }
+
+    /* ── Stats Bar ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .topbar-logo { font-size: 16px; font-weight: 700; color: var(--accent); margin-right: 16px; white-space: nowrap; }
+    .stat-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--sidebar); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 12px; color: var(--muted);
+    }
+    .stat-pill strong { color: var(--text); font-size: 13px; }
+    .stat-pill.cost strong { color: var(--green); }
+    .live { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+    .live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Layout ── */
+    .app { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 300px; background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .sidebar-tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 11px 0; background: none; border: none;
+      color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all .15s; letter-spacing: .5px; text-transform: uppercase;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .tab-panel.active { display: flex; }
+
+    /* search */
+    .search-wrap { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .search-box {
+      width: 100%; background: var(--bg); border: none; border-radius: 20px;
+      padding: 7px 14px; color: var(--text); font-size: 13px; outline: none;
+    }
+    .search-box::placeholder { color: var(--muted); }
+
+    /* chat list */
+    .list { flex: 1; overflow-y: auto; }
+    .list::-webkit-scrollbar { width: 3px; }
+    .list::-webkit-scrollbar-thumb { background: #3a4a5c; border-radius: 3px; }
+
+    .chat-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,.03);
+      transition: background .12s;
+    }
+    .chat-item:hover { background: var(--hover); }
+    .chat-item.active { background: var(--active); }
+
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; flex-shrink: 0;
+      color: #fff;
+    }
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-preview { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .chat-preview.bot-msg { color: var(--accent); }
+    .chat-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .chat-time { font-size: 10px; color: var(--muted); }
+    .persona-badge {
+      font-size: 10px; font-weight: 600; padding: 2px 7px;
+      border-radius: 10px; color: #fff; white-space: nowrap;
+    }
+
+    /* personas panel */
+    .persona-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .persona-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .persona-name { font-size: 13px; font-weight: 600; }
+    .persona-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .persona-stat { margin-left: auto; text-align: right; }
+    .persona-stat .count { font-size: 13px; font-weight: 600; color: var(--text); }
+    .persona-stat .label { font-size: 10px; color: var(--muted); }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .chat-header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 11px 18px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .chat-header .avatar { width: 36px; height: 36px; font-size: 13px; }
+    .chat-header-info { flex: 1; }
+    .chat-header-name { font-size: 14px; font-weight: 600; }
+    .chat-header-sub { font-size: 11px; color: var(--muted); }
+    .chat-cost { font-size: 11px; color: var(--green); background: rgba(76,217,100,.1); border: 1px solid rgba(76,217,100,.2); padding: 3px 10px; border-radius: 12px; }
+
+    .messages-area {
+      flex: 1; overflow-y: auto; padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .messages-area::-webkit-scrollbar { width: 3px; }
+    .messages-area::-webkit-scrollbar-thumb { background: #3a4a5c; border-radius: 3px; }
+
+    .no-chat, .empty-state {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px; color: var(--muted);
+    }
+    .no-chat .icon { font-size: 72px; opacity: .1; }
+    .no-chat h3 { font-size: 16px; color: #3a4a5c; }
+    .no-chat p { font-size: 12px; }
+
+    .date-sep { text-align: center; margin: 14px 0 6px; }
+    .date-sep span { background: var(--surface); color: var(--muted); font-size: 11px; padding: 3px 12px; border-radius: 12px; }
+
+    .msg-row { display: flex; margin: 2px 0; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.assistant { justify-content: flex-start; }
+
+    .bubble {
+      max-width: 66%; padding: 8px 12px; border-radius: var(--radius);
+      font-size: 13px; line-height: 1.55; position: relative;
+    }
+    .msg-row.user .bubble { background: var(--bubble-user); border-bottom-right-radius: 3px; }
+    .msg-row.assistant .bubble { background: var(--bubble-bot); border-bottom-left-radius: 3px; border: 1px solid var(--sidebar); }
+
+    .persona-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+    .bubble-meta { display: flex; align-items: center; gap: 5px; margin-top: 4px; justify-content: flex-end; }
+    .bubble-time { font-size: 10px; color: var(--muted); }
+    .bubble-tokens { font-size: 10px; color: var(--green); opacity: .65; }
+  </style>
+</head>
+<body>
+
+<!-- Top Stats Bar -->
+<div class="topbar">
+  <div class="topbar-logo">🏛️ Sanctum</div>
+  <div class="stat-pill"><span>👥</span><strong id="s-users">—</strong> users</div>
+  <div class="stat-pill"><span>💬</span><strong id="s-msgs">—</strong> messages</div>
+  <div class="stat-pill"><span>⚡</span><strong id="s-tokens">—</strong> tokens</div>
+  <div class="stat-pill cost"><span>💵</span><strong id="s-cost">—</strong> spent</div>
+  <div class="live"><span class="live-dot"></span>Live</div>
+</div>
+
+<!-- App -->
+<div class="app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <button class="tab-btn active" onclick="switchTab('chats', this)">Chats</button>
+      <button class="tab-btn" onclick="switchTab('personas', this)">Personas</button>
+    </div>
+
+    <!-- Chats Tab -->
+    <div class="tab-panel active" id="tab-chats">
+      <div class="search-wrap">
+        <input class="search-box" type="text" id="searchInput" placeholder="Search users…" oninput="filterChats()" />
+      </div>
+      <div class="list" id="chatList">
+        <div class="empty-state" style="padding:40px 0"><p>No conversations yet</p></div>
+      </div>
+    </div>
+
+    <!-- Personas Tab -->
+    <div class="tab-panel" id="tab-personas">
+      <div class="list" id="personaList"></div>
+    </div>
+  </div>
+
+  <!-- Main Panel -->
+  <div class="main" id="mainPanel">
+    <div class="no-chat">
+      <div class="icon">💬</div>
+      <h3>Sanctum Dashboard</h3>
+      <p>Select a conversation to view messages</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── State ─────────────────────────────────────────────────────────────────
+  let activeUserId = null;
+  let allUsers     = [];
+  let pollInterval = null;
+
+  const PERSONAS = {
+    thara:  { name: "Thara",    emoji: "💕", color: "#e91e63" },
+    kai:    { name: "Kai",      emoji: "🤙", color: "#2196f3" },
+    aria:   { name: "Dr. Aria", emoji: "🌿", color: "#9c27b0" },
+    marcus: { name: "Marcus",   emoji: "🔥", color: "#ff9800" },
+    luna:   { name: "Luna",     emoji: "✨", color: "#00bcd4" },
+  };
+
+  function personaOf(id) {
+    return PERSONAS[id] || { name: id, emoji: "🤖", color: "#5288c1" };
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function fmt(ts) {
+    if (!ts) return '';
+    const d = new Date(ts.replace(' ', 'T') + 'Z');
+    const now = new Date();
+    if (d.toDateString() === now.toDateString())
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '';
+    const d = new Date(ts.replace(' ', 'T') + 'Z');
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) return 'Today';
+    const y = new Date(now); y.setDate(now.getDate() - 1);
+    if (d.toDateString() === y.toDateString()) return 'Yesterday';
+    return d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return '';
+    return new Date(ts.replace(' ', 'T') + 'Z').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function fmtTokens(n) {
+    if (!n) return '0';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return n;
+  }
+
+  function displayName(u) {
+    return u.first_name || u.username || 'User ' + u.user_id;
+  }
+
+  function avatarLetter(u) {
+    return displayName(u).charAt(0).toUpperCase();
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  async function fetchStats() {
+    try {
+      const s = await fetch('/api/stats').then(r => r.json());
+      document.getElementById('s-users').textContent  = s.total_users    || 0;
+      document.getElementById('s-msgs').textContent   = s.total_messages  || 0;
+      document.getElementById('s-tokens').textContent = fmtTokens((s.total_input_tokens || 0) + (s.total_output_tokens || 0));
+      document.getElementById('s-cost').textContent   = '$' + (s.total_cost_usd || 0).toFixed(4);
+    } catch {}
+  }
+
+  // ── User list ─────────────────────────────────────────────────────────────
+  async function fetchUsers() {
+    try {
+      allUsers = await fetch('/api/users').then(r => r.json());
+      renderChatList(allUsers);
+      renderPersonaList(allUsers);
+    } catch {}
+  }
+
+  function renderChatList(users) {
+    const el = document.getElementById('chatList');
+    if (!users.length) { el.innerHTML = '<div class="empty-state" style="padding:40px 0"><p>No conversations yet</p></div>'; return; }
+
+    el.innerHTML = users.map(u => {
+      const name     = displayName(u);
+      const pid      = u.current_persona || 'thara';
+      const p        = personaOf(pid);
+      const preview  = u.last_message ? u.last_message.slice(0, 55) : '';
+      const isBot    = u.last_message_role === 'assistant';
+      const active   = u.user_id === activeUserId ? 'active' : '';
+      const bgColor  = p.color + '33';
+
+      return `<div class="chat-item ${active}" onclick="openChat(${u.user_id})">
+        <div class="avatar" style="background:${p.color}">${avatarLetter(u)}</div>
+        <div class="chat-info">
+          <div class="chat-name">${esc(name)}</div>
+          <div class="chat-preview ${isBot ? 'bot-msg' : ''}">${isBot ? p.emoji + ' ' : ''}${esc(preview)}</div>
+        </div>
+        <div class="chat-meta">
+          <span class="chat-time">${fmt(u.last_message_time)}</span>
+          <span class="persona-badge" style="background:${p.color}">${p.emoji} ${p.name}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderPersonaList(users) {
+    const counts = {};
+    users.forEach(u => {
+      const pid = u.current_persona || 'thara';
+      counts[pid] = (counts[pid] || 0) + 1;
+    });
+
+    const el = document.getElementById('personaList');
+    const descriptions = {
+      thara:  "Loving wife & nurse",
+      kai:    "Fun, loyal best friend",
+      aria:   "Empathetic therapist",
+      marcus: "Straight-talking mentor",
+      luna:   "Playful creative companion",
+    };
+
+    el.innerHTML = Object.entries(PERSONAS).map(([pid, p]) => `
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:${p.color}33">${p.emoji}</div>
+        <div>
+          <div class="persona-name">${p.name}</div>
+          <div class="persona-desc">${descriptions[pid] || ''}</div>
+        </div>
+        <div class="persona-stat">
+          <div class="count">${counts[pid] || 0}</div>
+          <div class="label">users</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function filterChats() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    renderChatList(allUsers.filter(u =>
+      displayName(u).toLowerCase().includes(q) ||
+      (u.username && u.username.toLowerCase().includes(q))
+    ));
+  }
+
+  // ── Open chat ─────────────────────────────────────────────────────────────
+  async function openChat(userId) {
+    activeUserId = userId;
+    renderChatList(allUsers);
+
+    const user = allUsers.find(u => u.user_id === userId);
+    const name = user ? displayName(user) : 'User';
+    const pid  = user?.current_persona || 'thara';
+    const p    = personaOf(pid);
+
+    document.getElementById('mainPanel').innerHTML = `
+      <div class="chat-header">
+        <div class="avatar" style="background:${p.color}">${user ? avatarLetter(user) : '?'}</div>
+        <div class="chat-header-info">
+          <div class="chat-header-name">${esc(name)} <span style="color:${p.color};font-size:12px">${p.emoji} ${p.name}</span></div>
+          <div class="chat-header-sub" id="hdrSub">Loading…</div>
+        </div>
+        <div class="chat-cost" id="hdrCost">—</div>
+      </div>
+      <div class="messages-area" id="msgArea"><div class="empty-state"><p>Loading…</p></div></div>`;
+
+    await loadMessages(userId);
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(() => { if (activeUserId === userId) loadMessages(userId, true); }, 3000);
+  }
+
+  async function loadMessages(userId, silent = false) {
+    try {
+      const msgs = await fetch(`/api/messages/${userId}`).then(r => r.json());
+      renderMessages(msgs, silent);
+    } catch {}
+  }
+
+  function renderMessages(msgs, silent = false) {
+    const area = document.getElementById('msgArea');
+    if (!area) return;
+    const wasBottom = area.scrollHeight - area.clientHeight - area.scrollTop < 60;
+
+    if (!msgs.length) { area.innerHTML = '<div class="empty-state"><p>No messages yet</p></div>'; return; }
+
+    const totalCost = msgs.reduce((s, m) => s + (m.cost_usd || 0), 0);
+    const sub = document.getElementById('hdrSub');
+    const cst = document.getElementById('hdrCost');
+    if (sub) sub.textContent = `${msgs.length} messages`;
+    if (cst) cst.textContent = `$${totalCost.toFixed(5)} spent`;
+
+    let html = '', lastDate = '';
+    for (const m of msgs) {
+      const dl = fmtDate(m.timestamp);
+      if (dl !== lastDate) { html += `<div class="date-sep"><span>${dl}</span></div>`; lastDate = dl; }
+
+      const pid   = m.persona_id || 'thara';
+      const p     = personaOf(pid);
+      const tokens = m.completion_tokens
+        ? `<span class="bubble-tokens">${m.prompt_tokens}↑${m.completion_tokens}↓</span>` : '';
+
+      const dot = m.role === 'assistant'
+        ? `<span class="persona-dot" style="background:${p.color}" title="${p.name}"></span>` : '';
+
+      html += `<div class="msg-row ${m.role}">
+        <div class="bubble">
+          ${esc(m.content)}
+          <div class="bubble-meta">${dot}${tokens}<span class="bubble-time">${fmtTime(m.timestamp)}</span></div>
+        </div>
+      </div>`;
+    }
+
+    area.innerHTML = html;
+    if (!silent || wasBottom) area.scrollTop = area.scrollHeight;
+  }
+
+  // ── Poll ──────────────────────────────────────────────────────────────────
+  async function poll() { await Promise.all([fetchStats(), fetchUsers()]); }
+  poll();
+  setInterval(poll, 5000);
+</script>
+</body>
+</html>

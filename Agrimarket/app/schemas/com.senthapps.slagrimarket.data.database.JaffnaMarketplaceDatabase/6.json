@@ -1,0 +1,1279 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "2c5e4712ceb84d75ce86b5f0cb64f45a",
+    "entities": [
+      {
+        "tableName": "users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `phone` TEXT, `userType` TEXT, `location` TEXT, `verified` INTEGER NOT NULL, `language` TEXT NOT NULL, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "userType",
+            "columnName": "userType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "verified",
+            "columnName": "verified",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        }
+      },
+      {
+        "tableName": "listings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `farmerId` TEXT NOT NULL, `farmerName` TEXT, `farmerPhone` TEXT NOT NULL, `cropType` TEXT NOT NULL, `cropNameTamil` TEXT NOT NULL, `cropNameEnglish` TEXT NOT NULL, `cropNameSinhala` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `pricePerUnit` REAL NOT NULL, `quality` TEXT NOT NULL, `harvestDate` TEXT NOT NULL, `availableFrom` TEXT NOT NULL, `availableUntil` TEXT NOT NULL, `location` TEXT NOT NULL, `locationTamil` TEXT NOT NULL, `locationSinhala` TEXT NOT NULL, `description` TEXT NOT NULL, `descriptionTamil` TEXT NOT NULL, `descriptionSinhala` TEXT NOT NULL, `images` TEXT NOT NULL, `pickupLocations` TEXT NOT NULL, `isActive` INTEGER NOT NULL, `syncStatus` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `clientId` TEXT, `viewCount` INTEGER NOT NULL, `inquiryCount` INTEGER NOT NULL, `story` TEXT NOT NULL, `farmingMethods` TEXT NOT NULL, `certifications` TEXT NOT NULL, `harvestedAt` TEXT NOT NULL, `sustainabilityPractices` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`farmerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "farmerId",
+            "columnName": "farmerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "farmerName",
+            "columnName": "farmerName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "farmerPhone",
+            "columnName": "farmerPhone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropType",
+            "columnName": "cropType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropNameTamil",
+            "columnName": "cropNameTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropNameEnglish",
+            "columnName": "cropNameEnglish",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropNameSinhala",
+            "columnName": "cropNameSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pricePerUnit",
+            "columnName": "pricePerUnit",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quality",
+            "columnName": "quality",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "harvestDate",
+            "columnName": "harvestDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "availableFrom",
+            "columnName": "availableFrom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "availableUntil",
+            "columnName": "availableUntil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locationTamil",
+            "columnName": "locationTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locationSinhala",
+            "columnName": "locationSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descriptionTamil",
+            "columnName": "descriptionTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descriptionSinhala",
+            "columnName": "descriptionSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupLocations",
+            "columnName": "pickupLocations",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "syncStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "viewCount",
+            "columnName": "viewCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inquiryCount",
+            "columnName": "inquiryCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "story",
+            "columnName": "story",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "farmingMethods",
+            "columnName": "farmingMethods",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certifications",
+            "columnName": "certifications",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "harvestedAt",
+            "columnName": "harvestedAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sustainabilityPractices",
+            "columnName": "sustainabilityPractices",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        },
+        "indices": [
+          {
+            "name": "index_listings_farmerId",
+            "unique": false,
+            "columnNames": ["farmerId"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_farmerId` ON `${TABLE_NAME}` (`farmerId`)"
+          },
+          {
+            "name": "index_listings_cropType",
+            "unique": false,
+            "columnNames": ["cropType"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_cropType` ON `${TABLE_NAME}` (`cropType`)"
+          },
+          {
+            "name": "index_listings_quality",
+            "unique": false,
+            "columnNames": ["quality"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_quality` ON `${TABLE_NAME}` (`quality`)"
+          },
+          {
+            "name": "index_listings_syncStatus",
+            "unique": false,
+            "columnNames": ["syncStatus"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_syncStatus` ON `${TABLE_NAME}` (`syncStatus`)"
+          },
+          {
+            "name": "index_listings_isActive",
+            "unique": false,
+            "columnNames": ["isActive"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_isActive` ON `${TABLE_NAME}` (`isActive`)"
+          },
+          {
+            "name": "index_listings_harvestDate",
+            "unique": false,
+            "columnNames": ["harvestDate"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_harvestDate` ON `${TABLE_NAME}` (`harvestDate`)"
+          },
+          {
+            "name": "index_listings_createdAt",
+            "unique": false,
+            "columnNames": ["createdAt"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_listings_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": ["farmerId"],
+            "referencedColumns": ["id"]
+          }
+        ]
+      },
+      {
+        "tableName": "transactions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `listingId` TEXT NOT NULL, `farmerId` TEXT NOT NULL, `buyerId` TEXT NOT NULL, `sellerName` TEXT NOT NULL, `buyerName` TEXT NOT NULL, `sellerPhone` TEXT NOT NULL, `buyerPhone` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `pricePerUnit` REAL NOT NULL, `totalAmount` REAL NOT NULL, `pickupLocation` TEXT NOT NULL, `pickupLocationTamil` TEXT NOT NULL, `pickupLocationSinhala` TEXT NOT NULL, `pickupDate` TEXT NOT NULL, `pickupTime` TEXT NOT NULL, `status` TEXT NOT NULL, `paymentMethod` TEXT NOT NULL, `paymentStatus` TEXT NOT NULL, `notes` TEXT NOT NULL, `notesTamil` TEXT NOT NULL, `notesSinhala` TEXT NOT NULL, `farmerRating` INTEGER, `buyerRating` INTEGER, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, `completedAt` TEXT, `clientId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`listingId`) REFERENCES `listings`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`farmerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`buyerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listingId",
+            "columnName": "listingId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "farmerId",
+            "columnName": "farmerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyerId",
+            "columnName": "buyerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellerName",
+            "columnName": "sellerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyerName",
+            "columnName": "buyerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellerPhone",
+            "columnName": "sellerPhone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyerPhone",
+            "columnName": "buyerPhone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pricePerUnit",
+            "columnName": "pricePerUnit",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalAmount",
+            "columnName": "totalAmount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupLocation",
+            "columnName": "pickupLocation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupLocationTamil",
+            "columnName": "pickupLocationTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupLocationSinhala",
+            "columnName": "pickupLocationSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupDate",
+            "columnName": "pickupDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupTime",
+            "columnName": "pickupTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paymentMethod",
+            "columnName": "paymentMethod",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paymentStatus",
+            "columnName": "paymentStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notesTamil",
+            "columnName": "notesTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notesSinhala",
+            "columnName": "notesSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "farmerRating",
+            "columnName": "farmerRating",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "buyerRating",
+            "columnName": "buyerRating",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAt",
+            "columnName": "completedAt",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        },
+        "indices": [
+          {
+            "name": "index_transactions_listingId",
+            "unique": false,
+            "columnNames": ["listingId"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_listingId` ON `${TABLE_NAME}` (`listingId`)"
+          },
+          {
+            "name": "index_transactions_farmerId",
+            "unique": false,
+            "columnNames": ["farmerId"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_farmerId` ON `${TABLE_NAME}` (`farmerId`)"
+          },
+          {
+            "name": "index_transactions_buyerId",
+            "unique": false,
+            "columnNames": ["buyerId"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_buyerId` ON `${TABLE_NAME}` (`buyerId`)"
+          },
+          {
+            "name": "index_transactions_status",
+            "unique": false,
+            "columnNames": ["status"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_transactions_paymentMethod",
+            "unique": false,
+            "columnNames": ["paymentMethod"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_paymentMethod` ON `${TABLE_NAME}` (`paymentMethod`)"
+          },
+          {
+            "name": "index_transactions_pickupDate",
+            "unique": false,
+            "columnNames": ["pickupDate"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_pickupDate` ON `${TABLE_NAME}` (`pickupDate`)"
+          },
+          {
+            "name": "index_transactions_createdAt",
+            "unique": false,
+            "columnNames": ["createdAt"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_transactions_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "listings",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": ["listingId"],
+            "referencedColumns": ["id"]
+          },
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": ["farmerId"],
+            "referencedColumns": ["id"]
+          },
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": ["buyerId"],
+            "referencedColumns": ["id"]
+          }
+        ]
+      },
+      {
+        "tableName": "local_ops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`opId` TEXT NOT NULL, `type` TEXT NOT NULL, `payload` TEXT NOT NULL, `clientTs` TEXT NOT NULL, `attempts` INTEGER NOT NULL, `synced` INTEGER NOT NULL, `lastAttemptAt` TEXT, `errorMessage` TEXT, `clientId` TEXT, `entityId` TEXT, PRIMARY KEY(`opId`))",
+        "fields": [
+          {
+            "fieldPath": "opId",
+            "columnName": "opId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payload",
+            "columnName": "payload",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientTs",
+            "columnName": "clientTs",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "attempts",
+            "columnName": "attempts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "synced",
+            "columnName": "synced",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastAttemptAt",
+            "columnName": "lastAttemptAt",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "errorMessage",
+            "columnName": "errorMessage",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "entityId",
+            "columnName": "entityId",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["opId"]
+        }
+      },
+      {
+        "tableName": "market_prices",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `cropType` TEXT NOT NULL, `cropNameTamil` TEXT NOT NULL, `cropNameEnglish` TEXT NOT NULL, `cropNameSinhala` TEXT NOT NULL, `currentPrice` REAL NOT NULL, `previousPrice` REAL NOT NULL, `unit` TEXT NOT NULL, `trend` TEXT NOT NULL, `changePercentage` REAL NOT NULL, `changeAmount` REAL NOT NULL, `location` TEXT NOT NULL, `locationTamil` TEXT NOT NULL, `locationSinhala` TEXT NOT NULL, `lastUpdated` TEXT NOT NULL, `isActive` INTEGER NOT NULL, `source` TEXT NOT NULL, `reliability` REAL NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropType",
+            "columnName": "cropType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropNameTamil",
+            "columnName": "cropNameTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropNameEnglish",
+            "columnName": "cropNameEnglish",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cropNameSinhala",
+            "columnName": "cropNameSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentPrice",
+            "columnName": "currentPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previousPrice",
+            "columnName": "previousPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trend",
+            "columnName": "trend",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changePercentage",
+            "columnName": "changePercentage",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changeAmount",
+            "columnName": "changeAmount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locationTamil",
+            "columnName": "locationTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locationSinhala",
+            "columnName": "locationSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdated",
+            "columnName": "lastUpdated",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reliability",
+            "columnName": "reliability",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        },
+        "indices": [
+          {
+            "name": "index_market_prices_cropType",
+            "unique": false,
+            "columnNames": ["cropType"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_cropType` ON `${TABLE_NAME}` (`cropType`)"
+          },
+          {
+            "name": "index_market_prices_trend",
+            "unique": false,
+            "columnNames": ["trend"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_trend` ON `${TABLE_NAME}` (`trend`)"
+          },
+          {
+            "name": "index_market_prices_location",
+            "unique": false,
+            "columnNames": ["location"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_location` ON `${TABLE_NAME}` (`location`)"
+          },
+          {
+            "name": "index_market_prices_lastUpdated",
+            "unique": false,
+            "columnNames": ["lastUpdated"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_market_prices_lastUpdated` ON `${TABLE_NAME}` (`lastUpdated`)"
+          }
+        ]
+      },
+      {
+        "tableName": "activities",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `activityType` TEXT NOT NULL, `title` TEXT NOT NULL, `titleTamil` TEXT NOT NULL, `titleSinhala` TEXT NOT NULL, `description` TEXT NOT NULL, `descriptionTamil` TEXT NOT NULL, `descriptionSinhala` TEXT NOT NULL, `relatedEntityType` TEXT, `relatedEntityId` TEXT, `status` TEXT NOT NULL, `priority` TEXT NOT NULL, `timestamp` TEXT NOT NULL, `metadata` TEXT NOT NULL, `isRead` INTEGER NOT NULL, `isActionable` INTEGER NOT NULL, `expiresAt` TEXT, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`userId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activityType",
+            "columnName": "activityType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titleTamil",
+            "columnName": "titleTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titleSinhala",
+            "columnName": "titleSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descriptionTamil",
+            "columnName": "descriptionTamil",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descriptionSinhala",
+            "columnName": "descriptionSinhala",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relatedEntityType",
+            "columnName": "relatedEntityType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "relatedEntityId",
+            "columnName": "relatedEntityId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "priority",
+            "columnName": "priority",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metadata",
+            "columnName": "metadata",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isRead",
+            "columnName": "isRead",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActionable",
+            "columnName": "isActionable",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresAt",
+            "columnName": "expiresAt",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        },
+        "indices": [
+          {
+            "name": "index_activities_userId",
+            "unique": false,
+            "columnNames": ["userId"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_userId` ON `${TABLE_NAME}` (`userId`)"
+          },
+          {
+            "name": "index_activities_activityType",
+            "unique": false,
+            "columnNames": ["activityType"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_activityType` ON `${TABLE_NAME}` (`activityType`)"
+          },
+          {
+            "name": "index_activities_status",
+            "unique": false,
+            "columnNames": ["status"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_activities_timestamp",
+            "unique": false,
+            "columnNames": ["timestamp"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
+          },
+          {
+            "name": "index_activities_relatedEntityId",
+            "unique": false,
+            "columnNames": ["relatedEntityId"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_relatedEntityId` ON `${TABLE_NAME}` (`relatedEntityId`)"
+          },
+          {
+            "name": "index_activities_priority",
+            "unique": false,
+            "columnNames": ["priority"],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activities_priority` ON `${TABLE_NAME}` (`priority`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": ["userId"],
+            "referencedColumns": ["id"]
+          }
+        ]
+      },
+      {
+        "tableName": "notifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `type` TEXT NOT NULL, `title` TEXT NOT NULL, `message` TEXT NOT NULL, `relatedId` TEXT, `isRead` INTEGER NOT NULL, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relatedId",
+            "columnName": "relatedId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRead",
+            "columnName": "isRead",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        }
+      },
+      {
+        "tableName": "reviews",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `transactionId` TEXT NOT NULL, `reviewerId` TEXT NOT NULL, `reviewerName` TEXT NOT NULL, `revieweeId` TEXT NOT NULL, `rating` INTEGER NOT NULL, `comment` TEXT NOT NULL, `reviewType` TEXT NOT NULL, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transactionId",
+            "columnName": "transactionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewerId",
+            "columnName": "reviewerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewerName",
+            "columnName": "reviewerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "revieweeId",
+            "columnName": "revieweeId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "comment",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewType",
+            "columnName": "reviewType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        }
+      },
+      {
+        "tableName": "messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `senderId` TEXT NOT NULL, `senderName` TEXT NOT NULL, `receiverId` TEXT NOT NULL, `content` TEXT NOT NULL, `messageType` TEXT NOT NULL, `isRead` INTEGER NOT NULL, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationId",
+            "columnName": "conversationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderId",
+            "columnName": "senderId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderName",
+            "columnName": "senderName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receiverId",
+            "columnName": "receiverId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageType",
+            "columnName": "messageType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isRead",
+            "columnName": "isRead",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        }
+      },
+      {
+        "tableName": "conversations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `listingId` TEXT, `participant1Id` TEXT NOT NULL, `participant1Name` TEXT NOT NULL, `participant2Id` TEXT NOT NULL, `participant2Name` TEXT NOT NULL, `lastMessage` TEXT, `lastMessageTime` TEXT, `unreadCount` INTEGER NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listingId",
+            "columnName": "listingId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "participant1Id",
+            "columnName": "participant1Id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "participant1Name",
+            "columnName": "participant1Name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "participant2Id",
+            "columnName": "participant2Id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "participant2Name",
+            "columnName": "participant2Name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastMessage",
+            "columnName": "lastMessage",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastMessageTime",
+            "columnName": "lastMessageTime",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "unreadCount",
+            "columnName": "unreadCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        }
+      },
+      {
+        "tableName": "favorites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `listingId` TEXT NOT NULL, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listingId",
+            "columnName": "listingId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": ["id"]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2c5e4712ceb84d75ce86b5f0cb64f45a')"
+    ]
+  }
+}

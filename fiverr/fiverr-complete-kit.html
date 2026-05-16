@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiverr Complete Kit — All 4 Gigs — kabi10</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface-2: #f3f1ee;
+  --border: #e2dfd9;
+  --border-light: #edeae4;
+  --text: #1a1a1a;
+  --text-dim: #5c5a56;
+  --text-muted: #9a968f;
+  --accent: #1a8f5c;
+  --accent-light: #e6f5ee;
+  --accent-dark: #14704a;
+  --blue: #2563eb;
+  --blue-light: #e8f0fe;
+  --purple: #7c3aed;
+  --purple-light: #f0ebfe;
+  --orange: #c2410c;
+  --orange-light: #fef3e8;
+  --warm: #b45309;
+  --teal: #0f766e;
+  --teal-light: #ccfbf1;
+  --rose: #be123c;
+  --rose-light: #ffe4e6;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+.page { max-width: 860px; margin: 0 auto; padding: 60px 32px 100px; }
+p { color: var(--text-dim); font-size: 14px; margin-bottom: 12px; }
+
+header { margin-bottom: 40px; padding-bottom: 40px; border-bottom: 2px solid var(--text); }
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-weight: 600; }
+h1 { font-family: 'DM Serif Display', serif; font-size: clamp(34px, 5vw, 50px); font-weight: 400; line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 16px; }
+.header-sub { font-size: 16px; color: var(--text-dim); font-weight: 300; max-width: 620px; }
+h2 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; line-height: 1.2; }
+h3 { font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 400; margin-bottom: 8px; }
+
+/* ── Gig Divider ── */
+.gig-divider { margin: 80px 0 48px; padding: 32px; border: 2px solid var(--text); border-radius: 16px; text-align: center; }
+.gig-divider .gig-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+.gig-divider h2 { margin-bottom: 8px; }
+.gig-divider .gig-status { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; padding: 4px 14px; border-radius: 20px; display: inline-block; margin-top: 8px; }
+.status-listed { background: var(--accent-light); color: var(--accent); }
+.status-new { background: var(--orange-light); color: var(--orange); }
+
+.gd-green .gig-num { color: var(--accent); }
+.gd-blue .gig-num { color: var(--blue); }
+.gd-teal .gig-num { color: var(--teal); }
+.gd-rose .gig-num { color: var(--rose); }
+
+/* ── Section / Tab ── */
+.tab-section { margin-bottom: 48px; }
+.tab-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.tab-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; padding: 5px 12px; border-radius: 6px; white-space: nowrap; }
+.tb-g { background: var(--accent-light); color: var(--accent); }
+.tb-b { background: var(--blue-light); color: var(--blue); }
+.tb-p { background: var(--purple-light); color: var(--purple); }
+.tb-o { background: var(--orange-light); color: var(--orange); }
+.tb-t { background: var(--teal-light); color: var(--teal); }
+.tb-r { background: var(--rose-light); color: var(--rose); }
+
+/* ── Fields ── */
+.field { margin-bottom: 24px; }
+.field-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.field-label .char-count { font-size: 10px; background: var(--surface-2); padding: 2px 8px; border-radius: 4px; color: var(--text-muted); letter-spacing: 0; }
+.field-label .required { color: var(--orange); font-size: 9px; }
+.field-note { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+
+/* ── Copy Block ── */
+.copy-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; position: relative; }
+.copy-block::before { content: 'COPY'; position: absolute; top: 10px; right: 14px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--text-muted); background: var(--surface-2); padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+.copy-block .copy-text { font-size: 14.5px; color: var(--text); line-height: 1.75; white-space: pre-wrap; padding-right: 48px; }
+.copy-block .copy-text strong { font-weight: 600; }
+
+.prefix-row { display: flex; align-items: baseline; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; }
+.prefix-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+.prefix-value { font-size: 15px; color: var(--text); font-weight: 500; }
+
+/* ── Tags ── */
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 6px; background: var(--text); color: white; }
+.tag-light { background: var(--surface-2); color: var(--text-dim); }
+
+/* ── Pricing ── */
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 8px; }
+.tier-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.tier-card.featured { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue-light); }
+.tier-head { padding: 16px 18px; border-bottom: 1px solid var(--border-light); }
+.tier-card.featured .tier-head { background: var(--blue); border-bottom-color: var(--blue); }
+.tier-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.tier-card.featured .tier-name { color: rgba(255,255,255,0.7); }
+.tier-price { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); line-height: 1; }
+.tier-card.featured .tier-price { color: white; }
+.tier-meta { display: flex; gap: 12px; margin-top: 8px; }
+.tier-meta span { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-muted); }
+.tier-card.featured .tier-meta span { color: rgba(255,255,255,0.55); }
+.tier-body { padding: 16px 18px; background: var(--surface); }
+.tier-desc-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; border-left: 2px solid var(--border); padding-left: 10px; }
+.tier-feature { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-dim); padding: 4px 0; border-bottom: 1px solid var(--border-light); }
+.tier-feature:last-child { border-bottom: none; }
+.feat-on { color: var(--accent); font-weight: 700; font-size: 13px; }
+.feat-off { color: var(--border); font-weight: 700; font-size: 13px; }
+
+/* ── Extras ── */
+.extras-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.extra-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.extra-name { font-size: 14px; font-weight: 500; }
+.extra-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--accent); }
+
+/* ── FAQ ── */
+.faq-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.faq-q { background: var(--surface-2); padding: 14px 18px; font-weight: 600; font-size: 14px; border-bottom: 1px solid var(--border-light); display: flex; align-items: flex-start; gap: 10px; }
+.faq-q-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-muted); margin-top: 3px; flex-shrink: 0; }
+.faq-a { padding: 14px 18px; font-size: 14px; color: var(--text-dim); line-height: 1.65; }
+
+/* ── Requirements ── */
+.req-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 10px; }
+.req-type { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.req-q { font-size: 14.5px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.req-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.req-opt { font-size: 12px; padding: 4px 12px; border-radius: 6px; background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border-light); }
+.req-badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.rb-new { background: var(--accent-light); color: var(--accent); }
+
+/* ── Gallery ── */
+.gallery-slot { background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 12px; }
+.gallery-slot-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.gallery-slot-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.gi-video { background: #fee2e2; }
+.gi-image { background: var(--blue-light); }
+.gi-pdf { background: var(--orange-light); }
+.gallery-slot-title { font-weight: 600; font-size: 15px; }
+.gallery-slot-sub { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.gallery-desc { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; }
+.gallery-spec { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); background: var(--surface-2); padding: 8px 12px; border-radius: 6px; margin-top: 10px; line-height: 1.7; white-space: pre-wrap; }
+
+/* ── Tip / Warn / Info ── */
+.tip { background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0; }
+.tip-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+.tip p { font-size: 13px; color: var(--accent-dark); line-height: 1.6; margin-bottom: 0; }
+.warn { background: var(--orange-light); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0; }
+.warn .tip-label { color: var(--orange); }
+.warn p { color: var(--orange); font-size: 13px; line-height: 1.6; margin-bottom: 0; }
+.info { background: var(--blue-light); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0; }
+.info .tip-label { color: var(--blue); }
+.info p { color: #1d4ed8; font-size: 13px; line-height: 1.6; margin-bottom: 0; }
+
+.sep { width: 48px; height: 2px; background: var(--border); margin: 48px 0; }
+
+/* ── Summary Table ── */
+.summary-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.summary-table th { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; }
+.summary-table td { padding: 12px; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+.summary-table td:first-child { font-weight: 600; }
+.status-pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; font-weight: 600; padding: 3px 10px; border-radius: 4px; }
+.sp-live { background: var(--accent-light); color: var(--accent); }
+.sp-new { background: var(--orange-light); color: var(--orange); }
+
+@media (max-width: 640px) {
+  .page { padding: 32px 16px 60px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .gig-divider { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="eyebrow">Fiverr Complete Kit · kabi10</div>
+  <h1>All 4 Gigs —<br>Field-by-Field Guide</h1>
+  <p class="header-sub">Copy-paste reference for every gig in your Fiverr storefront. Each gig includes title, category, tags, pricing tiers with form toggles, description, FAQ, buyer requirements, and gallery specs.</p>
+</header>
+
+<!-- ── Master Summary ── -->
+<table class="summary-table">
+  <thead><tr><th>Gig</th><th>Buyer</th><th>Basic</th><th>Standard</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1. Apps Script + AI</td><td style="color:var(--text-dim)">Business owners</td><td>$90</td><td>$225</td><td><span class="status-pill sp-live">LISTED</span></td></tr>
+    <tr><td>2. MCP Server Dev</td><td style="color:var(--text-dim)">Developers / teams</td><td>$150</td><td>$400</td><td><span class="status-pill sp-live">LISTED</span></td></tr>
+    <tr><td>3. FastAPI AI Backend</td><td style="color:var(--text-dim)">SaaS / startups</td><td>$90</td><td>$300</td><td><span class="status-pill sp-new">NEW</span></td></tr>
+    <tr><td>4. RAG Document Q&A</td><td style="color:var(--text-dim)">Anyone with docs</td><td>$90</td><td>$350</td><td><span class="status-pill sp-new">NEW</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║  GIG 1: APPS SCRIPT + AI                      ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+
+<div class="gig-divider gd-green">
+  <div class="gig-num">Gig 01 — Launch First</div>
+  <h2>AI-Powered Google Sheets & Apps Script Automation</h2>
+  <p style="color:var(--text-dim);margin:8px 0 0;">Targets non-technical business owners drowning in spreadsheet work</p>
+  <span class="gig-status status-listed">Already Listed</span>
+</div>
+
+<!-- Tab 1: Overview -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-g">Overview</span><h2>Title, Category & Tags</h2></div>
+
+  <div class="field">
+    <div class="field-label">Gig Title <span class="char-count">76 / 80</span></div>
+    <div class="prefix-row">
+      <span class="prefix-label">I will</span>
+      <span class="prefix-value">build ai powered google sheets and apps script automation for your business</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Category</div>
+    <div class="tag-row">
+      <span class="tag tag-light">Programming & Tech</span>
+      <span class="tag tag-light">→ Automation</span>
+      <span class="tag tag-light">→ Automations & Workflows</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Search Tags <span class="char-count">5 / 5</span></div>
+    <div class="tag-row">
+      <span class="tag">google apps script</span>
+      <span class="tag">google sheets automation</span>
+      <span class="tag">ai spreadsheet</span>
+      <span class="tag">google workspace automation</span>
+      <span class="tag">apps script developer</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tab 2: Pricing -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-b">Pricing</span><h2>Packages & Extras</h2></div>
+
+  <div class="pricing-grid">
+    <div class="tier-card">
+      <div class="tier-head"><div class="tier-name">Basic</div><div class="tier-price">$90</div><div class="tier-meta"><span>5-day delivery</span><span>1 revision</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">1 automation workflow (e.g., form→sheet processing, auto-email, scheduled report). Up to 3 functions. Source code + README.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">1</span> Revision</div>
+      </div>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-head"><div class="tier-name">Standard</div><div class="tier-price">$225</div><div class="tier-meta"><span>10-day delivery</span><span>2 revisions</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Full automation system: multi-step workflow, AI integration (GPT/Claude API), custom UI sidebar, 5+ functions, and 2 revisions.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">2</span> Revisions</div>
+      </div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-head"><div class="tier-name">Premium</div><div class="tier-price">$500</div><div class="tier-meta"><span>18-day delivery</span><span>3 revisions</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Complete business system: multi-sheet architecture, AI-powered processing, external API integrations, dashboard, full docs, and 30-day support.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">3</span> Revisions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:24px;">
+    <div class="field-label">Gig Extras</div>
+    <div class="extras-list">
+      <div class="extra-item"><span class="extra-name">⚡ Extra Fast Delivery</span><span class="extra-price">+$50 · 2 days faster</span></div>
+      <div class="extra-item"><span class="extra-name">📝 Detailed Code Comments</span><span class="extra-price">+$25</span></div>
+      <div class="extra-item"><span class="extra-name">🔁 Additional Revision</span><span class="extra-price">+$30</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab 3: Description & FAQ -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-p">Description & FAQ</span><h2>Gig Copy</h2></div>
+
+  <div class="field">
+    <div class="field-label">Description</div>
+    <div class="copy-block">
+      <div class="copy-text">Tired of manually copying data between spreadsheets, generating reports by hand, or wishing your Google Sheets were smarter? I build <strong>custom Google Apps Script automation enhanced with AI</strong> that turns your Google Workspace into a self-running system.
+
+<strong>What I build:</strong>
+✦ Automated workflows triggered by form submissions, edits, or scheduled timers
+✦ AI-powered data categorization, tagging, and summarization inside Sheets
+✦ Dynamic document generation (invoices, labels, reports) from spreadsheet data
+✦ Custom sidebar tools and dashboards within Google Sheets
+✦ Integrations between Sheets, Docs, Gmail, Drive, Calendar, and external APIs
+✦ QR code generation, barcode lookups, and inventory tracking systems
+
+<strong>Real-world systems I've built:</strong>
+→ Work order tracking system spanning 4 production stages with lot traceability
+→ Automated label generation from Sheets and Docs templates with dynamic QR codes
+→ Inventory pipeline connecting upstream/downstream production data across job types
+
+<strong>Why I'm different:</strong>
+Most Apps Script sellers build basic macros. I build <strong>AI-enhanced systems</strong> — connecting GPT/Claude APIs to your spreadsheet data for intelligent categorization, auto-generated summaries, and smart alerts. This is automation that thinks.
+
+<strong>Process:</strong>
+1. Tell me what you're trying to automate (or what's frustrating you)
+2. I'll scope the project and confirm the right package
+3. I build, test with your data, and deliver with documentation
+4. You get a system that runs itself
+
+Message me with your use case — I reply within a few hours.</div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:24px;">
+    <div class="field-label">FAQ — Add all 5</div>
+
+    <div class="faq-card">
+      <div class="faq-q"><span class="faq-q-num">Q1</span>Can you work with my existing Google Sheets setup?</div>
+      <div class="faq-a">Yes — I work with your existing spreadsheets, not a blank slate. Send me view access and I'll assess the structure before we start. If restructuring would improve the automation, I'll recommend it upfront.</div>
+    </div>
+    <div class="faq-card">
+      <div class="faq-q"><span class="faq-q-num">Q2</span>What does "AI integration" mean for a spreadsheet?</div>
+      <div class="faq-a">It means connecting your Google Sheet to an AI model (like GPT or Claude) via API. Examples: auto-categorizing form responses, generating email drafts from row data, summarizing long text entries, or flagging anomalies in your numbers. The AI processes your data inside the sheet — no separate tool needed.</div>
+    </div>
+    <div class="faq-card">
+      <div class="faq-q"><span class="faq-q-num">Q3</span>Will I need to pay for AI API costs separately?</div>
+      <div class="faq-a">Yes — if your project uses an AI API (OpenAI, Claude), you'll need your own API key and account. Costs are typically $1-$10/month for most small business use cases. I'll set up the integration; you just paste your key into a config sheet.</div>
+    </div>
+    <div class="faq-card">
+      <div class="faq-q"><span class="faq-q-num">Q4</span>Can I update or extend the automation myself later?</div>
+      <div class="faq-a">Yes. I deliver clean, commented code with a README explaining the architecture. If you know basic Apps Script you can modify it. If not, order an Additional Revision or a follow-up gig and I'll handle changes for you.</div>
+    </div>
+    <div class="faq-card">
+      <div class="faq-q"><span class="faq-q-num">Q5</span>How do I know which package I need?</div>
+      <div class="faq-a">Message me with a description of what you want automated. I'll tell you which tier fits — most single-workflow automations are Basic, anything with AI or multiple integrations is Standard, and full business systems with dashboards are Premium.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab 4: Requirements -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-o">Requirements</span><h2>Buyer Questions</h2></div>
+
+  <div class="field">
+    <div class="field-label">Add these questions <span class="req-badge rb-new">Add These</span></div>
+
+    <div class="req-card">
+      <div class="req-type">Free Text · Required</div>
+      <div class="req-q">Describe the process you want to automate. What are you currently doing manually?</div>
+    </div>
+    <div class="req-card">
+      <div class="req-type">Multiple Choice · Required</div>
+      <div class="req-q">Which Google Workspace apps are involved?</div>
+      <div class="req-options">
+        <span class="req-opt">Google Sheets</span>
+        <span class="req-opt">Google Docs</span>
+        <span class="req-opt">Gmail</span>
+        <span class="req-opt">Google Forms</span>
+        <span class="req-opt">Google Drive</span>
+        <span class="req-opt">Google Calendar</span>
+        <span class="req-opt">External API</span>
+      </div>
+    </div>
+    <div class="req-card">
+      <div class="req-type">Multiple Choice · Required</div>
+      <div class="req-q">Do you want AI features in this automation?</div>
+      <div class="req-options">
+        <span class="req-opt">Yes — auto-categorize or summarize data</span>
+        <span class="req-opt">Yes — generate text/emails from data</span>
+        <span class="req-opt">Not sure — advise me</span>
+        <span class="req-opt">No AI needed</span>
+      </div>
+    </div>
+    <div class="req-card">
+      <div class="req-type">Free Text · Optional</div>
+      <div class="req-q">Can you share a link to your Google Sheet (view access)? This helps me scope accurately before starting.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab 5: Gallery -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-t">Gallery</span><h2>Images & Docs</h2></div>
+
+  <div class="gallery-slot">
+    <div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 1 — Primary (thumbnail)</div><div class="gallery-slot-sub">Shown in search results</div></div></div>
+    <div class="gallery-desc">Before/after split: Left shows a messy spreadsheet with manual work. Right shows the same sheet with automated highlights, sidebar UI, and "Automated ✓" overlay.</div>
+    <div class="gallery-spec">Create in Canva or Figma · Before: raw spreadsheet chaos · After: clean sheet + sidebar tool
+Caption: "From manual busywork to automated intelligence"
+Export: PNG 1280×800</div>
+  </div>
+  <div class="gallery-slot">
+    <div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 2 — Work Order System Screenshot</div><div class="gallery-slot-sub">From Herbal Dispatch (anonymized)</div></div></div>
+    <div class="gallery-desc">Screenshot of your WIP lookup tool with lot traceability chain visible. Blur company name and product data. This is real production code — far more credible than mockups.</div>
+    <div class="gallery-spec">Blur: company name, product names, lot numbers, employee data
+Replace with: "ACME Corp", "WO-0001", "Product A"
+Caption: "Work order tracking with upstream/downstream lot traceability"</div>
+  </div>
+  <div class="gallery-slot">
+    <div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 3 — Label Generator Output</div><div class="gallery-slot-sub">Template → Generated label with QR code</div></div></div>
+    <div class="gallery-desc">Side-by-side: Docs/Sheets template on left, generated label with QR code on right. Shows the transformation from data to deliverable.</div>
+    <div class="gallery-spec">Caption: "Dynamic label generation — pulls from templates with auto-generated QR codes"</div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║  GIG 2: MCP SERVER                             ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+
+<div class="gig-divider gd-blue">
+  <div class="gig-num">Gig 02 — Blue Ocean</div>
+  <h2>Custom MCP Server Development</h2>
+  <p style="color:var(--text-dim);margin:8px 0 0;">Targets developers and dev teams connecting AI to private data</p>
+  <span class="gig-status status-listed">Already Listed</span>
+</div>
+
+<div class="info">
+  <div class="tip-label">Refer to your detailed kit</div>
+  <p>You already have the full field-by-field MCP guide in your revamped <strong>fiverr-launch-kit.html</strong> with all 5 tabs completed (Overview, Pricing, Description & FAQ, Requirements, Gallery). No need to duplicate it here — that file is your MCP reference. Key specs below for quick reference.</p>
+</div>
+
+<div class="tab-section" style="margin-top:24px;">
+  <div class="field">
+    <div class="field-label">Quick Reference</div>
+    <div class="prefix-row">
+      <span class="prefix-label">I will</span>
+      <span class="prefix-value">build a custom MCP server to connect Claude or Cursor to your database and APIs</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Tags</div>
+    <div class="tag-row">
+      <span class="tag">MCP SERVER</span>
+      <span class="tag">mcp development</span>
+      <span class="tag">Claude Integration</span>
+      <span class="tag">cursor integration</span>
+      <span class="tag">ai api integration</span>
+    </div>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="tier-card"><div class="tier-head"><div class="tier-name">Basic</div><div class="tier-price">$150</div><div class="tier-meta"><span>7-day</span><span>1 rev</span></div></div></div>
+    <div class="tier-card featured"><div class="tier-head"><div class="tier-name">Standard</div><div class="tier-price">$400</div><div class="tier-meta"><span>14-day</span><span>2 rev</span></div></div></div>
+    <div class="tier-card"><div class="tier-head"><div class="tier-name">Premium</div><div class="tier-price">$1,000</div><div class="tier-meta"><span>21-day</span><span>3 rev</span></div></div></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║  GIG 3: FASTAPI AI BACKEND                     ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+
+<div class="gig-divider gd-teal">
+  <div class="gig-num">Gig 03 — Cross-Sell</div>
+  <h2>FastAPI AI Backend Development</h2>
+  <p style="color:var(--text-dim);margin:8px 0 0;">Targets SaaS founders and startups needing production API backends</p>
+  <span class="gig-status status-new">List Now</span>
+</div>
+
+<!-- Overview -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-g">Overview</span><h2>Title, Category & Tags</h2></div>
+
+  <div class="field">
+    <div class="field-label">Gig Title <span class="char-count">74 / 80</span></div>
+    <div class="prefix-row">
+      <span class="prefix-label">I will</span>
+      <span class="prefix-value">build a production-ready FastAPI backend with AI integration for your app</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Category</div>
+    <div class="tag-row">
+      <span class="tag tag-light">Programming & Tech</span>
+      <span class="tag tag-light">→ AI Development</span>
+      <span class="tag tag-light">→ AI Applications</span>
+    </div>
+    <div class="field-note" style="margin-top:8px;">If "AI Applications" isn't available, use: Web Application → Backend Development</div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Search Tags <span class="char-count">5 / 5</span></div>
+    <div class="tag-row">
+      <span class="tag">fastapi</span>
+      <span class="tag">python backend</span>
+      <span class="tag">ai backend</span>
+      <span class="tag">rest api development</span>
+      <span class="tag">api integration</span>
+    </div>
+  </div>
+</div>
+
+<!-- Pricing -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-b">Pricing</span><h2>Packages & Extras</h2></div>
+
+  <div class="pricing-grid">
+    <div class="tier-card">
+      <div class="tier-head"><div class="tier-name">Basic</div><div class="tier-price">$90</div><div class="tier-meta"><span>7-day delivery</span><span>1 revision</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Simple API: 3-5 endpoints, 1 database model, basic auth, auto-generated OpenAPI docs, README.</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">1</span> Revision</div>
+      </div>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-head"><div class="tier-name">Standard</div><div class="tier-price">$300</div><div class="tier-meta"><span>14-day delivery</span><span>2 revisions</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Full API: 8-12 endpoints, AI/LLM integration, database with migrations, auth, background tasks, Docker, 2 revisions.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">2</span> Revisions</div>
+      </div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-head"><div class="tier-name">Premium</div><div class="tier-price">$700</div><div class="tier-meta"><span>21-day delivery</span><span>3 revisions</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Production system: full API + AI pipeline, multi-model DB, auth + roles, file processing, Docker + deploy guide, testing, 30-day support.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">3</span> Revisions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:24px;">
+    <div class="field-label">Gig Extras</div>
+    <div class="extras-list">
+      <div class="extra-item"><span class="extra-name">⚡ Extra Fast Delivery</span><span class="extra-price">+$60 · 3 days faster</span></div>
+      <div class="extra-item"><span class="extra-name">📝 Detailed Code Comments</span><span class="extra-price">+$25</span></div>
+      <div class="extra-item"><span class="extra-name">🔁 Additional Revision</span><span class="extra-price">+$40</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Description & FAQ -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-p">Description & FAQ</span><h2>Gig Copy</h2></div>
+
+  <div class="field">
+    <div class="field-label">Description</div>
+    <div class="copy-block">
+      <div class="copy-text">Need a fast, reliable backend for your AI-powered app, SaaS tool, or automation system? I build <strong>production-ready APIs with FastAPI (Python)</strong> — the framework behind most modern AI applications.
+
+<strong>What I deliver:</strong>
+✦ RESTful API endpoints with automatic OpenAPI documentation
+✦ LLM/AI integration — connect OpenAI, Claude, or open-source models to your backend
+✦ Database layer — PostgreSQL, Supabase, MongoDB, or SQLite with async queries
+✦ Authentication — API keys, JWT tokens, or OAuth2 flows
+✦ File processing — upload, parse, and process documents, images, or CSVs
+✦ Background tasks and scheduled jobs for long-running operations
+✦ Docker containerization and deployment documentation
+
+<strong>Common projects I build:</strong>
+→ AI-powered API that processes user input through an LLM and returns structured results
+→ Backend for a React/Next.js frontend with database CRUD and user auth
+→ Data processing pipeline that ingests files, transforms content, and stores results
+→ Webhook receivers that trigger AI-powered workflows
+
+<strong>My process:</strong>
+1. You describe what your app needs to do
+2. I scope the API endpoints and confirm the package
+3. I build iteratively — you see progress, not just a final dump
+4. I deliver source code, API docs, a README, and deployment instructions
+
+Message me with your project details — I'll tell you exactly what's needed.</div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:24px;">
+    <div class="field-label">FAQ — Add all 5</div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q1</span>Why FastAPI over Django or Express?</div><div class="faq-a">FastAPI is async by default (handles high concurrency), auto-generates interactive API docs (Swagger UI), and has native support for Python's AI/ML ecosystem. If your project involves AI, FastAPI is the right backend. If you specifically need Django or Express, message me first.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q2</span>Can you deploy the API for me?</div><div class="faq-a">Standard and Premium include Docker containerization. Premium includes full cloud deployment. For Basic, I deliver a deploy guide for Railway, Render, or your VPS. I can also add deployment as a Gig Extra.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q3</span>Do I need to provide the frontend?</div><div class="faq-a">No — I build the backend API independently. It works with any frontend (React, Next.js, Flutter, mobile) or can be consumed by other services. If you don't have a frontend yet, the auto-generated Swagger UI lets you test every endpoint immediately.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q4</span>Can you add AI/LLM features to an existing backend?</div><div class="faq-a">Yes. If you already have a FastAPI or Python backend, I can add AI endpoints, LLM integration, or data processing features without rebuilding. Message me with your repo or architecture overview.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q5</span>What if my project is more complex than Premium?</div><div class="faq-a">Message me before ordering. For larger projects I'll create a custom offer with detailed milestones. I've built production systems with 20+ endpoints and complex AI pipelines — happy to scope anything.</div></div>
+  </div>
+</div>
+
+<!-- Requirements -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-o">Requirements</span><h2>Buyer Questions</h2></div>
+  <div class="field">
+    <div class="req-card"><div class="req-type">Free Text · Required</div><div class="req-q">Describe what your application needs to do. What data does it handle, and what should the API endpoints return?</div></div>
+    <div class="req-card"><div class="req-type">Multiple Choice · Required</div><div class="req-q">What frontend or client will consume this API?</div><div class="req-options"><span class="req-opt">React / Next.js</span><span class="req-opt">Mobile app</span><span class="req-opt">Another backend</span><span class="req-opt">Automation tool (n8n/Zapier)</span><span class="req-opt">No frontend yet</span><span class="req-opt">Other</span></div></div>
+    <div class="req-card"><div class="req-type">Multiple Choice · Required</div><div class="req-q">Do you need AI/LLM integration?</div><div class="req-options"><span class="req-opt">Yes — OpenAI</span><span class="req-opt">Yes — Claude</span><span class="req-opt">Yes — open-source</span><span class="req-opt">Not sure</span><span class="req-opt">No AI needed</span></div></div>
+    <div class="req-card"><div class="req-type">Multiple Choice · Required</div><div class="req-q">Where will this be deployed?</div><div class="req-options"><span class="req-opt">Railway / Render</span><span class="req-opt">AWS / GCP / Azure</span><span class="req-opt">VPS</span><span class="req-opt">Docker — I'll handle it</span><span class="req-opt">Not sure yet</span></div></div>
+  </div>
+</div>
+
+<!-- Gallery -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-t">Gallery</span><h2>Images</h2></div>
+  <div class="gallery-slot"><div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 1 — Architecture Diagram</div></div></div><div class="gallery-desc">Flow: <strong>Client → FastAPI → AI/LLM + Database</strong>. Dark background, same style as your MCP gig.</div></div>
+  <div class="gallery-slot"><div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 2 — Swagger UI Screenshot</div></div></div><div class="gallery-desc">Screenshot of FastAPI's auto-generated /docs page from Kai or a sample project. Shows 5-8 endpoint routes with schemas visible.</div></div>
+  <div class="gallery-slot"><div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 3 — Code Snippet</div></div></div><div class="gallery-desc">FastAPI route handler with Pydantic models and type hints. Use Carbon (carbon.now.sh) with dark theme. 15-25 lines.</div></div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║  GIG 4: RAG DOCUMENT Q&A                       ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+
+<div class="gig-divider gd-rose">
+  <div class="gig-num">Gig 04 — Broadest Audience</div>
+  <h2>RAG Document Q&A Chatbot</h2>
+  <p style="color:var(--text-dim);margin:8px 0 0;">Targets anyone with documents who wants AI to answer questions from them</p>
+  <span class="gig-status status-new">List Now</span>
+</div>
+
+<!-- Overview -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-g">Overview</span><h2>Title, Category & Tags</h2></div>
+
+  <div class="field">
+    <div class="field-label">Gig Title <span class="char-count">76 / 80</span></div>
+    <div class="prefix-row">
+      <span class="prefix-label">I will</span>
+      <span class="prefix-value">build an AI chatbot that answers questions from your documents and database</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Category</div>
+    <div class="tag-row">
+      <span class="tag tag-light">Programming & Tech</span>
+      <span class="tag tag-light">→ Chatbots</span>
+      <span class="tag tag-light">→ AI Chatbot Development</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Search Tags <span class="char-count">5 / 5</span></div>
+    <div class="tag-row">
+      <span class="tag">rag chatbot</span>
+      <span class="tag">ai chatbot</span>
+      <span class="tag">document qa</span>
+      <span class="tag">knowledge base ai</span>
+      <span class="tag">custom chatbot</span>
+    </div>
+  </div>
+</div>
+
+<!-- Pricing -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-b">Pricing</span><h2>Packages & Extras</h2></div>
+
+  <div class="pricing-grid">
+    <div class="tier-card">
+      <div class="tier-head"><div class="tier-name">Basic</div><div class="tier-price">$90</div><div class="tier-meta"><span>7-day delivery</span><span>1 revision</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Simple document Q&A: up to 50 pages of PDFs/docs, ChromaDB vector store, Streamlit chat interface, source citations, 1 revision.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">1</span> Revision</div>
+      </div>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-head"><div class="tier-name">Standard</div><div class="tier-price">$350</div><div class="tier-meta"><span>14-day delivery</span><span>2 revisions</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Full RAG system: up to 500 pages, FastAPI backend, metadata filtering, source citations, chat history, Streamlit or React UI, 2 revisions.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-off">–</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">2</span> Revisions</div>
+      </div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-head"><div class="tier-name">Premium</div><div class="tier-price">$800</div><div class="tier-meta"><span>21-day delivery</span><span>3 revisions</span></div></div>
+      <div class="tier-body">
+        <div class="tier-desc-text">Enterprise RAG: unlimited docs, multi-source ingestion (PDFs + DB + web), role-based access, admin dashboard, Docker deploy, testing, 30-day support.</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Integration of AI model</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Database integration</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Include source code</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Fine tuning</div>
+        <div class="tier-feature"><span class="feat-on">✓</span> Detailed code comments</div>
+        <div class="tier-feature"><span class="feat-on">3</span> Revisions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:24px;">
+    <div class="field-label">Gig Extras</div>
+    <div class="extras-list">
+      <div class="extra-item"><span class="extra-name">⚡ Extra Fast Delivery</span><span class="extra-price">+$60 · 3 days faster</span></div>
+      <div class="extra-item"><span class="extra-name">📝 Detailed Code Comments</span><span class="extra-price">+$25</span></div>
+      <div class="extra-item"><span class="extra-name">🔁 Additional Revision</span><span class="extra-price">+$40</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Description & FAQ -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-p">Description & FAQ</span><h2>Gig Copy</h2></div>
+
+  <div class="field">
+    <div class="field-label">Description</div>
+    <div class="copy-block">
+      <div class="copy-text">Your team wastes hours searching through documents, PDFs, manuals, and knowledge bases for answers that should be instant. I build <strong>AI chatbots powered by RAG (Retrieval-Augmented Generation)</strong> that read your documents and answer questions from them — accurately, with source citations.
+
+<strong>What you'll get:</strong>
+✦ An AI chatbot trained on YOUR data — PDFs, docs, spreadsheets, databases, or websites
+✦ Accurate answers grounded in your actual content (not hallucinated generic AI)
+✦ Source citations — every answer shows which document and section it came from
+✦ A clean web interface your team can use immediately
+✦ FastAPI backend — scalable and production-ready
+✦ Easy document updates — add new files anytime without rebuilding
+
+<strong>How RAG works (simply):</strong>
+Your documents get split into chunks, converted into searchable vectors, and stored in a database. When someone asks a question, the system finds the most relevant chunks and feeds them to an AI model, which generates an answer strictly from your content.
+
+<strong>Common use cases:</strong>
+→ Internal knowledge base: "What's our refund policy for enterprise clients?"
+→ Customer support: AI answers from your help docs before escalating to humans
+→ Legal/compliance: search across contracts and regulatory docs instantly
+→ Product docs: let users ask questions about your software in plain English
+
+<strong>What makes my RAG systems different:</strong>
+I build the full stack — not just a LangChain script. You get a FastAPI backend, proper chunking strategy, metadata filtering, and a UI your team can actually use.
+
+Message me with what documents you want your AI to learn from.</div>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:24px;">
+    <div class="field-label">FAQ — Add all 5</div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q1</span>What types of documents can the AI learn from?</div><div class="faq-a">PDFs, Word docs, text files, CSVs, spreadsheets, web pages, and SQL databases. For scanned PDFs or images with text, I can add OCR processing. If your format isn't listed, message me — I've likely handled it.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q2</span>Will the AI make things up (hallucinate)?</div><div class="faq-a">RAG dramatically reduces hallucination because the AI only answers from your documents, not its general knowledge. Every response includes a source citation so you can verify. I also configure the system to say "I don't have information on that" when a question falls outside your data.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q3</span>How much does the AI API cost to run?</div><div class="faq-a">You'll need an OpenAI or Claude API key. For most use cases (small team, 50-500 pages), costs are $5-$20/month. I optimize the chunking and embedding strategy to minimize token usage. I'll give you a cost estimate before we start.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q4</span>Can I add new documents after delivery?</div><div class="faq-a">Yes. The ingestion pipeline I build supports adding new files anytime. For Basic, you run a simple script. For Standard/Premium, there's a web interface or API endpoint for uploads that automatically processes and indexes new content.</div></div>
+    <div class="faq-card"><div class="faq-q"><span class="faq-q-num">Q5</span>Is my data secure?</div><div class="faq-a">Your data stays on your infrastructure. I can deploy the system on your own server or cloud account — nothing is stored on third-party platforms except the AI API calls (OpenAI/Claude). For Premium, I can configure a fully self-hosted setup with a local LLM if data sovereignty is critical.</div></div>
+  </div>
+</div>
+
+<!-- Requirements -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-o">Requirements</span><h2>Buyer Questions</h2></div>
+  <div class="field">
+    <div class="req-card"><div class="req-type">Multiple Choice · Required</div><div class="req-q">What type of documents will the AI learn from?</div><div class="req-options"><span class="req-opt">PDFs</span><span class="req-opt">Word docs</span><span class="req-opt">Spreadsheets / CSVs</span><span class="req-opt">Website / web pages</span><span class="req-opt">Database (SQL)</span><span class="req-opt">Mix of formats</span></div></div>
+    <div class="req-card"><div class="req-type">Free Text · Required</div><div class="req-q">Approximately how many documents / pages? Can you share a sample document so I can assess the format?</div></div>
+    <div class="req-card"><div class="req-type">Multiple Choice · Required</div><div class="req-q">Who will use this chatbot?</div><div class="req-options"><span class="req-opt">Internal team only</span><span class="req-opt">Customers (public-facing)</span><span class="req-opt">Both</span></div></div>
+    <div class="req-card"><div class="req-type">Multiple Choice · Required</div><div class="req-q">Preferred AI provider?</div><div class="req-options"><span class="req-opt">OpenAI (GPT-4)</span><span class="req-opt">Claude</span><span class="req-opt">Open-source / local</span><span class="req-opt">Recommend one</span></div></div>
+    <div class="req-card"><div class="req-type">Free Text · Optional</div><div class="req-q">What specific questions should the AI be able to answer? (Example: "What's our return policy for international orders?")</div></div>
+  </div>
+</div>
+
+<!-- Gallery -->
+<div class="tab-section">
+  <div class="tab-header"><span class="tab-badge tb-t">Gallery</span><h2>Images</h2></div>
+  <div class="gallery-slot"><div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 1 — RAG Pipeline Diagram</div></div></div><div class="gallery-desc">Flow: <strong>Documents → Chunking → Vector DB → Query → AI Response with Citations</strong>. Dark background matching your other gigs.</div></div>
+  <div class="gallery-slot"><div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 2 — Chat UI with Source Citation</div></div></div><div class="gallery-desc">Streamlit chat screenshot with a user question and AI response showing "[Source: handbook.pdf, p.12]" citation. Build a quick 30-min demo with any public PDF.</div></div>
+  <div class="gallery-slot"><div class="gallery-slot-head"><div class="gallery-slot-icon gi-image">🖼</div><div><div class="gallery-slot-title">Image 3 — Before/After</div></div></div><div class="gallery-desc">Left: pile of document icons + "Hours of searching." Right: clean chat UI + "Instant answers from your docs." Simple Canva/Figma graphic.</div></div>
+
+  <div class="tip" style="margin-top:16px;">
+    <div class="tip-label">Portfolio Shortcut</div>
+    <p>Spin up a 30-min demo RAG app using a public document (government handbook, open-source project docs). Upload 20 pages, build a Streamlit chat, screenshot it. Now you have real gallery images and a working demo link.</p>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ── Cross-sell note ── -->
+<div style="background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-bottom:40px;">
+  <h3 style="margin-bottom:12px;">How Your 4 Gigs Feed Each Other</h3>
+  <p style="max-width:560px;margin:0 auto;font-size:14px;">A RAG buyer might need a <strong>FastAPI backend</strong> (Gig 3) behind their chatbot. A FastAPI buyer might need an <strong>MCP layer</strong> (Gig 2) on top. An Apps Script buyer (Gig 1) might grow into needing a full <strong>RAG system</strong> (Gig 4) for their document library. Every gig is a doorway to the others.</p>
+</div>
+
+</div>
+</body>
+</html>

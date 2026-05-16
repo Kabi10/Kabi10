@@ -60,6 +60,7 @@ class HomeViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 recentListings = listings.take(5),
+                                activeListingCount = listings.size,
                                 isLoadingListings = false
                             )
                         }
@@ -98,7 +99,8 @@ class HomeViewModel @Inject constructor(
                                 _uiState.update {
                                     it.copy(
                                         marketPrices = resource.data ?: emptyList(),
-                                        isLoadingPrices = false
+                                        isLoadingPrices = false,
+                                        lastPricesUpdated = System.currentTimeMillis()
                                     )
                                 }
                             }
@@ -131,10 +133,11 @@ class HomeViewModel @Inject constructor(
                     activityRepository.getActivitiesForUser(user.id, forceRefresh = false)
                         .catch { e ->
                             Timber.e(e, "Error loading activities")
+                            // Don't show error for activities - they're not critical
                             _uiState.update {
                                 it.copy(
                                     isLoadingActivities = false,
-                                    error = "Failed to load activities"
+                                    recentActivities = emptyList()
                                 )
                             }
                         }
@@ -152,21 +155,33 @@ class HomeViewModel @Inject constructor(
                                     }
                                 }
                                 is Resource.Error -> {
+                                    Timber.w("Activities loading failed: ${resource.message}")
+                                    // Don't show error to user for activities - they're supplementary
                                     _uiState.update {
                                         it.copy(
                                             isLoadingActivities = false,
-                                            error = resource.message
+                                            recentActivities = emptyList()
                                         )
                                     }
                                 }
                             }
                         }
                 } ?: run {
-                    _uiState.update { it.copy(isLoadingActivities = false) }
+                    _uiState.update { 
+                        it.copy(
+                            isLoadingActivities = false,
+                            recentActivities = emptyList()
+                        ) 
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error loading activities")
-                _uiState.update { it.copy(isLoadingActivities = false) }
+                _uiState.update { 
+                    it.copy(
+                        isLoadingActivities = false,
+                        recentActivities = emptyList()
+                    ) 
+                }
             }
         }
     }
@@ -261,5 +276,7 @@ data class HomeUiState(
     val recentActivities: List<Activity> = emptyList(),
     val todayOrders: Int = 0,
     val todayRevenue: Double = 0.0,
-    val error: String? = null
+    val error: String? = null,
+    val lastPricesUpdated: Long = 0L,
+    val activeListingCount: Int = 0
 )

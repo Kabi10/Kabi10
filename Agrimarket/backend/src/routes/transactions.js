@@ -1,50 +1,73 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const db = require('../database/connection');
-const logger = require('../utils/logger');
-const { validateUUID, parseDate, isFutureDate } = require('../utils/helpers');
+const express = require("express");
+const { body, validationResult } = require("express-validator");
+const db = require("../database/connection");
+const logger = require("../utils/logger");
+const { validateUUID, parseDate, isFutureDate } = require("../utils/helpers");
 
 const router = express.Router();
 
 // Validation schemas
 const createTransactionValidation = [
-  body('listingId').isUUID().withMessage('Invalid listing ID'),
-  body('quantity').isFloat({ min: 0.1 }).withMessage('Quantity must be greater than 0'),
-  body('totalAmount').isFloat({ min: 0.01 }).withMessage('Total amount must be greater than 0'),
-  body('pickupLocation').isLength({ min: 1, max: 255 }).withMessage('Pickup location is required'),
-  body('pickupDate').isISO8601().withMessage('Invalid pickup date format'),
-  body('buyerContact').optional().isLength({ max: 20 }).withMessage('Buyer contact too long'),
-  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long')
+  body("listingId").isUUID().withMessage("Invalid listing ID"),
+  body("quantity")
+    .isFloat({ min: 0.1 })
+    .withMessage("Quantity must be greater than 0"),
+  body("totalAmount")
+    .isFloat({ min: 0.01 })
+    .withMessage("Total amount must be greater than 0"),
+  body("pickupLocation")
+    .isLength({ min: 1, max: 255 })
+    .withMessage("Pickup location is required"),
+  body("pickupDate").isISO8601().withMessage("Invalid pickup date format"),
+  body("buyerContact")
+    .optional()
+    .isLength({ max: 20 })
+    .withMessage("Buyer contact too long"),
+  body("notes").optional().isLength({ max: 500 }).withMessage("Notes too long"),
 ];
 
 /**
  * GET /api/v1/transactions
  * Get user's transactions with filtering
  */
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const {
       status,
       role, // 'farmer' or 'buyer'
       page = 1,
       limit = 20,
-      sortBy = 'created_at',
-      sortOrder = 'DESC'
+      sortBy: rawSortBy = "created_at",
+      sortOrder: rawSortOrder = "DESC",
     } = req.query;
 
+    // Whitelist sort columns to prevent SQL injection
+    const allowedSortColumns = [
+      "created_at",
+      "total_amount",
+      "quantity",
+      "pickup_date",
+      "updated_at",
+      "status",
+    ];
+    const sortBy = allowedSortColumns.includes(rawSortBy)
+      ? rawSortBy
+      : "created_at";
+    const sortOrder = rawSortOrder.toUpperCase() === "ASC" ? "ASC" : "DESC";
+
     // Build dynamic query based on user role
-    let whereConditions = [];
-    let queryParams = [req.user.userId];
+    const whereConditions = [];
+    const queryParams = [req.user.userId];
     let paramIndex = 2;
 
     // Role-based filtering
-    if (role === 'farmer') {
-      whereConditions.push('t.farmer_id = $1');
-    } else if (role === 'buyer') {
-      whereConditions.push('t.buyer_id = $1');
+    if (role === "farmer") {
+      whereConditions.push("t.farmer_id = $1");
+    } else if (role === "buyer") {
+      whereConditions.push("t.buyer_id = $1");
     } else {
       // Default: show all user's transactions
-      whereConditions.push('(t.farmer_id = $1 OR t.buyer_id = $1)');
+      whereConditions.push("(t.farmer_id = $1 OR t.buyer_id = $1)");
     }
 
     if (status) {
@@ -69,7 +92,7 @@ router.get('/', async (req, res) => {
       JOIN listings l ON t.listing_id = l.id
       JOIN users farmer ON t.farmer_id = farmer.id
       JOIN users buyer ON t.buyer_id = buyer.id
-      WHERE ${whereConditions.join(' AND ')}
+      WHERE ${whereConditions.join(" AND ")}
       ORDER BY t.${sortBy} ${sortOrder}
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
@@ -82,18 +105,23 @@ router.get('/', async (req, res) => {
     const countQuery = `
       SELECT COUNT(*) as total
       FROM transactions t
-      WHERE ${whereConditions.join(' AND ')}
+      WHERE ${whereConditions.join(" AND ")}
     `;
 
     const countResult = await db.query(countQuery, queryParams.slice(0, -2));
     const total = parseInt(countResult.rows[0].total);
 
-    // Transform data
-    const transactions = result.rows.map(row => ({
+    // Transform data - includes flat fields for Android compatibility
+    const transactions = result.rows.map((row) => ({
       id: row.id,
       listingId: row.listing_id,
       farmerId: row.farmer_id,
       buyerId: row.buyer_id,
+      // Flat name/phone fields for Android Transaction model
+      sellerName: row.farmer_name || "",
+      buyerName: row.buyer_name || "",
+      sellerPhone: row.farmer_contact || "",
+      buyerPhone: row.buyer_contact || "",
       quantity: parseFloat(row.quantity),
       totalAmount: parseFloat(row.total_amount),
       pickupLocation: row.pickup_location,
@@ -109,33 +137,31 @@ router.get('/', async (req, res) => {
       listing: {
         cropType: row.crop_type,
         unit: row.unit,
-        pricePerUnit: parseFloat(row.price_per_unit)
+        pricePerUnit: parseFloat(row.price_per_unit),
       },
       farmer: {
         name: row.farmer_name,
-        contact: row.farmer_contact
+        contact: row.farmer_contact,
       },
       buyer: {
         name: row.buyer_name,
-        contact: row.buyer_contact
-      }
+        contact: row.buyer_contact,
+      },
     }));
 
+    // Response matches Android TransactionsResponse DTO
     res.json({
       success: true,
-      data: transactions,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        totalPages: Math.ceil(total / parseInt(limit))
-      }
+      transactions, // Android expects 'transactions' not 'data'
+      totalCount: total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
     });
   } catch (error) {
-    logger.error('Get transactions error:', error);
+    logger.error("Get transactions error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch transactions'
+      message: "Failed to fetch transactions",
     });
   }
 });
@@ -144,18 +170,19 @@ router.get('/', async (req, res) => {
  * GET /api/v1/transactions/:id
  * Get specific transaction details
  */
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid transaction ID'
+        message: "Invalid transaction ID",
       });
     }
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT 
         t.*,
         l.crop_type,
@@ -173,12 +200,14 @@ router.get('/:id', async (req, res) => {
       JOIN users farmer ON t.farmer_id = farmer.id
       JOIN users buyer ON t.buyer_id = buyer.id
       WHERE t.id = $1 AND (t.farmer_id = $2 OR t.buyer_id = $2)
-    `, [id, req.user.userId]);
+    `,
+      [id, req.user.userId],
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Transaction not found'
+        message: "Transaction not found",
       });
     }
 
@@ -191,6 +220,11 @@ router.get('/:id', async (req, res) => {
         listingId: transaction.listing_id,
         farmerId: transaction.farmer_id,
         buyerId: transaction.buyer_id,
+        // Flat name/phone fields for Android Transaction model
+        sellerName: transaction.farmer_name || "",
+        buyerName: transaction.buyer_name || "",
+        sellerPhone: transaction.farmer_contact || "",
+        buyerPhone: transaction.buyer_contact || "",
         quantity: parseFloat(transaction.quantity),
         totalAmount: parseFloat(transaction.total_amount),
         pickupLocation: transaction.pickup_location,
@@ -208,24 +242,24 @@ router.get('/:id', async (req, res) => {
           unit: transaction.unit,
           pricePerUnit: parseFloat(transaction.price_per_unit),
           quality: transaction.quality,
-          description: transaction.listing_description
+          description: transaction.listing_description,
         },
         farmer: {
           name: transaction.farmer_name,
           contact: transaction.farmer_contact,
-          location: transaction.farmer_location
+          location: transaction.farmer_location,
         },
         buyer: {
           name: transaction.buyer_name,
-          contact: transaction.buyer_contact
-        }
-      }
+          contact: transaction.buyer_contact,
+        },
+      },
     });
   } catch (error) {
-    logger.error('Get transaction error:', error);
+    logger.error("Get transaction error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch transaction'
+      message: "Failed to fetch transaction",
     });
   }
 });
@@ -234,14 +268,14 @@ router.get('/:id', async (req, res) => {
  * POST /api/v1/transactions
  * Create new transaction (place order)
  */
-router.post('/', createTransactionValidation, async (req, res) => {
+router.post("/", createTransactionValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
 
@@ -252,97 +286,88 @@ router.post('/', createTransactionValidation, async (req, res) => {
       pickupLocation,
       pickupDate,
       buyerContact,
-      notes
+      notes,
     } = req.body;
 
     // Validate pickup date is in the future
     if (!isFutureDate(pickupDate)) {
       return res.status(400).json({
         success: false,
-        message: 'Pickup date must be in the future'
+        message: "Pickup date must be in the future",
       });
     }
 
-    // Get listing details and validate
-    const listing = await db.query(
-      'SELECT farmer_id, quantity, price_per_unit, is_active, available_until FROM listings WHERE id = $1',
-      [listingId]
-    );
+    // Validate listing exists and is available with locking inside a transaction
+    const result = await db.transaction(async (client) => {
+      const listing = await client.query(
+        "SELECT farmer_id, quantity, price_per_unit, is_active, available_until FROM listings WHERE id = $1 FOR UPDATE",
+        [listingId],
+      );
 
-    if (listing.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Listing not found'
-      });
-    }
+      if (listing.rows.length === 0) {
+        throw new Error("Listing not found");
+      }
 
-    const listingData = listing.rows[0];
+      const listingData = listing.rows[0];
 
-    if (!listingData.is_active) {
-      return res.status(400).json({
-        success: false,
-        message: 'Listing is not active'
-      });
-    }
+      if (!listingData.is_active) {
+        throw new Error("Listing is not active");
+      }
 
-    if (new Date(listingData.available_until) < new Date()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Listing is no longer available'
-      });
-    }
+      if (new Date(listingData.available_until) < new Date()) {
+        throw new Error("Listing is no longer available");
+      }
 
-    if (listingData.farmer_id === req.user.userId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot create transaction for your own listing'
-      });
-    }
+      if (listingData.farmer_id === req.user.userId) {
+        throw new Error("Cannot create transaction for your own listing");
+      }
 
-    if (quantity > parseFloat(listingData.quantity)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Requested quantity exceeds available quantity'
-      });
-    }
+      if (quantity > parseFloat(listingData.quantity)) {
+        throw new Error("Requested quantity exceeds available quantity");
+      }
 
-    // Validate total amount
-    const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
-    if (Math.abs(totalAmount - expectedAmount) > 0.01) {
-      return res.status(400).json({
-        success: false,
-        message: 'Total amount does not match expected calculation'
-      });
-    }
+      // Calculate total amount
+      const expectedAmount = quantity * parseFloat(listingData.price_per_unit);
 
-    // Create transaction
-    const result = await db.query(`
-      INSERT INTO transactions (
-        listing_id, farmer_id, buyer_id, quantity, total_amount,
-        pickup_location, pickup_date, buyer_contact, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING *
-    `, [
-      listingId,
-      listingData.farmer_id,
-      req.user.userId,
-      quantity,
-      totalAmount,
-      pickupLocation,
-      pickupDate,
-      buyerContact || req.user.phoneNumber,
-      notes
-    ]);
+      // Allow 1 cent difference for floating point errors
+      if (Math.abs(totalAmount - expectedAmount) > 0.01) {
+        throw new Error("Total amount does not match expected calculation");
+      }
 
-    const transaction = result.rows[0];
+      // Create transaction
+      const insertResult = await client.query(
+        `
+        INSERT INTO transactions (
+          listing_id, farmer_id, buyer_id, quantity, total_amount,
+          pickup_location, pickup_date, buyer_contact, notes
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING *
+      `,
+        [
+          listingId,
+          listingData.farmer_id,
+          req.user.userId,
+          quantity,
+          totalAmount,
+          pickupLocation,
+          pickupDate,
+          buyerContact || req.user.phoneNumber,
+          notes,
+        ],
+      );
 
-    logger.info('Transaction created', {
+      return insertResult.rows[0];
+    });
+
+    const transaction = result;
+
+    logger.info("Transaction created", {
       transactionId: transaction.id,
       buyerId: req.user.userId,
-      farmerId: listingData.farmer_id,
+      farmerId: transaction.farmer_id,
       listingId,
       quantity,
-      totalAmount
+      totalAmount,
     });
 
     res.status(201).json({
@@ -360,142 +385,290 @@ router.post('/', createTransactionValidation, async (req, res) => {
         paymentMethod: transaction.payment_method,
         notes: transaction.notes,
         createdAt: transaction.created_at,
-        updatedAt: transaction.updated_at
-      }
+        updatedAt: transaction.updated_at,
+      },
     });
   } catch (error) {
-    logger.error('Create transaction error:', error);
+    logger.error("Create transaction error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create transaction'
+      message: "Failed to create transaction",
     });
   }
 });
 
 /**
+ * PATCH /api/v1/transactions/:id
+ * Update transaction status (alias for /:id/status — matches Android TransactionApiService)
+ */
+router.patch(
+  "/:id",
+  [
+    body("status")
+      .isIn(["PENDING", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED"])
+      .withMessage("Invalid status"),
+    body("notes")
+      .optional()
+      .isLength({ max: 500 })
+      .withMessage("Notes too long"),
+  ],
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        });
+      }
+
+      if (!validateUUID(id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid transaction ID",
+        });
+      }
+
+      // Get current transaction
+      const current = await db.query(
+        "SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1",
+        [id],
+      );
+
+      if (current.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Transaction not found",
+        });
+      }
+
+      const transaction = current.rows[0];
+      const isFarmer = transaction.farmer_id === req.user.userId;
+      const isBuyer = transaction.buyer_id === req.user.userId;
+
+      if (!isFarmer && !isBuyer) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied",
+        });
+      }
+
+      // Validate status transitions
+      const validTransitions = {
+        PENDING: ["CONFIRMED", "CANCELLED"],
+        CONFIRMED: ["IN_PROGRESS", "CANCELLED"],
+        IN_PROGRESS: ["COMPLETED", "CANCELLED"],
+        COMPLETED: [],
+        CANCELLED: [],
+      };
+
+      if (!validTransitions[transaction.status].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot change status from ${transaction.status} to ${status}`,
+        });
+      }
+
+      // Update transaction
+      const updateFields = ["status = $2", "updated_at = NOW()"];
+      const updateValues = [id, status];
+      let paramIndex = 3;
+
+      if (status === "COMPLETED") {
+        updateFields.push("completed_at = NOW()");
+      } else if (status === "CANCELLED") {
+        updateFields.push("cancelled_at = NOW()");
+        if (notes) {
+          updateFields.push(`cancellation_reason = $${paramIndex}`);
+          updateValues.push(notes);
+          paramIndex++;
+        }
+      }
+
+      if (notes && status !== "CANCELLED") {
+        updateFields.push(`notes = $${paramIndex}`);
+        updateValues.push(notes);
+      }
+
+      const result = await db.query(
+        `
+      UPDATE transactions SET ${updateFields.join(", ")}
+      WHERE id = $1
+      RETURNING *
+    `,
+        updateValues,
+      );
+
+      const updatedTransaction = result.rows[0];
+
+      logger.info("Transaction status updated", {
+        transactionId: id,
+        userId: req.user.userId,
+        oldStatus: transaction.status,
+        newStatus: status,
+      });
+
+      res.json({
+        success: true,
+        data: {
+          id: updatedTransaction.id,
+          status: updatedTransaction.status,
+          updatedAt: updatedTransaction.updated_at,
+          completedAt: updatedTransaction.completed_at,
+          cancelledAt: updatedTransaction.cancelled_at,
+          cancellationReason: updatedTransaction.cancellation_reason,
+          notes: updatedTransaction.notes,
+        },
+      });
+    } catch (error) {
+      logger.error("Update transaction status error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to update transaction status",
+      });
+    }
+  },
+);
+
+/**
  * PATCH /api/v1/transactions/:id/status
  * Update transaction status
  */
-router.patch('/:id/status', [
-  body('status').isIn(['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])
-    .withMessage('Invalid status'),
-  body('notes').optional().isLength({ max: 500 }).withMessage('Notes too long')
-], async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status, notes } = req.body;
+router.patch(
+  "/:id/status",
+  [
+    body("status")
+      .isIn(["PENDING", "CONFIRMED", "IN_PROGRESS", "COMPLETED", "CANCELLED"])
+      .withMessage("Invalid status"),
+    body("notes")
+      .optional()
+      .isLength({ max: 500 })
+      .withMessage("Notes too long"),
+  ],
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    if (!validateUUID(id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid transaction ID'
-      });
-    }
-
-    // Get current transaction
-    const current = await db.query(
-      'SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1',
-      [id]
-    );
-
-    if (current.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Transaction not found'
-      });
-    }
-
-    const transaction = current.rows[0];
-    const isFarmer = transaction.farmer_id === req.user.userId;
-    const isBuyer = transaction.buyer_id === req.user.userId;
-
-    if (!isFarmer && !isBuyer) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    // Validate status transitions
-    const validTransitions = {
-      'PENDING': ['CONFIRMED', 'CANCELLED'],
-      'CONFIRMED': ['IN_PROGRESS', 'CANCELLED'],
-      'IN_PROGRESS': ['COMPLETED', 'CANCELLED'],
-      'COMPLETED': [],
-      'CANCELLED': []
-    };
-
-    if (!validTransitions[transaction.status].includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot change status from ${transaction.status} to ${status}`
-      });
-    }
-
-    // Update transaction
-    const updateFields = ['status = $2', 'updated_at = NOW()'];
-    const updateValues = [id, status];
-    let paramIndex = 3;
-
-    if (status === 'COMPLETED') {
-      updateFields.push('completed_at = NOW()');
-    } else if (status === 'CANCELLED') {
-      updateFields.push('cancelled_at = NOW()');
-      if (notes) {
-        updateFields.push(`cancellation_reason = $${paramIndex}`);
-        updateValues.push(notes);
-        paramIndex++;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        });
       }
-    }
 
-    if (notes && status !== 'CANCELLED') {
-      updateFields.push(`notes = $${paramIndex}`);
-      updateValues.push(notes);
-    }
+      if (!validateUUID(id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid transaction ID",
+        });
+      }
 
-    const result = await db.query(`
-      UPDATE transactions SET ${updateFields.join(', ')}
+      // Get current transaction
+      const current = await db.query(
+        "SELECT farmer_id, buyer_id, status FROM transactions WHERE id = $1",
+        [id],
+      );
+
+      if (current.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Transaction not found",
+        });
+      }
+
+      const transaction = current.rows[0];
+      const isFarmer = transaction.farmer_id === req.user.userId;
+      const isBuyer = transaction.buyer_id === req.user.userId;
+
+      if (!isFarmer && !isBuyer) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied",
+        });
+      }
+
+      // Validate status transitions
+      const validTransitions = {
+        PENDING: ["CONFIRMED", "CANCELLED"],
+        CONFIRMED: ["IN_PROGRESS", "CANCELLED"],
+        IN_PROGRESS: ["COMPLETED", "CANCELLED"],
+        COMPLETED: [],
+        CANCELLED: [],
+      };
+
+      if (!validTransitions[transaction.status].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot change status from ${transaction.status} to ${status}`,
+        });
+      }
+
+      // Update transaction
+      const updateFields = ["status = $2", "updated_at = NOW()"];
+      const updateValues = [id, status];
+      let paramIndex = 3;
+
+      if (status === "COMPLETED") {
+        updateFields.push("completed_at = NOW()");
+      } else if (status === "CANCELLED") {
+        updateFields.push("cancelled_at = NOW()");
+        if (notes) {
+          updateFields.push(`cancellation_reason = $${paramIndex}`);
+          updateValues.push(notes);
+          paramIndex++;
+        }
+      }
+
+      if (notes && status !== "CANCELLED") {
+        updateFields.push(`notes = $${paramIndex}`);
+        updateValues.push(notes);
+      }
+
+      const result = await db.query(
+        `
+      UPDATE transactions SET ${updateFields.join(", ")}
       WHERE id = $1
       RETURNING *
-    `, updateValues);
+    `,
+        updateValues,
+      );
 
-    const updatedTransaction = result.rows[0];
+      const updatedTransaction = result.rows[0];
 
-    logger.info('Transaction status updated', {
-      transactionId: id,
-      userId: req.user.userId,
-      oldStatus: transaction.status,
-      newStatus: status
-    });
+      logger.info("Transaction status updated", {
+        transactionId: id,
+        userId: req.user.userId,
+        oldStatus: transaction.status,
+        newStatus: status,
+      });
 
-    res.json({
-      success: true,
-      data: {
-        id: updatedTransaction.id,
-        status: updatedTransaction.status,
-        updatedAt: updatedTransaction.updated_at,
-        completedAt: updatedTransaction.completed_at,
-        cancelledAt: updatedTransaction.cancelled_at,
-        cancellationReason: updatedTransaction.cancellation_reason,
-        notes: updatedTransaction.notes
-      }
-    });
-  } catch (error) {
-    logger.error('Update transaction status error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update transaction status'
-    });
-  }
-});
+      res.json({
+        success: true,
+        data: {
+          id: updatedTransaction.id,
+          status: updatedTransaction.status,
+          updatedAt: updatedTransaction.updated_at,
+          completedAt: updatedTransaction.completed_at,
+          cancelledAt: updatedTransaction.cancelled_at,
+          cancellationReason: updatedTransaction.cancellation_reason,
+          notes: updatedTransaction.notes,
+        },
+      });
+    } catch (error) {
+      logger.error("Update transaction status error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to update transaction status",
+      });
+    }
+  },
+);
 
 module.exports = router;

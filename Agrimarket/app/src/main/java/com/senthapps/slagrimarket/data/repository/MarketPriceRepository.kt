@@ -1,5 +1,6 @@
 package com.senthapps.slagrimarket.data.repository
 
+import com.senthapps.slagrimarket.BuildConfig
 import com.senthapps.slagrimarket.data.api.MarketPriceApiService
 import com.senthapps.slagrimarket.data.dao.MarketPriceDao
 import com.senthapps.slagrimarket.data.model.MarketPrice
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -64,15 +66,37 @@ class MarketPriceRepository @Inject constructor(
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to refresh market prices from network")
-                    // Network failed, but we have cached data
-                    if (cachedPrices.isEmpty()) {
+                    // DEBUG: Provide sample market prices when network fails and no cache
+                    if (cachedPrices.isEmpty() && BuildConfig.DEBUG) {
+                        try {
+                            val samplePrices = createSampleMarketPrices()
+                            marketPriceDao.insertMarketPrices(samplePrices)
+                            emit(Resource.Success(samplePrices))
+                            Timber.d("🔧 DEBUG: Provided sample market prices as fallback")
+                        } catch (dbError: Exception) {
+                            Timber.e(dbError, "Failed to insert sample market prices")
+                            emit(Resource.Error("No internet connection", e))
+                        }
+                    } else if (cachedPrices.isEmpty()) {
                         emit(Resource.Error("No internet connection", e))
                     }
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting market prices")
-            emit(Resource.Error("Failed to load market prices", e))
+            // DEBUG: Last resort - provide sample data
+            if (BuildConfig.DEBUG) {
+                try {
+                    val samplePrices = createSampleMarketPrices()
+                    marketPriceDao.insertMarketPrices(samplePrices)
+                    emit(Resource.Success(samplePrices))
+                    Timber.d("🔧 DEBUG: Provided sample market prices as last resort")
+                } catch (dbError: Exception) {
+                    emit(Resource.Error("Failed to load market prices", e))
+                }
+            } else {
+                emit(Resource.Error("Failed to load market prices", e))
+            }
         }
     }
     
@@ -190,19 +214,45 @@ class MarketPriceRepository @Inject constructor(
                 }
             } else {
                 // Fallback to local statistics
-                val localStats: Map<String, Any> = emptyMap() // TODO: Implement local stats
+                val localStats = getLocalStatistics()
                 Resource.Success(localStats)
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting market statistics")
             // Fallback to local statistics
             try {
-                val localStats: Map<String, Any> = emptyMap() // TODO: Implement local stats
+                val localStats = getLocalStatistics()
                 Resource.Success(localStats)
             } catch (localE: Exception) {
                 Resource.Error("Failed to load statistics", e)
             }
         }
+    }
+
+    /**
+     * Get local market statistics from the database
+     */
+    private suspend fun getLocalStatistics(): Map<String, Any> {
+        val stats = marketPriceDao.getMarketStatistics()
+        val cropTypes = marketPriceDao.getAvailableCropTypes()
+        val locations = marketPriceDao.getAvailableLocations()
+
+        return mapOf(
+            "totalCrops" to cropTypes.size,
+            "totalLocations" to locations.size,
+            "averagePrice" to stats.avgPrice,
+            "priceRange" to mapOf(
+                "min" to 0.0, // Could be calculated but kept simple
+                "max" to 0.0
+            ),
+            "trendDistribution" to mapOf(
+                "rising" to stats.rising,
+                "falling" to stats.falling,
+                "stable" to stats.stable
+            ),
+            "totalPrices" to stats.total,
+            "averageChange" to stats.avgChange
+        )
     }
     
     /**
@@ -264,11 +314,25 @@ class MarketPriceRepository @Inject constructor(
         val lastUpdateTime = marketPriceDao.getLastUpdateTime()
         if (lastUpdateTime == null) return true
 
-        val lastUpdated = Instant.parse(lastUpdateTime)
-        val now = Instant.now()
-        val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+        return try {
+            // Try to parse the timestamp - handle both ISO format and SQLite datetime format
+            val lastUpdated = try {
+                Instant.parse(lastUpdateTime)
+            } catch (e: Exception) {
+                // If ISO parsing fails, try SQLite datetime format: "2025-10-02 19:36:33"
+                // Convert to ISO format by replacing space with 'T' and adding 'Z'
+                val isoFormat = lastUpdateTime.replace(" ", "T") + "Z"
+                Instant.parse(isoFormat)
+            }
 
-        return minutesSinceUpdate >= 5 // Refresh if older than 5 minutes
+            val now = Instant.now()
+            val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+
+            minutesSinceUpdate >= 5 // Refresh if older than 5 minutes
+        } catch (e: Exception) {
+            // If parsing fails, assume we need to refresh
+            true
+        }
     }
     
     /**
@@ -281,5 +345,12 @@ class MarketPriceRepository @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Error clearing stale market price data")
         }
+    }
+
+    /**
+     * DEBUG-only: Create sample market prices for testing when backend is unavailable
+     */
+    private fun createSampleMarketPrices(): List<MarketPrice> {
+        return com.senthapps.slagrimarket.data.model.SampleMarketPrices.SAMPLE_PRICES
     }
 }

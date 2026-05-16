@@ -1,0 +1,23 @@
+# Render.com deployment config — free tier
+# https://docs.render.com/blueprint-spec
+
+services:
+  - type: worker         # Background worker (no HTTP port — keeps free tier alive)
+    name: fifa-poller
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python poller.py
+    plan: free           # Render free tier (spins down after 15min idle — use cron keep-alive)
+    envVars:
+      - key: SUPABASE_URL
+        sync: false      # Set manually in Render dashboard
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: LEAGUE_SLUGS
+        value: "fifa.world,uefa.champions,eng.1,esp.1,ger.1,ita.1,fra.1"
+      - key: POLL_INTERVAL_LIVE
+        value: "60"
+      - key: POLL_INTERVAL_IDLE
+        value: "120"
+      - key: PYTHON_VERSION
+        value: "3.12.0"

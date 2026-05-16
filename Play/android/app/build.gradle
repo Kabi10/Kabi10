@@ -1,0 +1,128 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.yourcompany.yourapp'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.yourcompany.yourapp"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('../keystore/debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            storeFile file('../keystore/release.keystore')
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias 'release'
+            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            applicationIdSuffix ".debug"
+            debuggable true
+            minifyEnabled false
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "version"
+    productFlavors {
+        development {
+            dimension "version"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        staging {
+            dimension "version"
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-staging"
+        }
+        production {
+            dimension "version"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+// Task to increment version code
+task incrementVersionCode {
+    doLast {
+        def versionPropsFile = file('version.properties')
+        def versionCode = 1
+
+        if (versionPropsFile.exists()) {
+            def Properties versionProps = new Properties()
+            versionProps.load(new FileInputStream(versionPropsFile))
+            versionCode = versionProps['VERSION_CODE'].toInteger() + 1
+        }
+
+        def Properties versionProps = new Properties()
+        versionProps['VERSION_CODE'] = versionCode.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+
+        // Update build.gradle
+        def buildFile = file('build.gradle')
+        def buildFileText = buildFile.text
+        buildFileText = buildFileText.replaceAll(/versionCode \d+/, "versionCode ${versionCode}")
+        buildFile.write(buildFileText)
+
+        println "Version code incremented to: ${versionCode}"
+    }
+}

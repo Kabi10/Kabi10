@@ -28,7 +28,8 @@ class ListingRepository @Inject constructor(
     private val listingApiService: ListingApiService,
     private val listingDao: ListingDao,
     private val localOpDao: LocalOpDao,
-    private val moshi: Moshi
+    private val moshi: Moshi,
+    private val storageRepository: StorageRepository
 ) {
     
     // ============================================================================
@@ -178,32 +179,41 @@ class ListingRepository @Inject constructor(
     }
 
     /**
-     * Get listing by ID - offline-first
+     * Get listing by ID - offline-first with Flow
      */
-    suspend fun getListingById(listingId: String): Resource<Listing> {
-        return try {
+    fun getListingById(listingId: String): Flow<Resource<Listing>> = flow {
+        emit(Resource.Loading())
+
+        try {
             // Try local first
             val localListing = listingDao.getListingById(listingId)
             if (localListing != null) {
-                Resource.Success(localListing)
-            } else {
-                // Try network
+                emit(Resource.Success(localListing))
+            }
+
+            // Try to refresh from network
+            try {
                 val response = listingApiService.getListingById(listingId)
                 if (response.isSuccessful) {
                     val networkListing = response.body()
                     if (networkListing != null) {
                         listingDao.insertListing(networkListing)
-                        Resource.Success(networkListing)
-                    } else {
-                        Resource.Error("Listing not found", null)
+                        emit(Resource.Success(networkListing))
+                    } else if (localListing == null) {
+                        emit(Resource.Error("Listing not found", null))
                     }
-                } else {
-                    Resource.Error("Failed to load listing", null)
+                } else if (localListing == null) {
+                    emit(Resource.Error("Failed to load listing", null))
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to refresh listing from network")
+                if (localListing == null) {
+                    emit(Resource.Error("Failed to load listing", e))
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting listing by ID")
-            Resource.Error("Failed to load listing", e)
+            emit(Resource.Error("Failed to load listing", e))
         }
     }
     
@@ -215,7 +225,13 @@ class ListingRepository @Inject constructor(
         quality: String,
         harvestDate: String,
         location: String,
-        farmerId: String
+        farmerId: String,
+        imageUrls: List<String> = emptyList(),
+        story: String = "",
+        farmingMethods: List<String> = emptyList(),
+        certifications: List<com.senthapps.slagrimarket.data.model.Certification> = emptyList(),
+        harvestedAt: String = "",
+        sustainabilityPractices: List<String> = emptyList()
     ): Result<Listing> {
         return try {
             // Parse quality string to enum
@@ -236,10 +252,15 @@ class ListingRepository @Inject constructor(
                 quality = qualityGrade,
                 harvestDate = harvestDate,
                 location = location,
-                images = emptyList(),
+                images = imageUrls,
                 isActive = true,
                 createdAt = Instant.now().toString(),
-                updatedAt = Instant.now().toString()
+                updatedAt = Instant.now().toString(),
+                story = story,
+                farmingMethods = farmingMethods,
+                certifications = certifications,
+                harvestedAt = harvestedAt,
+                sustainabilityPractices = sustainabilityPractices
             )
             
             // Save locally first (optimistic update)
@@ -253,7 +274,12 @@ class ListingRepository @Inject constructor(
                 pricePerUnit = pricePerUnit,
                 quality = quality,
                 harvestDate = harvestDate,
-                location = location
+                location = location,
+                story = story,
+                farmingMethods = farmingMethods,
+                certifications = certifications,
+                harvestedAt = harvestedAt,
+                sustainabilityPractices = sustainabilityPractices
             )
             
             val op = LocalOp(
@@ -385,9 +411,28 @@ class ListingRepository @Inject constructor(
      * Check if listings need refresh (older than 10 minutes)
      */
     private suspend fun shouldRefreshListings(): Boolean {
-        // For now, always refresh if forced or if no cached data
-        // TODO: Implement proper timestamp checking when DAO method is available
-        return true
+        val lastUpdateTime = listingDao.getLastUpdateTime()
+        if (lastUpdateTime == null) return true
+
+        return try {
+            // Try to parse the timestamp - handle both ISO format and SQLite datetime format
+            val lastUpdated = try {
+                Instant.parse(lastUpdateTime)
+            } catch (e: Exception) {
+                // If ISO parsing fails, try SQLite datetime format: "2025-10-02 19:36:33"
+                // Convert to ISO format by replacing space with 'T' and adding 'Z'
+                val isoFormat = lastUpdateTime.replace(" ", "T") + "Z"
+                Instant.parse(isoFormat)
+            }
+
+            val now = Instant.now()
+            val minutesSinceUpdate = ChronoUnit.MINUTES.between(lastUpdated, now)
+
+            minutesSinceUpdate >= 10 // Refresh if older than 10 minutes
+        } catch (e: Exception) {
+            // If parsing fails, assume we need to refresh
+            true
+        }
     }
 
     /**
@@ -497,6 +542,37 @@ class ListingRepository @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Error incrementing inquiry count")
             Resource.Error("Failed to update inquiry count", e)
+        }
+    }
+
+    /**
+     * Upload images for a listing via backend Storage API
+     * Returns list of download URLs
+     */
+    suspend fun uploadImages(
+        listingId: String,
+        imageUris: List<android.net.Uri>,
+        context: android.content.Context
+    ): Result<List<String>> {
+        return try {
+            if (imageUris.isEmpty()) {
+                return Result.success(emptyList())
+            }
+
+            Timber.d("Uploading ${imageUris.size} images via backend Storage API for listing $listingId")
+            val result = storageRepository.uploadListingImages(imageUris, listingId)
+
+            if (result.isSuccess) {
+                val downloadUrls = result.getOrNull() ?: emptyList()
+                Timber.d("Successfully uploaded ${downloadUrls.size} images for listing $listingId")
+                Result.success(downloadUrls)
+            } else {
+                Timber.e(result.exceptionOrNull(), "Failed to upload images via backend Storage API")
+                Result.failure(result.exceptionOrNull() ?: Exception("Failed to upload images"))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error uploading images")
+            Result.failure(e)
         }
     }
 }

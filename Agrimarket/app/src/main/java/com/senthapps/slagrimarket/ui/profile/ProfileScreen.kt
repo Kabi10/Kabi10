@@ -37,6 +37,11 @@ import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
+    onNavigateToEditProfile: () -> Unit = {},
+    onNavigateToSyncSettings: () -> Unit = {},
+    onNavigateToListingDetail: (String) -> Unit = {},
+    onNavigateToHelp: () -> Unit = {},
+    onNavigateToAbout: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel(),
     languageViewModel: LanguageToggleViewModel = hiltViewModel()
 ) {
@@ -68,6 +73,9 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToEditProfile) {
+                        Icon(Icons.Default.Edit, "Edit Profile")
+                    }
                     LanguageToggleButton(
                         currentLanguage = currentLanguage,
                         onLanguageChange = languageViewModel::setLanguage,
@@ -111,10 +119,18 @@ fun ProfileScreen(
             LocationAndSocialMetricsSection(currentLanguage = currentLanguage)
 
             // Active Listings Gallery Section
-            ActiveListingsGallerySection(currentLanguage = currentLanguage)
+            ActiveListingsGallerySection(
+                currentLanguage = currentLanguage,
+                onNavigateToListingDetail = onNavigateToListingDetail
+            )
 
             // Settings/Preferences Section
-            SettingsPreferencesSection(currentLanguage = currentLanguage)
+            SettingsPreferencesSection(
+                currentLanguage = currentLanguage,
+                onNavigateToSyncSettings = onNavigateToSyncSettings,
+                onNavigateToHelp = onNavigateToHelp,
+                onNavigateToAbout = onNavigateToAbout
+            )
 
             // Logout Button
             Card(
@@ -569,108 +585,44 @@ private fun RatingRow(
 
 @Composable
 private fun LocationAndSocialMetricsSection(currentLanguage: String) {
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    // Location Display
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
-        // Location Display
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = when (currentLanguage) {
-                        "en" -> stringResource(R.string.profile_location)
-                        "ta" -> stringResource(R.string.profile_location)
-                        "si" -> stringResource(R.string.profile_location)
-                        else -> "${stringResource(R.string.profile_location)} / Jaffna District"
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-
-        // Social Metrics
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Followers Card
-            Card(
-                modifier = Modifier.weight(1f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "127",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = when (currentLanguage) {
-                            "en" -> stringResource(R.string.profile_followers)
-                            "ta" -> stringResource(R.string.profile_followers)
-                            "si" -> stringResource(R.string.profile_followers)
-                            else -> stringResource(R.string.profile_followers)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // Completed Orders Card
-            Card(
-                modifier = Modifier.weight(1f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "89",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = when (currentLanguage) {
-                            "en" -> stringResource(R.string.profile_completed_orders)
-                            "ta" -> stringResource(R.string.profile_completed_orders)
-                            "si" -> stringResource(R.string.profile_completed_orders)
-                            else -> stringResource(R.string.profile_completed_orders)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Text(
+                text = when (currentLanguage) {
+                    "en" -> stringResource(R.string.profile_location)
+                    "ta" -> stringResource(R.string.profile_location)
+                    "si" -> stringResource(R.string.profile_location)
+                    else -> "${stringResource(R.string.profile_location)} / Jaffna District"
+                },
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
 
 @Composable
-private fun ActiveListingsGallerySection(currentLanguage: String) {
+private fun ActiveListingsGallerySection(
+    currentLanguage: String,
+    onNavigateToListingDetail: (String) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -703,7 +655,8 @@ private fun ActiveListingsGallerySection(currentLanguage: String) {
                 items(getSampleListings()) { listing ->
                     ListingCard(
                         listing = listing,
-                        currentLanguage = currentLanguage
+                        currentLanguage = currentLanguage,
+                        onNavigateToListingDetail = onNavigateToListingDetail
                     )
                 }
             }
@@ -714,7 +667,8 @@ private fun ActiveListingsGallerySection(currentLanguage: String) {
 @Composable
 private fun ListingCard(
     listing: SampleListing,
-    currentLanguage: String
+    currentLanguage: String,
+    onNavigateToListingDetail: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -769,7 +723,7 @@ private fun ListingCard(
 
             // View Details button
             TextButton(
-                onClick = { /* Navigate to listing details */ },
+                onClick = { onNavigateToListingDetail(listing.id) },
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(vertical = 4.dp)
             ) {
@@ -809,7 +763,12 @@ private fun getSampleListings(): List<SampleListing> {
 }
 
 @Composable
-private fun SettingsPreferencesSection(currentLanguage: String) {
+private fun SettingsPreferencesSection(
+    currentLanguage: String,
+    onNavigateToSyncSettings: () -> Unit = {},
+    onNavigateToHelp: () -> Unit = {},
+    onNavigateToAbout: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -856,27 +815,27 @@ private fun SettingsPreferencesSection(currentLanguage: String) {
                 onClick = { /* Language is handled by top bar toggle */ }
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-            // Notifications Setting
+            // Sync Settings
             SettingsItem(
-                icon = Icons.Default.Notifications,
+                icon = Icons.Default.Settings,
                 title = when (currentLanguage) {
-                    "en" -> "Notifications"
-                    "ta" -> "அறிவிப்புகள்"
-                    "si" -> "දැනුම්දීම්"
-                    else -> "Notifications"
+                    "en" -> "Sync Settings"
+                    "ta" -> "ஒத்திசைவு அமைப்புகள்"
+                    "si" -> "සමමුහුර්ත සැකසුම්"
+                    else -> "Sync Settings"
                 },
                 subtitle = when (currentLanguage) {
-                    "en" -> "Manage notification preferences"
-                    "ta" -> "அறிவிப்பு விருப்பங்களை நிர்வகிக்கவும்"
-                    "si" -> "දැනුම්දීම් මනාපයන් කළමනාකරණය කරන්න"
-                    else -> "Manage notification preferences"
+                    "en" -> "Manage offline sync preferences"
+                    "ta" -> "ஆஃப்லைன் ஒத்திசைவு விருப்பங்களை நிர்வகிக்கவும்"
+                    "si" -> "නොබැඳි සමමුහුර්ත මනාපයන් කළමනාකරණය කරන්න"
+                    else -> "Manage offline sync preferences"
                 },
-                onClick = { /* TODO: Navigate to notifications settings */ }
+                onClick = onNavigateToSyncSettings
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // Help Setting
             SettingsItem(
@@ -893,10 +852,10 @@ private fun SettingsPreferencesSection(currentLanguage: String) {
                     "si" -> "උදව් ලබා ගන්න සහ සහාය අමතන්න"
                     else -> "Get help and contact support"
                 },
-                onClick = { /* TODO: Navigate to help screen */ }
+                onClick = onNavigateToHelp
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // About Setting
             SettingsItem(
@@ -913,7 +872,7 @@ private fun SettingsPreferencesSection(currentLanguage: String) {
                     "si" -> "යෙදුම් අනුවාදය සහ තොරතුරු"
                     else -> "App version and information"
                 },
-                onClick = { /* TODO: Navigate to about screen */ }
+                onClick = onNavigateToAbout
             )
         }
     }

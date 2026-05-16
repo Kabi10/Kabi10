@@ -1,0 +1,3806 @@
+{
+  "inputs": [
+    {
+      "type": "hidden",
+      "name": "albumuuid",
+      "id": "albumuuid",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "CSRF",
+      "id": "CSRF",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkspotify",
+      "label": "Spotify",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkapplemusic",
+      "label": "Apple Music",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkitunes",
+      "label": "iTunes",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkbeatport",
+      "label": "Beatport",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkfacebook",
+      "label": "Instagram & Facebook",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chktiktok",
+      "label": "TikTok & other ByteDance stores",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkgoogle",
+      "label": "YouTube Music",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkamazon",
+      "label": "Amazon",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkrdio",
+      "label": "Pandora",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkdeezer",
+      "label": "Deezer",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chktidal",
+      "label": "Tidal",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkiheart",
+      "label": "iHeartRadio",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkqobuz",
+      "label": "Qobuz",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chksaavn",
+      "label": "Saavn",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkboomplay",
+      "label": "Boomplay",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkanghami",
+      "label": "Anghami",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chknetease",
+      "label": "NetEase",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chktencent",
+      "label": "Tencent",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkimusica",
+      "label": "Claro Música",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkjoox",
+      "label": "Joox",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkkuackmedia",
+      "label": "Kuack Media",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkfeedfm",
+      "label": "Adaptr",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkflo",
+      "label": "Flo",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkbeats",
+      "label": "MediaNet",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chksnap",
+      "label": "Snapchat",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": "chkroblox",
+      "label": "Roblox (beta)",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": "socialmediapack",
+      "label": "Social Media Pack ($14.95/yr + 20% of platform ad revenue)\nGet notified & paid when your music is used in content on YouTube, TikTok, Instagram, and Facebook. We automatically detect matches and pay you ad revenue from videos that use your music.\n\nYour music will be added to:\n\nYouTube's Content ID, Creator Music, and Shorts music libraries.\nTikTok's music ID recognition service.\nInstagram monetization with Meta Rights Manager.\nFacebook's recognition service using Meta Rights Manager.\n\nLearn more about monetizing your music on social media.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "radio",
+      "name": "previouslyReleased_[myuuid]",
+      "id": null,
+      "label": "No",
+      "placeholder": null,
+      "required": false,
+      "className": "previouslyReleased_[myuuid] distroPreviouslyReleased"
+    },
+    {
+      "type": "radio",
+      "name": "previouslyReleased_[myuuid]",
+      "id": null,
+      "label": "Yes",
+      "placeholder": null,
+      "required": false,
+      "className": "previouslyReleased_[myuuid] distroPreviouslyReleased"
+    },
+    {
+      "type": "date",
+      "name": "originalReleaseDate",
+      "id": "original-release-date-dp",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-date"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "checkboxPreserveNonStandardCaps",
+      "label": "Preserve non-standard capitalization (warning: stores don't love this)",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "text",
+      "name": "bandname",
+      "id": "artistName",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-text no-emoji no-url"
+    },
+    {
+      "type": "radio",
+      "name": "compoundBandName",
+      "id": "js-compound-band-name-radio",
+      "label": "Collaboration: Paul McCartney and Stevie Wonder\n\nThis album will appear on Paul McCartney's iTunes page, and also Stevie Wonder's.\nIt will also appear if someone does a search for \"Paul McCartney and Stevie Wonder\"\nEven if either/both of the collaborators don't yet have anything else in iTunes, you should still choose this.",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "compoundBandName",
+      "id": "js-non-compound-band-name-radio",
+      "label": "Band name: Simon and Garfunkel or Huey Lewis and the News\n\n\"Simon\" is not a standalone artist (when solo, he uses \"Paul Simon\"). So \"Simon and Garfunkel\" is treated as a band name.\n\"The News\" is not a standalone band (and presumably never will be). So \"Huey Lewis and the News\" is a band name.",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "spotifyArtistID",
+      "id": "spotifyArtistIDPage",
+      "label": "There is a page for  in Spotify, but it’s not listed above.\n\n\n\n\n\nEnter your Spotify Artist URI below. Help me find it\n\n\n Please enter a valid Spotify Artist ID",
+      "placeholder": null,
+      "required": false,
+      "className": "spotifyArtistIdMultipleMatches"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "spotify:artist:12345",
+      "required": false,
+      "className": "myCustomSpotifyUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "spotifyArtistID",
+      "id": "spotifyArtistIDFirst",
+      "label": "This will be my first  release in Spotify.",
+      "placeholder": null,
+      "required": false,
+      "className": "spotifyArtistIdMultipleMatches defaultRadio"
+    },
+    {
+      "type": "radio",
+      "name": "spotifyArtistID",
+      "id": "spotifyArtistID1Yes",
+      "label": "Yes - Group this album with my other  releases that are already in Spotify\n\n\n\n\n\nEnter your Spotify Artist URI below. Help me find it\n\n\n Please enter a valid Spotify Artist ID",
+      "placeholder": null,
+      "required": false,
+      "className": "spotifyArtistIdZeroMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "spotify:artist:12345",
+      "required": false,
+      "className": "myCustomSpotifyUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "spotifyArtistID",
+      "id": "js-spotify-artist-id-zero-matches-new",
+      "label": "No - I don't yet have any  releases live in Spotify",
+      "placeholder": null,
+      "required": false,
+      "className": "spotifyArtistIdZeroMatches"
+    },
+    {
+      "type": "radio",
+      "name": "spotifyArtistID",
+      "id": "spotifyArtistIDGroup",
+      "label": "Yes - Group this album with my other  releases that are already in Spotify\n\n\n\n\n\nEnter your Spotify Artist URI below. What's that?\n\n\n Please enter a valid Spotify Artist ID",
+      "placeholder": null,
+      "required": false,
+      "className": "spotifyArtistIDTooManyMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "spotify:artist:12345",
+      "required": false,
+      "className": "myCustomSpotifyUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "spotifyArtistID",
+      "id": "spotifyNoArtistIDFirst",
+      "label": "No - This will be my first  release in Spotify",
+      "placeholder": null,
+      "required": false,
+      "className": "spotifyArtistIDTooManyMatches"
+    },
+    {
+      "type": "hidden",
+      "name": "spotifyArtistID",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "appleArtistID",
+      "id": "appleArtistIDPage",
+      "label": "There is a page for  in iTunes and Apple Music, but it’s not listed above.",
+      "placeholder": null,
+      "required": false,
+      "className": "appleArtistIdMultipleMatches"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://music.apple.com/us/artist/...",
+      "required": false,
+      "className": "myCustomAppleUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "appleArtistID",
+      "id": "appleArtistIDFirst",
+      "label": "This will be my first  release in iTunes and Apple Music.",
+      "placeholder": null,
+      "required": false,
+      "className": "appleArtistIdMultipleMatches defaultRadio"
+    },
+    {
+      "type": "radio",
+      "name": "appleArtistID",
+      "id": "appleArtistID1Yes",
+      "label": "Yes - Group this album with my other  releases that are already in iTunes & Apple Music\n\n\n\n\n\nEnter your Apple Artist URL below. Help me find it\n\n\n Please enter a valid Apple Artist URL",
+      "placeholder": null,
+      "required": false,
+      "className": "appleArtistIdZeroMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://music.apple.com/us/artist/...",
+      "required": false,
+      "className": "myCustomAppleUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "appleArtistID",
+      "id": "js-apple-artist-id-zero-matches-new",
+      "label": "No - I don't yet have any  releases live in iTunes & Apple Music",
+      "placeholder": null,
+      "required": false,
+      "className": "appleArtistIdZeroMatches"
+    },
+    {
+      "type": "radio",
+      "name": "appleArtistID",
+      "id": "appleArtistIDGroup",
+      "label": "Yes - Group this album with my other  releases that are already in iTunes & Apple Music\n\n\n\n\n\nEnter your Apple Artist URL below. Help me find it\n\n\n Please enter a valid Apple Artist URL",
+      "placeholder": null,
+      "required": false,
+      "className": "appleArtistIDTooManyMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://music.apple.com/us/artist/...",
+      "required": false,
+      "className": "myCustomAppleUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "appleArtistID",
+      "id": "appleNoArtistIDFirst",
+      "label": "No - This will be my first  release in iTunes & Apple Music",
+      "placeholder": null,
+      "required": false,
+      "className": "appleArtistIDTooManyMatches"
+    },
+    {
+      "type": "hidden",
+      "name": "appleArtistID",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "googleArtistID",
+      "id": "googleArtistIDPage",
+      "label": "There is a page for  in YouTube Music, but it’s not listed above.\n\n\n\n\n\nEnter your YouTube Music Artist URL below. Help me find it\n\n\n Please enter a valid YouTube Music Artist URL",
+      "placeholder": null,
+      "required": false,
+      "className": "googleArtistIdMultipleMatches"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://music.youtube.com/channel/...",
+      "required": false,
+      "className": "myCustomGoogleUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "googleArtistID",
+      "id": "googleArtistIDFirst",
+      "label": "doesn't yet have an artist profile in YouTube Music",
+      "placeholder": null,
+      "required": false,
+      "className": "googleArtistIdMultipleMatches defaultRadio"
+    },
+    {
+      "type": "radio",
+      "name": "googleArtistID",
+      "id": "googleArtistID1Yes",
+      "label": "Yes - Group this album with my other  releases that are already in YouTube Music\n\n\n\n\n\nEnter your YouTube Music Artist URL below. Help me find it\n\n\n Please enter a valid YouTube Music Artist URL",
+      "placeholder": null,
+      "required": false,
+      "className": "googleArtistIdZeroMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://music.youtube.com/channel/...",
+      "required": false,
+      "className": "myCustomGoogleUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "googleArtistID",
+      "id": "js-google-artist-id-zero-matches-new",
+      "label": "No -  doesn't yet have an artist profile in YouTube Music",
+      "placeholder": null,
+      "required": false,
+      "className": "googleArtistIdZeroMatches"
+    },
+    {
+      "type": "radio",
+      "name": "googleArtistID",
+      "id": "googleArtistIDGroup",
+      "label": "Yes - Group this album with my other  releases that are already in YouTube Music\n\n\n\n\n\nEnter your YouTube Music Artist URL below. Help me find it\n\n\n Please enter a valid YouTube Music Artist URL",
+      "placeholder": null,
+      "required": false,
+      "className": "googleArtistIDTooManyMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://music.youtube.com/channel/...",
+      "required": false,
+      "className": "myCustomGoogleUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "googleArtistID",
+      "id": "googleNoArtistIDFirst",
+      "label": "No -  doesn't yet have an artist profile in YouTube Music",
+      "placeholder": null,
+      "required": false,
+      "className": "googleArtistIDTooManyMatches"
+    },
+    {
+      "type": "hidden",
+      "name": "googleArtistID",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "instagramProfileArtistID",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "instagramProfileArtistID",
+      "id": "instagramProfileArtistID1Yes",
+      "label": "Yes - Group this album with my other Kabi releases on Instagram",
+      "placeholder": null,
+      "required": false,
+      "className": "instagramProfileArtistIdZeroMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://instagram.com/...",
+      "required": false,
+      "className": "myCustomInstagramProfileUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "instagramProfileArtistID",
+      "id": "js-instagramProfile-artist-id-zero-matches-new",
+      "label": "No - Kabi doesn't yet have a profile on Instagram",
+      "placeholder": null,
+      "required": false,
+      "className": "instagramProfileArtistIdZeroMatches"
+    },
+    {
+      "type": "hidden",
+      "name": "facebookProfileArtistID",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "facebookProfileArtistID",
+      "id": "facebookProfileArtistID1Yes",
+      "label": "Yes - Group this album with my other Kabi releases on Facebook",
+      "placeholder": null,
+      "required": false,
+      "className": "facebookProfileArtistIdZeroMatches defaultRadio"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "https://facebook.com/...",
+      "required": false,
+      "className": "myCustomFacebookProfileUri coolInput cool-input-text large-input"
+    },
+    {
+      "type": "radio",
+      "name": "facebookProfileArtistID",
+      "id": "js-facebookProfile-artist-id-zero-matches-new",
+      "label": "No - Kabi doesn't yet have a profile on Facebook",
+      "placeholder": null,
+      "required": false,
+      "className": "facebookProfileArtistIdZeroMatches"
+    },
+    {
+      "type": "date",
+      "name": "releaseDate",
+      "id": "release-date-dp",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-date"
+    },
+    {
+      "type": "radio",
+      "name": "synchronizedGlobalRelease",
+      "id": "synchronizedNo",
+      "label": "in the listener's time zone. (default)",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "synchronizedGlobalRelease",
+      "id": "synchronizedYes",
+      "label": "in New York, and simultaneously all other countries at the same time, regardless of time zone.",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "iTunesPreorder",
+      "id": "iTunesPreorderNo",
+      "label": "No, don't let anyone buy it until the release date",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "iTunesPreorder",
+      "id": "iTunesPreorderYes",
+      "label": "Yes, let people preorder it before the release date",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "date",
+      "name": "preOrderDate",
+      "id": "pre-order-date-dp",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-date"
+    },
+    {
+      "type": "text",
+      "name": "recordLabel",
+      "id": "recordLabel",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-text no-emoji"
+    },
+    {
+      "type": "hidden",
+      "name": "recordLabelLabel",
+      "id": "recordLabelLabel",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "customUpc",
+      "id": "customUpc",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "file",
+      "name": "artwork",
+      "id": "artwork",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "large distroFileInput resizeWithArtwork distroFile"
+    },
+    {
+      "type": "hidden",
+      "name": "artwork_originalFilename",
+      "id": "artwork_originalFilename",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "artworkDominantColor",
+      "id": "artworkDominantColor",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "artworkDominantColor"
+    },
+    {
+      "type": "hidden",
+      "name": "artworkCropCoordinates",
+      "id": "artworkCropCoordinates",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "artworkCropCoordinates"
+    },
+    {
+      "type": "text",
+      "name": "albumtitle",
+      "id": "albumTitleInput",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-text no-emoji"
+    },
+    {
+      "type": "hidden",
+      "name": "tracknum_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "tracknum_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "text",
+      "name": "title_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "title_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": "Track 1 title",
+      "required": false,
+      "className": "coolInput cool-input-text uploadFileTitle track_1 no-emoji"
+    },
+    {
+      "type": "radio",
+      "name": "feat_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-no-feat-1",
+      "label": "No, don't show any other artists in song title",
+      "placeholder": null,
+      "required": false,
+      "className": "feat_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroFeat"
+    },
+    {
+      "type": "radio",
+      "name": "feat_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-add-feat-1",
+      "label": "Yes, add featured artists to track title (please specify...)",
+      "placeholder": null,
+      "required": false,
+      "className": "feat_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroFeat"
+    },
+    {
+      "type": "radio",
+      "name": "version_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "track-1-version-no",
+      "label": "No, this is the normal version",
+      "placeholder": null,
+      "required": false,
+      "className": "version_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroVersion"
+    },
+    {
+      "type": "radio",
+      "name": "version_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "track-1-version-radio-edit",
+      "label": "Radio Edit",
+      "placeholder": null,
+      "required": false,
+      "className": "version_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroVersion"
+    },
+    {
+      "type": "radio",
+      "name": "version_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": null,
+      "label": "Other...",
+      "placeholder": null,
+      "required": false,
+      "className": "version_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroVersion"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "Version",
+      "required": false,
+      "className": "coolInput cool-input-text versionInput1 versionInput1Other no-emoji"
+    },
+    {
+      "type": "hidden",
+      "name": "tracknum_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "tracknum_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "key",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "acl",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "AWSAccessKeyId",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "policy",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "signature",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "file",
+      "name": "file",
+      "id": "js-track-upload-1",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "distroFileInput distroFile trackupload trackupload_1 file-highlight-new"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-text isrc isrc_1"
+    },
+    {
+      "type": "radio",
+      "name": "dolby_1",
+      "id": null,
+      "label": "No",
+      "placeholder": null,
+      "required": false,
+      "className": "distroDolbyAtmos"
+    },
+    {
+      "type": "radio",
+      "name": "dolby_1",
+      "id": null,
+      "label": "Yes, I have a version mixed with Atmos I'd like to upload in addition...",
+      "placeholder": null,
+      "required": false,
+      "className": "distroDolbyAtmos"
+    },
+    {
+      "type": "file",
+      "name": "dolbyAtmos",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "distroFileInput dolbyAtmosInput trackupload file-highlight-new"
+    },
+    {
+      "type": "text",
+      "name": "composer_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "composer_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": "Track 1 composer",
+      "required": false,
+      "className": "coolInput cool-input-text uploadFileComposer composer_1"
+    },
+    {
+      "type": "radio",
+      "name": "coversong_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "not_coversong_radio_button_1",
+      "label": "I wrote this song, or manage the songwriter (it's an original song)",
+      "placeholder": null,
+      "required": false,
+      "className": "coversong_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroCoverSong"
+    },
+    {
+      "type": "radio",
+      "name": "coversong_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "coversong_radio_button_1",
+      "label": "Another artist wrote it (it's a cover song)",
+      "placeholder": null,
+      "required": false,
+      "className": "coversong_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroCoverSong"
+    },
+    {
+      "type": "text",
+      "name": "originalArtist_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "originalArtist_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": "Original artist name",
+      "required": false,
+      "className": "coolInput cool-input-text originalArtist_1 originalArtist"
+    },
+    {
+      "type": "text",
+      "name": "originalSongTitle_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "originalSongTitle_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": "Original song title",
+      "required": false,
+      "className": "coolInput cool-input-text originalSongTitle_1 originalSongTitle"
+    },
+    {
+      "type": "text",
+      "name": "originalSongwriters_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "originalSongwriters_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "placeholder": "Original song writers",
+      "required": false,
+      "className": "coolInput cool-input-text originalSongwriters_1 originalSongwriters"
+    },
+    {
+      "type": "text",
+      "name": "songwriter_real_name_first1",
+      "id": null,
+      "label": null,
+      "placeholder": "First name",
+      "required": false,
+      "className": "coolInput cool-input-text songwriter_real_name_first no-emoji no-url"
+    },
+    {
+      "type": "text",
+      "name": "songwriter_real_name_middle1",
+      "id": null,
+      "label": null,
+      "placeholder": "Middle name",
+      "required": false,
+      "className": "coolInput cool-input-text songwriter_real_name_middle no-emoji no-url"
+    },
+    {
+      "type": "text",
+      "name": "songwriter_real_name_last1",
+      "id": null,
+      "label": null,
+      "placeholder": "Last name",
+      "required": false,
+      "className": "coolInput cool-input-text songwriter_real_name_last no-emoji no-url"
+    },
+    {
+      "type": "radio",
+      "name": "explicit_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-not-explicit-radio-button-1",
+      "label": "No",
+      "placeholder": null,
+      "required": false,
+      "className": "explicit_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroExplicit"
+    },
+    {
+      "type": "radio",
+      "name": "explicit_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-explicit-radio-button-1",
+      "label": "Yes",
+      "placeholder": null,
+      "required": false,
+      "className": "explicit_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroExplicit"
+    },
+    {
+      "type": "radio",
+      "name": "cleaned_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-not-cleaned-radio-button-1",
+      "label": "No - This song is clean, and always has been",
+      "placeholder": null,
+      "required": false,
+      "className": "cleaned_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroCleaned"
+    },
+    {
+      "type": "radio",
+      "name": "cleaned_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-cleaned-radio-button-1",
+      "label": "Yes - There is an explicit version of this song, but this is the clean (or censored) version of it",
+      "placeholder": null,
+      "required": false,
+      "className": "cleaned_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroCleaned"
+    },
+    {
+      "type": "radio",
+      "name": "instrumental_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-not-instrumental-radio-button-1",
+      "label": "This song contains lyrics",
+      "placeholder": null,
+      "required": false,
+      "className": "instrumental_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroInstrumental"
+    },
+    {
+      "type": "radio",
+      "name": "instrumental_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "js-instrumental-radio-button-1",
+      "label": "This song is instrumental and contains no lyrics",
+      "placeholder": null,
+      "required": false,
+      "className": "instrumental_2dfb407c-7ab1-20f7-acb2-9d07cde064db distroInstrumental"
+    },
+    {
+      "type": "radio",
+      "name": "previewStart_1",
+      "id": null,
+      "label": "Let streaming services decide",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "previewStart_1",
+      "id": null,
+      "label": "Let me specify when the good part starts",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "tracknum_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "tracknum_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "text",
+      "name": "title_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "title_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": "Track 2 title",
+      "required": false,
+      "className": "coolInput cool-input-text uploadFileTitle track_2 no-emoji"
+    },
+    {
+      "type": "radio",
+      "name": "feat_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-no-feat-2",
+      "label": "No, don't show any other artists in song title",
+      "placeholder": null,
+      "required": false,
+      "className": "feat_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroFeat"
+    },
+    {
+      "type": "radio",
+      "name": "feat_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-add-feat-2",
+      "label": "Yes, add featured artists to track title (please specify...)",
+      "placeholder": null,
+      "required": false,
+      "className": "feat_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroFeat"
+    },
+    {
+      "type": "radio",
+      "name": "version_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "track-2-version-no",
+      "label": "No, this is the normal version",
+      "placeholder": null,
+      "required": false,
+      "className": "version_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroVersion"
+    },
+    {
+      "type": "radio",
+      "name": "version_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "track-2-version-radio-edit",
+      "label": "Radio Edit",
+      "placeholder": null,
+      "required": false,
+      "className": "version_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroVersion"
+    },
+    {
+      "type": "radio",
+      "name": "version_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": null,
+      "label": "Other...",
+      "placeholder": null,
+      "required": false,
+      "className": "version_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroVersion"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": "Version",
+      "required": false,
+      "className": "coolInput cool-input-text versionInput2 versionInput2Other no-emoji"
+    },
+    {
+      "type": "hidden",
+      "name": "tracknum_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "tracknum_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "key",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "acl",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "AWSAccessKeyId",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "policy",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "signature",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "file",
+      "name": "file",
+      "id": "js-track-upload-2",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "distroFileInput distroFile trackupload trackupload_2 file-highlight-new"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "coolInput cool-input-text isrc isrc_2"
+    },
+    {
+      "type": "radio",
+      "name": "dolby_2",
+      "id": null,
+      "label": "No",
+      "placeholder": null,
+      "required": false,
+      "className": "distroDolbyAtmos"
+    },
+    {
+      "type": "radio",
+      "name": "dolby_2",
+      "id": null,
+      "label": "Yes, I have a version mixed with Atmos I'd like to upload in addition...",
+      "placeholder": null,
+      "required": false,
+      "className": "distroDolbyAtmos"
+    },
+    {
+      "type": "file",
+      "name": "dolbyAtmos",
+      "id": null,
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "distroFileInput dolbyAtmosInput trackupload file-highlight-new"
+    },
+    {
+      "type": "text",
+      "name": "composer_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "composer_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": "Track 2 composer",
+      "required": false,
+      "className": "coolInput cool-input-text uploadFileComposer composer_2"
+    },
+    {
+      "type": "radio",
+      "name": "coversong_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "not_coversong_radio_button_2",
+      "label": "I wrote this song, or manage the songwriter (it's an original song)",
+      "placeholder": null,
+      "required": false,
+      "className": "coversong_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroCoverSong"
+    },
+    {
+      "type": "radio",
+      "name": "coversong_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "coversong_radio_button_2",
+      "label": "Another artist wrote it (it's a cover song)",
+      "placeholder": null,
+      "required": false,
+      "className": "coversong_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroCoverSong"
+    },
+    {
+      "type": "text",
+      "name": "originalArtist_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "originalArtist_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": "Original artist name",
+      "required": false,
+      "className": "coolInput cool-input-text originalArtist_2 originalArtist"
+    },
+    {
+      "type": "text",
+      "name": "originalSongTitle_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "originalSongTitle_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": "Original song title",
+      "required": false,
+      "className": "coolInput cool-input-text originalSongTitle_2 originalSongTitle"
+    },
+    {
+      "type": "text",
+      "name": "originalSongwriters_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "originalSongwriters_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "placeholder": "Original song writers",
+      "required": false,
+      "className": "coolInput cool-input-text originalSongwriters_2 originalSongwriters"
+    },
+    {
+      "type": "text",
+      "name": "songwriter_real_name_first2",
+      "id": null,
+      "label": null,
+      "placeholder": "First name",
+      "required": false,
+      "className": "coolInput cool-input-text songwriter_real_name_first no-emoji no-url"
+    },
+    {
+      "type": "text",
+      "name": "songwriter_real_name_middle2",
+      "id": null,
+      "label": null,
+      "placeholder": "Middle name",
+      "required": false,
+      "className": "coolInput cool-input-text songwriter_real_name_middle no-emoji no-url"
+    },
+    {
+      "type": "text",
+      "name": "songwriter_real_name_last2",
+      "id": null,
+      "label": null,
+      "placeholder": "Last name",
+      "required": false,
+      "className": "coolInput cool-input-text songwriter_real_name_last no-emoji no-url"
+    },
+    {
+      "type": "radio",
+      "name": "explicit_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-not-explicit-radio-button-2",
+      "label": "No",
+      "placeholder": null,
+      "required": false,
+      "className": "explicit_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroExplicit"
+    },
+    {
+      "type": "radio",
+      "name": "explicit_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-explicit-radio-button-2",
+      "label": "Yes",
+      "placeholder": null,
+      "required": false,
+      "className": "explicit_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroExplicit"
+    },
+    {
+      "type": "radio",
+      "name": "cleaned_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-not-cleaned-radio-button-2",
+      "label": "No - This song is clean, and always has been",
+      "placeholder": null,
+      "required": false,
+      "className": "cleaned_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroCleaned"
+    },
+    {
+      "type": "radio",
+      "name": "cleaned_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-cleaned-radio-button-2",
+      "label": "Yes - There is an explicit version of this song, but this is the clean (or censored) version of it",
+      "placeholder": null,
+      "required": false,
+      "className": "cleaned_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroCleaned"
+    },
+    {
+      "type": "radio",
+      "name": "instrumental_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-not-instrumental-radio-button-2",
+      "label": "This song contains lyrics",
+      "placeholder": null,
+      "required": false,
+      "className": "instrumental_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroInstrumental"
+    },
+    {
+      "type": "radio",
+      "name": "instrumental_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "js-instrumental-radio-button-2",
+      "label": "This song is instrumental and contains no lyrics",
+      "placeholder": null,
+      "required": false,
+      "className": "instrumental_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17 distroInstrumental"
+    },
+    {
+      "type": "radio",
+      "name": "previewStart_2",
+      "id": null,
+      "label": "Let streaming services decide",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "radio",
+      "name": "previewStart_2",
+      "id": null,
+      "label": "Let me specify when the good part starts",
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "text",
+      "name": "performer-name",
+      "id": "track-1-performer-1-name",
+      "label": null,
+      "placeholder": "Name",
+      "required": false,
+      "className": "performer-name no-emoji no-url coolInput cool-input-text"
+    },
+    {
+      "type": "text",
+      "name": "producer-name",
+      "id": "track-1-producer-1-name",
+      "label": null,
+      "placeholder": "Name",
+      "required": false,
+      "className": "producer-name no-emoji no-url coolInput cool-input-text"
+    },
+    {
+      "type": "text",
+      "name": "performer-name",
+      "id": "track-2-performer-1-name",
+      "label": null,
+      "placeholder": "Name",
+      "required": false,
+      "className": "performer-name no-emoji no-url coolInput cool-input-text"
+    },
+    {
+      "type": "text",
+      "name": "producer-name",
+      "id": "track-2-producer-1-name",
+      "label": null,
+      "placeholder": "Name",
+      "required": false,
+      "className": "producer-name no-emoji no-url coolInput cool-input-text"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "Leave a Legacy ($49 one-time fee, nonrecurring)\nDistroKid will never delete this album, even if you cancel your account or your credit card is declined. You can always choose to delete it any time—or not. You will continue to accrue all royalties, as normal. Protect your music and leave a legacy for future generations.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": null,
+      "label": "Discovery Pack ($1.98/yr)\nAdd this album to the global databases that people use to match music and artist information. Only 99-cents per track. Includes:\nSong recognition in millions of automobiles (via Gracenote)\nRegistration with SoundScan (used for Billboard charts)\nArtist, track and album credits officially listed and linked in Jaxsta\nAudio fingerprinting for rights protection with ACRCloud",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "Store Maximizer ($7.95/yr)\nDistroKid will automatically deliver this album to new online stores and streaming services as we add them. Which is often. We'll give you notice each time we add the album to a new service.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "store",
+      "id": null,
+      "label": "Audiomack (free)\nDistroKid will upload your release to Audiomack.",
+      "placeholder": null,
+      "required": false,
+      "className": "distroStore js-audiomackExtraCheckbox"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "function clickedBeatportOptIn()\n{\nif ($j('input[type=\"checkbox\"][extra=\"beatport\"]:checked').length == 0)\n{\n$j('.beatportCheckboxLabel').hide();\n}\nelse\n{\n$j('.beatportCheckboxLabel').show();\n}\n}\n\n\n\n\nBeatport Unlimited Uploads ($9.99/mo)\nEnable Beatport for your DistroKid account. You'll be able to add this release, plus any future or past Electronic genre releases, to Beatport—which is the world's #1 store for electronic music DJs worldwide.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "Cover Song Licensing ( $12/yr x 0)\nDistroKid will make your cover songs legal. We'll secure a license and automatically pay songwriters on your behalf.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "DistroVid Music Video Distribution ($8.25/mo, billed annually at $99)\nUnlimited music video distribution to Spotify, Apple, Tidal, Boomplay, VEVO while keeping 100% of your earnings! Learn more about DistroVid here.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "Loudness Normalization ($2.99 one-time fee x2, nonrecurring)\nOptimizes audio level for streaming services per Spotify's recommendation (-14dB integrated LUFS & -1dB true peak maximum). This sets the volume of your track to an optimal level, and reduces or eliminates distortion & clipping during streaming services' transcoding process—without changing the sound or dynamic range of your music. If your album is already loud enough (> -14dB LUFS), this optimization will be skipped and you won't be charged.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": null,
+      "label": "Dolby Atmos/Spatial audio ($26.99 x 0 one-time fee, nonrecurring)\nDesignates this release as Dolby Atmos with Spatial Audio on supported devices & streaming services including Apple Music, Tidal and Amazon. It's okay if you're unsure; we'll check your audio and if it isn't valid Dolby Atmos, you won't be charged.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "checkbox",
+      "name": "extras",
+      "id": "socialmediapack_alternate",
+      "label": "Social Media Pack ($14.95/yr + 20% of platform ad revenue)\nGet notified & paid when your music is used in content on YouTube, TikTok, Instagram, and Facebook. We automatically detect matches and pay you ad revenue from videos that use your music.",
+      "placeholder": null,
+      "required": false,
+      "className": "extras"
+    },
+    {
+      "type": "hidden",
+      "name": null,
+      "id": "extrasAmountYearly",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": null,
+      "id": "extrasAmountOneTime",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": null,
+      "id": "extrasAmountOneTimePurchasesUnrelatedToRelease",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousureyoutube",
+      "label": "I selected \"YouTube Music\". So I won't email DistroKid later asking, \"why'd you upload my music to YouTube?!\" ...mkay?",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousurenonstandardscaps",
+      "label": "Non-standard cApiTaliZatiOn detected. Apple Music may convert to standard capitalization per paragraph 3.21 in the Apple Style Guide",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousurepromoservices",
+      "label": "I won't use \"promo services\" that guarantee streams or playlisting—even if they claim \"organic and real\" streams. These services typically use fake stream-bots easily detectable by streaming services. Read this message from Spotify to learn more: Don't put your music at risk",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousureticktokcml",
+      "label": "I have selected TikTok Commercial Music Library and confirm that I possess the necessary rights to opt-in this release",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousuresnap",
+      "label": "I have opted-in to Snapchat and confirm that I possess the necessary rights and agree to the Snapchat publishing rights grant",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousurerecorded",
+      "label": "I recorded this music, and am authorized to sell it in stores worldwide & collect all royalties.",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousureotherartist",
+      "label": "I'm not using any other artist's name in my name, song titles, or album title, without their approval.",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "areyousuretandc",
+      "label": "I have read and agree to the terms of the DistroKid Distribution Agreement",
+      "placeholder": null,
+      "required": false,
+      "className": "areyousure"
+    },
+    {
+      "type": "date",
+      "name": "rpReleaseDateInput",
+      "id": "rp-release-date-dp",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "cool-input-date rp-form-field"
+    },
+    {
+      "type": "text",
+      "name": null,
+      "id": "rp-record-label-input",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "rp-form-field"
+    },
+    {
+      "type": "checkbox",
+      "name": null,
+      "id": "rp-preorder-checkbox",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "date",
+      "name": "rpPreorderDateInput",
+      "id": "rp-preorder-dp",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "cool-input-date rp-form-field"
+    },
+    {
+      "type": "hidden",
+      "name": "doMixeaALaCarte",
+      "id": "doMixeaALaCarte",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "hidden",
+      "name": "hasSongsMasteredWithMixea",
+      "id": "hasSongsMasteredWithMixea",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    },
+    {
+      "type": "button",
+      "name": null,
+      "id": "doneButton",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": "distroDoneButtonWithAPI btn info button"
+    },
+    {
+      "type": "text",
+      "name": "zipcode",
+      "id": "zipcode-7F5BC86F-6178-4771-866AF7784AAD7266",
+      "label": null,
+      "placeholder": null,
+      "required": false,
+      "className": ""
+    }
+  ],
+  "selects": [
+    {
+      "name": "howmanysongs",
+      "id": "howManySongsOnThisAlbum",
+      "label": null,
+      "options": [
+        {
+          "v": "1",
+          "t": "1 song (a single)"
+        },
+        {
+          "v": "2",
+          "t": "2 songs"
+        },
+        {
+          "v": "3",
+          "t": "3 songs"
+        },
+        {
+          "v": "4",
+          "t": "4 songs"
+        },
+        {
+          "v": "5",
+          "t": "5 songs"
+        },
+        {
+          "v": "6",
+          "t": "6 songs"
+        },
+        {
+          "v": "7",
+          "t": "7 songs"
+        },
+        {
+          "v": "8",
+          "t": "8 songs"
+        },
+        {
+          "v": "9",
+          "t": "9 songs"
+        },
+        {
+          "v": "10",
+          "t": "10 songs"
+        },
+        {
+          "v": "11",
+          "t": "11 songs"
+        },
+        {
+          "v": "12",
+          "t": "12 songs"
+        },
+        {
+          "v": "13",
+          "t": "13 songs"
+        },
+        {
+          "v": "14",
+          "t": "14 songs"
+        },
+        {
+          "v": "15",
+          "t": "15 songs"
+        },
+        {
+          "v": "16",
+          "t": "16 songs"
+        },
+        {
+          "v": "17",
+          "t": "17 songs"
+        },
+        {
+          "v": "18",
+          "t": "18 songs"
+        },
+        {
+          "v": "19",
+          "t": "19 songs"
+        },
+        {
+          "v": "20",
+          "t": "20 songs"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "releaseHour",
+      "label": null,
+      "options": [
+        {
+          "v": "1",
+          "t": "1"
+        },
+        {
+          "v": "2",
+          "t": "2"
+        },
+        {
+          "v": "3",
+          "t": "3"
+        },
+        {
+          "v": "4",
+          "t": "4"
+        },
+        {
+          "v": "5",
+          "t": "5"
+        },
+        {
+          "v": "6",
+          "t": "6"
+        },
+        {
+          "v": "7",
+          "t": "7"
+        },
+        {
+          "v": "8",
+          "t": "8"
+        },
+        {
+          "v": "9",
+          "t": "9"
+        },
+        {
+          "v": "10",
+          "t": "10"
+        },
+        {
+          "v": "11",
+          "t": "11"
+        },
+        {
+          "v": "12",
+          "t": "12"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "releaseMinute",
+      "label": null,
+      "options": [
+        {
+          "v": "0",
+          "t": "00"
+        },
+        {
+          "v": "1",
+          "t": "01"
+        },
+        {
+          "v": "2",
+          "t": "02"
+        },
+        {
+          "v": "3",
+          "t": "03"
+        },
+        {
+          "v": "4",
+          "t": "04"
+        },
+        {
+          "v": "5",
+          "t": "05"
+        },
+        {
+          "v": "6",
+          "t": "06"
+        },
+        {
+          "v": "7",
+          "t": "07"
+        },
+        {
+          "v": "8",
+          "t": "08"
+        },
+        {
+          "v": "9",
+          "t": "09"
+        },
+        {
+          "v": "10",
+          "t": "10"
+        },
+        {
+          "v": "11",
+          "t": "11"
+        },
+        {
+          "v": "12",
+          "t": "12"
+        },
+        {
+          "v": "13",
+          "t": "13"
+        },
+        {
+          "v": "14",
+          "t": "14"
+        },
+        {
+          "v": "15",
+          "t": "15"
+        },
+        {
+          "v": "16",
+          "t": "16"
+        },
+        {
+          "v": "17",
+          "t": "17"
+        },
+        {
+          "v": "18",
+          "t": "18"
+        },
+        {
+          "v": "19",
+          "t": "19"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "releasePm",
+      "label": null,
+      "options": [
+        {
+          "v": "AM",
+          "t": "AM"
+        },
+        {
+          "v": "PM",
+          "t": "PM"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "priceAlbum",
+      "id": "priceAlbum",
+      "label": null,
+      "options": [
+        {
+          "v": "Track Back",
+          "t": "$0.69"
+        },
+        {
+          "v": "Track Mid",
+          "t": "$0.99"
+        },
+        {
+          "v": "Track Front",
+          "t": "$1.29"
+        },
+        {
+          "v": "Digital 45",
+          "t": "$1.99"
+        },
+        {
+          "v": "Mini EP",
+          "t": "$2.99"
+        },
+        {
+          "v": "EP",
+          "t": "$3.99"
+        },
+        {
+          "v": "Mini Album One",
+          "t": "$4.99"
+        },
+        {
+          "v": "Budget One",
+          "t": "$5.99"
+        },
+        {
+          "v": "Budget Two",
+          "t": "$6.99"
+        },
+        {
+          "v": "Back",
+          "t": "$7.99"
+        },
+        {
+          "v": "Mid",
+          "t": "$8.99"
+        },
+        {
+          "v": "Mid/Front",
+          "t": "$9.99"
+        },
+        {
+          "v": "Front One",
+          "t": "$10.99"
+        },
+        {
+          "v": "Deluxe One",
+          "t": "$12.99"
+        },
+        {
+          "v": "Deluxe Three",
+          "t": "$14.99"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "language",
+      "id": "language",
+      "label": null,
+      "options": [
+        {
+          "v": "1",
+          "t": "Arabic"
+        },
+        {
+          "v": "41",
+          "t": "Bosnian"
+        },
+        {
+          "v": "40",
+          "t": "Bulgarian"
+        },
+        {
+          "v": "2",
+          "t": "Cantonese"
+        },
+        {
+          "v": "3",
+          "t": "Catalan"
+        },
+        {
+          "v": "4",
+          "t": "Chinese (Simplified)"
+        },
+        {
+          "v": "5",
+          "t": "Chinese (Traditional)"
+        },
+        {
+          "v": "6",
+          "t": "Croatian"
+        },
+        {
+          "v": "7",
+          "t": "Czech"
+        },
+        {
+          "v": "8",
+          "t": "Danish"
+        },
+        {
+          "v": "9",
+          "t": "Dutch"
+        },
+        {
+          "v": "10",
+          "t": "English"
+        },
+        {
+          "v": "11",
+          "t": "Estonian"
+        },
+        {
+          "v": "12",
+          "t": "Finnish"
+        },
+        {
+          "v": "13",
+          "t": "French"
+        },
+        {
+          "v": "14",
+          "t": "German"
+        },
+        {
+          "v": "15",
+          "t": "Greek"
+        },
+        {
+          "v": "16",
+          "t": "Hebrew"
+        },
+        {
+          "v": "42",
+          "t": "Hindi"
+        },
+        {
+          "v": "17",
+          "t": "Hungarian"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "genre1",
+      "id": "genrePrimary",
+      "label": null,
+      "options": [
+        {
+          "v": "",
+          "t": "Select a genre"
+        },
+        {
+          "v": "58",
+          "t": "Afrobeat"
+        },
+        {
+          "v": "59",
+          "t": "Afropop"
+        },
+        {
+          "v": "1",
+          "t": "Alternative"
+        },
+        {
+          "v": "2",
+          "t": "Big Band"
+        },
+        {
+          "v": "3",
+          "t": "Blues"
+        },
+        {
+          "v": "4",
+          "t": "Children's Music"
+        },
+        {
+          "v": "5",
+          "t": "Christian/Gospel"
+        },
+        {
+          "v": "33",
+          "t": "Classical"
+        },
+        {
+          "v": "6",
+          "t": "Comedy"
+        },
+        {
+          "v": "61",
+          "t": "Contemporary Latin"
+        },
+        {
+          "v": "7",
+          "t": "Country"
+        },
+        {
+          "v": "8",
+          "t": "Dance"
+        },
+        {
+          "v": "9",
+          "t": "Electronic"
+        },
+        {
+          "v": "10",
+          "t": "Fitness & Workout"
+        },
+        {
+          "v": "11",
+          "t": "Folk"
+        },
+        {
+          "v": "12",
+          "t": "French Pop"
+        },
+        {
+          "v": "13",
+          "t": "German Folk"
+        },
+        {
+          "v": "14",
+          "t": "German Pop"
+        },
+        {
+          "v": "16",
+          "t": "Hip Hop/Rap"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "subgenre1",
+      "id": "subGenrePrimary",
+      "label": null,
+      "options": [
+        {
+          "v": "",
+          "t": ""
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "genre2",
+      "id": "genreSecondary",
+      "label": null,
+      "options": [
+        {
+          "v": "",
+          "t": "Select another genre"
+        },
+        {
+          "v": "58",
+          "t": "Afrobeat"
+        },
+        {
+          "v": "59",
+          "t": "Afropop"
+        },
+        {
+          "v": "1",
+          "t": "Alternative"
+        },
+        {
+          "v": "2",
+          "t": "Big Band"
+        },
+        {
+          "v": "3",
+          "t": "Blues"
+        },
+        {
+          "v": "4",
+          "t": "Children's Music"
+        },
+        {
+          "v": "5",
+          "t": "Christian/Gospel"
+        },
+        {
+          "v": "6",
+          "t": "Comedy"
+        },
+        {
+          "v": "61",
+          "t": "Contemporary Latin"
+        },
+        {
+          "v": "7",
+          "t": "Country"
+        },
+        {
+          "v": "8",
+          "t": "Dance"
+        },
+        {
+          "v": "9",
+          "t": "Electronic"
+        },
+        {
+          "v": "10",
+          "t": "Fitness & Workout"
+        },
+        {
+          "v": "11",
+          "t": "Folk"
+        },
+        {
+          "v": "12",
+          "t": "French Pop"
+        },
+        {
+          "v": "13",
+          "t": "German Folk"
+        },
+        {
+          "v": "14",
+          "t": "German Pop"
+        },
+        {
+          "v": "16",
+          "t": "Hip Hop/Rap"
+        },
+        {
+          "v": "17",
+          "t": "Holiday"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "subgenre2",
+      "id": "subGenreSecondary",
+      "label": null,
+      "options": [
+        {
+          "v": "",
+          "t": ""
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": null,
+      "label": null,
+      "options": [
+        {
+          "v": "125",
+          "t": "Music"
+        },
+        {
+          "v": "126",
+          "t": "Lyrics"
+        },
+        {
+          "v": "197",
+          "t": "Music and lyrics"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": null,
+      "label": null,
+      "options": [
+        {
+          "v": "0",
+          "t": "00"
+        },
+        {
+          "v": "1",
+          "t": "01"
+        },
+        {
+          "v": "2",
+          "t": "02"
+        },
+        {
+          "v": "3",
+          "t": "03"
+        },
+        {
+          "v": "4",
+          "t": "04"
+        },
+        {
+          "v": "5",
+          "t": "05"
+        },
+        {
+          "v": "6",
+          "t": "06"
+        },
+        {
+          "v": "7",
+          "t": "07"
+        },
+        {
+          "v": "8",
+          "t": "08"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": null,
+      "label": null,
+      "options": [
+        {
+          "v": "0",
+          "t": "00"
+        },
+        {
+          "v": "1",
+          "t": "01"
+        },
+        {
+          "v": "2",
+          "t": "02"
+        },
+        {
+          "v": "3",
+          "t": "03"
+        },
+        {
+          "v": "4",
+          "t": "04"
+        },
+        {
+          "v": "5",
+          "t": "05"
+        },
+        {
+          "v": "6",
+          "t": "06"
+        },
+        {
+          "v": "7",
+          "t": "07"
+        },
+        {
+          "v": "8",
+          "t": "08"
+        },
+        {
+          "v": "9",
+          "t": "09"
+        },
+        {
+          "v": "10",
+          "t": "10"
+        },
+        {
+          "v": "11",
+          "t": "11"
+        },
+        {
+          "v": "12",
+          "t": "12"
+        },
+        {
+          "v": "13",
+          "t": "13"
+        },
+        {
+          "v": "14",
+          "t": "14"
+        },
+        {
+          "v": "15",
+          "t": "15"
+        },
+        {
+          "v": "16",
+          "t": "16"
+        },
+        {
+          "v": "17",
+          "t": "17"
+        },
+        {
+          "v": "18",
+          "t": "18"
+        },
+        {
+          "v": "19",
+          "t": "19"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "price_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "id": "price_2dfb407c-7ab1-20f7-acb2-9d07cde064db",
+      "label": null,
+      "options": [
+        {
+          "v": "Track Back",
+          "t": "$0.69"
+        },
+        {
+          "v": "Track Mid",
+          "t": "$0.99"
+        },
+        {
+          "v": "Track Front",
+          "t": "$1.29"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": null,
+      "label": null,
+      "options": [
+        {
+          "v": "125",
+          "t": "Music"
+        },
+        {
+          "v": "126",
+          "t": "Lyrics"
+        },
+        {
+          "v": "197",
+          "t": "Music and lyrics"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": null,
+      "label": null,
+      "options": [
+        {
+          "v": "0",
+          "t": "00"
+        },
+        {
+          "v": "1",
+          "t": "01"
+        },
+        {
+          "v": "2",
+          "t": "02"
+        },
+        {
+          "v": "3",
+          "t": "03"
+        },
+        {
+          "v": "4",
+          "t": "04"
+        },
+        {
+          "v": "5",
+          "t": "05"
+        },
+        {
+          "v": "6",
+          "t": "06"
+        },
+        {
+          "v": "7",
+          "t": "07"
+        },
+        {
+          "v": "8",
+          "t": "08"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": null,
+      "label": null,
+      "options": [
+        {
+          "v": "0",
+          "t": "00"
+        },
+        {
+          "v": "1",
+          "t": "01"
+        },
+        {
+          "v": "2",
+          "t": "02"
+        },
+        {
+          "v": "3",
+          "t": "03"
+        },
+        {
+          "v": "4",
+          "t": "04"
+        },
+        {
+          "v": "5",
+          "t": "05"
+        },
+        {
+          "v": "6",
+          "t": "06"
+        },
+        {
+          "v": "7",
+          "t": "07"
+        },
+        {
+          "v": "8",
+          "t": "08"
+        },
+        {
+          "v": "9",
+          "t": "09"
+        },
+        {
+          "v": "10",
+          "t": "10"
+        },
+        {
+          "v": "11",
+          "t": "11"
+        },
+        {
+          "v": "12",
+          "t": "12"
+        },
+        {
+          "v": "13",
+          "t": "13"
+        },
+        {
+          "v": "14",
+          "t": "14"
+        },
+        {
+          "v": "15",
+          "t": "15"
+        },
+        {
+          "v": "16",
+          "t": "16"
+        },
+        {
+          "v": "17",
+          "t": "17"
+        },
+        {
+          "v": "18",
+          "t": "18"
+        },
+        {
+          "v": "19",
+          "t": "19"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "price_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "id": "price_9e96f4bc-ddd5-3508-0a9c-a64b8e758a17",
+      "label": null,
+      "options": [
+        {
+          "v": "Track Back",
+          "t": "$0.69"
+        },
+        {
+          "v": "Track Mid",
+          "t": "$0.99"
+        },
+        {
+          "v": "Track Front",
+          "t": "$1.29"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "track-1-performer-1-role",
+      "label": null,
+      "options": [
+        {
+          "v": "unselected",
+          "t": "Select a role"
+        },
+        {
+          "v": "Background vocals",
+          "t": "Background vocals"
+        },
+        {
+          "v": "Banjo",
+          "t": "Banjo"
+        },
+        {
+          "v": "Bass",
+          "t": "Bass"
+        },
+        {
+          "v": "Bass drum (concert)",
+          "t": "Bass drum (concert)"
+        },
+        {
+          "v": "Bass drum (kick)",
+          "t": "Bass drum (kick)"
+        },
+        {
+          "v": "Bass guitar (all types)",
+          "t": "Bass guitar (all types)"
+        },
+        {
+          "v": "Bass guitar (electric)",
+          "t": "Bass guitar (electric)"
+        },
+        {
+          "v": "Basset horn",
+          "t": "Basset horn"
+        },
+        {
+          "v": "Bassoon",
+          "t": "Bassoon"
+        },
+        {
+          "v": "Bell tree",
+          "t": "Bell tree"
+        },
+        {
+          "v": "Bongos",
+          "t": "Bongos"
+        },
+        {
+          "v": "Brass instrument",
+          "t": "Brass instrument"
+        },
+        {
+          "v": "Cello",
+          "t": "Cello"
+        },
+        {
+          "v": "Clarinet",
+          "t": "Clarinet"
+        },
+        {
+          "v": "Claves",
+          "t": "Claves"
+        },
+        {
+          "v": "Clavinet",
+          "t": "Clavinet"
+        },
+        {
+          "v": "Congas",
+          "t": "Congas"
+        },
+        {
+          "v": "Contrabass",
+          "t": "Contrabass"
+        },
+        {
+          "v": "Cowbell",
+          "t": "Cowbell"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "track-1-producer-1-role",
+      "label": null,
+      "options": [
+        {
+          "v": "unselected",
+          "t": "Select a role"
+        },
+        {
+          "v": "Additional engineer",
+          "t": "Additional engineer"
+        },
+        {
+          "v": "Artist background vocal engineer",
+          "t": "Artist background vocal engineer"
+        },
+        {
+          "v": "Artist vocal second engineer",
+          "t": "Artist vocal second engineer"
+        },
+        {
+          "v": "Assistant producer",
+          "t": "Assistant producer"
+        },
+        {
+          "v": "Beat maker",
+          "t": "Beat maker"
+        },
+        {
+          "v": "Co-executive producer",
+          "t": "Co-executive producer"
+        },
+        {
+          "v": "Co-producer",
+          "t": "Co-producer"
+        },
+        {
+          "v": "Digital audio workstation engineer",
+          "t": "Digital audio workstation engineer"
+        },
+        {
+          "v": "Digital editing engineer",
+          "t": "Digital editing engineer"
+        },
+        {
+          "v": "Digital editing second engineer",
+          "t": "Digital editing second engineer"
+        },
+        {
+          "v": "Direct stream digital engineer",
+          "t": "Direct stream digital engineer"
+        },
+        {
+          "v": "Engineer",
+          "t": "Engineer"
+        },
+        {
+          "v": "Executive producer",
+          "t": "Executive producer"
+        },
+        {
+          "v": "Film sound engineer",
+          "t": "Film sound engineer"
+        },
+        {
+          "v": "Immersive mix engineer",
+          "t": "Immersive mix engineer"
+        },
+        {
+          "v": "Mastering engineer",
+          "t": "Mastering engineer"
+        },
+        {
+          "v": "Mastering second engineer",
+          "t": "Mastering second engineer"
+        },
+        {
+          "v": "Mixing engineer",
+          "t": "Mixing engineer"
+        },
+        {
+          "v": "Overdub engineer",
+          "t": "Overdub engineer"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "track-2-performer-1-role",
+      "label": null,
+      "options": [
+        {
+          "v": "unselected",
+          "t": "Select a role"
+        },
+        {
+          "v": "Background vocals",
+          "t": "Background vocals"
+        },
+        {
+          "v": "Banjo",
+          "t": "Banjo"
+        },
+        {
+          "v": "Bass",
+          "t": "Bass"
+        },
+        {
+          "v": "Bass drum (concert)",
+          "t": "Bass drum (concert)"
+        },
+        {
+          "v": "Bass drum (kick)",
+          "t": "Bass drum (kick)"
+        },
+        {
+          "v": "Bass guitar (all types)",
+          "t": "Bass guitar (all types)"
+        },
+        {
+          "v": "Bass guitar (electric)",
+          "t": "Bass guitar (electric)"
+        },
+        {
+          "v": "Basset horn",
+          "t": "Basset horn"
+        },
+        {
+          "v": "Bassoon",
+          "t": "Bassoon"
+        },
+        {
+          "v": "Bell tree",
+          "t": "Bell tree"
+        },
+        {
+          "v": "Bongos",
+          "t": "Bongos"
+        },
+        {
+          "v": "Brass instrument",
+          "t": "Brass instrument"
+        },
+        {
+          "v": "Cello",
+          "t": "Cello"
+        },
+        {
+          "v": "Clarinet",
+          "t": "Clarinet"
+        },
+        {
+          "v": "Claves",
+          "t": "Claves"
+        },
+        {
+          "v": "Clavinet",
+          "t": "Clavinet"
+        },
+        {
+          "v": "Congas",
+          "t": "Congas"
+        },
+        {
+          "v": "Contrabass",
+          "t": "Contrabass"
+        },
+        {
+          "v": "Cowbell",
+          "t": "Cowbell"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "track-2-producer-1-role",
+      "label": null,
+      "options": [
+        {
+          "v": "unselected",
+          "t": "Select a role"
+        },
+        {
+          "v": "Additional engineer",
+          "t": "Additional engineer"
+        },
+        {
+          "v": "Artist background vocal engineer",
+          "t": "Artist background vocal engineer"
+        },
+        {
+          "v": "Artist vocal second engineer",
+          "t": "Artist vocal second engineer"
+        },
+        {
+          "v": "Assistant producer",
+          "t": "Assistant producer"
+        },
+        {
+          "v": "Beat maker",
+          "t": "Beat maker"
+        },
+        {
+          "v": "Co-executive producer",
+          "t": "Co-executive producer"
+        },
+        {
+          "v": "Co-producer",
+          "t": "Co-producer"
+        },
+        {
+          "v": "Digital audio workstation engineer",
+          "t": "Digital audio workstation engineer"
+        },
+        {
+          "v": "Digital editing engineer",
+          "t": "Digital editing engineer"
+        },
+        {
+          "v": "Digital editing second engineer",
+          "t": "Digital editing second engineer"
+        },
+        {
+          "v": "Direct stream digital engineer",
+          "t": "Direct stream digital engineer"
+        },
+        {
+          "v": "Engineer",
+          "t": "Engineer"
+        },
+        {
+          "v": "Executive producer",
+          "t": "Executive producer"
+        },
+        {
+          "v": "Film sound engineer",
+          "t": "Film sound engineer"
+        },
+        {
+          "v": "Immersive mix engineer",
+          "t": "Immersive mix engineer"
+        },
+        {
+          "v": "Mastering engineer",
+          "t": "Mastering engineer"
+        },
+        {
+          "v": "Mastering second engineer",
+          "t": "Mastering second engineer"
+        },
+        {
+          "v": "Mixing engineer",
+          "t": "Mixing engineer"
+        },
+        {
+          "v": "Overdub engineer",
+          "t": "Overdub engineer"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "sitetran_select",
+      "label": null,
+      "options": [
+        {
+          "v": "id",
+          "t": "Bahasa Indonesia"
+        },
+        {
+          "v": "ms",
+          "t": "Bahasa Melayu"
+        },
+        {
+          "v": "cs",
+          "t": "Čeština"
+        },
+        {
+          "v": "da",
+          "t": "Dansk"
+        },
+        {
+          "v": "de",
+          "t": "Deutsch"
+        },
+        {
+          "v": "en",
+          "t": "English"
+        },
+        {
+          "v": "en-GB",
+          "t": "English (UK)"
+        },
+        {
+          "v": "es",
+          "t": "Español"
+        },
+        {
+          "v": "es-ES",
+          "t": "Español (España)"
+        },
+        {
+          "v": "fr",
+          "t": "Français"
+        },
+        {
+          "v": "fr-CA",
+          "t": "Français (Canada)"
+        },
+        {
+          "v": "it",
+          "t": "Italiano"
+        },
+        {
+          "v": "sw",
+          "t": "Kiswahili"
+        },
+        {
+          "v": "hu",
+          "t": "Magyar"
+        },
+        {
+          "v": "nl",
+          "t": "Nederlands"
+        },
+        {
+          "v": "nb",
+          "t": "Norsk Bokmål"
+        },
+        {
+          "v": "pl",
+          "t": "Polski"
+        },
+        {
+          "v": "pt-BR",
+          "t": "Português (Brasil)"
+        },
+        {
+          "v": "pt-PT",
+          "t": "Português (Portugal)"
+        },
+        {
+          "v": "ro",
+          "t": "Românã"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": null,
+      "id": "subscriptionPlan",
+      "label": null,
+      "options": [
+        {
+          "v": "label5-v1",
+          "t": "5"
+        },
+        {
+          "v": "label10-v1",
+          "t": "10"
+        },
+        {
+          "v": "label20-v1",
+          "t": "20"
+        },
+        {
+          "v": "label50-v1",
+          "t": "50"
+        },
+        {
+          "v": "label100-v1",
+          "t": "100"
+        }
+      ],
+      "required": false
+    },
+    {
+      "name": "country",
+      "id": "checkout-form-country-7F5BC86F-6178-4771-866AF7784AAD7266",
+      "label": null,
+      "options": [
+        {
+          "v": "",
+          "t": "Select country"
+        },
+        {
+          "v": "US",
+          "t": "United States"
+        },
+        {
+          "v": "AF",
+          "t": "Afghanistan"
+        },
+        {
+          "v": "AX",
+          "t": "Aland Islands"
+        },
+        {
+          "v": "AL",
+          "t": "Albania"
+        },
+        {
+          "v": "DZ",
+          "t": "Algeria"
+        },
+        {
+          "v": "AS",
+          "t": "American Samoa"
+        },
+        {
+          "v": "AD",
+          "t": "Andorra"
+        },
+        {
+          "v": "AO",
+          "t": "Angola"
+        },
+        {
+          "v": "AI",
+          "t": "Anguilla"
+        },
+        {
+          "v": "AQ",
+          "t": "Antarctica"
+        },
+        {
+          "v": "AG",
+          "t": "Antigua And Barbuda"
+        },
+        {
+          "v": "AR",
+          "t": "Argentina"
+        },
+        {
+          "v": "AM",
+          "t": "Armenia"
+        },
+        {
+          "v": "AW",
+          "t": "Aruba"
+        },
+        {
+          "v": "AU",
+          "t": "Australia"
+        },
+        {
+          "v": "AT",
+          "t": "Austria"
+        },
+        {
+          "v": "AZ",
+          "t": "Azerbaijan"
+        },
+        {
+          "v": "BS",
+          "t": "Bahamas"
+        },
+        {
+          "v": "BH",
+          "t": "Bahrain"
+        }
+      ],
+      "required": false
+    }
+  ],
+  "labels": [
+    {
+      "for": null,
+      "text": "Spotify"
+    },
+    {
+      "for": null,
+      "text": "Apple Music"
+    },
+    {
+      "for": null,
+      "text": "iTunes"
+    },
+    {
+      "for": null,
+      "text": "Beatport"
+    },
+    {
+      "for": null,
+      "text": "Instagram & Facebook"
+    },
+    {
+      "for": null,
+      "text": "TikTok & other ByteDance stores"
+    },
+    {
+      "for": null,
+      "text": "YouTube Music"
+    },
+    {
+      "for": null,
+      "text": "Amazon"
+    },
+    {
+      "for": null,
+      "text": "Pandora"
+    },
+    {
+      "for": null,
+      "text": "Deezer"
+    },
+    {
+      "for": null,
+      "text": "Tidal"
+    },
+    {
+      "for": null,
+      "text": "iHeartRadio"
+    },
+    {
+      "for": null,
+      "text": "Qobuz"
+    },
+    {
+      "for": null,
+      "text": "Saavn"
+    },
+    {
+      "for": null,
+      "text": "Boomplay"
+    },
+    {
+      "for": null,
+      "text": "Anghami"
+    },
+    {
+      "for": null,
+      "text": "NetEase"
+    },
+    {
+      "for": null,
+      "text": "Tencent"
+    },
+    {
+      "for": null,
+      "text": "Claro Música"
+    },
+    {
+      "for": null,
+      "text": "Joox"
+    },
+    {
+      "for": null,
+      "text": "Kuack Media"
+    },
+    {
+      "for": null,
+      "text": "Adaptr"
+    },
+    {
+      "for": null,
+      "text": "Flo"
+    },
+    {
+      "for": null,
+      "text": "MediaNet"
+    },
+    {
+      "for": null,
+      "text": "Snapchat"
+    },
+    {
+      "for": null,
+      "text": "Roblox (beta)"
+    },
+    {
+      "for": "socialmediapack",
+      "text": "Social Media Pack ($14.95/yr + 20% of platform ad revenue)\nGet notified & paid when your music is us"
+    },
+    {
+      "for": null,
+      "text": "No"
+    },
+    {
+      "for": null,
+      "text": "Yes"
+    },
+    {
+      "for": null,
+      "text": "Preserve non-standard capitalization (warning: stores don't love this)"
+    },
+    {
+      "for": null,
+      "text": "Collaboration: Paul McCartney and Stevie Wonder\n\nThis album will appear on Paul McCartney's iTunes p"
+    },
+    {
+      "for": null,
+      "text": "Band name: Simon and Garfunkel or Huey Lewis and the News\n\n\"Simon\" is not a standalone artist (when "
+    },
+    {
+      "for": null,
+      "text": "There is a page for  in Spotify, but it’s not listed above.\n\n\n\n\n\nEnter your Spotify Artist URI below"
+    },
+    {
+      "for": "spotifyArtistIDPage",
+      "text": "There is a page for  in Spotify, but it’s not listed above."
+    },
+    {
+      "for": null,
+      "text": "This will be my first  release in Spotify."
+    },
+    {
+      "for": "spotifyArtistIDFirst",
+      "text": "This will be my first  release in Spotify."
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other  releases that are already in Spotify\n\n\n\n\n\nEnter your Spotify A"
+    },
+    {
+      "for": "spotifyArtistID1Yes",
+      "text": "Yes - Group this album with my other  releases that are already in Spotify"
+    },
+    {
+      "for": null,
+      "text": "No - I don't yet have any  releases live in Spotify"
+    },
+    {
+      "for": "js-spotify-artist-id-zero-matches-new",
+      "text": "No - I don't yet have any  releases live in Spotify"
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other  releases that are already in Spotify\n\n\n\n\n\nEnter your Spotify A"
+    },
+    {
+      "for": "spotifyArtistIDGroup",
+      "text": "Yes - Group this album with my other  releases that are already in Spotify"
+    },
+    {
+      "for": null,
+      "text": "No - This will be my first  release in Spotify"
+    },
+    {
+      "for": "spotifyNoArtistIDFirst",
+      "text": "No - This will be my first  release in Spotify"
+    },
+    {
+      "for": "appleArtistIDPage",
+      "text": "There is a page for  in iTunes and Apple Music, but it’s not listed above."
+    },
+    {
+      "for": "appleArtistIDFirst",
+      "text": "This will be my first  release in iTunes and Apple Music."
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other  releases that are already in iTunes & Apple Music\n\n\n\n\n\nEnter y"
+    },
+    {
+      "for": "appleArtistID1Yes",
+      "text": "Yes - Group this album with my other  releases that are already in iTunes & Apple Music"
+    },
+    {
+      "for": null,
+      "text": "No - I don't yet have any  releases live in iTunes & Apple Music"
+    },
+    {
+      "for": "js-apple-artist-id-zero-matches-new",
+      "text": "No - I don't yet have any  releases live in iTunes & Apple Music"
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other  releases that are already in iTunes & Apple Music\n\n\n\n\n\nEnter y"
+    },
+    {
+      "for": "appleArtistIDGroup",
+      "text": "Yes - Group this album with my other  releases that are already in iTunes & Apple Music"
+    },
+    {
+      "for": null,
+      "text": "No - This will be my first  release in iTunes & Apple Music"
+    },
+    {
+      "for": "appleNoArtistIDFirst",
+      "text": "No - This will be my first  release in iTunes & Apple Music"
+    },
+    {
+      "for": null,
+      "text": "There is a page for  in YouTube Music, but it’s not listed above.\n\n\n\n\n\nEnter your YouTube Music Arti"
+    },
+    {
+      "for": "googleArtistIDPage",
+      "text": "There is a page for  in YouTube Music, but it’s not listed above."
+    },
+    {
+      "for": null,
+      "text": "doesn't yet have an artist profile in YouTube Music"
+    },
+    {
+      "for": "googleArtistIDFirst",
+      "text": "doesn't yet have an artist profile in YouTube Music"
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other  releases that are already in YouTube Music\n\n\n\n\n\nEnter your You"
+    },
+    {
+      "for": "googleArtistID1Yes",
+      "text": "Yes - Group this album with my other  releases that are already in YouTube Music"
+    },
+    {
+      "for": null,
+      "text": "No -  doesn't yet have an artist profile in YouTube Music"
+    },
+    {
+      "for": "js-google-artist-id-zero-matches-new",
+      "text": "No -  doesn't yet have an artist profile in YouTube Music"
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other  releases that are already in YouTube Music\n\n\n\n\n\nEnter your You"
+    },
+    {
+      "for": "googleArtistIDGroup",
+      "text": "Yes - Group this album with my other  releases that are already in YouTube Music"
+    },
+    {
+      "for": null,
+      "text": "No -  doesn't yet have an artist profile in YouTube Music"
+    },
+    {
+      "for": "googleNoArtistIDFirst",
+      "text": "No -  doesn't yet have an artist profile in YouTube Music"
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other Kabi releases on Instagram"
+    },
+    {
+      "for": "instagramProfileArtistID1Yes",
+      "text": "Yes - Group this album with my other Kabi releases on Instagram"
+    },
+    {
+      "for": null,
+      "text": "No - Kabi doesn't yet have a profile on Instagram"
+    },
+    {
+      "for": "js-instagramProfile-artist-id-zero-matches-new",
+      "text": "No - Kabi doesn't yet have a profile on Instagram"
+    },
+    {
+      "for": null,
+      "text": "Yes - Group this album with my other Kabi releases on Facebook"
+    },
+    {
+      "for": "facebookProfileArtistID1Yes",
+      "text": "Yes - Group this album with my other Kabi releases on Facebook"
+    },
+    {
+      "for": null,
+      "text": "No - Kabi doesn't yet have a profile on Facebook"
+    },
+    {
+      "for": "js-facebookProfile-artist-id-zero-matches-new",
+      "text": "No - Kabi doesn't yet have a profile on Facebook"
+    },
+    {
+      "for": null,
+      "text": "in the listener's time zone. (default)"
+    },
+    {
+      "for": null,
+      "text": "in New York, and simultaneously all other countries at the same time, regardless of time zone."
+    },
+    {
+      "for": "iTunesPreorderNo",
+      "text": "No, don't let anyone buy it until the release date"
+    },
+    {
+      "for": "iTunesPreorderYes",
+      "text": "Yes, let people preorder it before the release date"
+    },
+    {
+      "for": null,
+      "text": "No, don't show any other artists in song title"
+    },
+    {
+      "for": null,
+      "text": "Yes, add featured artists to track title (please specify...)"
+    },
+    {
+      "for": null,
+      "text": "No, this is the normal version"
+    },
+    {
+      "for": null,
+      "text": "Radio Edit"
+    },
+    {
+      "for": null,
+      "text": "Other..."
+    },
+    {
+      "for": null,
+      "text": "No"
+    },
+    {
+      "for": null,
+      "text": "Yes, I have a version mixed with Atmos I'd like to upload in addition..."
+    },
+    {
+      "for": null,
+      "text": "I wrote this song, or manage the songwriter (it's an original song)"
+    },
+    {
+      "for": null,
+      "text": "Another artist wrote it (it's a cover song)"
+    },
+    {
+      "for": null,
+      "text": "No"
+    },
+    {
+      "for": null,
+      "text": "Yes"
+    },
+    {
+      "for": null,
+      "text": "No - This song is clean, and always has been"
+    },
+    {
+      "for": null,
+      "text": "Yes - There is an explicit version of this song, but this is the clean (or censored) version of it"
+    },
+    {
+      "for": null,
+      "text": "This song contains lyrics"
+    },
+    {
+      "for": null,
+      "text": "This song is instrumental and contains no lyrics"
+    },
+    {
+      "for": null,
+      "text": "Let streaming services decide"
+    },
+    {
+      "for": null,
+      "text": "Let me specify when the good part starts"
+    },
+    {
+      "for": null,
+      "text": "No, don't show any other artists in song title"
+    },
+    {
+      "for": null,
+      "text": "Yes, add featured artists to track title (please specify...)"
+    },
+    {
+      "for": null,
+      "text": "No, this is the normal version"
+    },
+    {
+      "for": null,
+      "text": "Radio Edit"
+    },
+    {
+      "for": null,
+      "text": "Other..."
+    },
+    {
+      "for": null,
+      "text": "No"
+    },
+    {
+      "for": null,
+      "text": "Yes, I have a version mixed with Atmos I'd like to upload in addition..."
+    },
+    {
+      "for": null,
+      "text": "I wrote this song, or manage the songwriter (it's an original song)"
+    },
+    {
+      "for": null,
+      "text": "Another artist wrote it (it's a cover song)"
+    },
+    {
+      "for": null,
+      "text": "No"
+    },
+    {
+      "for": null,
+      "text": "Yes"
+    },
+    {
+      "for": null,
+      "text": "No - This song is clean, and always has been"
+    },
+    {
+      "for": null,
+      "text": "Yes - There is an explicit version of this song, but this is the clean (or censored) version of it"
+    },
+    {
+      "for": null,
+      "text": "This song contains lyrics"
+    },
+    {
+      "for": null,
+      "text": "This song is instrumental and contains no lyrics"
+    },
+    {
+      "for": null,
+      "text": "Let streaming services decide"
+    },
+    {
+      "for": null,
+      "text": "Let me specify when the good part starts"
+    },
+    {
+      "for": null,
+      "text": "Leave a Legacy ($49 one-time fee, nonrecurring)\nDistroKid will never delete this album, even if you "
+    },
+    {
+      "for": null,
+      "text": "Discovery Pack ($1.98/yr)\nAdd this album to the global databases that people use to match music and "
+    },
+    {
+      "for": null,
+      "text": "Store Maximizer ($7.95/yr)\nDistroKid will automatically deliver this album to new online stores and "
+    },
+    {
+      "for": null,
+      "text": "Audiomack (free)\nDistroKid will upload your release to Audiomack."
+    },
+    {
+      "for": null,
+      "text": "function clickedBeatportOptIn()\n{\nif ($j('input[type=\"checkbox\"][extra=\"beatport\"]:checked').length "
+    },
+    {
+      "for": null,
+      "text": "Cover Song Licensing ( $12/yr x 0)\nDistroKid will make your cover songs legal. We'll secure a licens"
+    },
+    {
+      "for": null,
+      "text": "DistroVid Music Video Distribution ($8.25/mo, billed annually at $99)\nUnlimited music video distribu"
+    },
+    {
+      "for": null,
+      "text": "Loudness Normalization ($2.99 one-time fee x2, nonrecurring)\nOptimizes audio level for streaming ser"
+    },
+    {
+      "for": null,
+      "text": "Dolby Atmos/Spatial audio ($26.99 x 0 one-time fee, nonrecurring)\nDesignates this release as Dolby A"
+    },
+    {
+      "for": "socialmediapack_alternate",
+      "text": "Social Media Pack ($14.95/yr + 20% of platform ad revenue)\nGet notified & paid when your music is us"
+    },
+    {
+      "for": "areyousureyoutube",
+      "text": "I selected \"YouTube Music\". So I won't email DistroKid later asking, \"why'd you upload my music to Y"
+    },
+    {
+      "for": "areyousurenonstandardscaps",
+      "text": "Non-standard cApiTaliZatiOn detected. Apple Music may convert to standard capitalization per paragra"
+    },
+    {
+      "for": "areyousurepromoservices",
+      "text": "I won't use \"promo services\" that guarantee streams or playlisting—even if they claim \"organic and r"
+    },
+    {
+      "for": "areyousureticktokcml",
+      "text": "I have selected TikTok Commercial Music Library and confirm that I possess the necessary rights to o"
+    },
+    {
+      "for": "areyousuresnap",
+      "text": "I have opted-in to Snapchat and confirm that I possess the necessary rights and agree to the Snapcha"
+    },
+    {
+      "for": "areyousurerecorded",
+      "text": "I recorded this music, and am authorized to sell it in stores worldwide & collect all royalties."
+    },
+    {
+      "for": "areyousureotherartist",
+      "text": "I'm not using any other artist's name in my name, song titles, or album title, without their approva"
+    },
+    {
+      "for": "areyousuretandc",
+      "text": "I have read and agree to the terms of the DistroKid Distribution Agreement"
+    }
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "id": null,
+      "name": null
+    },
+    {
+      "text": "",
+      "id": "b89a8747-bffe-4d1b-a9ee-a351247c3260",
+      "name": null
+    },
+    {
+      "text": "",
+      "id": null,
+      "name": null
+    },
+    {
+      "text": "Upgrade for $89.99 $50.30",
+      "id": "upgradePlan",
+      "name": null
+    },
+    {
+      "text": "No thanks",
+      "id": null,
+      "name": null
+    },
+    {
+      "text": "Upgrade to Ultimate",
+      "id": "checkout-card-on-file-button-7F5BC86F-6178-4771-866AF7784AAD7266",
+      "name": null
+    },
+    {
+      "text": "Upgrade to Ultimate",
+      "id": "checkout-form-pay-button-7F5BC86F-6178-4771-866AF7784AAD7266",
+      "name": null
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+**1. Regulatory Requirements (Health Canada Cannabis Regulations)**
+
+The core rules are in the *Cannabis Regulations* (SOR/2018-144, as amended by SOR/2025-43 effective March 12, 2025).
+
+- **Destruction authorization (s. 43)**: A licence holder may destroy cannabis only by a method that (i) complies with all applicable federal, provincial, and municipal environmental protection legislation at the destruction location, and (ii) does not expose any individual to cannabis smoke or vapour. The destruction must occur in the presence of **at least one employee** of the licence holder. If off-site, the cannabis must remain in the continuous presence of at least one employee.  
+  **Exception for cultivation waste** (defined as cannabis leaves, shoots, or branches obtained during cultivation, propagation, or harvesting and intended for destruction): No witness or escort requirements apply (s. 43(2)).
+
+- **March 2025 streamlining changes (confirmed)**: Pre-amendment, it required **two qualified witnesses** (one with security clearance). Now it is **one employee witness** (no security clearance required) for all non-cultivation waste. Cultivation waste is fully exempt from witness, detailed records, and (as of April 1, 2025) monthly reporting. This materially reduces administrative burden and costs.
+
+- **GPP (Part 5, s. 88.9 – processing licences only)**: Facilities must have means for removal and disposal of contaminated materials and waste (including cannabis for destruction) at a frequency and in a manner that prevents contamination of cannabis or ingredients. Records of sanitation, destruction, and third-party waste contracts demonstrate compliance. General storage rules (s. 88-ish) require segregated, labelled, secure areas for material awaiting destruction.
+
+- **CTLS monthly reporting (Cannabis Tracking and Licensing System)**: Submit by the **15th day of the following month** (e.g., April data due May 15). Fields capture:  
+  - **Unpackaged cannabis**: “Quantity destroyed” (in kg for most classes; count for plants/seeds).  
+  - **Packaged cannabis products**: Number of products destroyed.  
+  Cultivation/plant trimmings waste reporting was removed effective April 2025 reports (plant trimmings fields no longer appear for whole/vegetative plants). Destruction is reported as monthly aggregates; there is **no per-event reporting deadline** beyond normal inventory reconciliation.
+
+- **Different classes of cannabis**: No fundamentally different destruction methods or witness rules. Records (see below) distinguish only **whole cannabis plants** (record number destroyed) vs. all other cannabis (pre-destruction net weight or volume). Cultivation waste has full exemptions. Dried, fresh, extracts, edibles, plants, seeds, and QC/expired/recalled material follow the general rules.
+
+- **Records retention (Part 11 and s. 229)**: For non-cannabis-drug licences, retain the destruction document and witness statement for **at least two years** after the destruction date (or end of non-therapeutic research for certain cases). General Part 11 rules require documents to be readily available for inspection.
+
+**2. The Physical Process (Typical Licensed Facility Event)**
+
+A standard on-site destruction event (post-2025) is now simpler:
+
+1. **Flag material**: Production/QA identifies batch/lot (e.g., QC fail, expired, recalled, trim) and moves it to a segregated “awaiting destruction” area (per GPP storage rules).
+2. **Weigh/record pre-destruction**: Accurately weigh (net weight/volume) or count whole plants — this is required for the official record.
+3. **Render unusable**: Grind/shred the cannabis and thoroughly mix with non-cannabis denaturing agents (e.g., soil, compost feedstock, spent growing media, kitty litter, sawdust, food/yard waste). Federal rules do **not** prescribe an exact method or ratio beyond env compliance + no smoke/vapour. Industry/BC practice: ≥50% non-cannabis material to make consumption/propagation “impossible or improbable.”
+4. **Witness**: One employee observes the entire rendering process (no security clearance needed).
+5. **Containerize**: Place mixed waste in secure bags/containers suitable for transport/disposal (no specific federal bag rules; must meet env/transport regs if off-site).
+6. **Dispose**: Landfill, commercial composting (BC-preferred for ag by-products if properly mixed), incineration, or third-party licensed waste hauler. All must comply with provincial/municipal env rules (BC *Environmental Management Act* / AEM Code).
+7. **Update systems**: Record event, sign witness statement, adjust inventory, and include in next monthly CTLS report.
+
+**Off-site destruction**: Cannabis must stay under continuous employee escort. Third-party haulers are common.
+
+**Provincial (BC) differences**: BC encourages **composting** of solid ag by-products (cannabis + non-viable seeds/stalks/roots/media). Shred cannabis and mix with ≥50% non-cannabis feedstocks (manure, veg waste, etc.) for aerobic composting. Landfill/incineration only after municipal approval. Liquids (leachate, fertigation) require authorization; no unauthorized discharge. Extraction solvents are often hazardous waste.
+
+No federal requirement for post-mix weighing (pre-destruction only for records).
+
+**3. Documentation Trail**
+
+**Required per event (s. 229, non-cultivation waste only)**:
+- Description of the cannabis (including brand name if applicable) — **link this to the source batch/lot ID** for traceability.
+- Date of destruction.
+- Pre-destruction net weight/volume **or** number of whole plants.
+- Name of the witnessing employee.
+- **Signed/dated witness statement** (or attestation) confirming: “I witnessed the destruction and it was performed in accordance with a method referred to in paragraph 43(1)(a).”
+
+**Cultivation waste**: No records or statement required.
+
+**Typical paper/digital record (minimal for <2-min tablet completion)**:  
+- Batch/Lot ID (auto-populate from inventory)  
+- Description/Class/Brand  
+- Pre-destruction quantity (wt/vol or plant count)  
+- Destruction date  
+- Witness name + digital signature  
+- Checkbox + e-signature for the exact statutory statement  
+- Optional (best practice): photo upload of before/after, disposal hauler receipt, method notes.  
+
+**Chain of custody**: Flag in seed-to-sale/inventory system → quarantine/move → destruction event record (links to batch) → inventory deduction → monthly CTLS upload. Facilities use ERP/MES systems to auto-reconcile.
+
+**Photo/video**: **Not required** by regulations — best practice for internal audit/defensibility during Health Canada inspections.
+
+**4. Common Pain Points (Industry Feedback)**
+
+- **Pre-2025**: Scheduling two witnesses (one security-cleared) was the biggest complaint — time-consuming and costly. Post-2025 changes directly address this.
+- **Documentation tedium**: Manual weighing, separate paper logs, witness statements, and CTLS reconciliation. Production workers/QA find inventory-CTLS mismatches (destroyed qty not matching deductions) a frequent pain.
+- **Inspection findings**: Incomplete/missing witness statements, failure to link records to specific batches/lots, inaccurate pre-destruction weights, inadequate waste segregation/storage (GPP violations), and discrepancies between physical destruction and CTLS reporting.
+- **CTLS mistakes**: Under- or over-reporting destroyed quantities, timing errors (monthly vs. real-time inventory), and failure to reconcile with CRA excise reporting.
+- Forums (Reddit r/weedbiz, industry blogs): Workers complain about “double-handling” (physical destruction + paperwork + monthly reports); LPs note third-party hauler coordination and env compliance audits as burdensome.
+
+**5. Ethanol / Solvent Destruction Specifically**
+
+- **Documentation**: **Separate** from cannabis destruction records. Denatured ethanol/solvent waste is treated as **hazardous waste** under provincial rules (BC *Hazardous Waste Regulation* / EMA), not as “cannabis” for s. 229/CTLS cannabis-destruction fields. Track via processing/sanitation/GPP records or dedicated hazardous-waste logs.
+- **Reporting**: Not captured in CTLS “quantity destroyed” cannabis fields unless the waste still contains recoverable cannabis product. Solvent residuals in extracts are limited (e.g., ethanol ≤5,000 ppm per older guidance).
+- **BC environmental requirements**: Test for hazardous characteristics; dispose via authorized third-party treatment/incineration. No discharge without permit.
+- **Tracking in facilities**: Sophisticated LPs distinguish: (1) recovered/reused ethanol (internal inventory), (2) ethanol bound in final product, (3) waste/denatured ethanol (hazardous waste stream with manifests). Use MES/ERP for lot-level costing and waste reconciliation.
+
+**6. Other Types of Cannabis Waste**
+
+- **Cultivation waste (trim, stems, roots)**: Now heavily streamlined — no witness, no detailed records, no CTLS reporting (April 2025 onward). Can be stored in operational areas if GPP is met. Still must be rendered non-recoverable (grind/mix) and disposed per env rules.
+- **QC sample destruction**: Treated as cannabis destruction (same s. 43/229 process) unless analytical-testing licence rules apply (90-day destruction window).
+- **Expired or recalled products**: Same destruction process and records as other cannabis. Recalls require controlled return/quarantine and documented disposal (recall SOPs).
+- **Packaging waste with cannabis residue**: If visible residue remains, treat as cannabis waste (render + destroy per rules). Empty/clean packaging may be recyclable after verification.
+
+**7. Existing Digital Tools**
+
+Most modern cannabis ERP/MES platforms have (or integrate) destruction workflows:
+- **Canix**: Strong cultivation workflows including “kill plants” / waste destruction, harvest-to-destruction tracking, real-time inventory, and CTLS export. Users praise automation for reducing manual entry.
+- **Elevated Signals** (Vancouver-based MES): Lot/batch-level tracking, quality holds, waste/destruction modules, costing, and CTLS reconciliation. Integrates with QMS for full GPP records.
+- **Isolocity**: QMS-focused with destruction record logging, exportable PDFs/CSVs for audits, and integrations (e.g., Elevated Signals) for seamless batch import. Good for compliance exports.
+- **GrowerIQ / Katana**: Similar inventory + batch record features; destruction often handled via custom workflows or waste adjustment modules.
+
+No widely marketed “standalone destruction-only” tool — most are modules within full seed-to-sale/ERP systems. Users consistently say the value is in **inventory auto-linkage + digital signatures + CTLS export**, which easily supports your <2-minute tablet goal.
+
+**Recommended Digital Template for Your Tool (Tablet-Optimized, <2 min/event)**  
+Auto-populate from inventory:  
+- Source Batch/Lot ID + Description/Class/Brand  
+- Pre-destruction quantity (kg/ml or plant count)  
+- Destruction date (auto)  
+- Witness: name/role + e-signature  
+- Statutory attestation checkbox + e-signature  
+- Optional: photo upload, disposal notes/hauler  
+
+This matches s. 229 exactly while linking everything for traceability/audits. Add optional fields (method, post-mix photo) as best-practice toggles.
+
+This covers everything needed for a compliant, efficient digital batch record. The 2025 amendments significantly simplified the process — your template can now be very lean while remaining fully auditable. If you need a sample JSON schema or wireframe for the UI, let me know!

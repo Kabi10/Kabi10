@@ -1,0 +1,15 @@
+services:
+  mcp-server:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - TRANSPORT=sse
+      - AUTH_ENABLED=true
+      - API_KEY=${API_KEY:-change-me}
+      - DB_PATH=./data/data.db
+      - WORKSPACE_DIR=./workspace
+    volumes:
+      - ./workspace:/app/workspace
+      - ./data:/app/data
+    restart: unless-stopped

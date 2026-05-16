@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="SL Agrimarket - Sri Lanka's first offline-first farmer-to-buyer marketplace. Trilingual support in English, Tamil, and Sinhala. Real-time market prices, DoA crop data, and direct farmer-buyer connections."
+    />
+    <meta
+      name="keywords"
+      content="agriculture, farmers, marketplace, Sri Lanka, Tamil, Sinhala, direct-to-consumer, market prices, offline, crop data"
+    />
+    <meta name="author" content="SL Agrimarket" />
+    <meta name="theme-color" content="#2D5016" />
+    <meta
+      property="og:title"
+      content="SL Agrimarket - Sri Lanka Farmers Marketplace"
+    />
+    <meta
+      property="og:description"
+      content="Connecting Sri Lankan farmers directly to buyers. Trilingual, offline-first, built for real farming conditions."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_LK" />
+    <meta property="og:locale:alternate" content="ta_LK" />
+    <meta property="og:locale:alternate" content="si_LK" />
+    <title>
+      SL Agrimarket - Sri Lanka Farmers Marketplace | இலங்கை விவசாயிகள் சந்தை |
+      ශ්‍රී ලංකා ගොවි වෙළඳපොළ
+    </title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Skip to content -->
+    <a
+      href="#main-content"
+      class="skip-to-content"
+      data-en="Skip to main content"
+      data-ta="முக்கிய உள்ளடக்கத்திற்குச் செல்"
+      data-si="ප්‍රධාන අන්තර්ගතයට යන්න"
+      >Skip to main content</a
+    >
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+      <div class="container nav-container">
+        <a href="#" class="nav-brand">
+          <span class="brand-icon" aria-hidden="true">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 64 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="32" cy="32" r="32" fill="#2D5016" />
+              <path
+                d="M32 48 L32 20"
+                stroke="#B8860B"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+              <ellipse
+                cx="28"
+                cy="22"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="27"
+                cy="26"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="26"
+                cy="30"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="27"
+                cy="34"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="36"
+                cy="22"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="37"
+                cy="26"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="38"
+                cy="30"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="37"
+                cy="34"
+                rx="3"
+                ry="5"
+                fill="#B8860B"
+                opacity="0.9"
+              />
+              <ellipse cx="32" cy="18" rx="3" ry="5" fill="#B8860B" />
+            </svg>
+          </span>
+          <span class="brand-name">SL Agrimarket</span>
+        </a>
+
+        <div class="nav-links" id="navMenu">
+          <a
+            href="#features"
+            class="nav-link"
+            data-en="Features"
+            data-ta="அம்சங்கள்"
+            data-si="විශේෂාංග"
+            >Features</a
+          >
+          <a
+            href="#how-it-works"
+            class="nav-link"
+            data-en="How It Works"
+            data-ta="எவ்வாறு செயல்படுகிறது"
+            data-si="ක්‍රියා කරන ආකාරය"
+            >How It Works</a
+          >
+          <a
+            href="#download"
+            class="nav-link"
+            data-en="Download"
+            data-ta="பதிவிறக்கம்"
+            data-si="බාගන්න"
+            >Download</a
+          >
+        </div>
+
+        <div class="nav-actions">
+          <div
+            class="language-toggle"
+            role="group"
+            aria-label="Language selector"
+          >
+            <button class="lang-btn active" data-lang="en" aria-label="English">
+              EN
+            </button>
+            <button class="lang-btn" data-lang="ta" aria-label="Tamil">
+              த
+            </button>
+            <button class="lang-btn" data-lang="si" aria-label="Sinhala">
+              සි
+            </button>
+          </div>
+          <button
+            class="mobile-menu-btn"
+            id="mobileMenuToggle"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+          >
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main id="main-content">
+      <!-- Hero Section -->
+      <section class="hero" id="home">
+        <div class="hero-bg" aria-hidden="true">
+          <div class="hero-pattern"></div>
+        </div>
+        <div class="container hero-container">
+          <div class="hero-content">
+            <div
+              class="hero-badge"
+              data-en="Made for Sri Lankan Farmers"
+              data-ta="இலங்கை விவசாயிகளுக்காக உருவாக்கப்பட்டது"
+              data-si="ශ්‍රී ලංකා ගොවීන් සඳහා නිර්මාණය කර ඇත"
+            >
+              Made for Sri Lankan Farmers
+            </div>
+            <h1
+              class="hero-title"
+              data-en="Sell Your Harvest. Get Fair Prices."
+              data-ta="உங்கள் அறுவடையை விற்கவும். நியாயமான விலை பெறுங்கள்."
+              data-si="ඔබේ අස්වැන්න විකුණන්න. සාධාරණ මිල ලබාගන්න."
+            >
+              Sell Your Harvest. Get Fair Prices.
+            </h1>
+            <p
+              class="hero-subtitle"
+              data-en="Sri Lanka's first offline-first marketplace connecting farmers directly to buyers. Works in English, Tamil, and Sinhala -- even without internet."
+              data-ta="இலங்கையின் முதல் ஆஃப்லைன் சந்தை, விவசாயிகளை நேரடியாக வாங்குபவர்களுடன் இணைக்கிறது. ஆங்கிலம், தமிழ் மற்றும் சிங்களத்தில் இயங்குகிறது -- இணையம் இல்லாமலும்."
+              data-si="ශ්‍රී ලංකාවේ පළමු නොබැඳි වෙළඳපොළ, ගොවීන් සෘජුවම ගැනුම්කරුවන් සමඟ සම්බන්ධ කරයි. ඉංග්‍රීසි, දෙමළ සහ සිංහලෙන් ක්‍රියා කරයි -- අන්තර්ජාලය නොමැතිව පවා."
+            >
+              Sri Lanka's first offline-first marketplace connecting farmers
+              directly to buyers. Works in English, Tamil, and Sinhala -- even
+              without internet.
+            </p>
+            <div class="hero-actions">
+              <a href="#download" class="btn btn-primary btn-lg">
+                <svg
+                  class="btn-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span
+                  data-en="Coming Soon on Google Play"
+                  data-ta="Google Play-இல் விரைவில்"
+                  data-si="Google Play හි ඉක්මනින්"
+                  >Coming Soon on Google Play</span
+                >
+              </a>
+              <a href="#features" class="btn btn-outline btn-lg">
+                <span
+                  data-en="Learn More"
+                  data-ta="மேலும் அறிக"
+                  data-si="තව දැනගන්න"
+                  >Learn More</span
+                >
+              </a>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <span class="hero-stat-value">3</span>
+                <span
+                  class="hero-stat-label"
+                  data-en="Languages"
+                  data-ta="மொழிகள்"
+                  data-si="භාෂා"
+                  >Languages</span
+                >
+              </div>
+              <div class="hero-stat-divider" aria-hidden="true"></div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">100%</span>
+                <span
+                  class="hero-stat-label"
+                  data-en="Offline Ready"
+                  data-ta="ஆஃப்லைன் தயார்"
+                  data-si="නොබැඳි සූදානම්"
+                  >Offline Ready</span
+                >
+              </div>
+              <div class="hero-stat-divider" aria-hidden="true"></div>
+              <div class="hero-stat">
+                <span class="hero-stat-value">0%</span>
+                <span
+                  class="hero-stat-label"
+                  data-en="Middleman Fees"
+                  data-ta="தரகர் கட்டணம்"
+                  data-si="තැරැව්කාර ගාස්තු"
+                  >Middleman Fees</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="phone-mockup">
+              <div class="phone-frame">
+                <div class="phone-screen">
+                  <div class="mockup-header">
+                    <div class="mockup-status-bar">
+                      <span>9:41</span>
+                      <span>SL Agrimarket</span>
+                      <span>|||</span>
+                    </div>
+                  </div>
+                  <div class="mockup-content">
+                    <div class="mockup-card">
+                      <div
+                        class="mockup-card-color"
+                        style="background: #4caf50"
+                      ></div>
+                      <div class="mockup-card-text">
+                        <div class="mockup-line" style="width: 70%"></div>
+                        <div class="mockup-line short" style="width: 40%"></div>
+                        <div class="mockup-price">Rs. 280/kg</div>
+                      </div>
+                    </div>
+                    <div class="mockup-card">
+                      <div
+                        class="mockup-card-color"
+                        style="background: #ff9800"
+                      ></div>
+                      <div class="mockup-card-text">
+                        <div class="mockup-line" style="width: 60%"></div>
+                        <div class="mockup-line short" style="width: 50%"></div>
+                        <div class="mockup-price">Rs. 450/kg</div>
+                      </div>
+                    </div>
+                    <div class="mockup-card">
+                      <div
+                        class="mockup-card-color"
+                        style="background: #f44336"
+                      ></div>
+                      <div class="mockup-card-text">
+                        <div class="mockup-line" style="width: 80%"></div>
+                        <div class="mockup-line short" style="width: 35%"></div>
+                        <div class="mockup-price">Rs. 320/kg</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mockup-nav">
+                    <div class="mockup-nav-item active"></div>
+                    <div class="mockup-nav-item"></div>
+                    <div class="mockup-nav-item"></div>
+                    <div class="mockup-nav-item"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="features" id="features">
+        <div class="container">
+          <div class="section-header">
+            <h2
+              class="section-title"
+              data-en="Built for the Way You Farm"
+              data-ta="நீங்கள் விவசாயம் செய்யும் விதத்திற்காக"
+              data-si="ඔබ ගොවිතැන් කරන ආකාරයට"
+            >
+              Built for the Way You Farm
+            </h2>
+            <p
+              class="section-subtitle"
+              data-en="Every feature designed with Sri Lankan farmers in mind. No complicated setup, no hidden fees."
+              data-ta="ஒவ்வொரு அம்சமும் இலங்கை விவசாயிகளை மனதில் கொண்டு வடிவமைக்கப்பட்டது. சிக்கலான அமைப்பு இல்லை, மறைவான கட்டணங்கள் இல்லை."
+              data-si="සෑම විශේෂාංගයක්ම ශ්‍රී ලංකා ගොවීන් සිතේ තබාගෙන නිර්මාණය කර ඇත. සංකීර්ණ පිහිටුවීම් නැත, සඟවා ඇති ගාස්තු නැත."
+            >
+              Every feature designed with Sri Lankan farmers in mind. No
+              complicated setup, no hidden fees.
+            </p>
+          </div>
+          <div class="features-grid">
+            <!-- Feature 1: Offline-first -->
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                  <path d="M16.72 11.06A10.94 10.94 0 0119 12.55" />
+                  <path d="M5 12.55a10.94 10.94 0 015.17-2.39" />
+                  <path d="M10.71 5.05A16 16 0 0122.56 9" />
+                  <path d="M1.42 9a15.91 15.91 0 014.7-2.88" />
+                  <path d="M8.53 16.11a6 6 0 016.95 0" />
+                  <line x1="12" y1="20" x2="12.01" y2="20" />
+                </svg>
+              </div>
+              <h3
+                class="feature-title"
+                data-en="Works Offline"
+                data-ta="ஆஃப்லைன் செயல்படும்"
+                data-si="නොබැඳිව ක්‍රියා කරයි"
+              >
+                Works Offline
+              </h3>
+              <p
+                class="feature-desc"
+                data-en="List produce, check prices, and manage your farm -- even in areas with no signal. Everything syncs when you're back online."
+                data-ta="விளைபொருட்களை பட்டியலிடுங்கள், விலைகளை சரிபாருங்கள், பண்ணையை நிர்வகியுங்கள் -- சிக்னல் இல்லாத பகுதிகளிலும். ஆன்லைனில் திரும்பும்போது அனைத்தும் ஒத்திசைக்கப்படும்."
+                data-si="නිෂ්පාදන ලැයිස්තුගත කරන්න, මිල බලන්න, ගොවිපළ කළමනාකරණය කරන්න -- සංඥා නැති ප්‍රදේශවලත්. නැවත සබැඳි වූ විට සියල්ල සමමුහුර්ත වේ."
+              >
+                List produce, check prices, and manage your farm -- even in
+                areas with no signal. Everything syncs when you're back online.
+              </p>
+            </div>
+
+            <!-- Feature 2: Market Prices -->
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                </svg>
+              </div>
+              <h3
+                class="feature-title"
+                data-en="Live Market Prices"
+                data-ta="நேரடி சந்தை விலை"
+                data-si="සජීවී වෙළඳපොළ මිල"
+              >
+                Live Market Prices
+              </h3>
+              <p
+                class="feature-desc"
+                data-en="Know what your crops are worth before you sell. Real-time price data from markets across Sri Lanka so you never undersell."
+                data-ta="விற்பதற்கு முன் உங்கள் பயிர்களின் மதிப்பை அறியுங்கள். இலங்கை முழுவதிலுமுள்ள சந்தைகளின் நிகழ்நேர விலை தரவு, நீங்கள் குறைந்த விலைக்கு விற்காதீர்கள்."
+                data-si="විකුණීමට පෙර ඔබේ බෝග වටිනාකම දැනගන්න. ශ්‍රී ලංකාව පුරා වෙළඳපොළවලින් සජීවී මිල දත්ත, එබැවින් ඔබ කිසිදා අඩුවෙන් නොවිකුණයි."
+              >
+                Know what your crops are worth before you sell. Real-time price
+                data from markets across Sri Lanka so you never undersell.
+              </p>
+            </div>
+
+            <!-- Feature 3: DoA Crop Data -->
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+              </div>
+              <h3
+                class="feature-title"
+                data-en="DoA Crop Intelligence"
+                data-ta="விவசாயத் திணைக்களப் பயிர் தரவு"
+                data-si="කෘෂිකර්ම දෙපාර්තමේන්තු බෝග දත්ත"
+              >
+                DoA Crop Intelligence
+              </h3>
+              <p
+                class="feature-desc"
+                data-en="Official crop data from Sri Lanka's Department of Agriculture. Get verified yield tips, seasonal guides, and variety recommendations."
+                data-ta="இலங்கை விவசாயத் திணைக்களத்தின் அதிகாரப்பூர்வ பயிர் தரவு. சரிபார்க்கப்பட்ட மகசூல் குறிப்புகள், பருவகால வழிகாட்டிகள், இரக பரிந்துரைகள்."
+                data-si="ශ්‍රී ලංකා කෘෂිකර්ම දෙපාර්තමේන්තුවේ නිල බෝග දත්ත. සත්‍යාපිත අස්වැන්න ඉඟි, සෘතු මාර්ගෝපදේශ සහ ප්‍රභේද නිර්දේශ."
+              >
+                Official crop data from Sri Lanka's Department of Agriculture.
+                Get verified yield tips, seasonal guides, and variety
+                recommendations.
+              </p>
+            </div>
+
+            <!-- Feature 4: Trilingual -->
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path
+                    d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="feature-title"
+                data-en="Your Language, Your Way"
+                data-ta="உங்கள் மொழி, உங்கள் வழி"
+                data-si="ඔබේ භාෂාව, ඔබේ මාර්ගය"
+              >
+                Your Language, Your Way
+              </h3>
+              <p
+                class="feature-desc"
+                data-en="Full support for English, Tamil, and Sinhala. Every screen, every button, every notification -- in the language you think in."
+                data-ta="ஆங்கிலம், தமிழ் மற்றும் சிங்களத்திற்கு முழு ஆதரவு. ஒவ்வொரு திரையும், ஒவ்வொரு பொத்தானும், ஒவ்வொரு அறிவிப்பும் -- நீங்கள் சிந்திக்கும் மொழியில்."
+                data-si="ඉංග්‍රීසි, දෙමළ සහ සිංහල සඳහා සම්පූර්ණ සහාය. සෑම තිරයක්ම, සෑම බොත්තමක්ම, සෑම දැනුම්දීමක්ම -- ඔබ සිතන භාෂාවෙන්."
+              >
+                Full support for English, Tamil, and Sinhala. Every screen,
+                every button, every notification -- in the language you think
+                in.
+              </p>
+            </div>
+
+            <!-- Feature 5: Field Mode -->
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              </div>
+              <h3
+                class="feature-title"
+                data-en="Field Mode"
+                data-ta="வயல்வெளி பயன்முறை"
+                data-si="ක්ෂේත්‍ර ප්‍රකාරය"
+              >
+                Field Mode
+              </h3>
+              <p
+                class="feature-desc"
+                data-en="Large text, high-contrast colors, and easy tap targets designed for use under bright sunlight with work-worn hands."
+                data-ta="பெரிய எழுத்து, உயர் வேறுபாடு வண்ணங்கள், மற்றும் பிரகாசமான சூரிய ஒளியில் வேலை செய்யும் கைகளால் பயன்படுத்த வடிவமைக்கப்பட்டது."
+                data-si="ලොකු අකුරු, ඉහළ වෙනස්කම් වර්ණ, සහ දීප්තිමත් හිරු එළියේ වැඩ කරන අතින් භාවිත කිරීමට නිර්මාණය කළ සැහැල්ලු ස්පර්ශ ඉලක්ක."
+              >
+                Large text, high-contrast colors, and easy tap targets designed
+                for use under bright sunlight with work-worn hands.
+              </p>
+            </div>
+
+            <!-- Feature 6: Direct Connection -->
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+              </div>
+              <h3
+                class="feature-title"
+                data-en="Direct Farmer-Buyer Chat"
+                data-ta="நேரடி விவசாயி-வாங்குபவர் அரட்டை"
+                data-si="සෘජු ගොවි-ගැනුම්කරු සංවාදය"
+              >
+                Direct Farmer-Buyer Chat
+              </h3>
+              <p
+                class="feature-desc"
+                data-en="No middlemen taking a cut. Chat directly with buyers, negotiate fair prices, and build lasting trade relationships."
+                data-ta="தரகர்கள் பங்கு எடுப்பதில்லை. வாங்குபவர்களுடன் நேரடியாக உரையாடுங்கள், நியாயமான விலையை பேச்சுவார்த்தை நடத்துங்கள்."
+                data-si="මධ්‍යස්ථයන් කප්පාදු ගන්නේ නැත. ගැනුම්කරුවන් සමඟ සෘජුවම කතාබස් කරන්න, සාධාරණ මිල ගණන් සාකච්ඡා කරන්න."
+              >
+                No middlemen taking a cut. Chat directly with buyers, negotiate
+                fair prices, and build lasting trade relationships.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works Section -->
+      <section class="how-it-works" id="how-it-works">
+        <div class="container">
+          <div class="section-header">
+            <h2
+              class="section-title"
+              data-en="Start Selling in Three Steps"
+              data-ta="மூன்று படிகளில் விற்பனையைத் தொடங்குங்கள்"
+              data-si="පියවර තුනකින් විකිණීම ආරම්භ කරන්න"
+            >
+              Start Selling in Three Steps
+            </h2>
+            <p
+              class="section-subtitle"
+              data-en="Getting started takes less than five minutes. If you can take a photo, you can use Agrimarket."
+              data-ta="தொடங்குவதற்கு ஐந்து நிமிடங்களுக்கும் குறைவான நேரமே ஆகும். நீங்கள் புகைப்படம் எடுக்க முடிந்தால், நீங்கள் அக்ரிமார்க்கெட்டைப் பயன்படுத்தலாம்."
+              data-si="ආරම්භ කිරීමට මිනිත්තු පහකටත් වඩා අඩු කාලයක් ගතවේ. ඔබට ඡායාරූපයක් ගත හැකි නම්, ඔබට Agrimarket භාවිත කළ හැක."
+            >
+              Getting started takes less than five minutes. If you can take a
+              photo, you can use Agrimarket.
+            </p>
+          </div>
+          <div class="steps-grid">
+            <!-- Step 1 -->
+            <div class="step-card">
+              <div class="step-number" aria-hidden="true">1</div>
+              <div class="step-icon" aria-hidden="true">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <line x1="20" y1="8" x2="20" y2="14" />
+                  <line x1="23" y1="11" x2="17" y2="11" />
+                </svg>
+              </div>
+              <h3
+                class="step-title"
+                data-en="Create Your Profile"
+                data-ta="உங்கள் சுயவிவரத்தை உருவாக்கவும்"
+                data-si="ඔබේ පැතිකඩ සාදන්න"
+              >
+                Create Your Profile
+              </h3>
+              <p
+                class="step-desc"
+                data-en="Sign up with your phone number. Choose your language, set your location, and you're ready to go."
+                data-ta="உங்கள் தொலைபேசி எண்ணுடன் பதிவு செய்யுங்கள். உங்கள் மொழியைத் தேர்வு செய்து, இடத்தை அமைத்து, நீங்கள் தயாராகிவிட்டீர்கள்."
+                data-si="ඔබේ දුරකථන අංකයෙන් ලියාපදිංචි වන්න. ඔබේ භාෂාව තෝරන්න, ස්ථානය සකසන්න, එවිට ඔබ සූදානම්."
+              >
+                Sign up with your phone number. Choose your language, set your
+                location, and you're ready to go.
+              </p>
+            </div>
+
+            <!-- Connector -->
+            <div class="step-connector" aria-hidden="true">
+              <svg width="40" height="24" viewBox="0 0 40 24">
+                <path
+                  d="M0 12h32m0 0l-6-6m6 6l-6 6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+              <div class="step-number" aria-hidden="true">2</div>
+              <div class="step-icon" aria-hidden="true">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"
+                  />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </div>
+              <h3
+                class="step-title"
+                data-en="Snap and List"
+                data-ta="புகைப்படம் எடுத்து பட்டியலிடுங்கள்"
+                data-si="ඡායාරූපය ගෙන ලැයිස්තුගත කරන්න"
+              >
+                Snap and List
+              </h3>
+              <p
+                class="step-desc"
+                data-en="Take a photo of your produce, set your price, and publish your listing. It works even without internet -- your listing syncs when signal returns."
+                data-ta="உங்கள் விளைபொருளின் புகைப்படத்தை எடுத்து, விலையை நிர்ணயித்து, பட்டியலை வெளியிடுங்கள். இணையம் இல்லாமலும் வேலை செய்யும் -- சிக்னல் திரும்பும்போது ஒத்திசைக்கும்."
+                data-si="ඔබේ නිෂ්පාදනයේ ඡායාරූපයක් ගන්න, මිල තියන්න, ලැයිස්තුගත කරන්න. අන්තර්ජාලය නොමැතිව පවා ක්‍රියා කරයි -- සංඥාව ආපසු එනවිට සමමුහුර්ත වේ."
+              >
+                Take a photo of your produce, set your price, and publish your
+                listing. It works even without internet -- your listing syncs
+                when signal returns.
+              </p>
+            </div>
+
+            <!-- Connector -->
+            <div class="step-connector" aria-hidden="true">
+              <svg width="40" height="24" viewBox="0 0 40 24">
+                <path
+                  d="M0 12h32m0 0l-6-6m6 6l-6 6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+              <div class="step-number" aria-hidden="true">3</div>
+              <div class="step-icon" aria-hidden="true">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </div>
+              <h3
+                class="step-title"
+                data-en="Connect and Sell"
+                data-ta="இணைந்து விற்கவும்"
+                data-si="සම්බන්ධ වී විකුණන්න"
+              >
+                Connect and Sell
+              </h3>
+              <p
+                class="step-desc"
+                data-en="Buyers in your area find your listing. Chat directly, agree on a price, and complete the sale. No middlemen, no commission."
+                data-ta="உங்கள் பகுதியில் உள்ள வாங்குபவர்கள் உங்கள் பட்டியலைக் காண்பார்கள். நேரடியாக உரையாடி, விலையை ஒப்புக்கொண்டு, விற்பனையை முடிக்கவும்."
+                data-si="ඔබේ ප්‍රදේශයේ ගැනුම්කරුවන් ඔබේ ලැයිස්තුගත කිරීම සොයා ගනී. සෘජුවම කතාබස් කරන්න, මිලකට එකඟ වන්න, විකිණීම සම්පූර්ණ කරන්න."
+              >
+                Buyers in your area find your listing. Chat directly, agree on a
+                price, and complete the sale. No middlemen, no commission.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Download CTA Section -->
+      <section class="download-cta" id="download">
+        <div class="container">
+          <div class="cta-card">
+            <div class="cta-content">
+              <h2
+                class="cta-title"
+                data-en="Ready to Get Fair Prices for Your Harvest?"
+                data-ta="உங்கள் அறுவடைக்கு நியாயமான விலை பெற தயாரா?"
+                data-si="ඔබේ අස්වැන්නට සාධාරණ මිල ලබාගැනීමට සූදානම්ද?"
+              >
+                Ready to Get Fair Prices for Your Harvest?
+              </h2>
+              <p
+                class="cta-desc"
+                data-en="SL Agrimarket is coming soon to Google Play. Join thousands of Sri Lankan farmers who are cutting out the middleman."
+                data-ta="SL அக்ரிமார்க்கெட் விரைவில் Google Play-இல் வரவிருக்கிறது. தரகர்களை ஒழிக்கும் ஆயிரக்கணக்கான இலங்கை விவசாயிகளுடன் இணையுங்கள்."
+                data-si="SL Agrimarket ඉක්මනින් Google Play වෙත පැමිණේ. මධ්‍යස්ථයන් ඉවත් කරන දහස් ගණනක් ශ්‍රී ලංකා ගොවීන් හා එක්වන්න."
+              >
+                SL Agrimarket is coming soon to Google Play. Join thousands of
+                Sri Lankan farmers who are cutting out the middleman.
+              </p>
+              <div class="cta-actions">
+                <button class="btn btn-cta btn-lg" disabled>
+                  <svg
+                    class="btn-icon"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302-2.302 2.302-2.698-2.302 2.698-2.302zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"
+                    />
+                  </svg>
+                  <span class="btn-text-group">
+                    <span
+                      class="btn-text-small"
+                      data-en="Coming Soon on"
+                      data-ta="விரைவில் வருகிறது"
+                      data-si="ඉක්මනින් පැමිණේ"
+                      >Coming Soon on</span
+                    >
+                    <span class="btn-text-large">Google Play</span>
+                  </span>
+                </button>
+              </div>
+              <p
+                class="cta-note"
+                data-en="Free to download. Free to use. No hidden charges."
+                data-ta="இலவசமாக பதிவிறக்கம். இலவசமாக பயன்படுத்தவும். மறைவான கட்டணங்கள் இல்லை."
+                data-si="නොමිලේ බාගන්න. නොමිලේ භාවිත කරන්න. සැඟවුණු ගාස්තු නැත."
+              >
+                Free to download. Free to use. No hidden charges.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 64 64"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <circle cx="32" cy="32" r="32" fill="#2D5016" />
+                <path
+                  d="M32 48 L32 20"
+                  stroke="#B8860B"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+                <ellipse
+                  cx="28"
+                  cy="22"
+                  rx="3"
+                  ry="5"
+                  fill="#B8860B"
+                  opacity="0.9"
+                />
+                <ellipse
+                  cx="27"
+                  cy="26"
+                  rx="3"
+                  ry="5"
+                  fill="#B8860B"
+                  opacity="0.9"
+                />
+                <ellipse
+                  cx="26"
+                  cy="30"
+                  rx="3"
+                  ry="5"
+                  fill="#B8860B"
+                  opacity="0.9"
+                />
+                <ellipse
+                  cx="36"
+                  cy="22"
+                  rx="3"
+                  ry="5"
+                  fill="#B8860B"
+                  opacity="0.9"
+                />
+                <ellipse
+                  cx="37"
+                  cy="26"
+                  rx="3"
+                  ry="5"
+                  fill="#B8860B"
+                  opacity="0.9"
+                />
+                <ellipse
+                  cx="38"
+                  cy="30"
+                  rx="3"
+                  ry="5"
+                  fill="#B8860B"
+                  opacity="0.9"
+                />
+                <ellipse cx="32" cy="18" rx="3" ry="5" fill="#B8860B" />
+              </svg>
+              <span>SL Agrimarket</span>
+            </div>
+            <p
+              class="footer-tagline"
+              data-en="Connecting Sri Lankan farmers to fair markets since 2026."
+              data-ta="2026 முதல் இலங்கை விவசாயிகளை நியாயமான சந்தைகளுடன் இணைக்கிறது."
+              data-si="2026 සිට ශ්‍රී ලංකා ගොවීන් සාධාරණ වෙළඳපොළවලට සම්බන්ධ කරයි."
+            >
+              Connecting Sri Lankan farmers to fair markets since 2026.
+            </p>
+          </div>
+          <div class="footer-links-group">
+            <h4
+              class="footer-heading"
+              data-en="Product"
+              data-ta="தயாரிப்பு"
+              data-si="නිෂ්පාදනය"
+            >
+              Product
+            </h4>
+            <a
+              href="#features"
+              class="footer-link"
+              data-en="Features"
+              data-ta="அம்சங்கள்"
+              data-si="විශේෂාංග"
+              >Features</a
+            >
+            <a
+              href="#how-it-works"
+              class="footer-link"
+              data-en="How It Works"
+              data-ta="எவ்வாறு செயல்படுகிறது"
+              data-si="ක්‍රියා කරන ආකාරය"
+              >How It Works</a
+            >
+            <a
+              href="#download"
+              class="footer-link"
+              data-en="Download"
+              data-ta="பதிவிறக்கம்"
+              data-si="බාගන්න"
+              >Download</a
+            >
+          </div>
+          <div class="footer-links-group">
+            <h4
+              class="footer-heading"
+              data-en="Legal"
+              data-ta="சட்டம்"
+              data-si="නීතිමය"
+            >
+              Legal
+            </h4>
+            <a
+              href="privacy.html"
+              class="footer-link"
+              data-en="Privacy Policy"
+              data-ta="தனியுரிமைக் கொள்கை"
+              data-si="පෞද්ගලිකත්ව ප්‍රතිපත්තිය"
+              >Privacy Policy</a
+            >
+            <a
+              href="terms.html"
+              class="footer-link"
+              data-en="Terms of Service"
+              data-ta="சேவை விதிமுறைகள்"
+              data-si="සේවා නියමයන්"
+              >Terms of Service</a
+            >
+          </div>
+          <div class="footer-links-group">
+            <h4
+              class="footer-heading"
+              data-en="Language"
+              data-ta="மொழி"
+              data-si="භාෂාව"
+            >
+              Language
+            </h4>
+            <button class="footer-lang-btn lang-btn" data-lang="en">
+              English
+            </button>
+            <button class="footer-lang-btn lang-btn" data-lang="ta">
+              தமிழ்
+            </button>
+            <button class="footer-lang-btn lang-btn" data-lang="si">
+              සිංහල
+            </button>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p
+            class="footer-copyright"
+            data-en="2026 SL Agrimarket. Built with care for Sri Lankan farmers."
+            data-ta="2026 SL அக்ரிமார்க்கெட். இலங்கை விவசாயிகளுக்காக அக்கறையுடன் உருவாக்கப்பட்டது."
+            data-si="2026 SL Agrimarket. ශ්‍රී ලංකා ගොවීන් වෙනුවෙන් සැලකිල්ලෙන් ගොඩනගා ඇත."
+          >
+            2026 SL Agrimarket. Built with care for Sri Lankan farmers.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15" />
+      </svg>
+    </button>
+
+    <script src="script.js"></script>
+  </body>
+</html>

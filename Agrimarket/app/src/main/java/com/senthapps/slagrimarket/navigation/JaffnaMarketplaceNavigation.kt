@@ -1,72 +1,218 @@
 package com.senthapps.slagrimarket.navigation
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.senthapps.slagrimarket.ui.home.HomeScreen
-import com.senthapps.slagrimarket.ui.home.MarketPricesScreen
-import com.senthapps.slagrimarket.ui.listings.CreateListingScreen
-import com.senthapps.slagrimarket.ui.listings.ListingsScreen
+import com.senthapps.slagrimarket.data.model.getCropEmoji
+import com.senthapps.slagrimarket.ui.home.TickerPriceItem
+import com.senthapps.slagrimarket.ui.home.HomeViewModel
+import com.senthapps.slagrimarket.util.RelativeTimeUtil
+import com.senthapps.slagrimarket.ui.analytics.AnalyticsScreen
+import com.senthapps.slagrimarket.ui.auth.IndustrialOtpVerificationScreen
+import com.senthapps.slagrimarket.ui.auth.IndustrialPasswordScreen
+import com.senthapps.slagrimarket.ui.auth.IndustrialPhoneInputScreen
+import com.senthapps.slagrimarket.ui.chat.ChatScreen
+import com.senthapps.slagrimarket.ui.chat.ConversationsScreen
+import com.senthapps.slagrimarket.ui.favorites.FavoritesScreen
+import com.senthapps.slagrimarket.ui.listings.QuickListingScreen
+import com.senthapps.slagrimarket.ui.help.ContactScreen
+import com.senthapps.slagrimarket.ui.help.FAQScreen
+import com.senthapps.slagrimarket.ui.help.HelpScreen
+import com.senthapps.slagrimarket.ui.help.PrivacyScreen
+import com.senthapps.slagrimarket.ui.help.TermsScreen
+import com.senthapps.slagrimarket.ui.map.ListingsMapScreen
+import com.senthapps.slagrimarket.ui.map.LocationMapScreen
+import com.senthapps.slagrimarket.ui.notifications.NotificationsScreen
+import com.senthapps.slagrimarket.ui.profile.EditProfileScreen
 import com.senthapps.slagrimarket.ui.profile.ProfileScreen
+import com.senthapps.slagrimarket.ui.reviews.WriteReviewScreen
+import com.senthapps.slagrimarket.ui.search.AdvancedSearchScreen
 import com.senthapps.slagrimarket.ui.search.SearchScreen
+import com.senthapps.slagrimarket.ui.settings.IndustrialSettingsScreen
+import com.senthapps.slagrimarket.ui.sync.SyncSettingsScreen
+import com.senthapps.slagrimarket.ui.home.IndustrialHomeScreen
+import com.senthapps.slagrimarket.ui.home.IndustrialMarketPricesScreen
+import com.senthapps.slagrimarket.ui.listings.CreateListingSuccessScreen
+import com.senthapps.slagrimarket.ui.listings.CreateListingViewModel
+import com.senthapps.slagrimarket.ui.listings.IndustrialCategorySelectionScreen
+import com.senthapps.slagrimarket.ui.listings.IndustrialCreateListingScreen
+import com.senthapps.slagrimarket.ui.listings.IndustrialListingDetailScreen
+import com.senthapps.slagrimarket.ui.listings.IndustrialListingsListScreen
+import com.senthapps.slagrimarket.ui.listings.ListingDetail
+import com.senthapps.slagrimarket.ui.listings.ListingPreview
+import com.senthapps.slagrimarket.ui.listings.ListingsScreen
 import com.senthapps.slagrimarket.ui.transactions.CreateTransactionScreen
-import com.senthapps.slagrimarket.ui.transactions.TransactionsScreen
+import com.senthapps.slagrimarket.ui.transactions.IndustrialTransactionDetailScreen
+import com.senthapps.slagrimarket.ui.transactions.IndustrialTransactionsScreen
+import com.senthapps.slagrimarket.ui.common.LanguageToggleViewModel
+import com.senthapps.slagrimarket.ui.theme.LocalAppLanguage
 
 @Composable
 fun JaffnaMarketplaceNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    startWithAuth: Boolean = false // Set to true to enable auth flow
 ) {
-    // MVP: FORCE DIRECT HOME SCREEN ACCESS - NO AUTHENTICATION
-    // This completely bypasses any authentication logic that might exist elsewhere
+    val context = LocalContext.current
+    // Choose start destination based on auth requirement
+    val startDestination = if (startWithAuth) Screen.PhoneInput.route else "home_direct"
 
     NavHost(
         navController = navController,
-        startDestination = "home_direct" // Use unique route to avoid conflicts
+        startDestination = startDestination,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
-        // MVP: Direct home screen access with unique route
-        composable("home_direct") {
-            HomeScreen(
-                onNavigateToListings = {
-                    navController.navigate(Screen.Listings.route)
-                },
-                onNavigateToProfile = {
-                    navController.navigate(Screen.Profile.route)
-                },
-                onNavigateToCreateListing = {
-                    navController.navigate(Screen.CreateListing.route)
-                },
-                onNavigateToTransactions = {
-                    navController.navigate(Screen.Transactions.route)
-                },
-                onNavigateToMarketPrices = {
-                    navController.navigate(Screen.MarketPrices.route)
+        // Authentication screens - INDUSTRIAL STYLE
+        composable(Screen.PhoneInput.route) {
+            IndustrialPhoneInputScreen(
+                onNavigateToOtpVerification = { phoneNumber, _ ->
+                    navController.navigate(Screen.PasswordAuth.createRoute(phoneNumber))
                 }
             )
         }
 
-        // Alternative home route (in case something tries to navigate to original home)
-        composable(Screen.Home.route) {
-            HomeScreen(
-                onNavigateToListings = {
-                    navController.navigate(Screen.Listings.route)
-                },
-                onNavigateToProfile = {
-                    navController.navigate(Screen.Profile.route)
-                },
-                onNavigateToCreateListing = {
-                    navController.navigate(Screen.CreateListing.route)
-                },
-                onNavigateToTransactions = {
-                    navController.navigate(Screen.Transactions.route)
-                },
-                onNavigateToMarketPrices = {
-                    navController.navigate(Screen.MarketPrices.route)
+        composable(Screen.PasswordAuth.route) { backStackEntry ->
+            val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+            IndustrialPasswordScreen(
+                phoneNumber = phoneNumber,
+                onNavigateBack = { navController.popBackStack() },
+                onAuthSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.PhoneInput.route) { inclusive = true }
+                    }
                 }
             )
         }
-        
+
+        composable(Screen.OtpVerification.route) { backStackEntry ->
+            val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+            val otpId = backStackEntry.arguments?.getString("otpId") ?: ""
+            IndustrialOtpVerificationScreen(
+                phoneNumber = phoneNumber,
+                otpId = otpId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onVerificationSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.PhoneInput.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        // MVP: Direct home screen access with unique route - INDUSTRIAL UI
+        composable("home_direct") {
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val homeUiState by homeViewModel.uiState.collectAsState()
+            val currentUser by homeViewModel.currentUser.collectAsState(initial = null)
+            val language = LocalAppLanguage.current
+            val accessibilityViewModel: com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel = hiltViewModel()
+            val isLargeText by accessibilityViewModel.isLargeTextEnabled.collectAsState()
+
+            // Convert top-5 market prices to ticker items
+            val tickerPrices = homeUiState.marketPrices.take(5).map { mp ->
+                TickerPriceItem(
+                    emoji = mp.getCropEmoji(),
+                    cropName = when (language) {
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.SINHALA -> mp.cropNameSinhala
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.TAMIL -> mp.cropNameTamil
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH -> mp.cropNameEnglish
+                    },
+                    price = mp.currentPrice,
+                    unit = mp.unit,
+                    trend = mp.trend
+                )
+            }
+
+            IndustrialHomeScreen(
+                onNavigateToSell = {
+                    navController.navigate(Screen.QuickListing.route)
+                },
+                onNavigateToBuy = {
+                    navController.navigate(Screen.Categories.route)
+                },
+                onNavigateToPrices = {
+                    navController.navigate(Screen.MarketPrices.route)
+                },
+                onNavigateToOrders = {
+                    navController.navigate(Screen.Transactions.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
+                },
+                language = language,
+                farmerName = currentUser?.name ?: "",
+                farmerDistrict = currentUser?.location ?: "",
+                marketPrices = tickerPrices,
+                activeListingCount = homeUiState.activeListingCount,
+                onToggleTextSize = { accessibilityViewModel.toggleLargeText(!isLargeText) }
+            )
+        }
+
+        // Alternative home route (in case something tries to navigate to original home) - INDUSTRIAL UI
+        composable(Screen.Home.route) {
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val homeUiState by homeViewModel.uiState.collectAsState()
+            val currentUser by homeViewModel.currentUser.collectAsState(initial = null)
+            val language = LocalAppLanguage.current
+            val accessibilityViewModel: com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel = hiltViewModel()
+            val isLargeText by accessibilityViewModel.isLargeTextEnabled.collectAsState()
+
+            val tickerPrices = homeUiState.marketPrices.take(5).map { mp ->
+                TickerPriceItem(
+                    emoji = mp.getCropEmoji(),
+                    cropName = when (language) {
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.SINHALA -> mp.cropNameSinhala
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.TAMIL -> mp.cropNameTamil
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH -> mp.cropNameEnglish
+                    },
+                    price = mp.currentPrice,
+                    unit = mp.unit,
+                    trend = mp.trend
+                )
+            }
+
+            IndustrialHomeScreen(
+                onNavigateToSell = {
+                    navController.navigate(Screen.QuickListing.route)
+                },
+                onNavigateToBuy = {
+                    navController.navigate(Screen.Categories.route)
+                },
+                onNavigateToPrices = {
+                    navController.navigate(Screen.MarketPrices.route)
+                },
+                onNavigateToOrders = {
+                    navController.navigate(Screen.Transactions.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
+                },
+                language = language,
+                farmerName = currentUser?.name ?: "",
+                farmerDistrict = currentUser?.location ?: "",
+                marketPrices = tickerPrices,
+                activeListingCount = homeUiState.activeListingCount,
+                onToggleTextSize = { accessibilityViewModel.toggleLargeText(!isLargeText) }
+            )
+        }
+
         composable(Screen.Listings.route) {
             ListingsScreen(
                 onNavigateBack = {
@@ -74,17 +220,131 @@ fun JaffnaMarketplaceNavigation(
                 },
                 onNavigateToSearch = {
                     navController.navigate(Screen.Search.route)
+                },
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                }
+            )
+        }
+
+        // Categories screen - 2x2 grid for buyer browsing
+        composable(Screen.Categories.route) {
+            val language = LocalAppLanguage.current
+            IndustrialCategorySelectionScreen(
+                language = language,
+                onCategorySelected = { category ->
+                    navController.navigate(Screen.CategoryListings.createRoute(category))
+                }
+            )
+        }
+
+        // Category listings - filtered list of products by category
+        composable(Screen.CategoryListings.route) { backStackEntry ->
+            val language = LocalAppLanguage.current
+            val category = backStackEntry.arguments?.getString("category") ?: ""
+            val viewModel: com.senthapps.slagrimarket.ui.listings.ListingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            // Filter listings by category (convert industrial categories to existing format)
+            val filteredListings = uiState.listings
+                .filter { listing ->
+                    // Map industrial categories to existing listing crop types
+                    when (category) {
+                        "VEGETABLES" -> listing.cropType.contains("Vegetable", ignoreCase = true) ||
+                                       listing.cropType.contains("Tomato", ignoreCase = true) ||
+                                       listing.cropType.contains("Carrot", ignoreCase = true) ||
+                                       listing.cropType.contains("Onion", ignoreCase = true)
+                        "FRUITS" -> listing.cropType.contains("Fruit", ignoreCase = true) ||
+                                   listing.cropType.contains("Mango", ignoreCase = true) ||
+                                   listing.cropType.contains("Banana", ignoreCase = true)
+                        "GRAINS" -> listing.cropType.contains("Rice", ignoreCase = true) ||
+                                  listing.cropType.contains("Wheat", ignoreCase = true) ||
+                                  listing.cropType.contains("Grain", ignoreCase = true)
+                        "LIVESTOCK" -> listing.cropType.contains("Livestock", ignoreCase = true) ||
+                                     listing.cropType.contains("Poultry", ignoreCase = true) ||
+                                     listing.cropType.contains("Chicken", ignoreCase = true)
+                        else -> true
+                    }
+                }
+                .map { listing ->
+                    ListingPreview(
+                        id = listing.id,
+                        productName = listing.cropNameEnglish.ifEmpty { listing.cropType },
+                        price = listing.pricePerUnit,
+                        unit = listing.unit,
+                        location = listing.location
+                    )
+                }
+
+            IndustrialListingsListScreen(
+                categoryName = category,
+                language = language,
+                listings = filteredListings,
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }
 
         composable(Screen.CreateListing.route) {
-            CreateListingScreen(
+            val viewModel: CreateListingViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            // Navigate to success screen when listing is successfully created
+            LaunchedEffect(uiState.isSuccess) {
+                if (uiState.isSuccess) {
+                    navController.navigate(Screen.CreateListingSuccess.route) {
+                        popUpTo(Screen.CreateListing.route) { inclusive = true }
+                    }
+                }
+            }
+
+            IndustrialCreateListingScreen(
+                onSubmit = { productName, category, quantity, unit, price, location ->
+                    // Set all form values in ViewModel
+                    viewModel.updateCropType(productName)
+                    viewModel.updateQuantity(quantity)
+                    viewModel.updateUnit(unit)
+                    viewModel.updatePricePerUnit(price)
+                    viewModel.updateLocation(location)
+                    // Set defaults for required fields not in industrial form
+                    viewModel.updateQuality("A") // Default quality grade
+                    viewModel.updateHarvestDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                    // Create the listing
+                    viewModel.createListing()
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Create Listing Success Screen (Industrial UI)
+        composable(Screen.CreateListingSuccess.route) {
+            val language = LocalAppLanguage.current
+            CreateListingSuccessScreen(
+                language = language,
+                onDone = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // Quick Listing - Photo-first sell flow
+        composable(Screen.QuickListing.route) {
+            QuickListingScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onListingCreated = {
-                    navController.popBackStack()
+                    navController.navigate(Screen.CreateListingSuccess.route) {
+                        popUpTo(Screen.QuickListing.route) { inclusive = true }
+                    }
                 }
             )
         }
@@ -100,10 +360,59 @@ fun JaffnaMarketplaceNavigation(
             )
         }
 
-        composable(Screen.Transactions.route) {
-            TransactionsScreen(
+        composable(Screen.ListingDetail.route) { backStackEntry ->
+            val listingId = backStackEntry.arguments?.getString("listingId") ?: ""
+            val language = LocalAppLanguage.current
+            val viewModel: com.senthapps.slagrimarket.ui.listings.ListingDetailViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            // Load listing detail
+            androidx.compose.runtime.LaunchedEffect(listingId) {
+                viewModel.loadListing(listingId)
+            }
+
+            // Convert Listing to ListingDetail data class
+            val listingDetail = uiState.listing?.let { listing ->
+                ListingDetail(
+                    id = listing.id,
+                    productName = listing.cropNameEnglish.ifEmpty { listing.cropType },
+                    price = listing.pricePerUnit,
+                    unit = listing.unit,
+                    categoryName = listing.cropType,
+                    availableFrom = listing.availableFrom,
+                    availableUntil = listing.availableUntil,
+                    pickupLocation = listing.location,
+                    sellerName = listing.farmerName ?: "",
+                    sellerDistrict = listing.location,
+                    sellerPhone = listing.farmerPhone,
+                    postedTime = listing.createdAt
+                )
+            }
+
+            // Display industrial listing detail screen with proper data class
+            IndustrialListingDetailScreen(
+                listing = listingDetail,
+                language = language,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onSendMessage = {
+                    // Chat functionality is not yet implemented - show placeholder message
+                    Toast.makeText(context, "Chat coming soon", Toast.LENGTH_SHORT).show()
+                },
+                isLoading = uiState.isLoading,
+                isError = uiState.error != null,
+                onRetry = { viewModel.loadListing(listingId) }
+            )
+        }
+
+        composable(Screen.Transactions.route) {
+            IndustrialTransactionsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onTransactionClick = { transactionId ->
+                    navController.navigate(Screen.TransactionDetail.createRoute(transactionId))
                 }
             )
         }
@@ -122,12 +431,55 @@ fun JaffnaMarketplaceNavigation(
                 }
             )
         }
-        
-        composable(Screen.MarketPrices.route) {
-            MarketPricesScreen(
+
+        composable(Screen.TransactionDetail.route) { backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+            IndustrialTransactionDetailScreen(
+                transactionId = transactionId,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onContactUser = { phoneNumber ->
+                    // Open phone dialer with the user's phone number
+                    if (phoneNumber.isNotEmpty()) {
+                        val intent = Intent(Intent.ACTION_DIAL).apply {
+                            data = Uri.parse("tel:$phoneNumber")
+                        }
+                        context.startActivity(intent)
+                    } else {
+                        Toast.makeText(context, "Phone number not available", Toast.LENGTH_SHORT).show()
+                    }
                 }
+            )
+        }
+        
+        composable(Screen.MarketPrices.route) {
+            val viewModel: com.senthapps.slagrimarket.ui.home.HomeViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+            val language = LocalAppLanguage.current
+            val isOffline = uiState.marketPrices.isEmpty()
+            val displayPrices = uiState.marketPrices.ifEmpty {
+                com.senthapps.slagrimarket.data.model.SampleMarketPrices.SAMPLE_PRICES
+            }
+
+            // Calculate relative time for the market prices update
+            val lastUpdatedText = if (uiState.lastPricesUpdated > 0) {
+                RelativeTimeUtil.getUpdatedTimeString(uiState.lastPricesUpdated, "en")
+            } else {
+                "UPDATED: JUST NOW"
+            }
+
+            IndustrialMarketPricesScreen(
+                marketPrices = displayPrices,
+                language = language,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                lastUpdatedText = lastUpdatedText,
+                isLoading = uiState.isLoadingPrices,
+                isError = false,
+                isOffline = isOffline,
+                onRetry = { viewModel.refreshData() }
             )
         }
 
@@ -139,6 +491,231 @@ fun JaffnaMarketplaceNavigation(
                 onLogout = {
                     // MVP: No logout functionality needed
                     navController.popBackStack()
+                },
+                onNavigateToEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
+                },
+                onNavigateToSyncSettings = {
+                    navController.navigate(Screen.SyncSettings.route)
+                },
+                onNavigateToListingDetail = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                },
+                onNavigateToHelp = {
+                    navController.navigate(Screen.Help.route)
+                },
+                onNavigateToAbout = {
+                    // Show app version info via a toast for MVP
+                    // AboutScreen route exists but navigates to Help for now
+                    navController.navigate(Screen.Help.route)
+                }
+            )
+        }
+
+        composable(Screen.Analytics.route) {
+            AnalyticsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.EditProfile.route) {
+            EditProfileScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.AdvancedSearch.route) {
+            AdvancedSearchScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                }
+            )
+        }
+
+        composable(Screen.Notifications.route) {
+            NotificationsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNotificationClick = { type, relatedId ->
+                    // Navigate based on notification type
+                    relatedId?.let {
+                        when {
+                            type.contains("ORDER") -> navController.navigate(Screen.TransactionDetail.createRoute(it))
+                            type.contains("LISTING") -> navController.navigate(Screen.ListingDetail.createRoute(it))
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.WriteReview.route) { backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+            val revieweeId = backStackEntry.arguments?.getString("revieweeId") ?: ""
+            val revieweeName = backStackEntry.arguments?.getString("revieweeName") ?: ""
+            WriteReviewScreen(
+                transactionId = transactionId,
+                revieweeId = revieweeId,
+                revieweeName = revieweeName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.SyncSettings.route) {
+            SyncSettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Industrial Settings (Language + Accessibility)
+        composable(Screen.Settings.route) {
+            val languageViewModel: LanguageToggleViewModel = hiltViewModel()
+            val accessibilityViewModel: com.senthapps.slagrimarket.ui.settings.AccessibilityViewModel = hiltViewModel()
+            val currentLanguage = LocalAppLanguage.current
+            val isLargeText by accessibilityViewModel.isLargeTextEnabled.collectAsState()
+            val isHighContrast by accessibilityViewModel.isHighContrastEnabled.collectAsState()
+
+            IndustrialSettingsScreen(
+                currentLanguage = currentLanguage,
+                onLanguageSelected = { language ->
+                    // Convert AppLanguage to string code and persist
+                    val languageCode = when (language) {
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.ENGLISH -> "en"
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.SINHALA -> "si"
+                        com.senthapps.slagrimarket.ui.home.AppLanguage.TAMIL -> "ta"
+                    }
+                    languageViewModel.setLanguage(languageCode)
+                    // Navigate back - UI will update reactively via CompositionLocal
+                    navController.popBackStack()
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                isLargeTextEnabled = isLargeText,
+                isHighContrastEnabled = isHighContrast,
+                onLargeTextToggle = accessibilityViewModel::toggleLargeText,
+                onHighContrastToggle = accessibilityViewModel::toggleHighContrast,
+                onNavigateToPrivacy = { navController.navigate(Screen.Privacy.route) },
+                onNavigateToTerms = { navController.navigate(Screen.Terms.route) }
+            )
+        }
+
+        composable(Screen.Favorites.route) {
+            FavoritesScreen(
+                onNavigateToDetail = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                }
+            )
+        }
+
+        composable(Screen.Conversations.route) {
+            ConversationsScreen(
+                onNavigateToChat = { conversationId, otherUserName ->
+                    navController.navigate(Screen.Chat.createRoute(conversationId, otherUserName))
+                }
+            )
+        }
+
+        composable(Screen.Chat.route) { backStackEntry ->
+            val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
+            val otherUserName = backStackEntry.arguments?.getString("otherUserName") ?: ""
+            ChatScreen(
+                conversationId = conversationId,
+                otherUserName = otherUserName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.LocationMap.route) { backStackEntry ->
+            val latitude = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 9.6615
+            val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 80.0255
+            val locationName = backStackEntry.arguments?.getString("locationName") ?: "Jaffna"
+            LocationMapScreen(
+                latitude = latitude,
+                longitude = longitude,
+                locationName = locationName,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.ListingsMap.route) {
+            val viewModel: com.senthapps.slagrimarket.ui.listings.ListingsViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            ListingsMapScreen(
+                listings = uiState.listings,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onListingClick = { listingId ->
+                    navController.navigate(Screen.ListingDetail.createRoute(listingId))
+                }
+            )
+        }
+
+        composable(Screen.Help.route) {
+            HelpScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToFAQ = {
+                    navController.navigate(Screen.FAQ.route)
+                },
+                onNavigateToContact = {
+                    navController.navigate(Screen.Contact.route)
+                },
+                onNavigateToTerms = {
+                    navController.navigate(Screen.Terms.route)
+                },
+                onNavigateToPrivacy = {
+                    navController.navigate(Screen.Privacy.route)
+                }
+            )
+        }
+
+        composable(Screen.FAQ.route) {
+            FAQScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Contact.route) {
+            ContactScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Terms.route) {
+            TermsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Privacy.route) {
+            PrivacyScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -146,12 +723,25 @@ fun JaffnaMarketplaceNavigation(
 }
 
 sealed class Screen(val route: String) {
-    // MVP: ALL AUTHENTICATION SCREENS COMPLETELY REMOVED
-    // NO PHONE INPUT, NO OTP VERIFICATION, NO AUTH FLOWS
+    // Authentication screens
+    object PhoneInput : Screen("phone_input")
+    object OtpVerification : Screen("otp_verification/{phoneNumber}/{otpId}") {
+        fun createRoute(phoneNumber: String, otpId: String) = "otp_verification/$phoneNumber/$otpId"
+    }
+    object PasswordAuth : Screen("password_auth/{phoneNumber}") {
+        fun createRoute(phoneNumber: String) = "password_auth/$phoneNumber"
+    }
+    
+    // Main app screens
     object Home : Screen("home")
     object Listings : Screen("listings")
+    object Categories : Screen("categories") // Industrial UI - Category selection
+    object CategoryListings : Screen("category_listings/{category}") { // Industrial UI - Filtered listings
+        fun createRoute(category: String) = "category_listings/$category"
+    }
     object Profile : Screen("profile")
     object CreateListing : Screen("create_listing")
+    object CreateListingSuccess : Screen("create_listing_success") // Industrial UI - Success confirmation
     object Search : Screen("search")
     object MarketPrices : Screen("market_prices")
     object ListingDetail : Screen("listing_detail/{listingId}") {
@@ -164,4 +754,31 @@ sealed class Screen(val route: String) {
     object TransactionDetail : Screen("transaction_detail/{transactionId}") {
         fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
     }
+    object Analytics : Screen("analytics")
+    object EditProfile : Screen("edit_profile")
+    object AdvancedSearch : Screen("advanced_search")
+    object Notifications : Screen("notifications")
+    object WriteReview : Screen("write_review/{transactionId}/{revieweeId}/{revieweeName}") {
+        fun createRoute(transactionId: String, revieweeId: String, revieweeName: String) = 
+            "write_review/$transactionId/$revieweeId/$revieweeName"
+    }
+    object SyncSettings : Screen("sync_settings")
+    object Favorites : Screen("favorites")
+    object Conversations : Screen("conversations")
+    object Chat : Screen("chat/{conversationId}/{otherUserName}") {
+        fun createRoute(conversationId: String, otherUserName: String) = 
+            "chat/$conversationId/$otherUserName"
+    }
+    object LocationMap : Screen("location_map/{latitude}/{longitude}/{locationName}") {
+        fun createRoute(latitude: Double, longitude: Double, locationName: String) = 
+            "location_map/$latitude/$longitude/$locationName"
+    }
+    object ListingsMap : Screen("listings_map")
+    object Help : Screen("help")
+    object FAQ : Screen("faq")
+    object Contact : Screen("contact")
+    object Terms : Screen("terms")
+    object Privacy : Screen("privacy")
+    object Settings : Screen("settings") // Industrial UI - Language + Accessibility settings
+    object QuickListing : Screen("quick_listing") // Photo-first quick sell flow
 }

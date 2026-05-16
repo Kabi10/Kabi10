@@ -1,0 +1,50 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://kabilan.io/sitemap.xml
+
+# Crawl delay (optional, adjust as needed)
+Crawl-delay: 1
+
+# Disallow certain paths if needed (currently allowing all)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Allow specific bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Block unwanted bots (add as needed)
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /

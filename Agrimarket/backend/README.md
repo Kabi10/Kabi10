@@ -24,18 +24,21 @@ This backend provides REST API endpoints that seamlessly integrate with the Andr
 ### Installation
 
 1. **Clone and setup:**
+
 ```bash
 cd Agrimarket/backend
 npm install
 ```
 
 2. **Environment configuration:**
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 3. **Database setup:**
+
 ```bash
 # Create database
 createdb jaffna_marketplace
@@ -48,6 +51,7 @@ npm run seed
 ```
 
 4. **Start development server:**
+
 ```bash
 npm run dev
 ```
@@ -59,16 +63,19 @@ The API will be available at `http://localhost:3000`
 This backend is specifically designed to integrate with the Jaffna Marketplace Android app:
 
 ### Authentication Flow
+
 - Matches `AuthApiService.kt` contracts exactly
 - Supports `SendOtpRequest/Response` and `LoginRequest/Response` models
 - JWT token management with refresh token rotation
 
 ### Sync System
+
 - Compatible with `SyncManager.kt` and `SyncApiService.kt`
 - Handles `LocalOp` queue system for offline operations
 - Implements delta sync with timestamp-based change tracking
 
 ### Data Models
+
 - Database schema mirrors Android Room entities exactly
 - JSON serialization compatible with Moshi adapters
 - Supports all crop types, locations, and business rules from Android app
@@ -76,6 +83,7 @@ This backend is specifically designed to integrate with the Jaffna Marketplace A
 ## 🏗️ Architecture
 
 ### Technology Stack
+
 - **Framework:** Express.js with Node.js
 - **Database:** PostgreSQL with connection pooling
 - **Authentication:** JWT with bcrypt
@@ -85,6 +93,7 @@ This backend is specifically designed to integrate with the Jaffna Marketplace A
 - **Security:** Helmet, CORS, rate limiting
 
 ### Project Structure
+
 ```
 src/
 ├── routes/          # API route handlers
@@ -100,6 +109,7 @@ src/
 ### OTP-based Phone Authentication
 
 **Send OTP:**
+
 ```http
 POST /api/v1/auth/send-otp
 Content-Type: application/json
@@ -110,6 +120,7 @@ Content-Type: application/json
 ```
 
 **Verify OTP:**
+
 ```http
 POST /api/v1/auth/verify-otp
 Content-Type: application/json
@@ -121,6 +132,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -139,32 +151,74 @@ Content-Type: application/json
 
 ### Core Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/send-otp` | Send OTP to phone |
-| POST | `/api/v1/auth/verify-otp` | Verify OTP and login |
-| GET | `/api/v1/users/profile` | Get user profile |
-| PUT | `/api/v1/users/profile` | Update user profile |
-| GET | `/api/v1/listings` | Get listings with filters |
-| POST | `/api/v1/listings` | Create new listing |
-| GET | `/api/v1/transactions` | Get user transactions |
-| POST | `/api/v1/transactions` | Create transaction |
-| POST | `/api/v1/sync/operations` | Sync offline operations |
+| Method | Endpoint                  | Description               |
+| ------ | ------------------------- | ------------------------- |
+| POST   | `/api/v1/auth/send-otp`   | Send OTP to phone         |
+| POST   | `/api/v1/auth/verify-otp` | Verify OTP and login      |
+| GET    | `/api/v1/users/profile`   | Get user profile          |
+| PUT    | `/api/v1/users/profile`   | Update user profile       |
+| GET    | `/api/v1/listings`        | Get listings with filters |
+| POST   | `/api/v1/listings`        | Create new listing        |
+| GET    | `/api/v1/transactions`    | Get user transactions     |
+| POST   | `/api/v1/transactions`    | Create transaction        |
+| POST   | `/api/v1/sync/operations` | Sync offline operations   |
+
+### Messaging (Auth Required)
+
+| Method | Endpoint                                      | Description                  |
+| ------ | --------------------------------------------- | ---------------------------- |
+| GET    | `/api/v1/messages/conversations`              | List user's conversations    |
+| GET    | `/api/v1/messages/conversations/:id`          | Get conversation detail      |
+| POST   | `/api/v1/messages/conversations`              | Create/get conversation      |
+| GET    | `/api/v1/messages/conversations/:id/messages` | Get messages in conversation |
+| POST   | `/api/v1/messages/conversations/:id/messages` | Send a message               |
+| PATCH  | `/api/v1/messages/conversations/:id/read`     | Mark messages as read        |
+| GET    | `/api/v1/messages/unread-count`               | Get unread count             |
+
+### Favorites (Auth Required)
+
+| Method | Endpoint                             | Description              |
+| ------ | ------------------------------------ | ------------------------ |
+| GET    | `/api/v1/favorites`                  | List user's favorites    |
+| POST   | `/api/v1/favorites`                  | Add listing to favorites |
+| DELETE | `/api/v1/favorites/:listingId`       | Remove from favorites    |
+| GET    | `/api/v1/favorites/check/:listingId` | Check if favorited       |
+
+### Reviews (Auth Required)
+
+| Method | Endpoint                               | Description          |
+| ------ | -------------------------------------- | -------------------- |
+| GET    | `/api/v1/reviews/user/:userId`         | Get reviews for user |
+| GET    | `/api/v1/reviews/user/:userId/summary` | Get rating summary   |
+| POST   | `/api/v1/reviews`                      | Create review        |
+| PUT    | `/api/v1/reviews/:id`                  | Update own review    |
+| DELETE | `/api/v1/reviews/:id`                  | Delete own review    |
+
+### Notifications (Auth Required)
+
+| Method | Endpoint                             | Description             |
+| ------ | ------------------------------------ | ----------------------- |
+| GET    | `/api/v1/notifications`              | List user notifications |
+| GET    | `/api/v1/notifications/unread-count` | Get unread count        |
+| PATCH  | `/api/v1/notifications/:id/read`     | Mark as read            |
+| PATCH  | `/api/v1/notifications/read-all`     | Mark all as read        |
+| DELETE | `/api/v1/notifications/:id`          | Delete notification     |
 
 ### Health Checks
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Basic health check |
-| GET | `/health/detailed` | Detailed system health |
-| GET | `/health/database` | Database connectivity |
-| GET | `/health/sms` | SMS service status |
+| Method | Endpoint           | Description            |
+| ------ | ------------------ | ---------------------- |
+| GET    | `/health`          | Basic health check     |
+| GET    | `/health/detailed` | Detailed system health |
+| GET    | `/health/database` | Database connectivity  |
+| GET    | `/health/sms`      | SMS service status     |
 
 ## 🔄 Offline Sync System
 
 The sync system handles offline operations from the Android app:
 
 ### Sync Operations
+
 ```http
 POST /api/v1/sync/operations
 Authorization: Bearer <token>
@@ -185,47 +239,84 @@ Content-Type: application/json
 ```
 
 ### Conflict Resolution
+
 - Server-wins strategy for conflicts
 - Returns conflicted operations with server data
 - Client can resolve conflicts and retry
 
 ## 📱 SMS Integration
 
-### Sri Lankan Providers
+### SMS_MODE Configuration
 
-**Dialog Ideamart (Primary):**
-- Cost: ~0.50 LKR per SMS
-- Coverage: Excellent in Sri Lanka
-- Configuration: `DIALOG_API_KEY`, `DIALOG_API_SECRET`
+The `SMS_MODE` environment variable controls OTP delivery:
 
-**Mobitel mSpace (Alternative):**
-- Cost: ~0.45 LKR per SMS
-- Coverage: Good in Sri Lanka
-- Configuration: `MOBITEL_USERNAME`, `MOBITEL_PASSWORD`
+| Mode      | Description                            | Use Case               |
+| --------- | -------------------------------------- | ---------------------- |
+| `mock`    | Logs OTP to console, does NOT send SMS | Development/testing    |
+| `dialog`  | Send via Dialog Ideamart API           | Production (Sri Lanka) |
+| `mobitel` | Send via Mobitel mSpace API            | Production (Sri Lanka) |
+| `twilio`  | Send via Twilio API                    | International fallback |
 
-**Twilio (International Fallback):**
-- Cost: ~2.50 LKR per SMS
-- Coverage: Global
-- Configuration: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
+**Mock Mode Example Output:**
 
-### SMS Configuration
+```
+============================================================
+📱 MOCK SMS - OTP CODE (NOT SENT)
+============================================================
+Phone: +94771234567
+OTP:   482615
+============================================================
+```
+
+### OTP Security Features
+
+- **Max 3 attempts** per OTP before invalidation
+- **60-second cooldown** between OTP requests
+- **5-minute expiry** for each OTP
+- **No master OTP bypass** in any environment
+
+### Provider Configuration
+
+**Dialog Ideamart (Primary Sri Lankan):**
+
 ```env
-SMS_PROVIDER=dialog
+SMS_MODE=dialog
 DIALOG_API_KEY=your_api_key
 DIALOG_API_SECRET=your_api_secret
 DIALOG_SENDER_ID=JaffnaFarm
+```
+
+**Mobitel mSpace (Alternative):**
+
+```env
+SMS_MODE=mobitel
+MOBITEL_USERNAME=your_username
+MOBITEL_PASSWORD=your_password
+```
+
+**Twilio (International):**
+
+```env
+SMS_MODE=twilio
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_PHONE_NUMBER=+1234567890
 ```
 
 ## 🚀 Deployment
 
 ### Production Environment
 
+> ⚠️ **MOCK_DB Safety**: `MOCK_DB=true` is for development/testing only. The server will refuse to start if `MOCK_DB=true` and `NODE_ENV=production` are both set.
+
 **Recommended Hosting:**
+
 - **DigitalOcean Droplets** (Singapore region for low latency to Sri Lanka)
 - **AWS Asia Pacific (Mumbai)** for enterprise scale
 - **Local Sri Lankan providers** for data sovereignty
 
 ### Docker Deployment
+
 ```bash
 # Build image
 docker build -t jaffna-marketplace-api .
@@ -239,6 +330,7 @@ docker run -d \
 ```
 
 ### Environment Variables
+
 ```env
 # Required
 NODE_ENV=production
@@ -260,18 +352,21 @@ DIALOG_API_SECRET=your_secret
 ### Monthly Costs (Estimated)
 
 **Small Scale (100 users, 1000 SMS/month):**
+
 - DigitalOcean Droplet (2GB): $12/month
 - PostgreSQL Database: $15/month
 - SMS (Dialog): $5/month
 - **Total: ~$32/month**
 
 **Medium Scale (1000 users, 10000 SMS/month):**
+
 - DigitalOcean Droplet (4GB): $24/month
 - Managed PostgreSQL: $30/month
 - SMS (Dialog): $50/month
 - **Total: ~$104/month**
 
 **Large Scale (10000 users, 100000 SMS/month):**
+
 - AWS EC2 (t3.large): $60/month
 - RDS PostgreSQL: $100/month
 - SMS (Dialog): $500/month
@@ -281,6 +376,7 @@ DIALOG_API_SECRET=your_secret
 ## 🔧 Development
 
 ### Scripts
+
 ```bash
 npm run dev          # Start development server
 npm run start        # Start production server
@@ -291,6 +387,7 @@ npm run lint         # Lint code
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 npm test
@@ -301,6 +398,26 @@ npm run test:coverage
 # Run specific test file
 npm test -- auth.test.js
 ```
+
+### E2E Testing (Mock Mode)
+
+Run automated E2E tests against an in-memory mock database:
+
+```powershell
+# Windows (PowerShell)
+npm run e2e:mock
+
+# Or directly:
+powershell -ExecutionPolicy Bypass -File scripts/e2e-mock.ps1
+```
+
+This script:
+
+1. Starts backend with `MOCK_DB=true` and `SMS_MODE=mock`
+2. Tests auth flow (send-otp → verify-otp)
+3. Tests listings (GET, POST)
+4. Tests transactions (GET)
+5. Reports PASS/FAIL per endpoint
 
 ## 🛡️ Security
 
@@ -315,6 +432,7 @@ npm test -- auth.test.js
 ## 📈 Monitoring
 
 ### Health Checks
+
 - `/health` - Basic health status
 - `/health/detailed` - Full system status
 - `/health/database` - Database connectivity
@@ -322,6 +440,7 @@ npm test -- auth.test.js
 - `/health/liveness` - Kubernetes liveness probe
 
 ### Logging
+
 - Structured JSON logging with Winston
 - Request/response logging
 - Error tracking with stack traces
@@ -343,6 +462,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue on GitHub
 - Email: support@jaffna-marketplace.com
 - Documentation: [API Docs](https://api.jaffna-marketplace.com/docs)

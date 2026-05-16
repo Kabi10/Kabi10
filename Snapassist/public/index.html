@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snapassist Dashboard</title>
+  <style>
+    :root { font-family: Inter, system-ui, Arial; }
+    body { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    header { display:flex; align-items:center; gap:.75rem; margin-bottom:1rem; }
+    button { padding:.6rem 1rem; border:1px solid #ddd; border-radius:.6rem; cursor:pointer; }
+    input, select { padding:.55rem .8rem; border:1px solid #ddd; border-radius:.5rem; min-width: 220px; }
+    .card { border:1px solid #eee; border-radius:1rem; padding:1rem; margin:.75rem 0; }
+    .row { display:flex; gap:.5rem; align-items:center; flex-wrap: wrap; }
+    .muted { opacity:.7 }
+    .disabled { opacity:.5; pointer-events:none }
+    #log { white-space: pre-wrap; background:#fafafa; border:1px solid #eee; padding:1rem; border-radius:.6rem; min-height: 80px;}
+    .ok { color:#0a7a2d } .err { color:#b00020 }
+  </style>
+
+  <header>
+    <h1 style="margin:0;">Snapassist</h1>
+    <span id="who" class="muted">Not signed in</span>
+    <div style="margin-left:auto;">
+      <button id="btnSignIn">Sign in with Google</button>
+      <button id="btnSignOut" style="display:none;">Sign out</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <h3>Config & Status</h3>
+    <div id="status" class="muted">Checking…</div>
+  </section>
+
+  <section class="card">
+    <h3>Devices</h3>
+    <div class="row">
+      <select id="deviceSelect" class="disabled"></select>
+      <button id="refreshDevices" class="disabled">Refresh</button>
+    </div>
+    <small>Devices are read from <code>Firestore /devices</code>. Android writes its FCM token here.</small>
+  </section>
+
+  <section class="card">
+    <h3>Commands</h3>
+    <div class="row" style="margin-bottom:.5rem;">
+      <button id="btnSnap" class="disabled">SNAP</button>
+      <input id="pkg" placeholder="com.whatsapp" />
+      <button id="btnLaunch" class="disabled">LAUNCH</button>
+      <button id="btnList" class="disabled">LIST_APPS</button>
+    </div>
+    <small>Sign in with an authorized email; at least one device doc must exist in Firestore.</small>
+  </section>
+
+  <section class="card">
+    <h3>Status & Logs</h3>
+    <div id="log">Ready.</div>
+    <h4>Latest App Report</h4>
+    <pre id="report" style="background:#fbfbfb; border:1px solid #eee; border-radius:.6rem; padding:1rem;"></pre>
+  </section>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+      getRedirectResult, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import {
+      getFirestore, collection, getDocs, doc, getDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import {
+      getFunctions, httpsCallable
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-functions.js";
+
+    // 🔑 PASTE YOUR REAL CONFIG HERE
+    const firebaseConfig = {
+      apiKey: "AIzaSyB2vGBCPf_oNo47zpnyd_nTunSq-pQ-Q4E",
+      authDomain: "snapassist-c2ef8.firebaseapp.com",
+      projectId: "snapassist-c2ef8",
+      storageBucket: "snapassist-c2ef8.firebasestorage.app",
+      messagingSenderId: "653668871387",
+      appId: "1:653668871387:web:904e13b3db2d0a86c6b0fe",
+      measurementId: "G-J9V82ERFJ8"
+    };
+
+    function assertConfig(cfg){
+      const req = ["apiKey","authDomain","projectId","storageBucket","messagingSenderId","appId"];
+      req.forEach(k => { if (!cfg[k]) throw new Error("Missing "+k+" in firebaseConfig"); });
+    }
+
+    const el = (id)=>document.getElementById(id);
+    const log = (msg, cls="") => {
+      const l = el("log"); const line = document.createElement("div");
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      if (cls) line.className = cls; l.appendChild(line);
+    };
+    const enable = (...nodes)=>nodes.forEach(n=>n.classList.remove("disabled"));
+    const disable = (...nodes)=>nodes.forEach(n=>n.classList.add("disabled"));
+
+    try {
+      assertConfig(firebaseConfig);
+      el("status").textContent = "Initializing Firebase…";
+    } catch (e) {
+      el("status").innerHTML = "❌ Firebase config missing. Paste your config into <code>firebaseConfig</code>.";
+      log(e.message, "err");
+      throw e;
+    }
+
+    // Init SDKs
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    // If your functions are NOT us-central1, set REGION (e.g., "asia-south1")
+    const REGION = undefined;
+    const fx = REGION ? getFunctions(app, REGION) : getFunctions(app);
+
+    el("status").textContent = "✅ Firebase initialized.";
+
+    // Auth UI
+    const provider = new GoogleAuthProvider();
+    el("btnSignIn").onclick = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+        log("Signed in (popup).", "ok");
+      } catch (e) {
+        if (String(e.code||"").includes("popup-blocked")) {
+          log("Popup blocked → redirect fallback…");
+          await signInWithRedirect(auth, provider);
+        } else {
+          log("Sign-in error: " + e.message, "err");
+        }
+      }
+    };
+    el("btnSignOut").onclick = async () => { await signOut(auth); };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        el("who").textContent = `Signed in as ${user.email}`;
+        el("btnSignIn").style.display="none"; el("btnSignOut").style.display="";
+        enable(el("refreshDevices"));
+        await loadDevices();
+        enable(el("btnSnap"), el("btnLaunch"), el("btnList"));
+        log("Auth OK. If calls still fail, confirm your email is whitelisted in Functions.", "ok");
+      } else {
+        el("who").textContent = "Not signed in";
+        el("btnSignIn").style.display=""; el("btnSignOut").style.display="none";
+        disable(el("deviceSelect"), el("refreshDevices"), el("btnSnap"), el("btnLaunch"), el("btnList"));
+      }
+    });
+
+    try { const rr = await getRedirectResult(auth); if (rr?.user) log("Signed in (redirect).", "ok"); } catch {}
+
+    // Devices + commands
+    async function loadDevices(){
+      try {
+        const snap = await getDocs(collection(db, "devices"));
+        const sel = el("deviceSelect"); sel.innerHTML = "";
+        snap.forEach(d => {
+          const opt = document.createElement("option"); opt.value = d.id; opt.textContent = d.id;
+          sel.appendChild(opt);
+        });
+        if (sel.options.length === 0) {
+          disable(sel);
+          log("No devices found in Firestore /devices. Ensure Android wrote token to /devices/primary.", "err");
+        } else {
+          enable(sel);
+          log(`Loaded ${sel.options.length} device(s).", "ok");
+        }
+      } catch (e) {
+        log("Failed to load devices: " + e.message, "err");
+      }
+    }
+    el("refreshDevices").onclick = loadDevices;
+
+    const sendSnap = httpsCallable(fx, "sendSnap");
+    const sendLaunch = httpsCallable(fx, "sendLaunch");
+    const requestAppReport = httpsCallable(fx, "requestAppReport");
+
+    function currentDevice() {
+      const v = el("deviceSelect").value;
+      return v && v.length ? v : "primary";
+    }
+
+    el("btnSnap").onclick = async () => {
+      try { await sendSnap({ deviceId: currentDevice() }); log("SNAP sent.", "ok"); }
+      catch(e){ log(`SNAP failed: ${e.message}`, "err"); }
+    };
+
+    el("btnLaunch").onclick = async () => {
+      const pkg = el("pkg").value.trim();
+      if (!pkg) return log("Enter a package (e.g., com.whatsapp).", "err");
+      try { await sendLaunch({ deviceId: currentDevice(), pkg }); log("LAUNCH sent.", "ok"); }
+      catch(e){ log(`LAUNCH failed: ${e.message}`, "err"); }
+    };
+
+    el("btnList").onclick = async () => {
+      try {
+        await requestAppReport({ deviceId: currentDevice() }); log("LIST_APPS requested.", "ok");
+        setTimeout(()=>renderReport(currentDevice()), 1500);
+      } catch(e){ log(`LIST_APPS failed: ${e.message}`, "err"); }
+    };
+
+    async function renderReport(id){
+      try {
+        const res = await getDoc(doc(db, `devices/${id}/reports/installed`));
+        document.getElementById("report").textContent = res.exists()
+          ? JSON.stringify(res.data(), null, 2)
+          : "(no report yet)";
+      } catch (e) { log("Report read failed: " + e.message, "err"); }
+    }
+  </script>
+</html>
+            try {
+                log(`Sending SNAP command to ${deviceId}...`);
+                await sendSnap({ deviceId });
+                log(`📸 SNAP sent to ${deviceId}`, "ok");
+            } catch (e) {
+                log(`SNAP failed: ${e.message}`, "err");
+                if (e.code === "functions/unauthenticated") {
+                    log("Sign in with Google first", "err");
+                }
+            }
+        };
+
+        el("btnLaunch").onclick = async () => {
+            const deviceId = el("deviceSelect").value;
+            const pkg = el("pkg").value.trim();
+            
+            if (!deviceId) return log("Select a device first.", "err");
+            if (!pkg) return log("Enter a package name (e.g., com.whatsapp).", "err");
+            
+            try {
+                await sendLaunch({ deviceId, pkg });
+                log(`🚀 LAUNCH sent (${pkg}) to ${deviceId}`, "ok");
+            } catch (e) {
+                log(`LAUNCH failed: ${e.message}`, "err");
+            }
+        };
+
+        el("btnList").onclick = async () => {
+            const deviceId = el("deviceSelect").value;
+            if (!deviceId) return log("Select a device first.", "err");
+            
+            try {
+                await requestAppReport({ deviceId });
+                log(`📋 LIST_APPS requested for ${deviceId}`, "ok");
+                setTimeout(() => renderReport(deviceId), 1500);
+            } catch (e) {
+                log(`LIST_APPS failed: ${e.message}`, "err");
+            }
+        };
+
+        async function renderReport(id) {
+            try {
+                const res = await getDoc(doc(db, `devices/${id}/reports/installed`));
+                el("report").textContent = res.exists() ? 
+                    JSON.stringify(res.data(), null, 2) : 
+                    "(no report yet)";
+            } catch (error) {
+                log(`Error loading report: ${error.message}`, "err");
+            }
+        }
+
+        // Handle redirect fallback
+        if (auth) {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result?.user) {
+                    log(`Signed in via redirect: ${result.user.email}`, "ok");
+                }
+            } catch (e) {
+                log(`Redirect error: ${e.message}`, "err");
+            }
+        }
+
+        log("Dashboard loaded. Ready to connect.", "ok");
+        
+        // Debug info
+        log(`Firebase SDK version: 11.0.0`, "ok");
+        log(`Project ID: snapassist-c2ef8`, "ok");
+        if (!app) {
+            log("⚠️ Firebase not initialized - check console for errors", "err");
+        }
+    </script>
+</body>
+</html>

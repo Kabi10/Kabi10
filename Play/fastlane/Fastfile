@@ -1,0 +1,161 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#     https://docs.fastlane.tools/plugins/available-plugins
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Build debug APK"
+  lane :build_debug do
+    gradle(
+      task: "clean assembleDebug",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Build release APK"
+  lane :build_release do
+    gradle(
+      task: "clean assembleRelease",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Build release AAB (Android App Bundle)"
+  lane :build_aab do
+    gradle(
+      task: "clean bundleRelease",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Increment version code"
+  lane :increment_version do
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+  end
+
+  desc "Deploy to internal testing track"
+  lane :deploy_internal do
+    build_aab
+    upload_to_play_store(
+      track: 'internal',
+      aab: 'android/app/build/outputs/bundle/release/app-release.aab',
+      json_key: 'credentials/google-play-service-account.json',
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to alpha testing track"
+  lane :deploy_alpha do
+    build_aab
+    upload_to_play_store(
+      track: 'alpha',
+      aab: 'android/app/build/outputs/bundle/release/app-release.aab',
+      json_key: 'credentials/google-play-service-account.json',
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to beta testing track"
+  lane :deploy_beta do
+    build_aab
+    upload_to_play_store(
+      track: 'beta',
+      aab: 'android/app/build/outputs/bundle/release/app-release.aab',
+      json_key: 'credentials/google-play-service-account.json',
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to production with staged rollout"
+  lane :deploy_production do |options|
+    build_aab
+
+    rollout_percentage = options[:rollout] || 10
+
+    upload_to_play_store(
+      track: 'production',
+      rollout: rollout_percentage.to_s,
+      aab: 'android/app/build/outputs/bundle/release/app-release.aab',
+      json_key: 'credentials/google-play-service-account.json',
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Complete deployment pipeline with version increment"
+  lane :deploy_to_play_store do |options|
+    track = options[:track] || 'internal'
+    increment_version
+
+    case track
+    when 'internal'
+      deploy_internal
+    when 'alpha'
+      deploy_alpha
+    when 'beta'
+      deploy_beta
+    when 'production'
+      deploy_production(rollout: options[:rollout])
+    else
+      UI.error("Invalid track: #{track}. Use internal, alpha, beta, or production")
+    end
+
+    # Send notification
+    slack(
+      message: "Successfully deployed to #{track} track! 🚀",
+      channel: "#releases",
+      success: true
+    ) if ENV['SLACK_URL']
+  end
+
+  desc "Update metadata only"
+  lane :update_metadata do
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      json_key: 'credentials/google-play-service-account.json'
+    )
+  end
+
+  desc "Upload screenshots only"
+  lane :upload_screenshots do
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      json_key: 'credentials/google-play-service-account.json'
+    )
+  end
+
+  # Error handling
+  error do |lane, exception|
+    slack(
+      message: "Deployment failed in lane #{lane}: #{exception.message}",
+      channel: "#releases",
+      success: false
+    ) if ENV['SLACK_URL']
+  end
+end
