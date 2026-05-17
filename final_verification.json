@@ -1,0 +1,279 @@
+{
+  "no_readme": [],
+  "short_readme": [
+    {
+      "name": "ideas",
+      "size": 450
+    },
+    {
+      "name": "portfolio-management",
+      "size": 348
+    },
+    {
+      "name": "SL-Research",
+      "size": 467
+    },
+    {
+      "name": "jaffna-transit",
+      "size": 468
+    },
+    {
+      "name": "Project-Ideas",
+      "size": 412
+    },
+    {
+      "name": "Bananaviewer",
+      "size": 472
+    }
+  ],
+  "good_readme": [
+    {
+      "name": "Kabi10",
+      "size": 11863
+    },
+    {
+      "name": "Memory-Builder",
+      "size": 1504
+    },
+    {
+      "name": "Chembench",
+      "size": 761
+    },
+    {
+      "name": "Ai-Art-Forensics",
+      "size": 1778
+    },
+    {
+      "name": "Batchcard",
+      "size": 1487
+    },
+    {
+      "name": "Pathways",
+      "size": 1789
+    },
+    {
+      "name": "Organiverse",
+      "size": 1161
+    },
+    {
+      "name": "Opssuite",
+      "size": 1107
+    },
+    {
+      "name": "Poet",
+      "size": 1171
+    },
+    {
+      "name": "Hereticreader",
+      "size": 986
+    },
+    {
+      "name": "Crypto-Dashboard",
+      "size": 2698
+    },
+    {
+      "name": "Awakened",
+      "size": 718
+    },
+    {
+      "name": "Constellation",
+      "size": 823
+    },
+    {
+      "name": "Srilanka-Farmers-Marketplace",
+      "size": 14997
+    },
+    {
+      "name": "thara-bot",
+      "size": 3000
+    },
+    {
+      "name": "Play",
+      "size": 2552
+    },
+    {
+      "name": "Snapassist",
+      "size": 8469
+    },
+    {
+      "name": "sanctum",
+      "size": 5655
+    },
+    {
+      "name": "Replit-Kabi",
+      "size": 3772
+    },
+    {
+      "name": "Storyteller",
+      "size": 4728
+    },
+    {
+      "name": "Ai-Abstract-Art-Generator",
+      "size": 4577
+    },
+    {
+      "name": "NurseShiftpay",
+      "size": 19015
+    },
+    {
+      "name": "Herbal-Dispatch",
+      "size": 5885
+    },
+    {
+      "name": "Dreamweaver",
+      "size": 1532
+    },
+    {
+      "name": "ratemyemployer",
+      "size": 30406
+    },
+    {
+      "name": "Moodlens",
+      "size": 3292
+    },
+    {
+      "name": "What-Ifs",
+      "size": 903
+    },
+    {
+      "name": "Memoirstudio",
+      "size": 6150
+    },
+    {
+      "name": "fkill-cli",
+      "size": 1506
+    },
+    {
+      "name": "yarle",
+      "size": 18082
+    },
+    {
+      "name": "examples",
+      "size": 977
+    },
+    {
+      "name": "archestra",
+      "size": 7509
+    },
+    {
+      "name": "website",
+      "size": 1670
+    },
+    {
+      "name": "autorouting",
+      "size": 17670
+    },
+    {
+      "name": "coolify",
+      "size": 15171
+    },
+    {
+      "name": "circuit-json-to-tscircuit",
+      "size": 888
+    },
+    {
+      "name": "kicad-component-converter",
+      "size": 2483
+    },
+    {
+      "name": "highlight",
+      "size": 23525
+    },
+    {
+      "name": "cursor-rules",
+      "size": 1539
+    },
+    {
+      "name": "awesome-cursorrules",
+      "size": 36774
+    },
+    {
+      "name": "chorus",
+      "size": 6281
+    },
+    {
+      "name": "kaiview",
+      "size": 4601
+    },
+    {
+      "name": "ditwah",
+      "size": 3349
+    },
+    {
+      "name": "ecommerce",
+      "size": 6026
+    },
+    {
+      "name": "hmis",
+      "size": 2273
+    },
+    {
+      "name": "android-ai-apps-suite",
+      "size": 10599
+    },
+    {
+      "name": "QoderAI",
+      "size": 12325
+    },
+    {
+      "name": "kid-news-rewritten",
+      "size": 2146
+    },
+    {
+      "name": "My-Command-Centre",
+      "size": 13119
+    },
+    {
+      "name": "diy-toolkit-rural",
+      "size": 8413
+    },
+    {
+      "name": "augment-code-best-practices",
+      "size": 3897
+    },
+    {
+      "name": "nextjs-ai-chatbot",
+      "size": 5590
+    },
+    {
+      "name": "html-progression",
+      "size": 2201
+    },
+    {
+      "name": "Webscraper",
+      "size": 2631
+    },
+    {
+      "name": "Jaffna-Houses",
+      "size": 6629
+    },
+    {
+      "name": "stanford-rna-folding",
+      "size": 7791
+    },
+    {
+      "name": "github-photos-extractor",
+      "size": 8513
+    },
+    {
+      "name": "photo-album-summarizer",
+      "size": 1072
+    },
+    {
+      "name": "web-ui-for-browser-use",
+      "size": 9273
+    },
+    {
+      "name": "deepseek-conversation-platform",
+      "size": 10484
+    },
+    {
+      "name": "NightRise",
+      "size": 1684
+    },
+    {
+      "name": "automated-gallery",
+      "size": 4062
+    }
+  ]
+}
