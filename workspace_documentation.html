@@ -3194,30 +3194,152 @@ KaiView Pro (monorepo)
   <li><strong>Discovery:</strong> Users find one "Kabi AI Lab" app instead of hunting for niche prototypes.</li>
 </ul>
 
-<h3>4. TypeScript Prototypes (Consolidate or Archive)</h3>
-<div class="warning">
-  <strong>Warning:</strong> These are tiny (0–2 MB), remote-only TypeScript prototypes with minimal code. Keeping them as independent repos creates noise and maintenance burden.
+<h3>4. TypeScript Prototypes (Project-Ideas vs Standalone)</h3>
+<div class="recommendation">
+  <strong>Key Finding from Project-Ideas Audit:</strong> The <a href="https://github.com/Kabi10/Project-Ideas">Project-Ideas</a> repository contains a curated portfolio of 69 AI-powered project concepts. Many of the "unclear" TypeScript prototypes are actually <strong>working implementations</strong> of these concepts. Their value propositions are now documented via the Project-Ideas README cross-reference.
 </div>
 
+<h4>Project-Ideas Mapped Prototypes (Known Value Proposition)</h4>
+<p>These repos implement specific concepts from the Idea Vault. Their READMEs now reference the original concept descriptions.</p>
+
 <table>
-  <thead><tr><th>Repo</th><th>Size</th><th>Verdict</th></tr></thead>
+  <thead><tr><th>Repo</th><th>Project-Ideas Concept</th><th>Concept Description</th><th>Verdict</th></tr></thead>
   <tbody>
-    <tr><td><strong>Hereticreader</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive.</td></tr>
-    <tr><td><strong>Poet</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or merge with Storyteller as "Creative Writing Suite."</td></tr>
-    <tr><td><strong>Opssuite</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive if no active development.</td></tr>
-    <tr><td><strong>Constellation</strong></td><td>2.3 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — largest of the prototypes but still manageable.</td></tr>
-    <tr><td><strong>Ai-Art-Forensics</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — pairs naturally with Ai-Abstract-Art-Generator.</td></tr>
-    <tr><td><strong>Organiverse</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Archive or merge</span> — unclear value proposition.</td></tr>
-    <tr><td><strong>Pathways</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or merge with portfolio-management.</td></tr>
-    <tr><td><strong>Awakened</strong></td><td>1.0 MB</td><td><span class="badge badge-consolidate">Merge with Dreamweaver</span> — both are consciousness/sleep-adjacent. Could become a single "Mind" artifact.</td></tr>
-    <tr><td><strong>Chembench</strong></td><td>0 MB</td><td><span class="badge badge-archive">Archive</span> — empty repo.</td></tr>
-    <tr><td><strong>Batchcard</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive.</td></tr>
-    <tr><td><strong>Memory-Builder</strong></td><td>0 MB</td><td><span class="badge badge-archive">Archive</span> — empty repo.</td></tr>
-    <tr><td><strong>portfolio-management</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge with Pathways</span> or into Replit-Kabi as "Career Tools."</td></tr>
-    <tr><td><strong>Crypto-Dashboard</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or keep if crypto is a serious focus area.</td></tr>
-    <tr><td><strong>ideas</strong></td><td>0.1 MB</td><td><span class="badge badge-archive">Archive</span> — superseded by Project-Ideas and Replit-Kabi.</td></tr>
-    <tr><td><strong>jaffna-transit</strong></td><td>2.8 MB</td><td><span class="badge badge-keep">Keep Independent</span> — transportation is a distinct domain; could eventually merge with Agrimarket as a "Jaffna Community" super-app module, but premature now.</td></tr>
-    <tr><td><strong>SL-Research</strong></td><td>0.8 MB</td><td><span class="badge badge-keep">Keep Independent</span> — research documentation and HTML reports. Could merge with Jaffna-Houses if both are Sri Lankan social good projects.</td></tr>
+    <tr>
+      <td><strong>What-Ifs</strong></td>
+      <td>"What Ifs"</td>
+      <td>AI explorer of hypothetical questions with Foresight Engine for predictive simulation of real decisions across multiple timelines.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — already there as an artifact.</td>
+    </tr>
+    <tr>
+      <td><strong>Poet</strong></td>
+      <td>"AI Poet Laureate"</td>
+      <td>Living poetry platform generating original verses in any form (Haiku, Sonnet, Villanelle) inspired by real poets (Dickinson to Neruda), with personal anthology and community gallery.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — natural creative writing module.</td>
+    </tr>
+    <tr>
+      <td><strong>Ai-Art-Forensics</strong></td>
+      <td>"AI Art Forensics"</td>
+      <td>Art authentication and provenance tool using AI Vision for style analysis, forgery detection, image restoration, and museum API cross-referencing.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — pairs with Ai-Abstract-Art-Generator.</td>
+    </tr>
+    <tr>
+      <td><strong>Memory-Builder</strong></td>
+      <td>"MemoryAI"</td>
+      <td>AI photo intelligence: best-shot finder, social auto-edit, event album builder from 200+ photos, and social wishes collector into keepsake books.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — rich media + AI analysis module.</td>
+    </tr>
+    <tr>
+      <td><strong>Dreamweaver</strong></td>
+      <td>"DreamMind"</td>
+      <td>AI dream journaling with emotional pattern analysis, therapeutic artwork generation, lucid dreaming toolkit, and wearable sleep correlation.</td>
+      <td><span class="badge badge-consolidate">Merge with NightRise</span> — both are sleep/wellness adjacent, but Moodlens should remain independent due to mental health sensitivity.</td>
+    </tr>
+    <tr>
+      <td><strong>Storyteller</strong></td>
+      <td>"StoryForge"</td>
+      <td>AI creative studio for personalized fiction with character builder, chapter-by-chapter mode, visual narrative illustrations, and abstract art generation.</td>
+      <td><span class="badge badge-consolidate">Already in Replit-Kabi</span> — shares infrastructure with Ai-Abstract-Art-Generator.</td>
+    </tr>
+    <tr>
+      <td><strong>Ai-Abstract-Art-Generator</strong></td>
+      <td>"StoryForge" (sub-module)</td>
+      <td>Abstract art generator translating concepts and emotions into visual art — originally a sub-feature of StoryForge.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — shares exact same architecture.</td>
+    </tr>
+    <tr>
+      <td><strong>Memoirstudio</strong></td>
+      <td>"Chronicle AI"</td>
+      <td>AI life documenter and ghostwriter — voice/text capture transformed into polished memoir entries, with searchable archive and collaborative family history.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — shares pnpm workspace stack.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Standalone Prototypes (No Project-Ideas Mapping — Truly Unclear)</h4>
+<p>These repos do not map to any concept in the Project-Ideas portfolio. They are standalone experiments with no documented value proposition.</p>
+
+<table>
+  <thead><tr><th>Repo</th><th>Size</th><th>Assessment</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Hereticreader</strong></td>
+      <td>0.2 MB</td>
+      <td>Academic reading companion with Desk, Library, Manuscript, Session, Settings pages. Has some structure but no clear differentiation from existing reading apps.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive.</td>
+    </tr>
+    <tr>
+      <td><strong>Opssuite</strong></td>
+      <td>0.2 MB</td>
+      <td>Operations dashboard with batches, events, samples. Generic admin-panel pattern with no unique domain.</td>
+      <td><span class="badge badge-archive">Archive</span> — no Project-Ideas concept; generic CRUD app.</td>
+    </tr>
+    <tr>
+      <td><strong>Constellation</strong></td>
+      <td>2.3 MB</td>
+      <td>Largest of the unmapped prototypes. Sky/constellation viewer with SkyView page. Some visual potential but no documented concept.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — could become an educational module.</td>
+    </tr>
+    <tr>
+      <td><strong>Organiverse</strong></td>
+      <td>0.2 MB</td>
+      <td>Chat + scenario simulation with ChatPage, ScenarioPage, PermalinkPage. Unclear what "Organiverse" means as a product.</td>
+      <td><span class="badge badge-archive">Archive</span> — no Project-Ideas concept; value proposition unclear.</td>
+    </tr>
+    <tr>
+      <td><strong>Pathways</strong></td>
+      <td>0.2 MB</td>
+      <td>Workflow/pathway system with authorities, dependencies, documents, people, requirements, templates, timeline. Could be a project management tool but no concept docs.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or merge with portfolio-management as "Career Tools."</td>
+    </tr>
+    <tr>
+      <td><strong>Awakened</strong></td>
+      <td>1.0 MB</td>
+      <td>Consciousness tracking. Empty pages — no clear features implemented. Likely an abandoned early experiment.</td>
+      <td><span class="badge badge-archive">Archive</span> — superseded by Dreamweaver (DreamMind concept).</td>
+    </tr>
+    <tr>
+      <td><strong>Chembench</strong></td>
+      <td>0 MB</td>
+      <td>Empty repo — no files beyond a Bench page placeholder.</td>
+      <td><span class="badge badge-archive">Archive</span> — empty repository.</td>
+    </tr>
+    <tr>
+      <td><strong>Batchcard</strong></td>
+      <td>0.2 MB</td>
+      <td>Batch processing card system with batches, entries, signatures, stages, audit trail. Has some real structure but no Project-Ideas concept mapping.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — generic workflow module.</td>
+    </tr>
+    <tr>
+      <td><strong>portfolio-management</strong></td>
+      <td>0.2 MB</td>
+      <td>Career docs and templates — not a software project, more of a document repository (resume templates, strategic guides, reference materials).</td>
+      <td><span class="badge badge-archive">Archive</span> — this is content, not code. Move documents to <strong>Kabi10</strong> profile repo.</td>
+    </tr>
+    <tr>
+      <td><strong>Crypto-Dashboard</strong></td>
+      <td>0.2 MB</td>
+      <td>Real-time crypto tracking with React, Tailwind, WebSocket, and interactive charts. Has actual functionality — not a prototype, a small utility app.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — functional utility with real use case. Could be expanded.</td>
+    </tr>
+    <tr>
+      <td><strong>ideas</strong></td>
+      <td>0.1 MB</td>
+      <td>Superseded by Project-Ideas (the actual idea vault repo).</td>
+      <td><span class="badge badge-archive">Archive</span> — replaced by Project-Ideas.</td>
+    </tr>
+    <tr>
+      <td><strong>jaffna-transit</strong></td>
+      <td>2.8 MB</td>
+      <td>Real-time bus tracking for Jaffna with Express backend. Has 1,900+ files — a real project, not a prototype.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — transportation is a distinct domain from Agrimarket.</td>
+    </tr>
+    <tr>
+      <td><strong>SL-Research</strong></td>
+      <td>0.8 MB</td>
+      <td>Research documentation and HTML reports for Sri Lanka-focused projects.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — data repository, not an app. Could merge with Jaffna-Houses as "Sri Lanka Social Good Data."</td>
+    </tr>
   </tbody>
 </table>
 
