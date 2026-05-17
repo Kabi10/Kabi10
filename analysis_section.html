@@ -1,0 +1,308 @@
+
+<!-- ============================================================ -->
+<!-- SECTION: REPO ANALYSIS & STRATEGIC ASSESSMENT -->
+<!-- ============================================================ -->
+
+<section id="sec-repo-analysis">
+<h2>Repository Analysis & Strategic Assessment</h2>
+<p class="source-note">Generated 2026-05-17. Covers all 71 Kabi10 repositories after README generation and new repo creation.</p>
+
+<h3>Executive Summary</h3>
+<table>
+  <thead><tr><th>Category</th><th>Count</th><th>Avg Size</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>Production Android Apps</td><td>5</td><td>95 MB</td><td><span class="badge badge-production">Keep Independent</span></td></tr>
+    <tr><td>Production Web Platforms</td><td>4</td><td>12 MB</td><td><span class="badge badge-production">Keep Independent</span></td></tr>
+    <tr><td>AI/ML Tools & Pipelines</td><td>6</td><td>18 MB</td><td><span class="badge badge-consolidate">Consolidate Hub</span></td></tr>
+    <tr><td>TypeScript Prototypes (0–2 MB)</td><td>16</td><td>0.5 MB</td><td><span class="badge badge-consolidate">Consolidate</span></td></tr>
+    <tr><td>Forks (Open Source Contributions)</td><td>12</td><td>180 MB</td><td><span class="badge badge-keep">Keep as Forks</span></td></tr>
+    <tr><td>Local-First Developer Tools</td><td>3</td><td>8 MB</td><td><span class="badge badge-keep">Keep Independent</span></td></tr>
+    <tr><td>Social Good / Crisis Response</td><td>3</td><td>15 MB</td><td><span class="badge badge-keep">Keep Independent</span></td></tr>
+    <tr><td>Profile / Portfolio / Docs</td><td>4</td><td>0.1 MB</td><td><span class="badge badge-archive">Archive or Merge</span></td></tr>
+  </tbody>
+</table>
+
+<h3>1. Production Android Apps (Stand-Alone Mobile Recommended)</h3>
+<div class="recommendation">
+  <strong>Recommendation:</strong> These are mature, high-complexity Android applications with Firebase backends, unique branding, and distinct user bases. Each should remain a <strong>standalone mobile app</strong>. Do not consolidate.
+</div>
+
+<table>
+  <thead><tr><th>Repo</th><th>Size</th><th>Stack</th><th>User Base</th><th>Mobile Suitability</th><th>Consolidation Risk</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Agrimarket</strong> / Srilanka-Farmers-Marketplace</td>
+      <td>156 MB</td>
+      <td>Kotlin + Jetpack Compose, Node.js backend, Supabase</td>
+      <td>Sri Lankan farmers (trilingual)</td>
+      <td><span class="badge badge-production">Perfect Standalone</span></td>
+      <td>High — trilingual UI, offline-first Room DB, OTP auth, and agricultural domain logic are not portable to other apps.</td>
+    </tr>
+    <tr>
+      <td><strong>NurseShiftPay</strong></td>
+      <td>103 MB</td>
+      <td>Kotlin</td>
+      <td>Nurses (shift scheduling + pay tracking)</td>
+      <td><span class="badge badge-production">Perfect Standalone</span></td>
+      <td>High — healthcare scheduling logic, pay calculation rules, and compliance requirements are domain-specific.</td>
+    </tr>
+    <tr>
+      <td><strong>Moodlens</strong></td>
+      <td>157 MB</td>
+      <td>Kotlin</td>
+      <td>Mental health / mood tracking users</td>
+      <td><span class="badge badge-production">Perfect Standalone</span></td>
+      <td>High — mood data is sensitive; combining with other apps would violate privacy expectations and complicate data isolation.</td>
+    </tr>
+    <tr>
+      <td><strong>diy-toolkit-rural</strong></td>
+      <td>0.2 MB</td>
+      <td>Kotlin</td>
+      <td>Rural communities (offline DIY)</td>
+      <td><span class="badge badge-production">Perfect Standalone</span></td>
+      <td>Medium — small app, but offline-first architecture and rural focus make it distinct. Could become a module inside a "Sri Lanka Community Toolkit" super-app, but only if that app exists.</td>
+    </tr>
+    <tr>
+      <td><strong>Snapassist</strong></td>
+      <td>2 MB</td>
+      <td>Kotlin + Firebase</td>
+      <td>General Android users</td>
+      <td><span class="badge badge-production">Stand-Alone or Module</span></td>
+      <td>Medium — camera service, app visibility, and FCM are generic enough to be modules, but the app has its own Firebase project and deployment pipeline. Keeping independent is safer.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>Detailed Analysis: Agrimarket</h4>
+<p>Agrimarket is the crown jewel of the Android portfolio. At 156 MB and 258+ unit tests, it represents a production-grade agricultural marketplace. The offline-first Room architecture, trilingual support (Tamil/Sinhala/English), and OTP-based Sri Lankan phone auth make it impossible to fold into another app without massive refactoring. <strong>Verdict: definitive standalone mobile app.</strong></p>
+
+<h4>Detailed Analysis: Moodlens</h4>
+<p>Moodlens is the largest repo by disk usage (157 MB), suggesting significant media assets or ML models. The mental health domain requires careful data handling and a focused UX. <strong>Verdict: standalone only. Never consolidate with commercial or social apps.</strong></p>
+
+<h3>2. Production Web Platforms (Keep Independent)</h3>
+<div class="recommendation">
+  <strong>Recommendation:</strong> These are full-stack web applications with distinct backends, databases, and user authentication. They should remain independent web platforms. Some could spin out mobile apps later, but consolidation now would create backend coupling.
+</div>
+
+<table>
+  <thead><tr><th>Repo</th><th>Stack</th><th>Domain</th><th>Mobile Suitability</th><th>Consolidation Target</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>ratemyemployer</strong></td>
+      <td>Next.js + Supabase + TypeScript</td>
+      <td>Employer reviews + AI insights</td>
+      <td>Mobile web is sufficient; native app unnecessary</td>
+      <td>None. Could merge with <code>ecommerce</code> if building a "career + commerce" platform, but no synergy.</td>
+    </tr>
+    <tr>
+      <td><strong>ecommerce</strong></td>
+      <td>Next.js + Prisma + PostgreSQL + Stripe</td>
+      <td>E-commerce with multi-source aggregation</td>
+      <td>Mobile web sufficient; consider PWA before native</td>
+      <td>None. Could absorb <code>automated-gallery</code> as a product image gallery module.</td>
+    </tr>
+    <tr>
+      <td><strong>chorus</strong></td>
+      <td>Python FastAPI + Playwright + D3.js</td>
+      <td>Multi-AI consultation tool</td>
+      <td>Local-first desktop/web; mobile would be secondary</td>
+      <td><strong>kaiview</strong> — both are local-first developer dashboards. Chorus adds multi-AI research; KaiView adds project management. A "developer OS" monorepo makes sense.</td>
+    </tr>
+    <tr>
+      <td><strong>kaiview</strong></td>
+      <td>Python FastAPI + aiosqlite + Vanilla JS</td>
+      <td>AI-powered developer OS dashboard</td>
+      <td>Desktop-first; mobile is a nice-to-have</td>
+      <td><strong>chorus</strong> — see above. The two share FastAPI, SQLite, and local-first philosophy. Consolidating into a single Python monorepo would reduce maintenance overhead.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>3. AI/ML Tools & Pipelines (Consolidate into a Hub)</h3>
+<div class="recommendation">
+  <strong>Recommendation:</strong> These are experimental or utility AI projects. Most are TypeScript prototypes with 0–2 MB of code. They share common infrastructure (OpenAI, Replit, pnpm workspaces) and should be consolidated into a single "AI Lab" monorepo.
+</div>
+
+<table>
+  <thead><tr><th>Repo</th><th>Type</th><th>Consolidation Verdict</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Replit-Kabi</strong></td><td>Workspace hub (API server, what-ifs, project-ideas)</td><td><span class="badge badge-consolidate">Keep as Hub</span> — this IS the consolidation target.</td></tr>
+    <tr><td><strong>Ai-Abstract-Art-Generator</strong></td><td>AI art generation (React + Express)</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — shares pnpm workspace pattern, OpenAI integration, and Replit environment.</td></tr>
+    <tr><td><strong>Storyteller</strong></td><td>AI fiction writing (React + Express)</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — identical architecture to Ai-Abstract-Art-Generator. Could share the same API server with different frontend artifacts.</td></tr>
+    <tr><td><strong>What-Ifs</strong></td><td>AI hypothetical question explorer</td><td><span class="badge badge-consolidate">Already in Replit-Kabi</span> — maintain there.</td></tr>
+    <tr><td><strong>Memoirstudio</strong></td><td>AI ghostwriting / memoir platform</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — same pnpm workspace stack. Could become an artifact in the hub.</td></tr>
+    <tr><td><strong>Dreamweaver</strong></td><td>Dream journaling + AI analysis</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — successor to dream-weaver-ai; small enough to port.</td></tr>
+  </tbody>
+</table>
+
+<h4>Why Consolidate the AI Prototypes?</h4>
+<ul>
+  <li><strong>Shared Infrastructure:</strong> All use pnpm workspaces, Express 5, PostgreSQL + Drizzle, Zod, Orval, and OpenAI.</li>
+  <li><strong>Shared Code:</strong> lib/api-spec, lib/db, lib/api-client-react, and lib/api-zod are identical across projects.</li>
+  <li><strong>Deployment Efficiency:</strong> One Vercel project, one database, one CI/CD pipeline instead of N.</li>
+  <li><strong>Discovery:</strong> Users find one "Kabi AI Lab" app instead of hunting for niche prototypes.</li>
+</ul>
+
+<h3>4. TypeScript Prototypes (Consolidate or Archive)</h3>
+<div class="warning">
+  <strong>Warning:</strong> These are tiny (0–2 MB), remote-only TypeScript prototypes with minimal code. Keeping them as independent repos creates noise and maintenance burden.
+</div>
+
+<table>
+  <thead><tr><th>Repo</th><th>Size</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Hereticreader</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive.</td></tr>
+    <tr><td><strong>Poet</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or merge with Storyteller as "Creative Writing Suite."</td></tr>
+    <tr><td><strong>Opssuite</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive if no active development.</td></tr>
+    <tr><td><strong>Constellation</strong></td><td>2.3 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — largest of the prototypes but still manageable.</td></tr>
+    <tr><td><strong>Ai-Art-Forensics</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — pairs naturally with Ai-Abstract-Art-Generator.</td></tr>
+    <tr><td><strong>Organiverse</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Archive or merge</span> — unclear value proposition.</td></tr>
+    <tr><td><strong>Pathways</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or merge with portfolio-management.</td></tr>
+    <tr><td><strong>Awakened</strong></td><td>1.0 MB</td><td><span class="badge badge-consolidate">Merge with Dreamweaver</span> — both are consciousness/sleep-adjacent. Could become a single "Mind" artifact.</td></tr>
+    <tr><td><strong>Chembench</strong></td><td>0 MB</td><td><span class="badge badge-archive">Archive</span> — empty repo.</td></tr>
+    <tr><td><strong>Batchcard</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive.</td></tr>
+    <tr><td><strong>Memory-Builder</strong></td><td>0 MB</td><td><span class="badge badge-archive">Archive</span> — empty repo.</td></tr>
+    <tr><td><strong>portfolio-management</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge with Pathways</span> or into Replit-Kabi as "Career Tools."</td></tr>
+    <tr><td><strong>Crypto-Dashboard</strong></td><td>0.2 MB</td><td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or keep if crypto is a serious focus area.</td></tr>
+    <tr><td><strong>ideas</strong></td><td>0.1 MB</td><td><span class="badge badge-archive">Archive</span> — superseded by Project-Ideas and Replit-Kabi.</td></tr>
+    <tr><td><strong>jaffna-transit</strong></td><td>2.8 MB</td><td><span class="badge badge-keep">Keep Independent</span> — transportation is a distinct domain; could eventually merge with Agrimarket as a "Jaffna Community" super-app module, but premature now.</td></tr>
+    <tr><td><strong>SL-Research</strong></td><td>0.8 MB</td><td><span class="badge badge-keep">Keep Independent</span> — research documentation and HTML reports. Could merge with Jaffna-Houses if both are Sri Lankan social good projects.</td></tr>
+  </tbody>
+</table>
+
+<h3>5. Forks (Keep as Open Source Contributions)</h3>
+<div class="recommendation">
+  <strong>Recommendation:</strong> These are forks of major open-source projects. They serve as bounty/contribution workspaces. Do not archive, but also do not merge into personal projects.
+</div>
+
+<table>
+  <thead><tr><th>Repo</th><th>Upstream</th><th>Branch Focus</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><strong>archestra</strong></td><td>defremont/archestra</td><td>fix/mermaid-error-display</td><td>Enterprise AI platform contributions</td></tr>
+    <tr><td><strong>autorouting</strong></td><td>tscircuit/autorouting</td><td>fix/wild-trace-jumps</td><td>PCB autorouting algorithm contributions</td></tr>
+    <tr><td><strong>coolify</strong></td><td>coollabsio/coolify</td><td>fix/healthcheck-improvements</td><td>PaaS healthcheck improvements</td></tr>
+    <tr><td><strong>highlight</strong></td><td>highlight/highlight</td><td>main</td><td>Full-stack monitoring platform</td></tr>
+    <tr><td><strong>hmis</strong></td><td>Hospital-Management-System</td><td>main</td><td>Hospital info system (Java EE)</td></tr>
+    <tr><td><strong>fkill-cli</strong></td><td>sindresorhus/fkill-cli</td><td>feat/group-process-kill-all</td><td>Cross-platform process killer</td></tr>
+    <tr><td><strong>yarle</strong></td><td>akosbalasko/yarle</td><td>main</td><td>Evernote-to-Markdown converter</td></tr>
+    <tr><td><strong>awesome-cursorrules</strong></td><td>PatrickJS/awesome-cursorrules</td><td>main</td><td>Cursor AI rules collection</td></tr>
+    <tr><td><strong>examples</strong></td><td>archestra/examples</td><td>feat/openai-python-example</td><td>AI platform examples</td></tr>
+    <tr><td><strong>website</strong></td><td>tscircuit/website</td><td>main</td><td>Circuit design web platform</td></tr>
+    <tr><td><strong>circuit-json-to-tscircuit</strong></td><td>tscircuit/circuit-json-to-tscircuit</td><td>feat/courtyard-polygon-circle</td><td>Circuit JSON conversion</td></tr>
+    <tr><td><strong>kicad-component-converter</strong></td><td>tscircuit/kicad-component-converter</td><td>feat/courtyard-polygon-circle-tests</td><td>KiCad to Circuit JSON conversion</td></tr>
+  </tbody>
+</table>
+
+<h3>6. Local-First Developer Tools (Keep Independent)</h3>
+<table>
+  <thead><tr><th>Repo</th><th>Purpose</th><th>Mobile Suitability</th><th>Consolidation</th></tr></thead>
+  <tbody>
+    <tr><td><strong>cursor-rules</strong></td><td>Auto-detect stack and generate .cursorrules</td><td>Not applicable (CLI tool)</td><td>Could merge with <strong>kaiview</strong> as a "Generate Rules" action.</td></tr>
+    <tr><td><strong>My-Command-Centre</strong></td><td>Automation framework for open source contributions</td><td>Not applicable</td><td>Keep private; it is a personal productivity system.</td></tr>
+    <tr><td><strong>QoderAI</strong></td><td>Universal prompt generator for Qoder IDE</td><td>Not applicable</td><td>Could merge with <strong>cursor-rules</strong> as both are IDE productivity tools.</td></tr>
+  </tbody>
+</table>
+
+<h3>7. Social Good & Crisis Response (Keep Independent)</h3>
+<table>
+  <thead><tr><th>Repo</th><th>Domain</th><th>Mobile Suitability</th><th>Consolidation</th></tr></thead>
+  <tbody>
+    <tr><td><strong>ditwah</strong></td><td>Cyclone Ditwah missing persons registry</td><td>Web-first; mobile web sufficient</td><td>Keep independent — humanitarian projects must be isolated for security and clarity.</td></tr>
+    <tr><td><strong>Jaffna-Houses</strong></td><td>Housing data for Jaffna region</td><td>Data repository; no app needed</td><td>Could merge with <strong>SL-Research</strong> as "Sri Lanka Social Good Data."</td></tr>
+    <tr><td><strong>android-ai-apps-suite</strong></td><td>10 AI-powered Android apps</td><td><span class="badge badge-production">Perfect Standalone</span></td><td>Keep independent — this is a portfolio showcase and shared infrastructure module.</td></tr>
+  </tbody>
+</table>
+
+<h3>8. Profile / Portfolio / Docs (Archive or Merge)</h3>
+<table>
+  <thead><tr><th>Repo</th><th>Purpose</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Kabi10</strong></td><td>GitHub profile README</td><td><span class="badge badge-keep">Keep</span> — required for GitHub profile.</td></tr>
+    <tr><td><strong>augment-code-best-practices</strong></td><td>Best practices collection</td><td><span class="badge badge-archive">Archive</span> — content should live in <strong>Kabi10</strong> profile or <strong>Replit-Kabi</strong> docs.</td></tr>
+    <tr><td><strong>html-progression</strong></td><td>HTML learning examples</td><td><span class="badge badge-archive">Archive</span> — educational; can be a directory in <strong>Kabi10</strong> or a blog post.</td></tr>
+    <tr><td><strong>Webscraper</strong></td><td>Python web scraping toolkit</td><td><span class="badge badge-keep">Keep</span> — functional utility with real use cases. Could become a module in <strong>ratemyemployer</strong> or <strong>Replit-Kabi</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h3>9. Newly Created Repos (This Run)</h3>
+<table>
+  <thead><tr><th>Repo</th><th>Origin</th><th>Mobile Suitability</th><th>Strategic Notes</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>sanctum</strong></td>
+      <td>Local-only Telegram bot platform</td>
+      <td>Telegram is the platform; no native app needed</td>
+      <td>High-value project. Keep independent. Consider open-sourcing a stripped-down version (thara-bot) as a reference implementation while keeping sanctum private.</td>
+    </tr>
+    <tr>
+      <td><strong>Snapassist</strong></td>
+      <td>Local-only Android app</td>
+      <td><span class="badge badge-production">Perfect Standalone</span></td>
+      <td>Firebase backend, camera service, and app visibility tracking make it a distinct utility. Could be marketed as a productivity tool.</td>
+    </tr>
+    <tr>
+      <td><strong>Play</strong></td>
+      <td>Local-only publishing automation</td>
+      <td>Not applicable (automation tool)</td>
+      <td>Keep as a private tooling repo. The fastlane + Google Play API scripts are reusable across all Android projects.</td>
+    </tr>
+    <tr>
+      <td><strong>thara-bot</strong></td>
+      <td>Local-only Telegram bot prototype</td>
+      <td>Telegram is the platform</td>
+      <td>Educational value as the "minimum viable companion bot." Keep public or as an open-source sample linked from sanctum.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Mobile App Consolidation Matrix</h3>
+<p>This table summarizes which projects could be combined into a single mobile app and which must remain independent.</p>
+
+<table>
+  <thead><tr><th>Super-App Concept</th><th>Modules</th><th>Feasibility</th><th>Risk</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>"Jaffna Community"</strong></td>
+      <td>Agrimarket + jaffna-transit + diy-toolkit-rural</td>
+      <td>Medium</td>
+      <td>High — different backends (Supabase vs unknown), different auth systems, massive APK size.</td>
+    </tr>
+    <tr>
+      <td><strong>"Sri Lanka Social Good"</strong></td>
+      <td>ditwah + Jaffna-Houses + SL-Research</td>
+      <td>Low</td>
+      <td>Low — these are mostly data repositories, not interactive apps. A static site would suffice.</td>
+    </tr>
+    <tr>
+      <td><strong>"Kabi AI Lab"</strong></td>
+      <td>Replit-Kabi + Ai-Abstract-Art-Generator + Storyteller + Memoirstudio + Dreamweaver + Poet</td>
+      <td>High</td>
+      <td>Low — all share pnpm workspaces, Express 5, PostgreSQL, and OpenAI. One monorepo with multiple frontend artifacts is the correct architecture.</td>
+    </tr>
+    <tr>
+      <td><strong>"Mind & Sleep"</strong></td>
+      <td>Moodlens + NightRise + Awakened + Dreamweaver</td>
+      <td>Medium</td>
+      <td>High — Moodlens has sensitive mental health data; combining with sleep tracking could confuse users and regulators.</td>
+    </tr>
+    <tr>
+      <td><strong>"Career Toolkit"</strong></td>
+      <td>ratemyemployer + portfolio-management + QoderAI + Webscraper</td>
+      <td>Medium</td>
+      <td>Medium — different backends and auth. A unified career platform would require significant backend rework.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Final Strategic Recommendations</h3>
+<ol>
+  <li><strong>Immediate Consolidation (Low Risk):</strong> Merge Hereticreader, Poet, Opssuite, Batchcard, Organiverse, Pathways, Crypto-Dashboard, ideas, Chembench, and Memory-Builder into <strong>Replit-Kabi</strong> as sub-artifacts or archive them. This removes 10 low-value repos.</li>
+  <li><strong>Monorepo Formation (Medium Risk):</strong> Create a "Kabi AI Lab" monorepo containing Replit-Kabi, Ai-Abstract-Art-Generator, Storyteller, Memoirstudio, Dreamweaver, and What-Ifs. Use pnpm workspaces and a shared Express backend.</li>
+  <li><strong>Developer OS Merge (Medium Risk):</strong> Merge <strong>kaiview</strong> and <strong>chorus</strong> into a single Python FastAPI monorepo. They share the same stack and user base (developers).</li>
+  <li><strong>Android Portfolio (No Consolidation):</strong> Keep Agrimarket, NurseShiftPay, Moodlens, diy-toolkit-rural, Snapassist, and android-ai-apps-suite as independent apps. They serve different users and have distinct backends.</li>
+  <li><strong>Archive Candidates:</strong> Attachment-List, Ai-Ghost-Writing, dream-weaver-ai, augment-code-best-practices, html-progression. These are superseded, empty, or low-value.</li>
+  <li><strong>Fork Maintenance:</strong> Keep all 12 forks active as open-source contribution portfolios. They demonstrate real-world collaboration skills.</li>
+</ol>
+</section>
+
+<hr class="section-divider">
