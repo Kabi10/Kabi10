@@ -375,6 +375,18 @@ details[open] summary { margin-bottom: 0.5rem; }
     <tr><td><strong>diy-toolkit-rural</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\DIY toolkit rural</code></td><td>master</td><td>Dirty + path parsing issues (spaces in path)</td><td>Review manually; rename path if needed</td></tr>
     <tr><td><strong>ideas</strong> (&#8594; SL-Research) <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\tools\ideas</code></td><td>main</td><td>Uncommitted changes (maps to SL-Research remote)</td><td>Commit / stash changes</td></tr>
     <tr><td><strong>Kabi10</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev</code> (root)</td><td>master</td><td>Profile README repo; 7 commits ahead of remote</td><td>Push or reset to match remote</td></tr>
+    <tr><td><strong>batchcard</strong> <span class="tag tag-dirty">UNTRACKED</span></td><td><code>C:\Dev\batchcard</code></td><td>&#x2014;</td><td>New local Python project; not yet in git</td><td>Run <code>git init</code> inside batchcard/ or decide if it belongs in a monorepo</td></tr>
+    <tr><td><strong>Ai-Abstract-Art-Generator</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\Ai-Abstract-Art-Generator</code></td><td>main</td><td>Submodule dirty / uncommitted changes</td><td>Commit / stash changes</td></tr>
+    <tr><td><strong>Bounties</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\Bounties</code></td><td>master</td><td>21 unpushed handoff commits; .env.local in working tree</td><td>Push handoff commits; gitignore .env.local</td></tr>
+    <tr><td><strong>Moodlens</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\Moodlens</code></td><td>master</td><td>69 dirty files; keystores and Firebase secrets in working tree</td><td>CRITICAL: gitignore secrets before any commit</td></tr>
+    <tr><td><strong>NurseShiftPay</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\NurseShiftPay</code></td><td>master</td><td>Keystores + Play Store certificate in working tree</td><td>CRITICAL: move keystores out of repo immediately</td></tr>
+    <tr><td><strong>Replit-Kabi</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\Replit-Kabi</code></td><td>master</td><td>Uncommitted changes</td><td>Commit / stash changes</td></tr>
+    <tr><td><strong>SL/Missing Persons/ditwah</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\SL\Missing Persons\ditwah</code></td><td>master</td><td>Uncommitted changes</td><td>Commit / stash changes</td></tr>
+    <tr><td><strong>Storyteller</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\Storyteller</code></td><td>master</td><td>Uncommitted changes</td><td>Commit / stash changes</td></tr>
+    <tr><td><strong>sanctum</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\sanctum</code></td><td>master</td><td>.env in working tree (bot tokens), 2 unpushed commits; README.md modified</td><td>gitignore .env; rotate exposed tokens; commit README</td></tr>
+    <tr><td><strong>projects/web-applications/Qoder Ai</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\projects\web-applications\Qoder Ai</code></td><td>master</td><td>Uncommitted changes</td><td>Commit / stash changes</td></tr>
+    <tr><td><strong>projects/web-applications/ecommerce</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\projects\web-applications\ecommerce</code></td><td>master</td><td>Uncommitted changes</td><td>Commit / stash changes</td></tr>
+    <tr><td><strong>projects/web-applications/rate-my-employer</strong> <span class="tag tag-dirty">DIRTY</span></td><td><code>C:\Dev\projects\web-applications\rate-my-employer</code></td><td>master</td><td>Uncommitted changes</td><td>Commit / stash changes</td></tr>
   </tbody>
 </table>
 
@@ -383,7 +395,7 @@ details[open] summary { margin-bottom: 0.5rem; }
   <thead><tr><th>Action</th><th>Repos</th><th>Notes</th></tr></thead>
   <tbody>
     <tr><td><span class="badge badge-keep">Keep Independent</span></td><td>Production apps, large projects, forks, and the profile repo.</td><td>Agrimarket, NurseShiftPay, Moodlens, ratemyemployer, Herbal-Dispatch, stanford-rna-folding, Jaffna-Houses, archestra, autorouting, coolify, examples, fkill-cli, highlight, hmis, kicad-component-converter, website, yarle, awesome-cursorrules, circuit-json-to-tscircuit, circuit-to-svg, tscircuit-autorouter, eslint-plugin-unicorn, Trilium, Kabi10</td></tr>
-    <tr><td><span class="badge badge-consolidate">Consolidate into Hub</span></td><td>Top 5 safest: <strong>Hereticreader, Poet, Opssuite, Ai-Art-Forensics, Organiverse</strong></td><td>All are remote-only, 0 MB, TypeScript. Merge into <code>Replit-Kabi</code> or a new dedicated hub repo.</td></tr>
+    <tr><td><span class="badge badge-consolidate">Consolidate into Hub</span></td><td><strong>Poet, Ai-Art-Forensics, Ai-Abstract-Art-Generator, Storyteller, Memoirstudio, Dreamweaver, What-Ifs, Opssuite, Organiverse</strong></td><td>Creative AI tools and pnpm workspace prototypes. Merge into <code>Replit-Kabi</code> as frontend artifacts.</td></tr>
     <tr><td><span class="badge badge-archive">Archive Duplicate</span></td><td><strong>Ai-Ghost-Writing</strong>, <strong>dream-weaver-ai</strong></td><td>Verify successors (Memoirstudio, Dreamweaver) contain all important content first.</td></tr>
     <tr><td><span class="badge badge-blocked">Resolve Local Work</span></td><td><strong>Bananaviewer, cursor-rules, diy-toolkit-rural, ideas, Kabi10, Agrimarket</strong></td><td>Commit, stash, or push local changes before any consolidation steps.</td></tr>
     <tr><td><span class="badge badge-prototype">Investigate</span></td><td><strong>rules</strong> (local only, no remote)</td><td>Verify if this is a new project or should be linked to an existing remote.</td></tr>
@@ -459,6 +471,8 @@ details[open] summary { margin-bottom: 0.5rem; }
     <tr><td><strong>sanctum</strong></td><td><span class="badge badge-production">HIGH</span></td><td><code>.env</code> in working tree (contains bot tokens), 2 unpushed commits</td></tr>
     <tr><td><strong>Bounties</strong></td><td><span class="badge badge-archive">MEDIUM</span></td><td><code>.env.local</code> in working tree, <code>.aider.chat.history.md</code> (may contain prompts)</td></tr>
     <tr><td><strong>C:/Dev root</strong></td><td><span class="badge badge-archive">MEDIUM</span></td><td><code>.env</code> file at workspace root</td></tr>
+    <tr><td><strong>batchcard</strong></td><td><span class="badge badge-archive">LOW</span></td><td>Untracked local Python project; <code>batchcard.db</code> (SQLite) in working tree. No <code>.env</code> found, but verify no hardcoded secrets in <code>database.py</code> or <code>main.py</code> before first commit.</td></tr>
+    <tr><td><strong>sanctum</strong></td><td><span class="badge badge-production">HIGH</span></td><td><code>.env</code> in working tree (contains bot tokens), 2 unpushed commits; <code>README.md</code> modified but uncommitted. Add <code>.env</code> to <code>.gitignore</code> immediately. Rotate any exposed Telegram bot tokens.</td></tr>
   </tbody>
 </table>
 
@@ -513,8 +527,9 @@ details[open] summary { margin-bottom: 0.5rem; }
   <strong>Hub recommendation:</strong> Use <code>kaiview</code> as the technical base (it already has the cleanest backend/frontend split and SQLite schema). Rename the monorepo to something new later if desired. <strong>Do NOT use Replit-Kabi or Project-Ideas as the hub</strong> &#x2014; they are meta-workspaces with no application architecture.
 </div>
 
-<h4>Group 5: Replit Creative AI Exports — NO-GO for consolidation. Archive candidates.</h4>
-<p><strong>What-Ifs, Memoirstudio, Ai-Abstract-Art-Generator, Storyteller, Poet, Hereticreader, Opssuite, Batchcard, Organiverse, Pathways, Awakened, Dreamweaver, Constellation</strong> &#x2014; Archive. Empty shells (200&#x2013;600 KB, mostly lockfiles). No application logic. No stars. Saturated market.</p>
+<h4>Group 5: Replit Creative AI Exports — MIXED. Some are archive candidates; others have real implementation.</h4>
+<p><strong>What-Ifs, Memoirstudio, Ai-Abstract-Art-Generator, Storyteller, Poet, Dreamweaver</strong> &#x2014; Consolidate into Replit-Kabi. These are creative AI tools with clear Project-Ideas mappings.</p>
+<p><strong>Hereticreader, Organiverse, Pathways, Opssuite, Batchcard, Constellation, Awakened, Chembench</strong> &#x2014; <span style="color:#58a6ff;font-weight:bold;">REASSESSED after deep code audit.</span> These repos contain substantial frontend applications with real page structures, state management, and domain-specific logic. They are NOT empty shells. Verdicts updated in Section 4 below.</p>
 <p><strong>Project-Ideas</strong> &#x2014; Archive or Keep. Slightly more substance (build-prompt launcher), but still a Replit export.</p>
 
 <h4>Group 6: Android / Mobile Learning — GO for internal suite consolidation, NO-GO for hub merge</h4>
@@ -582,7 +597,8 @@ details[open] summary { margin-bottom: 0.5rem; }
     <tr><td><strong>Moodlens keystore + Firebase Admin SDK in working tree</strong></td><td><span class="badge badge-blocked">CRITICAL</span></td><td>Immediately <code>gitignore</code> <code>*.keystore</code>, <code>*.jks</code>, <code>google-services.json</code>, <code>firebase-adminsdk-*.json</code>, <code>.env*</code>. Do NOT run <code>git add .</code> in this repo.</td></tr>
     <tr><td><strong>NurseShiftPay keystores in working tree</strong></td><td><span class="badge badge-blocked">CRITICAL</span></td><td>Same as above. These are Play Store signing keys. If committed, the app signing identity is permanently compromised.</td></tr>
     <tr><td><strong>Agrimarket <code>backend/.env.prod</code> untracked</strong></td><td><span class="badge badge-production">HIGH</span></td><td>Add to <code>.gitignore</code>. Verify no secrets were committed in earlier history.</td></tr>
-    <tr><td><strong>sanctum <code>.env</code> with bot tokens</strong></td><td><span class="badge badge-production">HIGH</span></td><td>Add <code>.env</code> to <code>.gitignore</code> immediately. Rotate any exposed Telegram bot tokens.</td></tr>
+    <tr><td><strong>sanctum <code>.env</code> with bot tokens</strong></td><td><span class="badge badge-production">HIGH</span></td><td>Add <code>.env</code> to <code>.gitignore</code> immediately. Rotate any exposed Telegram bot tokens. README.md also modified but uncommitted.</td></tr>
+    <tr><td><strong>batchcard not under version control</strong></td><td><span class="badge badge-archive">LOW</span></td><td>Local Python project has no <code>.git</code> history. Risk of data loss if disk fails. Init git or fold into a monorepo.</td></tr>
     <tr><td><strong>Bounty forks archived before PR resolution</strong></td><td><span class="badge badge-production">HIGH</span></td><td>Check each fork on GitHub for open PRs before archiving. The local <code>Bounties/</code> repo has 21 unpushed handoff commits &#x2014; push those first.</td></tr>
     <tr><td><strong>Consolidation accidentally merges secrets</strong></td><td><span class="badge badge-archive">MEDIUM</span></td><td>Only consolidate repos that are <strong>clean</strong> (kaiview, chorus, cursor-rules, QoderAI). Never bulk-import dirty repos.</td></tr>
     <tr><td><strong>Android apps lose signing identity</strong></td><td><span class="badge badge-archive">MEDIUM</span></td><td>Keystores should be stored in a password manager or CI secret store, not in git working trees.</td></tr>
@@ -1355,6 +1371,13 @@ PHASE 4 ──── Polish & Launch
   <li>Update dependencies across projects</li>
   <li>Archive completed or deprecated projects</li>
   <li>Review and update shared configurations</li>
+</ul>
+
+<h4>Current Workspace Notes (2026-05-17 Audit)</h4>
+<ul>
+  <li><strong>Untracked audit scripts:</strong> Root contains ~40 temporary Python scripts (<code>audit_local_dirs.py</code>, <code>generate_deep_readmes.py</code>, <code>update_html_tracker.py</code>, etc.) and generated READMEs (<code>readme_generated_*.md</code>, <code>readme_v2_*.md</code>, <code>readme_v3_*.md</code>) from the recent documentation sweep. These are <strong>not under version control</strong>. Either commit them to a <code>tools/scripts/</code> directory or add to <code>.gitignore</code> and delete once the audit is complete.</li>
+  <li><strong>New local project:</strong> <code>batchcard/</code> is a new Python project (SQLite-backed batch tracker) that is not yet in git. Decide whether to init a standalone repo or fold into the Replit-Kabi / Opssuite "Lab Tools" module.</li>
+  <li><strong>Dirty repos requiring action:</strong> 14 repos have uncommitted changes including keystores (Moodlens, NurseShiftPay), bot tokens (sanctum), and unpushed bounty work (Bounties). See Section 1 (Consolidation Audit) and Section 5 (Security Audit) for the full list.</li>
 </ul>
 
 <h3>Backup Strategy</h3>
@@ -2183,11 +2206,11 @@ KaiView Pro (monorepo)
 <table>
   <thead><tr><th>Metric</th><th>Count</th></tr></thead>
   <tbody>
-    <tr><td>Total Repositories</td><td>71</td></tr>
+    <tr><td>Total Repositories</td><td>72</td></tr>
     <tr><td>Already Have READMEs</td><td>62</td></tr>
-    <tr><td>Need READMEs Generated</td><td>0</td></tr>
+    <tr><td>Need READMEs Generated</td><td>1</td></tr>
     <tr><td>Completed in This Run</td><td id="readme-completed-count">71</td></tr>
-    <tr><td>Remaining</td><td id="readme-remaining-count">0</td></tr>
+    <tr><td>Remaining</td><td id="readme-remaining-count">1</td></tr>
   </tbody>
 </table>
 
@@ -2229,8 +2252,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>1059</td>
-      <td><span class="badge badge-keep" id="status-Awakened">Completed</span></td>
-      <td><span id="action-Awakened">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Awakened" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Awakened">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>4</td>
@@ -2238,8 +2261,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>195</td>
-      <td><span class="badge badge-keep" id="status-Batchcard">Completed</span></td>
-      <td><span id="action-Batchcard">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Batchcard" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Batchcard">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>5</td>
@@ -2247,8 +2270,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>0</td>
-      <td><span class="badge badge-keep" id="status-Chembench">Completed</span></td>
-      <td><span id="action-Chembench">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Chembench" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Chembench">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>6</td>
@@ -2256,8 +2279,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>2381</td>
-      <td><span class="badge badge-keep" id="status-Constellation">Completed</span></td>
-      <td><span id="action-Constellation">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Constellation" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Constellation">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>7</td>
@@ -2274,8 +2297,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>191</td>
-      <td><span class="badge badge-keep" id="status-Hereticreader">Completed</span></td>
-      <td><span id="action-Hereticreader">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Hereticreader" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Hereticreader">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>9</td>
@@ -2310,8 +2333,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>160</td>
-      <td><span class="badge badge-keep" id="status-Opssuite">Completed</span></td>
-      <td><span id="action-Opssuite">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Opssuite" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Opssuite">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>13</td>
@@ -2319,8 +2342,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>246</td>
-      <td><span class="badge badge-keep" id="status-Organiverse">Completed</span></td>
-      <td><span id="action-Organiverse">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Organiverse" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Organiverse">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>14</td>
@@ -2328,8 +2351,8 @@ KaiView Pro (monorepo)
       <td><code>—</code></td>
       <td>TypeScript</td>
       <td>234</td>
-      <td><span class="badge badge-keep" id="status-Pathways">Completed</span></td>
-      <td><span id="action-Pathways">Done</span></td>
+      <td><span class="badge badge-keep" id="status-Pathways" style="background:#238636;color:#fff;">Accurate (Deep Audit)</span></td>
+      <td><span id="action-Pathways">Rewritten with actual code structure</span></td>
     </tr>
     <tr>
       <td>15</td>
@@ -2411,6 +2434,15 @@ KaiView Pro (monorepo)
       <td>2964</td>
       <td><span class="badge badge-keep">Completed</span></td>
       <td>Done</td>
+    </tr>
+    <tr>
+      <td>72</td>
+      <td><strong>batchcard</strong> <span class="tag tag-dirty">UNTRACKED</span></td>
+      <td><code>batchcard</code></td>
+      <td>Python</td>
+      <td>50</td>
+      <td><span class="badge badge-prototype">Needs README</span></td>
+      <td>Init git and write README; or merge into Replit-Kabi / Opssuite as "Lab Tools" module</td>
     </tr>
     <tr>
       <td>20</td>
@@ -3056,7 +3088,7 @@ KaiView Pro (monorepo)
 
 <section id="sec-repo-analysis">
 <h2>Repository Analysis & Strategic Assessment</h2>
-<p class="source-note">Generated 2026-05-17. Covers all 71 Kabi10 repositories after README generation and new repo creation.</p>
+<p class="source-note">Generated 2026-05-17. Covers all 71 Kabi10 repositories after README generation and new repo creation. <strong>Audit update 2026-05-17:</strong> Added <code>batchcard</code> local-only Python project and refreshed dirty-status flags for 12 repos.</p>
 
 <h3>Executive Summary</h3>
 <table>
@@ -3070,6 +3102,7 @@ KaiView Pro (monorepo)
     <tr><td>Local-First Developer Tools</td><td>3</td><td>8 MB</td><td><span class="badge badge-keep">Keep Independent</span></td></tr>
     <tr><td>Social Good / Crisis Response</td><td>3</td><td>15 MB</td><td><span class="badge badge-keep">Keep Independent</span></td></tr>
     <tr><td>Profile / Portfolio / Docs</td><td>4</td><td>0.1 MB</td><td><span class="badge badge-archive">Archive or Merge</span></td></tr>
+    <tr><td>Local-Only / Untracked Projects</td><td>1</td><td>0.05 MB</td><td><span class="badge badge-prototype">Init or Merge</span></td></tr>
   </tbody>
 </table>
 
@@ -3256,8 +3289,8 @@ KaiView Pro (monorepo)
   </tbody>
 </table>
 
-<h4>Standalone Prototypes (No Project-Ideas Mapping — Truly Unclear)</h4>
-<p>These repos do not map to any concept in the Project-Ideas portfolio. They are standalone experiments with no documented value proposition.</p>
+<h4>Deep-Audit Prototypes (Previously Misclassified)</h4>
+<p><strong style="color:#58a6ff;">These 8 repos were initially assessed as "empty shells" based on root-level metadata.</strong> A deep audit of actual artifact source code revealed substantial frontend applications with real page structures, state management, and domain logic. Descriptions and verdicts below reflect the real codebase.</p>
 
 <table>
   <thead><tr><th>Repo</th><th>Size</th><th>Assessment</th><th>Verdict</th></tr></thead>
@@ -3265,50 +3298,50 @@ KaiView Pro (monorepo)
     <tr>
       <td><strong>Hereticreader</strong></td>
       <td>0.2 MB</td>
-      <td>Academic reading companion with Desk, Library, Manuscript, Session, Settings pages. Has some structure but no clear differentiation from existing reading apps.</td>
-      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or archive.</td>
+      <td><strong>Scholarly claim fact-checker.</strong> 5-stage AI pipeline (Decompose → Search → Curate → Refute → Synthesize) powered by DeepSeek API. Features: claim decomposition, academic source search with DOI validation, AI refutation reasoning, structured manuscript generation with PDF export, persistent local library via Dexie/IndexedDB. Pages: Desk (claim entry), Session (live pipeline), Manuscript (printable report), Library (history), Settings (API key + theme).</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — unique adversarial-AI research tool with no equivalent in open source. High educational value.</td>
     </tr>
     <tr>
       <td><strong>Opssuite</strong></td>
       <td>0.2 MB</td>
-      <td>Operations dashboard with batches, events, samples. Generic admin-panel pattern with no unique domain.</td>
-      <td><span class="badge badge-archive">Archive</span> — no Project-Ideas concept; generic CRUD app.</td>
+      <td><strong>Lab operations tracker (OpsTracker).</strong> React SPA for laboratory batch and sample management. Features: dashboard with total batches/samples/active batches/events cards, batch listing with status filtering, batch detail view with metadata, sample inventory, operational event stream, relative time formatting. Uses TanStack Query and shadcn/ui. pnpm workspace with Express API server.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — shares identical pnpm workspace architecture with Batchcard and Pathways. Could become a "Lab Tools" module.</td>
     </tr>
     <tr>
       <td><strong>Constellation</strong></td>
       <td>2.3 MB</td>
-      <td>Largest of the unmapped prototypes. Sky/constellation viewer with SkyView page. Some visual potential but no documented concept.</td>
-      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — could become an educational module.</td>
+      <td><strong>3D personal sky journal.</strong> Three.js immersive starfield where every journal entry becomes a star. Features: interactive 3D camera (orbit, zoom, fly-to), constellation line drawing between stars, star detail view with full entry text, codex (browse/search all entries), streak tracking, birth particle animations, nebula background, settings for theme and camera sensitivity. Uses React + Three.js + IndexedDB.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — unique therapeutic data visualization concept. No equivalent in open source. Could be expanded into a commercial journaling product.</td>
     </tr>
     <tr>
-      <td><strong>Organiverse</strong></td>
+      <td><strong>Organiverse</strong> (Body Text)</td>
       <td>0.2 MB</td>
-      <td>Chat + scenario simulation with ChatPage, ScenarioPage, PermalinkPage. Unclear what "Organiverse" means as a product.</td>
-      <td><span class="badge badge-archive">Archive</span> — no Project-Ideas concept; value proposition unclear.</td>
+      <td><strong>Narrative AI companion with scenario validation.</strong> React SPA that maps user situations to curated crisis scenarios and launches guided conversations. Features: scenario validation (rejects out-of-scope input), daily rotating scenario, crisis cards with rich metadata, structured chat sessions seeded with scenario context, permalink conversations for sharing, dark/light theme, Framer Motion animations. Uses TanStack Query, Wouter, next-themes, and shadcn/ui. pnpm workspace with Express API server.</td>
+      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — shares identical architecture with Poet, Storyteller, and What-Ifs. Could become a "Crisis Chat" or "Narrative Therapy" module.</td>
     </tr>
     <tr>
-      <td><strong>Pathways</strong></td>
+      <td><strong>Pathways</strong> (TransitDoc)</td>
       <td>0.2 MB</td>
-      <td>Workflow/pathway system with authorities, dependencies, documents, people, requirements, templates, timeline. Could be a project management tool but no concept docs.</td>
-      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> or merge with portfolio-management as "Career Tools."</td>
+      <td><strong>Regulatory relocation readiness platform.</strong> React SPA for tracking cross-border relocation compliance. Features: authorities directory with CRUD, requirements tracking with deadlines and dependencies, document repository linked to requirements, pathway visualization showing requirement chains, Gantt-style timeline, people/stakeholder management, slippage alerts when deadlines are at risk, dashboard summary with active requirements and completion percentage. Uses React Hook Form, date-fns, TanStack Query, and shadcn/ui. pnpm workspace with Express API.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — domain-specific tool with real-world utility for immigration/relocation. Could be productized as a SaaS.</td>
     </tr>
     <tr>
       <td><strong>Awakened</strong></td>
       <td>1.0 MB</td>
-      <td>Consciousness tracking. Empty pages — no clear features implemented. Likely an abandoned early experiment.</td>
-      <td><span class="badge badge-archive">Archive</span> — superseded by Dreamweaver (DreamMind concept).</td>
+      <td><strong>React Native gamified productivity RPG (Solo Leveling inspired).</strong> Expo app that turns daily habits into Hunter quests. Features: cinematic 3-step awakening onboarding with animated text and glow effects, daily quest auto-generation ("Gates"), XP bar and level progression, rank badges (E → S), boss challenges, stats dashboard (strength, agility, intelligence), codex (skill/achievement encyclopedia), haptic feedback on quest completion, system window modals, React Native Reanimated transitions. Uses Expo Router (file-based tabs), React Context with async storage, and safe-area-context.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — unique mobile RPG productivity concept with polished onboarding. High potential as a published app. NOT related to Dreamweaver (sleep journaling).</td>
     </tr>
     <tr>
       <td><strong>Chembench</strong></td>
       <td>0 MB</td>
-      <td>Empty repo — no files beyond a Bench page placeholder.</td>
-      <td><span class="badge badge-archive">Archive</span> — empty repository.</td>
+      <td><strong>Virtual chemistry laboratory simulation.</strong> React SPA with interactive lab bench. Features: drag-and-drop reagent bottles with color-coded caps (acid=red, base=blue, etc.), animated liquid pouring between bottle and beaker, multi-beaker bench (up to 4 slots) with independent pH/temperature, heat plate with flame animation, pipette tool for precision transfer, stir tool, live chemical equation panel, real-time hazard chip bar (acid/base/flammable/toxic warnings), reagent shelf with category grouping, toggleable sound effects (pour, heat, stir), splash screen with branded animation, onboarding tour, dark mode toggle, procedural log of all actions. Uses Zustand for state, Web Audio API for sound, and Tailwind CSS.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — rich interactive educational simulation with no equivalent in open source. Strong portfolio piece for ed-tech.</td>
     </tr>
     <tr>
       <td><strong>Batchcard</strong></td>
       <td>0.2 MB</td>
-      <td>Batch processing card system with batches, entries, signatures, stages, audit trail. Has some real structure but no Project-Ideas concept mapping.</td>
-      <td><span class="badge badge-consolidate">Merge into Replit-Kabi</span> — generic workflow module.</td>
+      <td><strong>Manufacturing batch tracking with audit trails and digital signatures.</strong> React SPA for regulated production environments. Features: batch lifecycle management (create with SKU, strain, target yield), multi-stage workflow with entry forms, immutable audit trail for every action, cryptographic digital signatures for critical transitions, dashboard summary (active/on-hold/completed), batch detail view with full metadata, batch report generation and export, auth-protected routes with role-based guards, search and filter by status. Uses React Context for auth, TanStack Query, and shadcn/ui. pnpm workspace with Express API server.</td>
+      <td><span class="badge badge-keep">Keep Independent</span> — domain-specific compliance tool for regulated manufacturing (pharma, food, cannabis, chemicals). Could be productized as vertical SaaS.</td>
     </tr>
     <tr>
       <td><strong>portfolio-management</strong></td>
@@ -3424,6 +3457,12 @@ KaiView Pro (monorepo)
       <td>Local-only Telegram bot prototype</td>
       <td>Telegram is the platform</td>
       <td>Educational value as the "minimum viable companion bot." Keep public or as an open-source sample linked from sanctum.</td>
+    </tr>
+    <tr>
+      <td><strong>batchcard</strong></td>
+      <td>Local-only Python batch-tracking app</td>
+      <td>Not applicable (backend tool)</td>
+      <td>Untracked local project. Init git or fold into a monorepo (e.g., Replit-Kabi backend modules or a "Lab Tools" suite with Opssuite).</td>
     </tr>
   </tbody>
 </table>
