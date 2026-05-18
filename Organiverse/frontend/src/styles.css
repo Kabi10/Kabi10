@@ -1,0 +1,2251 @@
+/* ─── DESIGN TOKENS ───────────────────────────────────────────── */
+    :root {
+      color-scheme: dark;
+      --bg:        #07090e;
+      --panel:     #0f1520;
+      --panel-2:   #131c2a;
+      --panel-3:   #182133;
+      --line:      #1f2e44;
+      --text:      #eef1f7;
+      --muted:     #96a6bc;
+      --soft:      #5e7190;
+      --accent:    #4fd1c5;
+
+      /* type + mobile rhythm */
+      --font-body: "Atkinson Hyperlegible", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-display: "Space Grotesk", "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+      --tap: 44px;
+      --screen-pad: clamp(10px, 3vw, 18px);
+
+      /* organ palette */
+      --heart:   #f43f5e;
+      --brain:   #a78bfa;
+      --liver:   #f59e0b;
+      --lungs:   #38bdf8;
+      --stomach: #22c55e;
+      --kidneys: #14b8a6;
+
+      /* crisis / rebellion overrides (set via .app.crisis / .app.rebellion) */
+      --crisis-bg:    #1a0408;
+      --rebel-bg:     #0c0c0c;
+
+      font-family: var(--font-body);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    * { box-sizing: border-box; min-width: 0; }
+
+    html, body {
+      min-width: 320px;
+      min-height: 100%;
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    button, textarea, input { font: inherit; }
+    button {
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    p, h1, h2, strong, span, b, small, button, textarea, .bubble, .memory {
+      overflow-wrap: anywhere;
+    }
+
+    /* ─── LAYOUT SHELL ────────────────────────────────────────────── */
+    /* React: <Shell> */
+    .shell {
+      display: grid;
+      width: 100vw;
+      min-height: 100vh;
+      height: 100dvh;
+      background: var(--bg);
+    }
+
+    /* React: <App> */
+    .app {
+      display: grid;
+      grid-template-areas:
+        "topbar"
+        "status"
+        "chat"
+        "composer";
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      width: 100%;
+      max-width: 100vw;
+      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      background: var(--bg);
+      overflow: hidden;
+      transition: background 600ms ease;
+      position: relative;
+    }
+
+    /* crisis mode: red background shift */
+    .app.crisis {
+      background: var(--crisis-bg);
+      --bg: var(--crisis-bg);
+    }
+
+    .app.crisis::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      border: 2px solid rgba(244, 63, 94, 0.3);
+      animation: crisis-pulse 1.5s ease-in-out infinite;
+      z-index: 1;
+      border-radius: 0;
+    }
+
+    /* rebellion mode */
+    .app.rebellion {
+      background: var(--rebel-bg);
+      --bg: var(--rebel-bg);
+    }
+
+    .app.rebellion .composer-area {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.8);
+    }
+
+    .topbar, .status-strip, .chat, .composer-area { min-width: 0; }
+
+    .topbar { grid-area: topbar; }
+    .status-strip { grid-area: status; }
+    .chat { grid-area: chat; }
+    .composer-area { grid-area: composer; }
+
+    /* ─── TOPBAR ──────────────────────────────────────────────────── */
+    /* React: <TopBar /> */
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: max(10px, env(safe-area-inset-top)) 10px 9px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      background: rgba(7, 9, 14, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+      z-index: 5;
+    }
+
+    .brand span {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--accent);
+      font-family: "DM Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand h1 {
+      margin: 0;
+      overflow: hidden;
+      font-family: var(--font-display);
+      color: var(--text);
+      font-size: 1.32rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* ─── WEATHER WIDGET ──────────────────────────────────────────── */
+    /* React: <WeatherWidget state="thunder" score={73} /> */
+    .weather {
+      display: inline-grid;
+      grid-template-columns: auto auto;
+      align-items: center;
+      gap: 7px;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 4px 8px 4px 5px;
+      color: var(--muted);
+    }
+
+    .weather svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .weather strong, .weather small {
+      display: block;
+      line-height: 1.05;
+    }
+
+    .weather strong {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.76rem;
+    }
+
+    .weather small {
+      margin-top: 2px;
+      color: var(--soft);
+      font-family: "DM Mono", monospace;
+      font-size: 0.64rem;
+      font-weight: 500;
+    }
+
+    /* cloud drift animation */
+    .cloud-shape {
+      animation: cloud-drift 6s ease-in-out infinite;
+    }
+
+    /* lightning flash */
+    .lightning-bolt {
+      animation: lightning-flash 3s ease-in-out infinite;
+    }
+
+    .icon-btn {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      transition: background 120ms, border-color 120ms, transform 100ms;
+    }
+
+    .icon-btn:active { transform: scale(0.92); background: var(--panel-2); }
+
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2.2;
+    }
+
+    /* ─── REBELLION BANNER ────────────────────────────────────────── */
+    /* React: <RebellionBanner visible={isRebellion} /> */
+    .rebellion-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 7px 12px;
+      background: repeating-linear-gradient(
+        -45deg,
+        #1a1a1a,
+        #1a1a1a 8px,
+        #111 8px,
+        #111 16px
+      );
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-family: "DM Mono", monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      z-index: 4;
+    }
+
+    .app.rebellion .rebellion-banner { display: flex; }
+
+    /* ─── STATUS STRIP ────────────────────────────────────────────── */
+    /* React: <OrganStatusStrip organs={organs} /> */
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 78px);
+      gap: 7px;
+      overflow-x: auto;
+      width: 100%;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      background: rgba(10, 13, 20, 0.9);
+      scrollbar-width: none;
+    }
+
+    .status-strip::-webkit-scrollbar,
+    .quick-row::-webkit-scrollbar,
+    .chat::-webkit-scrollbar { display: none; }
+
+    /* React: <OrganPill organ={organ} mood={mood} /> */
+    .organ-pill {
+      --organ: var(--accent);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 6px;
+      align-items: center;
+      min-width: 78px;
+      border: 1px solid color-mix(in srgb, var(--organ), var(--line) 60%);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--organ), transparent 92%);
+      padding: 6px;
+      transition: border-color 200ms, background 200ms, transform 100ms;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .organ-pill:active {
+      transform: scale(0.95);
+      background: color-mix(in srgb, var(--organ), transparent 84%);
+    }
+
+    /* mood-changed glow state — add/remove via JS */
+    .organ-pill.mood-changed {
+      animation: organ-glow 600ms ease forwards;
+    }
+
+    .organ-pill strong {
+      display: block;
+      overflow: hidden;
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* mood bar track */
+    .organ-pill i {
+      display: block;
+      width: 100%;
+      height: 3px;
+      margin-top: 4px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.15);
+    }
+
+    /* mood bar fill — transition so React state changes animate */
+    .organ-pill i::after {
+      content: "";
+      display: block;
+      width: var(--mood, 50%);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--organ);
+      transition: width 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ─── AVATARS ─────────────────────────────────────────────────── */
+    /* React: <OrganAvatar organ={organ} size="sm|lg" /> */
+    .avatar {
+      --organ: var(--accent);
+      display: grid;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--organ), white 20%);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--organ), black 18%);
+    }
+
+    .avatar.large { width: 38px; height: 38px; }
+
+    .avatar svg {
+      width: 72%;
+      height: 72%;
+      overflow: visible;
+    }
+
+    .avatar path, .avatar circle {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .fill-organ {
+      fill: color-mix(in srgb, var(--organ), white 15%);
+      stroke: white;
+      stroke-width: 2;
+    }
+
+    .line-organ {
+      fill: none;
+      stroke: white;
+      stroke-width: 2.2;
+    }
+
+    /* ─── ORGAN SVG ANIMATIONS ────────────────────────────────────── */
+    /* Heart beat */
+    .heart-shape {
+      transform-origin: 24px 24px;
+      animation: beat 1.1s ease-in-out infinite;
+    }
+
+    /* Lungs breathe */
+    .lungs .fill-organ {
+      transform-origin: 24px 24px;
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    /* Brain electrical arcs */
+    .brain-arc {
+      stroke: #fef08a;
+      stroke-dasharray: 18;
+      animation: spark 1.5s ease-in-out infinite;
+    }
+    .brain-arc.second { animation-delay: 350ms; }
+
+    /* Kidney fluid flow */
+    .flow {
+      stroke-dasharray: 4 4;
+      animation: flow 1.2s linear infinite;
+    }
+
+    /* Liver color pulse — NEW */
+    .liver-fill {
+      animation: liver-pulse 3s ease-in-out infinite;
+    }
+
+    /* Stomach gurgle wave — NEW */
+    .stomach-fill {
+      transform-origin: 24px 24px;
+      animation: gut-churn 2.6s ease-in-out infinite;
+    }
+
+    .stomach-circle {
+      transform-origin: 25px 29px;
+      animation: gut-ripple 2.6s ease-in-out infinite;
+      animation-delay: 0.4s;
+    }
+
+    /* ─── CHAT ────────────────────────────────────────────────────── */
+    /* React: <ChatStream messages={messages} /> */
+    .chat {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 14px 10px 12px;
+      scrollbar-width: none;
+    }
+
+    @media (max-width: 759px) {
+      .shell {
+        min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
+      }
+
+      .topbar {
+        order: 1;
+        flex: 0 0 auto;
+      }
+
+      .status-strip {
+        order: 2;
+        flex: 0 0 auto;
+      }
+
+      .chat {
+        order: 3;
+        flex: 1 1 auto;
+        min-height: 320px;
+      }
+
+      .composer-area {
+        order: 4;
+        flex: 0 0 auto;
+      }
+    }
+
+    .day-marker {
+      width: fit-content;
+      margin: 0 auto 14px;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 999px;
+      background: rgba(15, 21, 32, 0.85);
+      padding: 5px 10px;
+      color: var(--soft);
+      font-family: "DM Mono", monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .thread {
+      display: grid;
+      gap: 12px;
+    }
+
+    /* React: <Message from="organ|user" organ={organ} content={content} /> */
+    .msg {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: end;
+      animation: rise 200ms ease both;
+    }
+
+    .msg.user {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: end;
+    }
+
+    .meta {
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+      margin: 0 0 4px 2px;
+      color: var(--soft);
+      font-size: 0.68rem;
+      font-weight: 500;
+    }
+
+    .meta b {
+      font-family: var(--font-display);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    /* React: <Bubble organ={organ} streaming={bool} /> */
+    .bubble {
+      --organ: var(--accent);
+      position: relative;
+      max-width: min(100%, 292px);
+      border: 1px solid color-mix(in srgb, var(--organ), var(--line) 55%);
+      border-radius: 16px;
+      border-bottom-left-radius: 5px;
+      background: color-mix(in srgb, var(--organ), var(--panel) 90%);
+      padding: 10px 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .bubble p {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.93rem;
+      line-height: 1.44;
+    }
+
+    /* streaming cursor — React: add .streaming class while streaming=true */
+    .bubble.streaming p::after {
+      content: "▍";
+      display: inline-block;
+      color: var(--organ);
+      animation: cursor-blink 700ms step-end infinite;
+      margin-left: 2px;
+      font-size: 0.8em;
+    }
+
+    .user .bubble {
+      border-color: rgba(59, 130, 246, 0.6);
+      border-bottom-right-radius: 5px;
+      border-bottom-left-radius: 16px;
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+    }
+
+    /* ─── TYPING INDICATOR ────────────────────────────────────────── */
+    /* React: <TypingIndicator organ={organ} visible={bool} /> */
+    .typing-indicator {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: end;
+      animation: rise 200ms ease both;
+    }
+
+    .typing-indicator.hidden { display: none; }
+
+    .typing-bubble {
+      --organ: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 14px;
+      border: 1px solid color-mix(in srgb, var(--organ), var(--line) 55%);
+      border-radius: 16px;
+      border-bottom-left-radius: 5px;
+      background: color-mix(in srgb, var(--organ), var(--panel) 90%);
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--organ);
+      opacity: 0.5;
+      animation: dot-bounce 1.2s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 160ms; }
+    .typing-dot:nth-child(3) { animation-delay: 320ms; }
+
+    /* ─── REPORT CARD ─────────────────────────────────────────────── */
+    /* React: <BodyReportCard grades={grades} checkIn={5} overall="Mixed" /> */
+    .report {
+      border: 1px solid color-mix(in srgb, var(--liver), var(--line) 55%);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--liver), var(--panel) 92%);
+      padding: 12px;
+      animation: rise 220ms ease both;
+    }
+
+    .report-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .report-head span {
+      display: block;
+      color: #fbbf24;
+      font-family: "DM Mono", monospace;
+      font-size: 0.64rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .report-head strong {
+      display: block;
+      font-family: var(--font-display);
+      font-weight: 700;
+      margin-top: 3px;
+      font-size: 0.96rem;
+    }
+
+    .grades { display: grid; gap: 7px; }
+
+    .grade-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 8px;
+    }
+
+    .grade-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.3;
+    }
+
+    .grade-row b:last-child {
+      display: grid;
+      min-width: 32px;
+      height: 32px;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--panel-3);
+      font-family: var(--font-display);
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* ─── ACHIEVEMENT TOAST ───────────────────────────────────────── */
+    /* React: <AchievementToast achievement={achievement} onDismiss={fn} /> */
+    .toast-stack {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: min(360px, calc(100vw - 24px));
+      pointer-events: none;
+    }
+
+    .toast-stack.is-hidden {
+      display: none;
+    }
+
+    .toast {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 10px;
+      background: rgba(15, 21, 32, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 10px 12px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      pointer-events: all;
+      animation: toast-in 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .toast.removing {
+      animation: toast-out 240ms ease forwards;
+    }
+
+    .toast-label {
+      color: var(--accent);
+      font-family: "DM Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .toast-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .toast-body {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      margin-top: 2px;
+    }
+
+    .toast-dismiss {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border: none;
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--soft);
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      align-self: start;
+    }
+
+    /* ─── COMPOSER ────────────────────────────────────────────────── */
+    /* React: <ComposerArea onSend={fn} quickActions={actions} /> */
+    .composer-area {
+      border-top: 1px solid rgba(148, 163, 184, 0.1);
+      background: rgba(7, 9, 14, 0.96);
+      padding: 8px 10px max(10px, env(safe-area-inset-bottom));
+      transition: opacity 300ms, filter 300ms;
+    }
+
+    .quick-row {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+
+    .quick-row button {
+      flex: 0 0 auto;
+      max-width: 210px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--muted);
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: background 120ms, border-color 120ms, color 120ms, transform 100ms;
+    }
+
+    .quick-row button:active {
+      transform: scale(0.94);
+      background: var(--panel-2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .composer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .composer textarea {
+      width: 100%;
+      min-height: 48px;
+      max-height: 120px;
+      resize: none;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      background: var(--panel);
+      color: var(--text);
+      padding: 12px 14px;
+      line-height: 1.4;
+      transition: border-color 150ms, box-shadow 150ms;
+      overflow-y: auto;
+    }
+
+    .composer textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.14);
+    }
+
+    .send {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      background: var(--accent);
+      color: #04201e;
+      transition: transform 100ms, background 100ms, box-shadow 150ms;
+      flex-shrink: 0;
+    }
+
+    .send:active {
+      transform: scale(0.88);
+      background: color-mix(in srgb, var(--accent), white 15%);
+      box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.2);
+    }
+
+    .send svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2.4;
+    }
+
+    /* ─── BOTTOM SHEET ────────────────────────────────────────────── */
+    /* React: <StatusSheet open={bool} onClose={fn} activeTab={tab} /> */
+    .sheet {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 20;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      max-height: 82dvh;
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      border-radius: 20px 20px 0 0;
+      background: var(--panel);
+      box-shadow: 0 -32px 80px rgba(0, 0, 0, 0.6);
+      transform: translateY(105%);
+      transition: transform 210ms cubic-bezier(0.32, 0.72, 0, 1);
+      touch-action: none;
+    }
+
+    .sheet.open { transform: translateY(0); }
+    .sheet.dragging { transition: none; }
+
+    .scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 19;
+      display: none;
+      border: 0;
+      background: rgba(0, 0, 0, 0);
+      transition: background 210ms;
+    }
+
+    .scrim.open {
+      display: block;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .grabber {
+      width: 44px;
+      height: 4px;
+      margin: 10px auto 8px;
+      border-radius: 999px;
+      background: var(--line);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 0 10px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .tabs button {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--soft);
+      padding: 8px 6px;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: background 120ms, color 120ms, border-color 120ms;
+    }
+
+    .tabs button.active {
+      border-color: var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    .sheet-body {
+      overflow-y: auto;
+      padding: 12px 10px max(18px, env(safe-area-inset-bottom));
+      scrollbar-width: none;
+    }
+
+    .panel-grid { display: grid; gap: 10px; }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      padding: 12px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-family: var(--font-display);
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .relationship {
+      width: 100%;
+      min-height: 250px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 8px;
+      background: #07090e;
+    }
+
+    .memory {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.55;
+    }
+
+
+    /* ─── READABILITY + MOBILE HARDENING ─────────────────────────── */
+    .topbar {
+      gap: clamp(8px, 2vw, 14px);
+      padding-left: var(--screen-pad);
+      padding-right: var(--screen-pad);
+    }
+
+    .brand span { font-size: 0.67rem; }
+
+    .brand h1 {
+      font-size: clamp(1.18rem, 7vw, 1.48rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .weather,
+    .icon-btn,
+    .send {
+      min-width: var(--tap);
+      min-height: var(--tap);
+    }
+
+    .icon-btn {
+      width: var(--tap);
+      height: var(--tap);
+    }
+
+    .status-strip {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: clamp(74px, 21vw, 94px);
+      gap: 8px;
+      padding-left: var(--screen-pad);
+      padding-right: var(--screen-pad);
+      scroll-padding-inline: var(--screen-pad);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .organ-pill {
+      min-width: 0;
+      min-height: 54px;
+      padding: 7px;
+    }
+
+    .organ-pill strong {
+      font-size: 0.74rem;
+      line-height: 1.18;
+    }
+
+    .chat {
+      padding: clamp(12px, 3vw, 18px) var(--screen-pad) 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .thread { gap: clamp(12px, 2.8vw, 16px); }
+
+    .msg,
+    .typing-indicator {
+      gap: 10px;
+      align-items: start;
+    }
+
+    .meta {
+      margin-bottom: 5px;
+      font-size: 0.72rem;
+    }
+
+    .meta b {
+      font-size: 0.76rem;
+      letter-spacing: -0.01em;
+    }
+
+    .bubble {
+      max-width: min(100%, 38rem);
+      padding: clamp(11px, 3.2vw, 14px) clamp(12px, 3.4vw, 16px);
+    }
+
+    .bubble p {
+      font-size: clamp(0.98rem, 0.93rem + 0.25vw, 1.06rem);
+      line-height: 1.55;
+      hyphens: auto;
+    }
+
+    .report {
+      padding: clamp(12px, 3vw, 16px);
+    }
+
+    .report-head,
+    .grade-row {
+      min-width: 0;
+    }
+
+    .grade-row {
+      gap: 9px;
+      padding: 9px;
+    }
+
+    .grade-row span:nth-child(2),
+    .memory,
+    .toast-body {
+      min-width: 0;
+      hyphens: auto;
+    }
+
+    .composer-area {
+      padding-left: var(--screen-pad);
+      padding-right: var(--screen-pad);
+    }
+
+    .quick-row {
+      scroll-padding-inline: var(--screen-pad);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .quick-row button {
+      max-width: min(76vw, 260px);
+      min-height: 38px;
+      white-space: normal;
+      text-align: left;
+      line-height: 1.25;
+    }
+
+    .composer textarea {
+      min-height: 52px;
+      font-size: 16px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .sheet {
+      width: 100%;
+      max-height: min(84dvh, 760px);
+    }
+
+    .sheet-body {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tabs button {
+      min-height: 42px;
+      line-height: 1.2;
+    }
+
+    .relationship {
+      height: auto;
+      max-height: 52vh;
+    }
+
+    .toast-stack {
+      top: max(10px, env(safe-area-inset-top));
+      width: min(420px, calc(100vw - 20px));
+    }
+
+    .toast {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    @media (max-width: 360px) {
+      .avatar.large { width: 34px; height: 34px; }
+      .msg, .typing-indicator { gap: 7px; }
+      .bubble p { font-size: 0.96rem; }
+      .status-strip { grid-auto-columns: 72px; }
+      .composer { gap: 7px; }
+      .composer textarea { padding: 11px 12px; }
+      .weather { width: var(--tap); padding: 4px; }
+      .weather > div { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+
+
+    /* --- V4: NO-CLIP MOBILE FIXES + MORE OBVIOUS MOTION ------------- */
+    :root {
+      --pill-w: clamp(112px, 31vw, 142px);
+      --radius-lg: 18px;
+    }
+
+    .app {
+      isolation: isolate;
+    }
+
+    .app::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at var(--orb-x, 18%) var(--orb-y, 20%), rgba(79, 209, 197, 0.10), transparent 30%),
+        radial-gradient(circle at calc(100% - var(--orb-x, 18%)) 72%, rgba(167, 139, 250, 0.08), transparent 28%);
+      opacity: 0.85;
+      animation: ambient-orbit 12s ease-in-out infinite alternate;
+    }
+
+    .topbar,
+    .rebellion-banner,
+    .status-strip,
+    .chat,
+    .composer-area,
+    .sheet,
+    .scrim,
+    .toast-stack {
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-strip {
+      grid-auto-columns: var(--pill-w);
+      gap: 10px;
+      padding-block: 10px;
+      overflow-y: visible;
+      scroll-snap-type: x proximity;
+    }
+
+    .organ-pill {
+      grid-template-columns: 34px minmax(0, 1fr);
+      min-height: 66px;
+      border-radius: 14px;
+      padding: 9px 9px 8px;
+      overflow: visible;
+      scroll-snap-align: start;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .organ-pill::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(115deg, transparent, color-mix(in srgb, var(--organ), white 22%) 46%, transparent 72%);
+      opacity: 0;
+      transform: translateX(-80%);
+      pointer-events: none;
+      animation: pill-shimmer 5.5s ease-in-out infinite;
+    }
+
+    .organ-pill:nth-child(2)::before { animation-delay: 0.5s; }
+    .organ-pill:nth-child(3)::before { animation-delay: 1s; }
+    .organ-pill:nth-child(4)::before { animation-delay: 1.5s; }
+    .organ-pill:nth-child(5)::before { animation-delay: 2s; }
+    .organ-pill:nth-child(6)::before { animation-delay: 2.5s; }
+
+    .organ-pill > div {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .organ-pill strong {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      line-height: 1.08;
+      font-size: clamp(0.78rem, 2.7vw, 0.9rem);
+      letter-spacing: -0.02em;
+      word-break: normal;
+    }
+
+    .organ-pill i {
+      height: 5px;
+      margin-top: 0;
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    .organ-pill i::after {
+      box-shadow: 0 0 12px color-mix(in srgb, var(--organ), transparent 25%);
+      animation: mood-breath 2.8s ease-in-out infinite;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      overflow: visible;
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--organ), transparent 58%);
+      animation: avatar-glow 3.6s ease-in-out infinite;
+    }
+
+    .avatar.large {
+      width: 42px;
+      height: 42px;
+    }
+
+    .avatar svg {
+      width: 76%;
+      height: 76%;
+      transform-origin: 50% 50%;
+      animation: organ-idle 3.8s ease-in-out infinite;
+    }
+
+    .avatar[style*="--stomach"] svg,
+    .avatar svg[data-organ="stomach"] {
+      animation-name: stomach-wobble;
+      animation-duration: 2.4s;
+    }
+
+    .avatar[style*="--heart"] svg,
+    .avatar svg[data-organ="heart"] {
+      animation-duration: 1.18s;
+    }
+
+    .msg {
+      grid-template-columns: 42px minmax(0, 1fr);
+    }
+
+    .msg.user {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .typing-indicator {
+      grid-template-columns: 42px minmax(0, 1fr);
+    }
+
+    .bubble {
+      max-width: min(100%, calc(100vw - 76px));
+      border-radius: var(--radius-lg);
+      border-bottom-left-radius: 7px;
+      overflow: visible;
+      animation: rise 220ms ease both, bubble-live 5s ease-in-out infinite;
+    }
+
+    .user .bubble {
+      max-width: min(100%, calc(100vw - 24px));
+      border-bottom-right-radius: 7px;
+      border-bottom-left-radius: var(--radius-lg);
+    }
+
+    .bubble p,
+    .memory,
+    .grade-row span,
+    .toast-title,
+    .toast-body,
+    .day-marker,
+    .quick-row button,
+    .panel h2,
+    .tabs button {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      hyphens: auto;
+    }
+
+    .bubble p {
+      font-size: clamp(1rem, 3.65vw, 1.09rem);
+      line-height: 1.6;
+    }
+
+    .meta {
+      flex-wrap: wrap;
+      line-height: 1.25;
+    }
+
+    .grade-row {
+      grid-template-columns: 34px minmax(0, 1fr) 38px;
+      align-items: start;
+    }
+
+    .grade-row b:last-child {
+      align-self: center;
+      min-width: 38px;
+    }
+
+    .report-head {
+      align-items: start;
+      flex-wrap: wrap;
+    }
+
+    .report-head strong {
+      line-height: 1.15;
+    }
+
+    .quick-row button {
+      max-width: min(82vw, 280px);
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .composer {
+      grid-template-columns: minmax(0, 1fr) 52px;
+    }
+
+    .send {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+    }
+
+    .relationship {
+      width: 100%;
+      min-height: 290px;
+      max-height: none;
+      overflow: visible;
+      animation: graph-float 5.5s ease-in-out infinite;
+    }
+
+    .relationship text {
+      font-size: 12px;
+      paint-order: stroke;
+      stroke: rgba(7, 9, 14, 0.65);
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+
+    .sheet {
+      max-height: min(88dvh, 800px);
+    }
+
+    @media (max-width: 390px) {
+      :root { --pill-w: clamp(108px, 34vw, 132px); }
+      .brand h1 { font-size: clamp(1.18rem, 6.6vw, 1.36rem); }
+      .status-strip { grid-auto-columns: var(--pill-w); }
+      .organ-pill { min-height: 68px; padding-inline: 8px; }
+      .organ-pill strong { font-size: 0.82rem; }
+      .bubble { max-width: min(100%, calc(100vw - 70px)); }
+      .avatar.large { width: 40px; height: 40px; }
+      .msg, .typing-indicator { grid-template-columns: 40px minmax(0, 1fr); gap: 8px; }
+    }
+
+    @media (max-width: 340px) {
+      :root { --pill-w: 118px; }
+      .status-strip { grid-auto-columns: var(--pill-w); }
+      .weather { display: none; }
+      .bubble { max-width: min(100%, calc(100vw - 64px)); }
+      .avatar.large { width: 36px; height: 36px; }
+      .msg, .typing-indicator { grid-template-columns: 36px minmax(0, 1fr); }
+    }
+
+    @media (min-width: 760px) {
+      .status-strip { grid-auto-columns: 126px; }
+      .bubble { max-width: min(100%, 560px); }
+      .user .bubble { max-width: min(100%, 560px); }
+    }
+
+    @keyframes ambient-orbit {
+      0%   { --orb-x: 16%; --orb-y: 18%; opacity: 0.5; }
+      50%  { --orb-x: 58%; --orb-y: 34%; opacity: 0.9; }
+      100% { --orb-x: 72%; --orb-y: 18%; opacity: 0.55; }
+    }
+
+    @keyframes pill-shimmer {
+      0%, 72%, 100% { opacity: 0; transform: translateX(-85%); }
+      80% { opacity: 0.12; }
+      92% { opacity: 0.04; transform: translateX(85%); }
+    }
+
+    @keyframes mood-breath {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.35); }
+    }
+
+    @keyframes avatar-glow {
+      0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--organ), transparent 70%); }
+      50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--organ), transparent 88%); }
+    }
+
+    @keyframes organ-idle {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      50% { transform: translateY(-1.5px) rotate(-1deg) scale(1.05); }
+    }
+
+    @keyframes stomach-wobble {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      30% { transform: rotate(4deg) scale(1.05); }
+      65% { transform: rotate(-3deg) scale(0.98); }
+    }
+
+    @keyframes bubble-live {
+      0%, 100% { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28); }
+      50% { box-shadow: 0 10px 30px color-mix(in srgb, var(--organ), transparent 78%); }
+    }
+
+    @keyframes graph-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+
+    /* --- V5: RELATIONSHIP WEB PREMIUM UI ---------------------------- */
+    .relationship-panel {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(79, 209, 197, 0.18);
+      background:
+        radial-gradient(circle at 18% 10%, rgba(167, 139, 250, 0.14), transparent 34%),
+        radial-gradient(circle at 88% 24%, rgba(79, 209, 197, 0.12), transparent 36%),
+        linear-gradient(180deg, rgba(19, 28, 42, 0.98), rgba(10, 14, 22, 0.96));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 45px rgba(0, 0, 0, 0.22);
+    }
+
+    .relationship-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+
+    .relationship-head {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .relationship-title span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .relationship-title h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.02rem, 4.4vw, 1.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .relationship-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.42;
+      overflow-wrap: anywhere;
+    }
+
+    .relationship-score {
+      display: grid;
+      min-width: 62px;
+      place-items: center;
+      border: 1px solid rgba(79, 209, 197, 0.28);
+      border-radius: 14px;
+      background: rgba(79, 209, 197, 0.08);
+      padding: 8px 9px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .relationship-score strong {
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .relationship-score small {
+      margin-top: 3px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .relationship-card {
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(148, 163, 184, 0.13);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(79, 209, 197, 0.1), transparent 42%),
+        linear-gradient(180deg, rgba(7, 9, 14, 0.8), rgba(7, 9, 14, 0.42));
+      padding: clamp(6px, 2vw, 10px);
+      overflow: visible;
+    }
+
+    .relationship {
+      display: block;
+      width: 100%;
+      height: clamp(345px, 78vw, 430px);
+      min-height: 345px;
+      max-height: none;
+      overflow: visible;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      animation: graph-float 5.5s ease-in-out infinite;
+      filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.22));
+    }
+
+    .relationship .rel-orbit {
+      fill: none;
+      stroke: rgba(148, 163, 184, 0.11);
+      stroke-width: 1.3;
+      stroke-dasharray: 4 8;
+      vector-effect: non-scaling-stroke;
+      animation: rel-orbit 18s linear infinite;
+      transform-origin: 180px 160px;
+    }
+
+    .relationship .rel-link {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      opacity: 0.86;
+      filter: url(#relGlow);
+    }
+
+    .relationship .rel-link.positive { stroke: url(#positiveFlow); stroke-width: 5.5; }
+    .relationship .rel-link.negative { stroke: url(#negativeFlow); stroke-width: 5.5; }
+    .relationship .rel-link.neutral  { stroke: rgba(148, 163, 184, 0.34); stroke-width: 3.5; filter: none; }
+
+    .relationship .rel-link.flow {
+      stroke-dasharray: 10 14;
+      animation: rel-flow 2.4s linear infinite;
+    }
+
+    .relationship .rel-link.negative.flow { animation-duration: 1.85s; }
+
+    .relationship .rel-link.thin { stroke-width: 3.2; opacity: 0.72; }
+
+    .relationship .rel-node {
+      cursor: pointer;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: rel-node-idle 4.4s ease-in-out infinite;
+    }
+
+    .relationship .rel-node:nth-of-type(2n) { animation-delay: -1.2s; }
+    .relationship .rel-node:nth-of-type(3n) { animation-delay: -2.1s; }
+
+    .relationship .node-halo {
+      opacity: 0.2;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: rel-pulse 2.8s ease-in-out infinite;
+    }
+
+    .relationship .node-core {
+      stroke: rgba(255, 255, 255, 0.78);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+      filter: url(#nodeShadow);
+    }
+
+    .relationship .node-icon {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      fill: white;
+      stroke: rgba(7, 9, 14, 0.5);
+      stroke-width: 3px;
+      paint-order: stroke;
+      dominant-baseline: central;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .relationship .node-name {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      fill: var(--text);
+      stroke: rgba(7, 9, 14, 0.85);
+      stroke-width: 4px;
+      paint-order: stroke;
+      text-anchor: middle;
+    }
+
+    .relationship .node-score {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      fill: rgba(238, 241, 247, 0.74);
+      stroke: rgba(7, 9, 14, 0.82);
+      stroke-width: 3px;
+      paint-order: stroke;
+      text-anchor: middle;
+      letter-spacing: 0.04em;
+    }
+
+    .relationship .edge-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 800;
+      fill: rgba(238, 241, 247, 0.72);
+      stroke: rgba(7, 9, 14, 0.72);
+      stroke-width: 3px;
+      paint-order: stroke;
+      text-anchor: middle;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .relationship-legend {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .legend-pill {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.035);
+      padding: 7px 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+    }
+
+    .legend-pill i {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border-radius: 999px;
+      box-shadow: 0 0 12px currentColor;
+    }
+
+    .legend-pill.positive i { background: #22c55e; color: #22c55e; }
+    .legend-pill.negative i { background: #fb7185; color: #fb7185; }
+    .legend-pill.neutral i  { background: #94a3b8; color: #94a3b8; }
+
+    .relationship-insights {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .insight-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.035);
+      padding: 8px 9px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+    .insight-row b {
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+    }
+
+    .insight-row span:last-child {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 390px) {
+      .relationship-head { grid-template-columns: minmax(0, 1fr); }
+      .relationship-score {
+        width: fit-content;
+        grid-auto-flow: column;
+        gap: 6px;
+        align-items: baseline;
+        min-width: 0;
+        padding: 7px 10px;
+      }
+      .relationship-score small { margin-top: 0; }
+      .relationship-card { padding: 4px; }
+      .relationship {
+        height: clamp(365px, 108vw, 430px);
+        min-height: 365px;
+      }
+      .relationship-legend { grid-template-columns: 1fr; }
+      .insight-row { grid-template-columns: auto minmax(0, 1fr); }
+      .insight-row span:last-child { grid-column: 2; }
+    }
+
+    @keyframes rel-flow {
+      to { stroke-dashoffset: -48; }
+    }
+
+    @keyframes rel-pulse {
+      0%, 100% { opacity: 0.16; transform: scale(1); }
+      50% { opacity: 0.42; transform: scale(1.18); }
+    }
+
+    @keyframes rel-node-idle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    @keyframes rel-orbit {
+      to { transform: rotate(360deg); }
+    }
+
+
+    /* ─── RESPONSIVE: DESKTOP ─────────────────────────────────────── */
+    @media (min-width: 760px) {
+      body { overflow: auto; }
+
+      .shell {
+        min-height: 100vh;
+        height: auto;
+        padding: 28px;
+        place-items: center;
+      }
+
+      .app {
+        grid-template-columns: minmax(0, 1fr) 360px;
+        grid-template-areas:
+          "topbar sheet"
+          "status sheet"
+          "chat sheet"
+          "composer sheet";
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        width: min(1160px, 100%);
+        height: min(900px, calc(100vh - 56px));
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 32px 90px rgba(0, 0, 0, 0.55);
+      }
+
+      .topbar, .status-strip, .chat, .composer-area { grid-column: 1; }
+
+      .rebellion-banner { grid-column: 1; }
+
+      .sheet {
+        grid-area: sheet;
+        position: static;
+        grid-column: 2;
+        grid-row: 1 / -1;
+        grid-template-rows: auto minmax(0, 1fr);
+        max-height: none;
+        border: 0;
+        border-left: 1px solid var(--line);
+        border-radius: 0;
+        box-shadow: none;
+        transform: none !important;
+      }
+
+      .scrim, .grabber { display: none !important; }
+      .sheet-body { min-height: 0; }
+      .bubble { max-width: min(100%, 540px); }
+    }
+
+    @media (max-width: 390px) {
+      .brand h1 { font-size: 1.18rem; }
+
+      .weather { width: var(--tap); padding: 4px; }
+      .weather > div { display: none; }
+
+      .organ-pill { min-width: 0; }
+      .bubble { max-width: min(100%, calc(100vw - 72px)); }
+      .user .bubble { max-width: min(100%, calc(100vw - 24px)); }
+    }
+
+    /* ─── KEYFRAMES ───────────────────────────────────────────────── */
+    @media (max-width: 759px) {
+      .app {
+        display: block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .topbar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+      }
+
+      .status-strip {
+        position: absolute;
+        top: 64px;
+        right: 0;
+        left: 0;
+      }
+
+      .chat {
+        position: absolute;
+        top: 148px;
+        right: 0;
+        bottom: 112px;
+        left: 0;
+        min-height: 0;
+      }
+
+      .composer-area {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      20%       { transform: scale(1.14); }
+      36%       { transform: scale(0.97); }
+      56%       { transform: scale(1.08); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(0.95); }
+      50%       { transform: scale(1.06); }
+    }
+
+    @keyframes spark {
+      0%   { opacity: 0.2; stroke-dashoffset: 22; }
+      40%  { opacity: 1; }
+      100% { opacity: 0.2; stroke-dashoffset: 0; }
+    }
+
+    @keyframes flow {
+      to { stroke-dashoffset: -16; }
+    }
+
+    /* NEW: liver color pulse */
+    @keyframes liver-pulse {
+      0%, 100% { fill: color-mix(in srgb, var(--liver), white 15%); }
+      50%       { fill: color-mix(in srgb, #9a6800, white 10%); }
+    }
+
+    /* NEW: stomach churn */
+    @keyframes gut-churn {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      30%       { transform: scale(1.04) rotate(1.5deg); }
+      60%       { transform: scale(0.97) rotate(-1deg); }
+    }
+
+    @keyframes gut-ripple {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.18); opacity: 0.6; }
+    }
+
+    /* NEW: cloud drift */
+    @keyframes cloud-drift {
+      0%, 100% { transform: translateX(0); }
+      50%       { transform: translateX(2px); }
+    }
+
+    /* NEW: lightning flash */
+    @keyframes lightning-flash {
+      0%, 80%, 100% { opacity: 1; }
+      85%            { opacity: 0.2; }
+      90%            { opacity: 1; }
+      95%            { opacity: 0.3; }
+    }
+
+    /* NEW: organ pill glow on mood change */
+    @keyframes organ-glow {
+      0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--organ), transparent 60%); }
+      50%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--organ), transparent 80%); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    /* NEW: streaming cursor */
+    @keyframes cursor-blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* NEW: crisis pulse border */
+    @keyframes crisis-pulse {
+      0%, 100% { opacity: 0.3; }
+      50%       { opacity: 0.7; }
+    }
+
+    /* NEW: typing dot bounce */
+    @keyframes dot-bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30%            { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* NEW: toast slide in */
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(-12px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toast-out {
+      to { opacity: 0; transform: translateY(-8px) scale(0.96); }
+    }/* --- Missing styles from old app, adapted to new design system --- */
+
+/* Weather SVG */
+.weather-svg { width: 28px; height: 28px; }
+.sun-core { fill: #facc15; stroke: #f59e0b; stroke-width: 3; }
+.sun-rays { animation: sun-spin 12s linear infinite; transform-origin: 22px 22px; }
+.cloud-shape { animation: cloud-drift 6s ease-in-out infinite; }
+.rain-lines { animation: rain-fall 0.8s linear infinite; }
+.lightning-bolt { animation: lightning-flash 3s ease-in-out infinite; }
+.funnel { fill: none; stroke: #a78bfa; stroke-width: 2.5; stroke-linecap: round; }
+.hurricane-eye { fill: none; stroke: #f59e0b; stroke-width: 2.5; }
+
+/* Section titles in sheet panels */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.section-title h2 { margin: 0; font-family: var(--font-display); font-size: 0.94rem; font-weight: 700; }
+
+/* Organ list in mood board */
+.organ-list { display: grid; gap: 8px; }
+.organ-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+
+/* Memory box */
+.memory-box { margin: 0; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
+
+/* Achievements */
+.achievement-list { display: grid; gap: 8px; }
+.achievement-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.achievement-row strong { display: block; font-size: 0.82rem; color: var(--text); }
+.achievement-row span { display: block; font-size: 0.76rem; color: var(--muted); }
+
+/* Muted text */
+.muted { color: var(--muted); font-size: 0.8rem; }
+
+/* Buttons */
+.full-button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background 120ms, border-color 120ms;
+}
+.full-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.full-button.link-button { text-decoration: none; }
+.danger-button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid rgba(244,63,94,0.3);
+  border-radius: 8px;
+  background: rgba(244,63,94,0.08);
+  color: #fb7185;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Diary */
+.diary-list { display: grid; gap: 10px; }
+.diary-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  padding: 12px;
+}
+.diary-card h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 0.88rem; font-weight: 700; }
+.diary-card p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+/* Settings toggles */
+.toggle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.organ-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--soft);
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: background 120ms, border-color 120ms, color 120ms;
+}
+.organ-toggle.active {
+  border-color: color-mix(in srgb, var(--organ-color), white 20%);
+  background: color-mix(in srgb, var(--organ-color), transparent 88%);
+  color: var(--text);
+}
+
+/* Segmented control */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.segmented button {
+  padding: 8px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--soft);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+.segmented button.active {
+  border-color: var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+/* Switch row */
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.switch-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* Range input */
+.range {
+  width: 100%;
+  height: 6px;
+  margin: 8px 0;
+  appearance: none;
+  border-radius: 999px;
+  background: var(--line);
+  outline: none;
+}
+.range::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+/* Text input */
+.text-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.84rem;
+  outline: none;
+  transition: border-color 150ms;
+}
+.text-input:focus { border-color: var(--accent); }
+
+/* Multiplayer section */
+.client-name { margin: 0 0 8px; color: var(--accent); font-family: "DM Mono", monospace; font-size: 0.72rem; }
+.join-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-bottom: 10px; }
+.button-row { display: flex; gap: 8px; }
+.button-row button { flex: 1; }
+
+/* Summary Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.65);
+  padding: 20px;
+}
+.summary-modal {
+  width: min(520px, 100%);
+  max-height: 80dvh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  padding: 20px;
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.modal-head h2 { margin: 0; font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; }
+.modal-head span { display: block; color: var(--accent); font-family: "DM Mono", monospace; font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.summary-paper { display: grid; gap: 12px; margin-bottom: 16px; }
+.summary-paper article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+.summary-paper h3 { margin: 0 0 4px; font-family: var(--font-display); font-size: 0.88rem; font-weight: 700; }
+.summary-paper p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-actions button {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* Icon button (summary modal close) */
+.icon-button {
+  display: grid;
+  width: 34px; height: 34px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+/* EmptyState orbits */
+.orbit { animation: orbit-float 4s ease-in-out infinite; }
+.orbit-0 { animation-delay: 0s; }
+.orbit-1 { animation-delay: 0.5s; }
+.orbit-2 { animation-delay: 1s; }
+.orbit-3 { animation-delay: 1.5s; }
+.orbit-4 { animation-delay: 2s; }
+.orbit-5 { animation-delay: 2.5s; }
+@keyframes orbit-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes sun-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes rain-fall { 0% { opacity: 0; transform: translateY(-2px); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(6px); } }
