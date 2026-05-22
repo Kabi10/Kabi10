@@ -65,6 +65,18 @@
       overflow-wrap: anywhere;
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
     /* ─── LAYOUT SHELL ────────────────────────────────────────────── */
     /* React: <Shell> */
     .shell {
@@ -176,6 +188,32 @@
       display: flex;
       gap: 6px;
       align-items: center;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+    }
+
+    .clear-chat-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: var(--tap);
+      padding: 0 12px;
+      border: 1px solid rgba(244, 63, 94, 0.26);
+      border-radius: 999px;
+      background: rgba(244, 63, 94, 0.12);
+      color: #fecdd3;
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: background 120ms, border-color 120ms, transform 100ms;
+    }
+
+    .clear-chat-btn:active {
+      transform: scale(0.96);
+      background: rgba(244, 63, 94, 0.18);
+      border-color: rgba(244, 63, 94, 0.48);
     }
 
     /* ─── WEATHER WIDGET ──────────────────────────────────────────── */
@@ -249,7 +287,6 @@
       stroke: currentColor;
       stroke-linecap: round;
       stroke-linejoin: round;
-      stroke-width: 2.2;
     }
 
     /* ─── REBELLION BANNER ────────────────────────────────────────── */
@@ -333,6 +370,12 @@
       line-height: 1.1;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .organ-pill--disabled {
+      opacity: 0.35;
+      filter: grayscale(1);
+      pointer-events: none;
     }
 
     /* mood bar track */
@@ -451,16 +494,14 @@
 
     @media (max-width: 759px) {
       .shell {
-        min-height: 100vh;
-        height: 100vh;
+        min-height: 100dvh;
         height: 100dvh;
       }
 
       .app {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        height: 100vh;
+        min-height: 100dvh;
         height: 100dvh;
       }
 
@@ -481,13 +522,32 @@
 
       .chat {
         order: 3;
-        flex: 1 1 auto;
-        min-height: 180px;
+        flex: 1 1 0;
+        min-height: 0;
       }
 
       .composer-area {
         order: 4;
         flex: 0 0 auto;
+        padding-left: var(--screen-pad);
+        padding-right: var(--screen-pad);
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+      }
+
+      .topbar {
+        min-height: 58px;
+        padding-top: max(8px, env(safe-area-inset-top));
+        padding-bottom: 8px;
+      }
+
+      .clear-chat-btn {
+        min-width: var(--tap);
+        padding: 0;
+        justify-content: center;
+      }
+
+      .clear-label {
+        display: none;
       }
     }
 
@@ -766,7 +826,7 @@
     .composer-area {
       border-top: 1px solid rgba(148, 163, 184, 0.1);
       background: rgba(7, 9, 14, 0.96);
-      padding: 8px 10px max(10px, env(safe-area-inset-bottom));
+      padding: 8px 10px max(12px, env(safe-area-inset-bottom));
       transition: opacity 300ms, filter 300ms;
     }
 
@@ -1102,6 +1162,25 @@
       max-height: min(84dvh, 760px);
     }
 
+    @media (max-width: 759px) {
+      .sheet {
+        left: 8px;
+        right: 8px;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+        width: auto;
+        max-height: min(80dvh, calc(100dvh - 112px));
+        border-radius: 18px 18px 14px 14px;
+      }
+
+      .sheet-body {
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+      }
+
+      .tabs {
+        padding-inline: 8px;
+      }
+    }
+
     .sheet-body {
       -webkit-overflow-scrolling: touch;
     }
@@ -1149,7 +1228,7 @@
 
     /* --- V4: NO-CLIP MOBILE FIXES + MORE OBVIOUS MOTION ------------- */
     :root {
-      --pill-w: clamp(112px, 31vw, 142px);
+      --pill-w: clamp(120px, 33vw, 148px);
       --radius-lg: 18px;
     }
 
@@ -1225,9 +1304,9 @@
     }
 
     .organ-pill strong {
-      overflow: visible;
-      text-overflow: clip;
-      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       line-height: 1.08;
       font-size: clamp(0.78rem, 2.7vw, 0.9rem);
       letter-spacing: -0.02em;
@@ -1850,6 +1929,102 @@
       .user .bubble { max-width: min(100%, calc(100vw - 24px)); }
     }
 
+    @media (max-width: 759px) {
+      :root { --pill-w: clamp(92px, 28vw, 112px); }
+
+      .sheet {
+        position: fixed;
+        z-index: 20;
+      }
+
+      .scrim {
+        position: fixed;
+        z-index: 15;
+      }
+
+      .brand span {
+        font-size: 0.56rem;
+        letter-spacing: 0.08em;
+      }
+
+      .brand h1 {
+        font-size: 1.14rem;
+      }
+
+      .topbar {
+        grid-template-columns: minmax(0, 1fr) max-content;
+        gap: 8px;
+      }
+
+      .icon-btn,
+      .clear-chat-btn {
+        width: 38px;
+        min-width: 38px;
+        height: 38px;
+        min-height: 38px;
+      }
+
+      .status-strip {
+        grid-template-columns: none;
+        grid-auto-flow: column;
+        grid-auto-columns: var(--pill-w);
+        gap: 8px;
+        padding: 7px var(--screen-pad);
+      }
+
+      .organ-pill {
+        grid-template-columns: 30px minmax(0, 1fr);
+        min-height: 54px;
+        padding: 7px;
+      }
+
+      .organ-pill strong {
+        font-size: 0.76rem;
+        line-height: 1.05;
+      }
+
+      .avatar {
+        width: 30px;
+        height: 30px;
+      }
+
+      .chat {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .day-marker {
+        margin-bottom: 10px;
+      }
+
+      .quick-row {
+        padding-bottom: 6px;
+      }
+
+      .quick-row button {
+        min-height: 34px;
+        padding: 6px 10px;
+        font-size: 0.76rem;
+      }
+
+      .composer {
+        grid-template-columns: minmax(0, 1fr) 46px;
+      }
+
+      .composer textarea {
+        min-height: 46px;
+        max-height: 96px;
+        padding: 10px 12px;
+        line-height: 1.35;
+      }
+
+      .send {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+      }
+    }
+
     /* ─── KEYFRAMES ───────────────────────────────────────────────── */
     @keyframes rise {
       from { opacity: 0; transform: translateY(8px); }
@@ -2216,6 +2391,321 @@
 }
 @keyframes sun-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 @keyframes rain-fall { 0% { opacity: 0; transform: translateY(-2px); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(6px); } }
+
+/* ─── ADMIN DASHBOARD ───────────────────────────────────────────────── */
+.admin-shell {
+  background:
+    radial-gradient(circle at top, rgba(79, 209, 197, 0.12), transparent 32%),
+    var(--bg);
+}
+
+.admin-app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(12px, env(safe-area-inset-top)) 14px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(7, 9, 14, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.admin-topbar span,
+.admin-kicker {
+  display: block;
+  color: var(--accent);
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-topbar h1,
+.admin-detail-head h2,
+.admin-card h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.14rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.admin-top-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid rgba(79, 209, 197, 0.25);
+  border-radius: 999px;
+  background: rgba(79, 209, 197, 0.12);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+}
+
+.admin-link.secondary {
+  border-color: var(--line);
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.admin-login {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 18px;
+  overflow: auto;
+}
+
+.admin-card {
+  width: min(100%, 420px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(15, 21, 32, 0.96);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  padding: 18px;
+}
+
+.admin-card p,
+.admin-empty-state p,
+.admin-state-block p,
+.admin-session-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-error,
+.admin-floating-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(244, 63, 94, 0.28);
+  border-radius: 12px;
+  background: rgba(244, 63, 94, 0.1);
+  color: #fecdd3;
+  font-size: 0.82rem;
+}
+
+.admin-error {
+  padding: 10px 12px;
+}
+
+.admin-main {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.admin-sidebar,
+.admin-detail {
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(15, 21, 32, 0.96);
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.admin-sidebar-head,
+.admin-detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+  padding: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.admin-sidebar-head h2,
+.admin-state-block h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.admin-sidebar-head p,
+.admin-detail-head p {
+  margin: 4px 0 0;
+  color: var(--soft);
+  font-size: 0.78rem;
+}
+
+.admin-refresh {
+  width: 40px;
+  height: 40px;
+}
+
+.admin-search {
+  margin: 0 14px 12px;
+  width: calc(100% - 28px);
+}
+
+.admin-session-list,
+.admin-thread {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 14px 14px;
+  scrollbar-width: none;
+}
+
+.admin-session-card {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 14px;
+  background: var(--panel-2);
+  padding: 12px;
+  color: var(--text);
+}
+
+.admin-session-card.active {
+  border-color: rgba(79, 209, 197, 0.44);
+  background: color-mix(in srgb, var(--accent), var(--panel-2) 88%);
+}
+
+.admin-session-head,
+.admin-session-foot,
+.admin-meta-grid,
+.admin-state {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.admin-session-head strong {
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+}
+
+.admin-session-head span,
+.admin-session-foot span {
+  color: var(--soft);
+  font-size: 0.72rem;
+}
+
+.admin-detail {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.admin-meta-grid,
+.admin-state {
+  padding: 0 14px 14px;
+}
+
+.admin-meta-card,
+.admin-state-block {
+  flex: 1 1 160px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+}
+
+.admin-meta-card span,
+.admin-state-block h3 {
+  display: block;
+  color: var(--soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-meta-card strong {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.admin-state-block p {
+  margin-top: 8px;
+  word-break: break-word;
+}
+
+.admin-thread {
+  align-content: start;
+  padding-top: 0;
+}
+
+.admin-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 24px;
+  text-align: center;
+}
+
+.admin-floating-error {
+  position: fixed;
+  right: 14px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 70;
+  padding: 10px 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 900px) {
+  .admin-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 759px) {
+  .admin-topbar {
+    padding-left: var(--screen-pad);
+    padding-right: var(--screen-pad);
+  }
+
+  .admin-main {
+    padding: var(--screen-pad);
+  }
+
+  .admin-floating-error {
+    right: var(--screen-pad);
+    left: var(--screen-pad);
+  }
+}
 
 /* ─── MOBILE HARDENING OVERRIDES ───────────────────────────────── */
 @media (max-width: 390px) {

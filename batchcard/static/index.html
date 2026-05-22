@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Batchcard — ALCOA++ Compliant Batch Tracking</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #334155;
+  --border: #475569;
+  --text: #f8fafc;
+  --text-dim: #94a3b8;
+  --accent: #10b981;
+  --accent-dim: #059669;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --info: #3b82f6;
+  --mono: "SF Mono", ui-monospace, monospace;
+  --radius: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { background:var(--bg); color:var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height:1.45; -webkit-font-smoothing:antialiased; }
+body { padding: 16px; max-width: 640px; margin: 0 auto; }
+h1 { font-size: 1.4rem; font-weight:700; letter-spacing:-0.02em; margin-bottom:4px; }
+.sub { color:var(--text-dim); font-size:0.82rem; margin-bottom:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; }
+.card h2 { font-size:1.05rem; font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.label { display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); margin-bottom:6px; margin-top:12px; }
+input, select, textarea {
+  width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border);
+  border-radius:8px; padding:10px 12px; font-size:0.95rem; outline:none;
+}
+input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+textarea { min-height: 60px; resize:vertical; }
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  background:var(--accent); color:#fff; border:none; border-radius:8px;
+  padding:10px 16px; font-size:0.92rem; font-weight:600; cursor:pointer;
+  margin-top:12px;
+}
+.btn.secondary { background:var(--surface-2); color:var(--text); border:1px solid var(--border); }
+.btn.danger { background:var(--danger); }
+.btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+.status-badge {
+  display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:600; text-transform:uppercase;
+}
+.status-active { background:rgba(16,185,129,0.15); color:var(--accent); }
+.status-completed { background:rgba(59,130,246,0.15); color:var(--info); }
+.status-quarantined { background:rgba(245,158,11,0.15); color:var(--warn); }
+.status-rejected { background:rgba(239,68,68,0.15); color:var(--danger); }
+
+.batch-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 0; border-bottom:1px solid var(--border);
+}
+.batch-row:last-child { border-bottom:none; }
+.batch-meta { font-size:0.8rem; color:var(--text-dim); }
+.batch-id { font-family:var(--mono); font-size:0.82rem; color:var(--accent); }
+
+.entry-row {
+  background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:10px;
+}
+.entry-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.entry-stage { font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); font-weight:600; }
+.entry-sig { font-family:var(--mono); font-size:0.7rem; color:var(--text-dim); }
+
+.tabs { display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; }
+.tab {
+  padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:500; cursor:pointer;
+  background:var(--surface); border:1px solid var(--border); color:var(--text-dim); white-space:nowrap;
+}
+.tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+.hidden { display:none; }
+
+.audit-row {
+  font-family:var(--mono); font-size:0.76rem; padding:8px 0; border-bottom:1px solid var(--border);
+  color:var(--text-dim);
+}
+.audit-row strong { color:var(--text); }
+
+.alcoa-grid {
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:16px;
+}
+.alcoa-item {
+  background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center; font-size:0.72rem;
+}
+.alcoa-item.on { border-color:var(--accent); color:var(--accent); font-weight:600; }
+
+.toast {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  background:var(--surface-2); color:var(--text); border:1px solid var(--border);
+  padding:10px 18px; border-radius:10px; font-size:0.85rem; z-index:100;
+  opacity:0; transition:opacity 0.3s;
+}
+.toast.show { opacity:1; }
+
+@media (min-width: 640px) {
+  body { padding: 32px; }
+}
+</style>
+</head>
+<body>
+
+<h1>Batchcard</h1>
+<div class="sub">ALCOA++ compliant batch tracking for regulated manufacturing</div>
+
+<div class="alcoa-grid">
+  <div class="alcoa-item on">Attributable</div>
+  <div class="alcoa-item on">Legible</div>
+  <div class="alcoa-item on">Contemporaneous</div>
+  <div class="alcoa-item on">Original</div>
+  <div class="alcoa-item on">Accurate</div>
+  <div class="alcoa-item on">Complete</div>
+  <div class="alcoa-item on">Consistent</div>
+  <div class="alcoa-item on">Enduring</div>
+  <div class="alcoa-item on">Available</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="batches" onclick="showTab('batches')">Batches</div>
+  <div class="tab" data-tab="new" onclick="showTab('new')">New Batch</div>
+  <div class="tab" data-tab="audit" onclick="showTab('audit')">Audit Log</div>
+</div>
+
+<!-- Batches List -->
+<div id="tab-batches">
+  <div class="card">
+    <div id="batch-list">Loading...</div>
+  </div>
+</div>
+
+<!-- New Batch -->
+<div id="tab-new" class="hidden">
+  <div class="card">
+    <h2>Create Batch</h2>
+    <label class="label">Batch Number</label>
+    <input id="nb-number" placeholder="e.g. BC-2026-0001">
+    <label class="label">Product Name</label>
+    <input id="nb-product" placeholder="e.g. Dried Cannabis Flower">
+    <label class="label">Lot Number</label>
+    <input id="nb-lot" placeholder="e.g. LOT-2026-A">
+    <label class="label">Quantity</label>
+    <input id="nb-qty" type="number" step="0.01" placeholder="0.00">
+    <label class="label">Unit</label>
+    <input id="nb-unit" placeholder="kg, g, units, litres">
+    <label class="label">Your Name (Operator)</label>
+    <input id="nb-operator" placeholder="Jane Doe">
+    <button class="btn" onclick="createBatch()">Create Batch</button>
+  </div>
+</div>
+
+<!-- Audit -->
+<div id="tab-audit" class="hidden">
+  <div class="card">
+    <h2>Global Audit Log</h2>
+    <div id="audit-list">Loading...</div>
+  </div>
+</div>
+
+<!-- Batch Detail Modal (simulated inline) -->
+<div id="batch-detail" class="hidden">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h2 id="bd-title">Batch Detail</h2>
+      <button class="btn secondary" onclick="closeDetail()">Close</button>
+    </div>
+    <div id="bd-content"></div>
+    <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
+      <h3 style="font-size:0.9rem; margin-bottom:8px; color:var(--text-dim);">Add Entry</h3>
+      <label class="label">Stage</label>
+      <select id="bd-stage"></select>
+      <label class="label">Field Name</label>
+      <input id="bd-field" placeholder="e.g. temperature">
+      <label class="label">Value</label>
+      <input id="bd-value" placeholder="e.g. 22.5">
+      <label class="label">Unit (optional)</label>
+      <input id="bd-unit" placeholder="e.g. °C">
+      <label class="label">Notes</label>
+      <textarea id="bd-notes" placeholder="Any observations..."></textarea>
+      <label class="label">Your Name</label>
+      <input id="bd-operator" placeholder="Operator name for signature">
+      <button class="btn" onclick="addEntry()">Add Entry & Sign</button>
+      <button class="btn secondary" style="margin-left:8px;" onclick="signStage()">Sign Stage Only</button>
+    </div>
+    <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
+      <h3 style="font-size:0.9rem; margin-bottom:8px; color:var(--text-dim);">Actions</h3>
+      <button class="btn secondary" onclick="exportCSV()">Export CSV</button>
+      <button class="btn secondary" onclick="updateStatus('completed')">Mark Completed</button>
+      <button class="btn secondary" onclick="updateStatus('quarantined')">Quarantine</button>
+      <button class="btn danger" onclick="updateStatus('rejected')">Reject</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API = "";
+let stages = [];
+let currentBatchId = null;
+
+async function api(path, opts={}) {
+  const res = await fetch(API + path, { headers:{"Content-Type":"application/json"}, ...opts });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({detail:res.statusText}));
+    throw new Error(err.detail || res.statusText);
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab===id));
+  ["batches","new","audit","batch-detail"].forEach(k => {
+    const el = document.getElementById(k==="batch-detail"?"batch-detail":("tab-"+k));
+    if(el) el.classList.toggle("hidden", k!==id && !(k==="batch-detail" && id==="batch-detail"));
+  });
+  if(id==="batches") loadBatches();
+  if(id==="audit") loadAudit();
+}
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function statusClass(s) {
+  return "status-badge status-" + s;
+}
+
+async function loadBatches() {
+  const list = document.getElementById("batch-list");
+  try {
+    const data = await api("/api/batches");
+    if(!data.length) { list.innerHTML = "<p style='color:var(--text-dim)'>No batches yet.</p>"; return; }
+    list.innerHTML = data.map(b => `
+      <div class="batch-row" onclick="openBatch(${b.id})" style="cursor:pointer">
+        <div>
+          <div><span class="batch-id">${b.batch_number}</span> <span class="${statusClass(b.status)}">${b.status}</span></div>
+          <div class="batch-meta">${b.product_name} &middot; ${b.lot_number} &middot; ${b.quantity} ${b.unit} &middot; ${b.current_stage}</div>
+        </div>
+        <div style="color:var(--text-dim); font-size:0.8rem;">&rsaquo;</div>
+      </div>
+    `).join("");
+  } catch(e) { list.innerHTML = `<p style="color:var(--danger)">Error: ${e.message}</p>`; }
+}
+
+async function loadAudit() {
+  const list = document.getElementById("audit-list");
+  try {
+    const data = await api("/api/audit");
+    if(!data.length) { list.innerHTML = "<p style='color:var(--text-dim)'>No audit records.</p>"; return; }
+    list.innerHTML = data.map(a => `
+      <div class="audit-row">
+        <strong>${a.action}</strong> on <strong>${a.table_name}</strong>
+        #${a.record_id || "-"} by ${a.performed_by} at ${new Date(a.performed_at).toLocaleString()}
+        ${a.ip_address ? "("+a.ip_address+")" : ""}
+      </div>
+    `).join("");
+  } catch(e) { list.innerHTML = `<p style="color:var(--danger)">Error: ${e.message}</p>`; }
+}
+
+async function createBatch() {
+  const payload = {
+    batch_number: document.getElementById("nb-number").value,
+    product_name: document.getElementById("nb-product").value,
+    lot_number: document.getElementById("nb-lot").value,
+    quantity: parseFloat(document.getElementById("nb-qty").value),
+    unit: document.getElementById("nb-unit").value,
+    created_by: document.getElementById("nb-operator").value,
+  };
+  if(Object.values(payload).some(v => v==="" || v==null || isNaN(v))) { toast("Fill all fields correctly."); return; }
+  try {
+    await api("/api/batches", {method:"POST", body:JSON.stringify(payload)});
+    toast("Batch created.");
+    ["nb-number","nb-product","nb-lot","nb-qty","nb-unit","nb-operator"].forEach(id => document.getElementById(id).value="");
+    showTab("batches");
+  } catch(e) { toast(e.message); }
+}
+
+async function openBatch(id) {
+  currentBatchId = id;
+  try {
+    const report = await api(`/api/batches/${id}/report`);
+    const b = report.batch;
+    document.getElementById("bd-title").innerHTML = `${b.batch_number} <span class="${statusClass(b.status)}">${b.status}</span>`;
+
+    let html = `
+      <div class="batch-meta" style="margin-bottom:12px;">
+        ${b.product_name} &middot; ${b.lot_number} &middot; ${b.quantity} ${b.unit} &middot; Stage: ${b.current_stage}<br>
+        Created by ${b.created_by} on ${new Date(b.created_at).toLocaleString()}
+      </div>
+    `;
+
+    html += `<h3 style="font-size:0.85rem; margin:12px 0 8px; color:var(--text-dim);">Entries (${report.entries.length})</h3>`;
+    if(report.entries.length===0) html += `<p style="color:var(--text-dim); font-size:0.85rem;">No entries yet.</p>`;
+    html += report.entries.map(e => `
+      <div class="entry-row">
+        <div class="entry-header">
+          <span class="entry-stage">${e.stage_name}</span>
+          <span style="font-size:0.78rem; color:var(--text-dim)">${new Date(e.created_at).toLocaleString()}</span>
+        </div>
+        <div style="font-size:0.92rem; margin-bottom:4px;"><strong>${e.field_name}:</strong> ${e.value} ${e.unit||""}</div>
+        ${e.notes ? `<div style="font-size:0.8rem; color:var(--text-dim); margin-bottom:4px;">${e.notes}</div>` : ""}
+        <div class="entry-sig">Sig: ${e.signature_hash.slice(0,24)}... &middot; ${e.operator_name}</div>
+      </div>
+    `).join("");
+
+    html += `<h3 style="font-size:0.85rem; margin:16px 0 8px; color:var(--text-dim);">Signatures (${report.signatures.length})</h3>`;
+    if(report.signatures.length===0) html += `<p style="color:var(--text-dim); font-size:0.85rem;">No signatures yet.</p>`;
+    html += report.signatures.map(s => `
+      <div class="entry-row" style="padding:8px 12px;">
+        <div style="font-size:0.85rem;"><strong>${s.stage_name}</strong> — ${s.action} by ${s.operator_name}</div>
+        <div class="entry-sig">${new Date(s.signed_at).toLocaleString()} &middot; ${s.signature_hash.slice(0,24)}...</div>
+      </div>
+    `).join("");
+
+    html += `<h3 style="font-size:0.85rem; margin:16px 0 8px; color:var(--text-dim);">Audit Trail</h3>`;
+    if(report.audit.length===0) html += `<p style="color:var(--text-dim); font-size:0.85rem;">No audit records.</p>`;
+    html += report.audit.slice(0,10).map(a => `
+      <div class="audit-row">
+        <strong>${a.action}</strong> ${a.table_name}#${a.record_id||"-"} by ${a.performed_by}
+        ${a.new_values ? `→ ${JSON.stringify(a.new_values).slice(0,80)}` : ""}
+      </div>
+    `).join("");
+
+    document.getElementById("bd-content").innerHTML = html;
+
+    // Populate stage select
+    const sel = document.getElementById("bd-stage");
+    sel.innerHTML = stages.map(s => `<option value="${s.name}">${s.name}</option>`).join("");
+
+    showTab("batch-detail");
+  } catch(e) { toast(e.message); }
+}
+
+function closeDetail() { showTab("batches"); currentBatchId = null; }
+
+async function addEntry() {
+  if(!currentBatchId) return;
+  const payload = {
+    stage_name: document.getElementById("bd-stage").value,
+    field_name: document.getElementById("bd-field").value,
+    value: document.getElementById("bd-value").value,
+    unit: document.getElementById("bd-unit").value || null,
+    notes: document.getElementById("bd-notes").value || null,
+    operator_name: document.getElementById("bd-operator").value,
+  };
+  if(!payload.field_name || !payload.value || !payload.operator_name) { toast("Fill required fields."); return; }
+  try {
+    await api(`/api/batches/${currentBatchId}/entries`, {method:"POST", body:JSON.stringify(payload)});
+    toast("Entry added.");
+    ["bd-field","bd-value","bd-unit","bd-notes"].forEach(id => document.getElementById(id).value="");
+    openBatch(currentBatchId);
+  } catch(e) { toast(e.message); }
+}
+
+async function signStage() {
+  if(!currentBatchId) return;
+  const operator = document.getElementById("bd-operator").value;
+  const stage = document.getElementById("bd-stage").value;
+  if(!operator) { toast("Enter your name to sign."); return; }
+  try {
+    await api(`/api/batches/${currentBatchId}/signatures`, {method:"POST", body:JSON.stringify({stage_name:stage, operator_name:operator, action:"stage_completion"})});
+    toast("Stage signed.");
+    openBatch(currentBatchId);
+  } catch(e) { toast(e.message); }
+}
+
+async function updateStatus(status) {
+  if(!currentBatchId) return;
+  const operator = document.getElementById("bd-operator").value || "system";
+  try {
+    await api(`/api/batches/${currentBatchId}/status`, {method:"PATCH", body:JSON.stringify({status, performed_by:operator})});
+    toast(`Status updated to ${status}.`);
+    openBatch(currentBatchId);
+  } catch(e) { toast(e.message); }
+}
+
+async function exportCSV() {
+  if(!currentBatchId) return;
+  window.open(`/api/batches/${currentBatchId}/export.csv`, "_blank");
+}
+
+async function init() {
+  try { stages = await api("/api/stages"); } catch(e) { console.error("stages", e); }
+  showTab("batches");
+}
+init();
+</script>
+</body>
+</html>

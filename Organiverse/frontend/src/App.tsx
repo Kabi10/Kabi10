@@ -10,6 +10,7 @@ import {
   Download,
   HeartPulse,
   KeyRound,
+  Menu,
   Moon,
   Newspaper,
   PanelRightClose,
@@ -28,11 +29,14 @@ import {
   WifiOff,
   Wind,
   Zap,
+  Trash2,
 } from "lucide-react";
 import {
   type FormEvent,
+  type TouchEvent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -41,7 +45,23 @@ import {
 type Role = "user" | "organ" | "report" | "system";
 type PanelTab = "status" | "diary" | "settings";
 type Verbosity = "terse" | "normal" | "verbose";
-type Theme = "dark" | "light";
+type ReplyLanguage =
+  | "auto"
+  | "en"
+  | "ta"
+  | "si"
+  | "hi"
+  | "es"
+  | "fr"
+  | "ar"
+  | "pt"
+  | "de"
+  | "ru"
+  | "ja"
+  | "ko"
+  | "zh"
+  | "tr"
+  | "id";
 
 type Message = {
   id: number | string;
@@ -82,8 +102,8 @@ type SessionSettings = {
   verbosity: Verbosity;
   soundEnabled: boolean;
   achievementsEnabled: boolean;
-  theme: Theme;
   volume: number;
+  replyLanguage: ReplyLanguage;
 };
 
 type Achievement = {
@@ -127,7 +147,28 @@ type Summary = {
   }>;
 };
 
-type Toast = Achievement & { toastId: string };
+type Toast = Achievement & { toastId: string; removing?: boolean };
+
+type AdminSessionSummary = {
+  sessionId: string;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+  lastMessage: string;
+  lastSenderName: string;
+  lastMessageAt: string;
+  eventCount: number;
+  crisisCount: number;
+  crisisActive: boolean;
+  rebellionActive: boolean;
+  memorySummary: string;
+  weather: WeatherState;
+};
+
+type AdminAuth = {
+  username: string;
+  password: string;
+};
 
 type AudioWindow = Window &
   typeof globalThis & {
@@ -137,6 +178,7 @@ type AudioWindow = Window &
 const SESSION_KEY = "organiverse-session-id";
 const API_KEY_KEY = "organiverse-deepseek-api-key";
 const CLIENT_NAME_KEY = "organiverse-client-name";
+const ADMIN_AUTH_KEY = "organiverse-admin-auth";
 const SEND_DEBOUNCE_MS = 500;
 
 const QUICK_ACTIONS = [
@@ -158,14 +200,33 @@ const FALLBACK_ORGANS: Organ[] = [
 ];
 
 const ORGAN_IDS = FALLBACK_ORGANS.map((organ) => organ.id);
+const REPLY_LANGUAGE_OPTIONS: Array<{ value: ReplyLanguage; label: string; note: string }> = [
+  { value: "auto", label: "Auto", note: "Mirror the latest message language." },
+  { value: "en", label: "English", note: "Keep the organs in English." },
+  { value: "ta", label: "Tamil", note: "Use Tamil script for replies." },
+  { value: "si", label: "Sinhala", note: "Use Sinhala script for replies." },
+  { value: "hi", label: "Hindi", note: "Use Devanagari script for replies." },
+  { value: "es", label: "Spanish", note: "Reply in Spanish." },
+  { value: "fr", label: "French", note: "Reply in French." },
+  { value: "ar", label: "Arabic", note: "Use Arabic script for replies." },
+  { value: "pt", label: "Portuguese", note: "Reply in Portuguese." },
+  { value: "de", label: "German", note: "Reply in German." },
+  { value: "ru", label: "Russian", note: "Use Cyrillic for replies." },
+  { value: "ja", label: "Japanese", note: "Use Japanese script for replies." },
+  { value: "ko", label: "Korean", note: "Use Hangul for replies." },
+  { value: "zh", label: "Chinese", note: "Use Simplified Chinese for replies." },
+  { value: "tr", label: "Turkish", note: "Reply in Turkish." },
+  { value: "id", label: "Indonesian", note: "Reply in Indonesian." },
+];
+const REPLY_LANGUAGE_VALUES = new Set<ReplyLanguage>(REPLY_LANGUAGE_OPTIONS.map((option) => option.value));
 
 const DEFAULT_SETTINGS: SessionSettings = {
   enabledOrgans: ORGAN_IDS,
   verbosity: "normal",
   soundEnabled: false,
   achievementsEnabled: true,
-  theme: "dark",
   volume: 0.35,
+  replyLanguage: "auto",
 };
 
 const SPECIALTY_COPY: Record<string, string> = {
@@ -242,6 +303,45 @@ function getDeploymentBasePath() {
 function withDeploymentBase(path: string) {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${getDeploymentBasePath()}${normalized}`;
+}
+
+function getAdminRouteBase() {
+  const base = getDeploymentBasePath();
+  return `${base || ""}/admin`;
+}
+
+function isAdminRoute() {
+  const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+  const adminBase = getAdminRouteBase();
+  return pathname === adminBase || pathname.startsWith(`${adminBase}/`);
+}
+
+function getAdminApiAuthHeader(auth: AdminAuth) {
+  return `Basic ${window.btoa(`${auth.username}:${auth.password}`)}`;
+}
+
+function readAdminAuth(): AdminAuth {
+  try {
+    const stored = sessionStorage.getItem(ADMIN_AUTH_KEY);
+    if (!stored) {
+      return { username: "", password: "" };
+    }
+    const parsed = JSON.parse(stored) as Partial<AdminAuth>;
+    return {
+      username: typeof parsed.username === "string" ? parsed.username : "",
+      password: typeof parsed.password === "string" ? parsed.password : "",
+    };
+  } catch {
+    return { username: "", password: "" };
+  }
+}
+
+function saveAdminAuth(auth: AdminAuth) {
+  sessionStorage.setItem(ADMIN_AUTH_KEY, JSON.stringify(auth));
+}
+
+function clearAdminAuth() {
+  sessionStorage.removeItem(ADMIN_AUTH_KEY);
 }
 
 function isCompactViewport() {
@@ -339,10 +439,12 @@ function normalizeSettings(value: unknown): SessionSettings {
   const verbosity = ["terse", "normal", "verbose"].includes(String(raw.verbosity))
     ? (raw.verbosity as Verbosity)
     : DEFAULT_SETTINGS.verbosity;
-  const theme = raw.theme === "light" ? "light" : "dark";
   const enabledOrgans = Array.isArray(raw.enabledOrgans)
     ? raw.enabledOrgans.filter((id): id is string => typeof id === "string")
     : DEFAULT_SETTINGS.enabledOrgans;
+  const replyLanguage = REPLY_LANGUAGE_VALUES.has(String(raw.replyLanguage) as ReplyLanguage)
+    ? (raw.replyLanguage as ReplyLanguage)
+    : DEFAULT_SETTINGS.replyLanguage;
 
   return {
     enabledOrgans: enabledOrgans.length ? enabledOrgans : DEFAULT_SETTINGS.enabledOrgans,
@@ -352,8 +454,8 @@ function normalizeSettings(value: unknown): SessionSettings {
       typeof raw.achievementsEnabled === "boolean"
         ? raw.achievementsEnabled
         : DEFAULT_SETTINGS.achievementsEnabled,
-    theme,
     volume: Math.max(0, Math.min(1, Number(raw.volume ?? DEFAULT_SETTINGS.volume))),
+    replyLanguage,
   };
 }
 
@@ -587,7 +689,7 @@ function useSyntheticAudio(settings: SessionSettings, weather: WeatherState, reb
   return play;
 }
 
-function App() {
+function UserApp() {
   const [sessionId, setSessionId] = useState(getInitialSessionId);
   const [clientName] = useState(getClientName);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -612,11 +714,19 @@ function App() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState("");
   const [now, setNow] = useState(Date.now());
+  const [sheetDragOffset, setSheetDragOffset] = useState(0);
+  const [sheetDragging, setSheetDragging] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const socketRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const lastSendRef = useRef(0);
   const initialSettingsSentRef = useRef(false);
+  const toastTimersRef = useRef<Map<string, number>>(new Map());
+  const sheetTouchRef = useRef({ startY: 0, currentY: 0 });
+  const diaryAutoLoadRef = useRef(false);
 
   const apiBase = useMemo(getApiBase, []);
   const wsUrl = useMemo(() => getWebSocketUrl(sessionId), [sessionId]);
@@ -685,14 +795,37 @@ function App() {
         return;
       }
       const toastId = `${achievement.id}-${Date.now()}`;
-      setToasts((current) => [{ ...achievement, toastId }, ...current].slice(0, 4));
+      setToasts((current) => [{ ...achievement, toastId, removing: false }, ...current].slice(0, 4));
       playSound("achievement");
-      window.setTimeout(() => {
-        setToasts((current) => current.filter((toast) => toast.toastId !== toastId));
+      const timeoutId = window.setTimeout(() => {
+        setToasts((current) =>
+          current.map((toast) => (toast.toastId === toastId ? { ...toast, removing: true } : toast)),
+        );
       }, 5200);
+      toastTimersRef.current.set(toastId, timeoutId);
     },
     [playSound, settings.achievementsEnabled],
   );
+
+  const removeToast = useCallback((toastId: string) => {
+    const timeoutId = toastTimersRef.current.get(toastId);
+    if (typeof timeoutId !== "undefined") {
+      window.clearTimeout(timeoutId);
+      toastTimersRef.current.delete(toastId);
+    }
+    setToasts((current) => current.filter((toast) => toast.toastId !== toastId));
+  }, []);
+
+  const dismissToast = useCallback((toastId: string) => {
+    setToasts((current) =>
+      current.map((toast) => (toast.toastId === toastId ? { ...toast, removing: true } : toast)),
+    );
+    const timeoutId = toastTimersRef.current.get(toastId);
+    if (typeof timeoutId !== "undefined") {
+      window.clearTimeout(timeoutId);
+      toastTimersRef.current.delete(toastId);
+    }
+  }, []);
 
   const sendSocket = useCallback((payload: Record<string, unknown>) => {
     const socket = socketRef.current;
@@ -721,6 +854,29 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!error) {
+      return;
+    }
+    const timer = window.setTimeout(() => setError(""), 5000);
+    return () => window.clearTimeout(timer);
+  }, [error]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPanelsOpen(false);
+      }
+    };
+
+    if (panelsOpen) {
+      window.addEventListener("keydown", onKeyDown);
+      return () => window.removeEventListener("keydown", onKeyDown);
+    }
+
+    return undefined;
+  }, [panelsOpen]);
+
+  useEffect(() => {
     const query = window.matchMedia("(max-width: 900px)");
     const syncPanels = () => setPanelsOpen(!query.matches);
     syncPanels();
@@ -739,6 +895,27 @@ function App() {
     setSummaryError("");
     setSessionState(createInitialState(sessionId));
   }, [sessionId]);
+
+  useEffect(() => {
+    const element = composerRef.current;
+    if (!element) {
+      return;
+    }
+    element.style.height = "auto";
+    element.style.height = `${Math.min(element.scrollHeight, 120)}px`;
+  }, [draft]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => pulseMoods(ORGAN_IDS), 900);
+    return () => window.clearTimeout(timer);
+  }, [pulseMoods]);
+
+  useLayoutEffect(() => {
+    if (!panelsOpen) {
+      setSheetDragOffset(0);
+      setSheetDragging(false);
+    }
+  }, [panelsOpen]);
 
   useEffect(() => {
     let retryTimer = 0;
@@ -868,6 +1045,22 @@ function App() {
           return;
         }
 
+        if (type === "chat_cleared") {
+          setMessages([]);
+          setDiaryLoading(false);
+          setDiaries([]);
+          setSummary(null);
+          setSummaryError("");
+          if (payload.state) {
+            applyState(payload.state);
+          }
+          setThinking(false);
+          setActiveRoundOrgans([]);
+          setCopiedId(null);
+          diaryAutoLoadRef.current = true;
+          return;
+        }
+
         if (type === "error") {
           setError(String(payload.message ?? "Something went wrong."));
           setThinking(false);
@@ -939,7 +1132,7 @@ function App() {
     sendUserMessage(draft);
   };
 
-  const requestDiary = () => {
+  const requestDiary = useCallback(() => {
     setDiaryLoading(true);
     setActivePanel("diary");
     setPanelsOpen(true);
@@ -947,7 +1140,7 @@ function App() {
       setDiaryLoading(false);
       setError("WebSocket is not connected yet.");
     }
-  };
+  }, [sendSocket]);
 
   const applyApiKey = () => {
     const trimmed = apiKey.trim();
@@ -960,13 +1153,39 @@ function App() {
   };
 
   const resetSession = () => {
-    if (!window.confirm("Reset this Organiverse session?")) {
+    if (!confirmReset) {
+      setConfirmReset(true);
+      window.setTimeout(() => setConfirmReset(false), 3000);
       return;
     }
+    setConfirmReset(false);
+    setDiaryLoading(false);
     setDiaries([]);
     setSummary(null);
     setSummaryError("");
+    diaryAutoLoadRef.current = false;
     sendSocket({ type: "reset_session" });
+  };
+
+  const clearChat = () => {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      window.setTimeout(() => setConfirmClear(false), 3000);
+      return;
+    }
+    setConfirmClear(false);
+    setMessages([]);
+    setThinking(false);
+    setActiveRoundOrgans([]);
+    setCopiedId(null);
+    setDiaryLoading(false);
+    setDiaries([]);
+    setSummary(null);
+    setSummaryError("");
+    diaryAutoLoadRef.current = true;
+    if (!sendSocket({ type: "clear_chat" })) {
+      setError("WebSocket is not connected yet.");
+    }
   };
 
   const joinRoom = (value: string) => {
@@ -1023,6 +1242,73 @@ function App() {
     patchSettings({ enabledOrgans: ORGAN_IDS.filter((id) => enabled.has(id)) });
   };
 
+  const fillDraft = useCallback((value: string) => {
+    setDraft(value);
+    window.requestAnimationFrame(() => {
+      composerRef.current?.focus();
+      const element = composerRef.current;
+      if (element) {
+        element.style.height = "auto";
+        element.style.height = `${Math.min(element.scrollHeight, 120)}px`;
+      }
+    });
+  }, []);
+
+  const handleSheetTouchStart = useCallback((event: TouchEvent<HTMLElement>) => {
+    if (!panelsOpen) {
+      return;
+    }
+    sheetTouchRef.current.startY = event.touches[0]?.clientY ?? 0;
+    sheetTouchRef.current.currentY = sheetTouchRef.current.startY;
+    setSheetDragging(true);
+  }, [panelsOpen]);
+
+  const handleSheetTouchMove = useCallback((event: TouchEvent<HTMLElement>) => {
+    if (!sheetDragging) {
+      return;
+    }
+    const currentY = event.touches[0]?.clientY ?? sheetTouchRef.current.currentY;
+    sheetTouchRef.current.currentY = currentY;
+    const delta = Math.max(0, currentY - sheetTouchRef.current.startY);
+    setSheetDragOffset(delta);
+  }, [sheetDragging]);
+
+  const handleSheetTouchEnd = useCallback(() => {
+    if (!sheetDragging) {
+      return;
+    }
+    const delta = sheetTouchRef.current.currentY - sheetTouchRef.current.startY;
+    setSheetDragging(false);
+    setSheetDragOffset(0);
+    sheetTouchRef.current = { startY: 0, currentY: 0 };
+    if (delta > 80) {
+      setPanelsOpen(false);
+    }
+  }, [sheetDragging]);
+
+  useEffect(() => {
+    if (activePanel !== "diary") {
+      diaryAutoLoadRef.current = false;
+      return;
+    }
+    if (diaries.length > 0) {
+      diaryAutoLoadRef.current = false;
+      return;
+    }
+    if (diaryLoading || diaryAutoLoadRef.current) {
+      return;
+    }
+    diaryAutoLoadRef.current = true;
+    requestDiary();
+  }, [activePanel, diaries.length, diaryLoading, requestDiary]);
+
+  const handlePanelChange = useCallback(
+    (tab: PanelTab) => {
+      setActivePanel(tab);
+    },
+    [],
+  );
+
   return (
     <>
       <div className="shell">
@@ -1048,6 +1334,10 @@ function App() {
               >
                 {connected ? <Wifi size={16} /> : <WifiOff size={16} />}
               </div>
+              <button className="clear-chat-btn" onClick={clearChat} title="Clear chat" type="button">
+                <Trash2 size={15} />
+                <span className="clear-label">{confirmClear ? "Confirm?" : "Clear"}</span>
+              </button>
               <button
                 className="icon-btn panel-toggle"
                 onClick={() => setPanelsOpen((current) => !current)}
@@ -1055,9 +1345,7 @@ function App() {
                 aria-expanded={panelsOpen}
                 type="button"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <Menu size={18} />
               </button>
             </div>
           </header>
@@ -1121,9 +1409,8 @@ function App() {
             <div className="quick-row">
               {QUICK_ACTIONS.map((action) => (
                 <button
-                  disabled={!connected || sendLocked}
                   key={action.label}
-                  onClick={() => sendUserMessage(action.fill)}
+                  onClick={() => fillDraft(action.fill)}
                   type="button"
                 >
                   {action.label}
@@ -1143,6 +1430,7 @@ function App() {
 
             <form className="composer" onSubmit={sendMessage}>
               <textarea
+                ref={composerRef}
                 rows={1}
                 placeholder="@Heart should I text them back?"
                 autoComplete="off"
@@ -1194,10 +1482,12 @@ function App() {
             onGenerateRoom={generateRoom}
             onJoinCodeChange={setJoinCode}
             onJoinRoom={() => joinRoom(joinCode)}
-            onPanelChange={setActivePanel}
+            onPanelChange={handlePanelChange}
             onRequestDiary={requestDiary}
             onRequestSummary={requestSummary}
+            onClearChat={clearChat}
             onReset={resetSession}
+            confirmReset={confirmReset}
             onSettingsChange={patchSettings}
             onToggleOrgan={toggleOrgan}
             open={panelsOpen}
@@ -1206,11 +1496,16 @@ function App() {
             settings={settings}
             shareUrl={shareUrl}
             summaryLoading={summaryLoading}
+            dragOffset={sheetDragOffset}
+            dragging={sheetDragging}
+            onSheetTouchEnd={handleSheetTouchEnd}
+            onSheetTouchMove={handleSheetTouchMove}
+            onSheetTouchStart={handleSheetTouchStart}
           />
         </main>
       </div>
 
-      <ToastStack organs={organs} toasts={toasts} />
+      <ToastStack organs={organs} onDismiss={dismissToast} onRemove={removeToast} toasts={toasts} />
 
       {summary && (
         <SummaryModal
@@ -1237,6 +1532,354 @@ function App() {
         </div>
       )}
     </>
+  );
+}
+
+function AdminApp() {
+  const [auth, setAuth] = useState<AdminAuth>(() => readAdminAuth());
+  const [sessions, setSessions] = useState<AdminSessionSummary[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState("");
+  const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
+  const [selectedState, setSelectedState] = useState<SessionState | null>(null);
+  const [loadingSessions, setLoadingSessions] = useState(false);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [error, setError] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [search, setSearch] = useState("");
+  const apiBase = useMemo(getApiBase, []);
+  const authHeader = useMemo(
+    () => (auth.username && auth.password ? getAdminApiAuthHeader(auth) : ""),
+    [auth],
+  );
+
+  const adminRequest = useCallback(
+    async <T,>(path: string): Promise<T> => {
+      const response = await fetch(`${apiBase}${path}`, {
+        headers: authHeader ? { Authorization: authHeader } : undefined,
+      });
+      if (response.status === 401) {
+        throw new Error("Unauthorized");
+      }
+      if (response.status === 503) {
+        throw new Error("Admin auth is not configured.");
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return (await response.json()) as T;
+    },
+    [apiBase, authHeader],
+  );
+
+  const loadSessions = useCallback(
+    async (preferredSessionId?: string) => {
+      if (!auth.username || !auth.password) {
+        return;
+      }
+      setLoadingSessions(true);
+      setError("");
+      try {
+        const nextSessions = await adminRequest<AdminSessionSummary[]>("/admin/api/sessions");
+        setSessions(nextSessions);
+        const nextSelected =
+          preferredSessionId ??
+          (nextSessions.some((item) => item.sessionId === selectedSessionId) ? selectedSessionId : nextSessions[0]?.sessionId ?? "");
+        setSelectedSessionId(nextSelected);
+        if (!nextSelected) {
+          setSelectedMessages([]);
+          setSelectedState(null);
+        } else {
+          void loadSessionDetail(nextSelected);
+        }
+        setAuthError("");
+      } catch (requestError) {
+        const message = requestError instanceof Error ? requestError.message : "Admin request failed.";
+        setAuthError(message);
+        if (message === "Unauthorized" || message === "Admin auth is not configured.") {
+          clearAdminAuth();
+          setAuth({ username: "", password: "" });
+          setSessions([]);
+          setSelectedSessionId("");
+          setSelectedMessages([]);
+          setSelectedState(null);
+        }
+      } finally {
+        setLoadingSessions(false);
+      }
+    },
+    [adminRequest, auth.password, auth.username, selectedSessionId],
+  );
+
+  const loadSessionDetail = useCallback(
+    async (sessionId: string) => {
+      if (!sessionId || !auth.username || !auth.password) {
+        return;
+      }
+      setLoadingDetail(true);
+      setError("");
+      try {
+        const [messages, state] = await Promise.all([
+          adminRequest<Message[]>(`/admin/api/sessions/${encodeURIComponent(sessionId)}/messages`),
+          adminRequest<SessionState>(`/admin/api/sessions/${encodeURIComponent(sessionId)}/state`),
+        ]);
+        setSelectedMessages(messages);
+        setSelectedState(state);
+      } catch (requestError) {
+        const message = requestError instanceof Error ? requestError.message : "Failed to load session.";
+        setError(message);
+      } finally {
+        setLoadingDetail(false);
+      }
+    },
+    [adminRequest, auth.password, auth.username],
+  );
+
+  useEffect(() => {
+    if (!auth.username || !auth.password) {
+      setSessions([]);
+      setSelectedSessionId("");
+      setSelectedMessages([]);
+      setSelectedState(null);
+      return;
+    }
+    saveAdminAuth(auth);
+    void loadSessions();
+  }, [auth, loadSessions]);
+
+  useEffect(() => {
+    if (!selectedSessionId) {
+      return;
+    }
+    void loadSessionDetail(selectedSessionId);
+  }, [loadSessionDetail, selectedSessionId]);
+
+  const filteredSessions = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    const sorted = [...sessions].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+    if (!needle) {
+      return sorted;
+    }
+    return sorted.filter((session) => {
+      return (
+        session.sessionId.toLowerCase().includes(needle) ||
+        session.lastMessage.toLowerCase().includes(needle) ||
+        session.lastSenderName.toLowerCase().includes(needle) ||
+        session.memorySummary.toLowerCase().includes(needle)
+      );
+    });
+  }, [search, sessions]);
+
+  const selectedSession = useMemo(
+    () => sessions.find((session) => session.sessionId === selectedSessionId) ?? null,
+    [selectedSessionId, sessions],
+  );
+
+  const selectedOrganMap = useMemo(
+    () => (selectedState ? selectedState.settings.enabledOrgans : ORGAN_IDS),
+    [selectedState],
+  );
+
+  const copyText = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      setError("Clipboard write failed.");
+    }
+  };
+
+  const handleLogin = (event: FormEvent) => {
+    event.preventDefault();
+    const username = auth.username.trim();
+    const password = auth.password;
+    if (!username || !password) {
+      setAuthError("Enter admin credentials.");
+      return;
+    }
+    setAuthError("");
+    setAuth({ username, password });
+  };
+
+  const handleLogout = () => {
+    clearAdminAuth();
+    setAuth({ username: "", password: "" });
+    setSessions([]);
+    setSelectedSessionId("");
+    setSelectedMessages([]);
+    setSelectedState(null);
+    setSearch("");
+    setError("");
+    setAuthError("");
+  };
+
+  return (
+    <div className="shell admin-shell">
+      <main className="admin-app" aria-label="Organiverse admin dashboard">
+        <header className="admin-topbar">
+          <div>
+            <span>Organiverse</span>
+            <h1>Admin dashboard</h1>
+          </div>
+          <div className="admin-top-actions">
+            <a className="admin-link" href={withDeploymentBase("/")} rel="noreferrer">
+              User mode
+            </a>
+            {auth.username && auth.password ? (
+              <button className="admin-link secondary" onClick={handleLogout} type="button">
+                Sign out
+              </button>
+            ) : null}
+          </div>
+        </header>
+
+        {!auth.username || !auth.password ? (
+          <section className="admin-login">
+            <div className="admin-card">
+              <span className="admin-kicker">Basic auth</span>
+              <h2>Sign in to view chat history</h2>
+              <p className="muted">Use the same admin credentials configured on the server.</p>
+              <form className="admin-login-form" onSubmit={handleLogin}>
+                <input
+                  className="text-input"
+                  onChange={(event) => setAuth((current) => ({ ...current, username: event.target.value }))}
+                  placeholder="Admin username"
+                  value={auth.username}
+                />
+                <input
+                  className="text-input"
+                  onChange={(event) => setAuth((current) => ({ ...current, password: event.target.value }))}
+                  placeholder="Admin password"
+                  type="password"
+                  value={auth.password}
+                />
+                {authError && <p className="admin-error">{authError}</p>}
+                <button className="full-button" type="submit">
+                  Enter dashboard
+                </button>
+              </form>
+            </div>
+          </section>
+        ) : (
+          <div className="admin-main">
+            <aside className="admin-sidebar">
+              <div className="admin-sidebar-head">
+                <div>
+                  <h2>Sessions</h2>
+                  <p>{loadingSessions ? "Refreshing..." : `${sessions.length} total`}</p>
+                </div>
+                <button className="icon-btn admin-refresh" onClick={() => void loadSessions(selectedSessionId)} type="button" aria-label="Refresh sessions">
+                  <RotateCcw size={16} />
+                </button>
+              </div>
+              <input
+                className="text-input admin-search"
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search sessions"
+                value={search}
+              />
+              <div className="admin-session-list">
+                {filteredSessions.map((session) => (
+                  <button
+                    className={classNames("admin-session-card", selectedSessionId === session.sessionId && "active")}
+                    key={session.sessionId}
+                    onClick={() => setSelectedSessionId(session.sessionId)}
+                    type="button"
+                  >
+                    <div className="admin-session-head">
+                      <strong>{session.sessionId}</strong>
+                      <span>{session.messageCount} msgs</span>
+                    </div>
+                    <p>{session.lastMessage || "No messages yet."}</p>
+                    <div className="admin-session-foot">
+                      <span>{session.lastSenderName || "unknown"}</span>
+                      <span>{formatTime(session.lastMessageAt || session.updatedAt)}</span>
+                    </div>
+                  </button>
+                ))}
+                {!filteredSessions.length && <p className="muted admin-empty">No sessions match this search.</p>}
+              </div>
+            </aside>
+
+            <section className="admin-detail">
+              {selectedSession ? (
+                <>
+                  <header className="admin-detail-head">
+                    <div>
+                      <span className="admin-kicker">Selected session</span>
+                      <h2>{selectedSession.sessionId}</h2>
+                      <p className="muted">Created {formatTime(selectedSession.createdAt)} · Updated {formatTime(selectedSession.updatedAt)}</p>
+                    </div>
+                    <button className="admin-link secondary" onClick={() => void copyText(selectedSession.sessionId)} type="button">
+                      Copy ID
+                    </button>
+                  </header>
+
+                  <div className="admin-meta-grid">
+                    <div className="admin-meta-card">
+                      <span>Messages</span>
+                      <strong>{selectedSession.messageCount}</strong>
+                    </div>
+                    <div className="admin-meta-card">
+                      <span>Events</span>
+                      <strong>{selectedSession.eventCount}</strong>
+                    </div>
+                    <div className="admin-meta-card">
+                      <span>Crisis</span>
+                      <strong>{selectedSession.crisisCount}</strong>
+                    </div>
+                    <div className="admin-meta-card">
+                      <span>Status</span>
+                      <strong>{selectedSession.rebellionActive ? "Rebellion" : selectedSession.crisisActive ? "Crisis" : "Stable"}</strong>
+                    </div>
+                  </div>
+
+                  <div className="admin-state">
+                    <div className="admin-state-block">
+                      <h3>Memory</h3>
+                      <p>{selectedState?.memorySummary || selectedSession.memorySummary || "No summary available."}</p>
+                    </div>
+                    <div className="admin-state-block">
+                      <h3>Weather</h3>
+                      <p>{selectedState?.weather?.label || selectedSession.weather?.label || "Unknown"}</p>
+                    </div>
+                    <div className="admin-state-block">
+                      <h3>Enabled organs</h3>
+                      <p>{selectedOrganMap.join(", ")}</p>
+                    </div>
+                  </div>
+
+                  <div className="admin-thread">
+                    {loadingDetail && <p className="muted">Loading session history...</p>}
+                    {!loadingDetail && !selectedMessages.length && <p className="muted">No chat history for this session.</p>}
+                    {selectedMessages.map((message) => (
+                      <ChatMessage
+                        copied={false}
+                        key={message.id}
+                        message={message}
+                        onCopy={copyText}
+                        organs={FALLBACK_ORGANS}
+                        rebellionActive={Boolean(selectedState?.rebellionActive)}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="admin-empty-state">
+                  <h2>Select a session</h2>
+                  <p className="muted">Choose a chat on the left to inspect its messages and body state.</p>
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+
+        {error && (
+          <div className="admin-floating-error" role="alert">
+            <Zap size={16} />
+            <span>{error}</span>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
 
@@ -1290,7 +1933,7 @@ function OrganPill({
 }) {
   return (
     <div
-      className={classNames("organ-pill", pulsing && "mood-changed")}
+      className={classNames("organ-pill", pulsing && "mood-changed", !active && "organ-pill--disabled")}
       style={{ "--organ": `var(--${organ.id})`, "--mood": `${Math.max(0, Math.min(100, 50 + mood / 2))}%` } as React.CSSProperties}
       data-organ={organ.id}
     >
@@ -1465,14 +2108,21 @@ function StatusSheet({
   onPanelChange,
   onRequestDiary,
   onRequestSummary,
+  onClearChat,
   onReset,
+  confirmReset,
   onSettingsChange,
   onToggleOrgan,
+  onSheetTouchEnd,
+  onSheetTouchMove,
+  onSheetTouchStart,
   open,
   organs,
   relationships,
   settings,
   shareUrl,
+  dragOffset = 0,
+  dragging = false,
   summaryLoading,
 }: {
   activePanel: PanelTab;
@@ -1495,18 +2145,33 @@ function StatusSheet({
   onPanelChange: (tab: PanelTab) => void;
   onRequestDiary: () => void;
   onRequestSummary: () => void;
+  onClearChat: () => void;
   onReset: () => void;
+  confirmReset: boolean;
   onSettingsChange: (patch: Partial<SessionSettings>) => void;
   onToggleOrgan: (id: string) => void;
+  onSheetTouchEnd: () => void;
+  onSheetTouchMove: (event: TouchEvent<HTMLElement>) => void;
+  onSheetTouchStart: (event: TouchEvent<HTMLElement>) => void;
   open: boolean;
   organs: Organ[];
   relationships: Relationship[];
   settings: SessionSettings;
   shareUrl: string;
+  dragOffset?: number;
+  dragging?: boolean;
   summaryLoading: boolean;
 }) {
   return (
-    <aside className={classNames("sheet", open && "open")} aria-label="Status panel" aria-modal="true">
+    <aside
+      className={classNames("sheet", open && "open", dragging && "dragging")}
+      onTouchEnd={onSheetTouchEnd}
+      onTouchMove={onSheetTouchMove}
+      onTouchStart={onSheetTouchStart}
+      aria-label="Status panel"
+      aria-modal="true"
+      style={dragOffset ? { transform: `translateY(${dragOffset}px)` } : undefined}
+    >
       <div className="grabber" />
       <nav className="tabs" aria-label="Panel tabs">
         <button className={classNames(activePanel === "status" && "active")} onClick={() => onPanelChange("status")} type="button">
@@ -1656,6 +2321,30 @@ function StatusSheet({
 
           <section className="panel">
             <div className="section-title">
+              <h2>Language</h2>
+              <BookOpen size={17} />
+            </div>
+            <label className="switch-row" style={{ marginBottom: 10 }}>
+              <span>Organ reply language</span>
+            </label>
+            <select
+              className="text-input"
+              onChange={(event) => onSettingsChange({ replyLanguage: event.target.value as ReplyLanguage })}
+              value={settings.replyLanguage}
+            >
+              {REPLY_LANGUAGE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <p className="muted" style={{ marginTop: 10 }}>
+              Auto mirrors the latest user language. Tamil uses Tamil script.
+            </p>
+          </section>
+
+          <section className="panel">
+            <div className="section-title">
               <h2>Sound</h2>
               {settings.soundEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}
             </div>
@@ -1734,9 +2423,13 @@ function StatusSheet({
             <button className="full-button" disabled={summaryLoading} onClick={onRequestSummary} type="button">
               {summaryLoading ? "Generating..." : "Session summary"}
             </button>
+            <button className="full-button" onClick={onClearChat} type="button">
+              <Trash2 size={16} />
+              Clear chat
+            </button>
             <button className="danger-button" onClick={onReset} type="button">
               <RotateCcw size={16} />
-              Reset session
+              {confirmReset ? "Confirm reset?" : "Reset session"}
             </button>
           </section>
         </div>
@@ -1825,20 +2518,29 @@ function RelationshipWeb({ organs, relationships }: { organs: Organ[]; relations
   );
 }
 
-function ToastStack({ organs, toasts }: { organs: Organ[]; toasts: Toast[] }) {
+function ToastStack({ organs, onDismiss, onRemove, toasts }: { organs: Organ[]; onDismiss: (toastId: string) => void; onRemove: (toastId: string) => void; toasts: Toast[] }) {
   if (!toasts.length) {
     return null;
   }
   return (
     <div className={classNames("toast-stack", !toasts.length && "is-hidden")}>
       {toasts.map((toast) => (
-        <div className="toast" role="alert" key={toast.toastId}>
+        <div
+          className={classNames("toast", toast.removing && "removing")}
+          key={toast.toastId}
+          onAnimationEnd={() => {
+            if (toast.removing) {
+              onRemove(toast.toastId);
+            }
+          }}
+          role="alert"
+        >
           <div>
             <div className="toast-label">Achievement Unlocked</div>
             <div className="toast-title">{toast.title}</div>
             <div className="toast-body">{toast.message}</div>
           </div>
-          <button className="toast-dismiss" type="button" aria-label="Dismiss">
+          <button className="toast-dismiss" onClick={() => onDismiss(toast.toastId)} type="button" aria-label="Dismiss">
             ×
           </button>
         </div>
@@ -1971,6 +2673,10 @@ function OrganSvg({ id }: { id: string }) {
       <circle cx="24" cy="24" r="16" />
     </svg>
   );
+}
+
+function App() {
+  return isAdminRoute() ? <AdminApp /> : <UserApp />;
 }
 
 export default App;

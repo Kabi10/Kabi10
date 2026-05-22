@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>TG Search — Telegram Explorer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #17212b;
+      --surface:     #1c2733;
+      --sidebar:     #232e3c;
+      --border:      #0d1117;
+      --border-soft: rgba(255,255,255,0.06);
+      --hover:       #2b3a4a;
+      --active:      #2b5278;
+      --text:        #e8f0f7;
+      --muted:       #6b8299;
+      --accent:      #5288c1;
+      --accent-dim:  rgba(82,136,193,0.15);
+      --accent-glow: rgba(82,136,193,0.25);
+      --green:       #4cd964;
+      --red:         #ff4d4d;
+      --orange:      #ff9800;
+      --yellow:      #ffcc00;
+      --radius:      12px;
+      --radius-sm:   8px;
+      --font:        'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono:        'JetBrains Mono', 'Fira Code', monospace;
+      --topbar-h:    52px;
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ─────────────────────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--topbar-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+    }
+
+    .topbar-logo {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -.3px;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 13px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s, background .15s;
+      letter-spacing: .1px;
+    }
+    .nav-link:hover { color: var(--text); background: var(--hover); }
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .nav-link svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── PAGE ───────────────────────────────────────────────────────── */
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -.4px;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── TABS ───────────────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 16px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── SEARCH BAR ─────────────────────────────────────────────────── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon svg { width: 20px; height: 20px; }
+
+    .search-input {
+      width: 100%;
+      height: 52px;
+      background: var(--surface);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 26px;
+      padding: 0 20px 0 52px;
+      font-size: 16px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border: none;
+      background: var(--hover);
+      border-radius: 50%;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .15s, background .15s;
+    }
+    .search-clear:hover { color: var(--text); background: var(--active); }
+    .search-clear svg { width: 14px; height: 14px; }
+    .search-input:not(:placeholder-shown) ~ .search-clear { display: flex; }
+
+    /* ── FILTER ROW ─────────────────────────────────────────────────── */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 3px;
+    }
+
+    .filter-btn {
+      height: 28px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 17px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      letter-spacing: .3px;
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+    }
+    .filter-btn:hover { color: var(--text); }
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .filter-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border-soft);
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      white-space: nowrap;
+    }
+
+    .members-inputs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .members-input {
+      width: 110px;
+      height: 34px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .members-input::placeholder { color: var(--muted); }
+    .members-input:focus { border-color: var(--accent); }
+
+    .members-dash { font-size: 12px; color: var(--muted); }
+
+    /* ── RESULT META ────────────────────────────────────────────────── */
+    .result-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      min-height: 18px;
+    }
+    .result-meta strong { color: var(--text); }
+
+    .result-error {
+      background: rgba(255,77,77,0.1);
+      border: 1px solid rgba(255,77,77,0.25);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--red);
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      z-index: 100;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform .3s, opacity .3s;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error   { border-left: 3px solid var(--red); }
+
+    /* ── CARD GRID ──────────────────────────────────────────────────── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .filter-row { gap: 8px; }
+      .members-input { width: 90px; }
+    }
+
+    /* ── RESULT CARD ───────────────────────────────────────────────── */
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      animation: cardIn .3s ease both;
+    }
+    .result-card:hover {
+      border-color: rgba(82,136,193,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .result-card.inactive {
+      opacity: .65;
+      border-color: rgba(255,77,77,0.15);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .card-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+
+    .card-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .card-verified {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+    .card-verified svg { width: 14px; height: 14px; }
+
+    .card-scam {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      color: var(--red);
+      background: rgba(255,77,77,0.15);
+      border: 1px solid rgba(255,77,77,0.3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .status-badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .status-badge.active {
+      background: rgba(76,217,100,0.15); color: var(--green);
+    }
+    .status-badge.inactive {
+      background: rgba(255,77,77,0.15); color: var(--red);
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .type-badge.channel { background: rgba(82,136,193,0.2); color: var(--accent); }
+    .type-badge.group   { background: rgba(76,217,100,0.15); color: var(--green); }
+    .type-badge.bot     { background: rgba(255,152,0,0.15); color: var(--orange); }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255,204,0,0.12);
+      color: var(--yellow);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .card-username {
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-username:hover { color: var(--accent); }
+
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-members {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .card-members svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .card-members strong { color: var(--text); font-family: var(--font); font-weight: 600; }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .result-card:hover .card-actions { opacity: 1; }
+    @media (hover: none) { .card-actions { opacity: 1; } }
+
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 16px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(82,136,193,0.2);
+      transition: background .15s, border-color .15s, color .15s;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .card-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .card-btn.danger {
+      background: rgba(255,77,77,0.1);
+      color: var(--red);
+      border-color: rgba(255,77,77,0.2);
+    }
+    .card-btn.danger:hover {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+    .card-btn svg { width: 11px; height: 11px; }
+
+    .card-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 16px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(82,136,193,0.2);
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .card-open:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .card-open svg { width: 11px; height: 11px; }
+
+    /* ── SKELETON CARDS ────────────────────────────────────────────── */
+    .skeleton-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .skeleton-top { display: flex; gap: 12px; align-items: center; }
+    .skeleton-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--sidebar);
+    }
+    .skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+    .skel {
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--sidebar) 0%, var(--hover) 50%, var(--sidebar) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    .skel-line  { height: 12px; }
+    .skel-short { width: 55%; }
+    .skel-long  { width: 80%; }
+    .skel-mid   { width: 68%; }
+    .skel-badge { width: 50px; height: 16px; border-radius: 4px; }
+    .skel-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .skel-members { height: 12px; width: 70px; }
+    .skel-btn    { height: 26px; width: 64px; border-radius: 13px; }
+
+    /* ── EMPTY STATE ────────────────────────────────────────────────── */
+    .empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      gap: 14px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--sidebar);
+      border: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+    .empty-icon svg { width: 28px; height: 28px; }
+
+    .empty-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .empty-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 300px;
+      line-height: 1.5;
+    }
+
+    /* ── INDEX TOOLBAR ──────────────────────────────────────────────── */
+    .index-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .toolbar-select {
+      height: 34px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+    }
+    .toolbar-select:focus { border-color: var(--accent); }
+
+    .toolbar-btn {
+      height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .toolbar-btn:hover { background: var(--hover); border-color: var(--accent); }
+    .toolbar-btn.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .toolbar-btn.primary:hover { background: #3a6fa3; }
+    .toolbar-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* ── MODAL ────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .modal-field {
+      margin-bottom: 14px;
+    }
+    .modal-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+    .modal-field input,
+    .modal-field textarea,
+    .modal-field select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+    }
+    .modal-field input:focus,
+    .modal-field textarea:focus,
+    .modal-field select:focus { border-color: var(--accent); }
+    .modal-field textarea { resize: vertical; min-height: 60px; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-btn {
+      height: 36px;
+      padding: 0 18px;
+      border-radius: 20px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .modal-btn.cancel {
+      background: var(--hover);
+      color: var(--text);
+    }
+    .modal-btn.cancel:hover { background: var(--active); }
+    .modal-btn.save {
+      background: var(--accent);
+      color: #fff;
+    }
+    .modal-btn.save:hover { background: #3a6fa3; }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-chip .remove-tag {
+      cursor: pointer;
+      opacity: .7;
+    }
+    .tag-chip .remove-tag:hover { opacity: 1; }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .card-tag {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .last-checked {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── HELP / GUIDE ──────────────────────────────────────────────── */
+    .help-btn {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-soft);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: color .15s, background .15s;
+    }
+    .help-btn:hover { color: var(--accent); background: var(--accent-dim); }
+    .help-btn svg { width: 14px; height: 14px; }
+
+    .guide-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .guide-overlay.open { display: flex; }
+
+    .guide-panel {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 640px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 28px;
+      animation: modalIn .2s ease;
+    }
+
+    .guide-panel::-webkit-scrollbar { width: 6px; }
+    .guide-panel::-webkit-scrollbar-track { background: transparent; }
+    .guide-panel::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 3px; }
+
+    .guide-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .guide-close {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--hover);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .guide-close:hover { color: var(--text); background: var(--active); }
+    .guide-close svg { width: 14px; height: 14px; }
+
+    .guide-section {
+      margin-bottom: 24px;
+    }
+    .guide-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 10px;
+    }
+    .guide-section p, .guide-section li {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .guide-section ul {
+      padding-left: 18px;
+      margin-top: 8px;
+    }
+    .guide-section li {
+      margin-bottom: 6px;
+    }
+    .guide-section code {
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--orange);
+    }
+    .guide-section strong {
+      color: var(--accent);
+    }
+    .guide-checklist {
+      list-style: none;
+      padding-left: 0 !important;
+    }
+    .guide-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .guide-checklist li:last-child { border-bottom: none; }
+    .check-box {
+      width: 16px; height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--muted);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .check-box.checked {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--bg);
+    }
+    .check-box.checked svg { width: 10px; height: 10px; }
+
+    .guide-tip {
+      background: var(--accent-dim);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text);
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+    .guide-tip strong { color: var(--accent); }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(82,136,193,0.12) 0%, rgba(76,217,100,0.08) 100%);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .welcome-banner.hidden { display: none; }
+
+    .welcome-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .welcome-icon svg { width: 20px; height: 20px; }
+
+    .welcome-text h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .welcome-text p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .welcome-dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .welcome-dismiss:hover { color: var(--text); }
+    .welcome-dismiss svg { width: 16px; height: 16px; }
+
+    /* ── TOOLTIP ───────────────────────────────────────────────────── */
+    [data-tip] {
+      position: relative;
+    }
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s;
+      z-index: 60;
+    }
+    [data-tip]:hover::after { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ── TOPBAR ────────────────────────────────────────────────────── -->
+  <div class="topbar">
+    <a href="./" class="topbar-logo">TG Search</a>
+
+    <nav class="topbar-nav">
+      <a href="./" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Explorer
+      </a>
+    </nav>
+    <button class="help-btn" id="helpBtn" data-tip="Open setup guide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      Guide
+    </button>
+  </div>
+
+  <!-- ── PAGE ──────────────────────────────────────────────────────── -->
+  <div class="page">
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner" id="welcomeBanner">
+      <div class="welcome-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="welcome-text">
+        <h3>Welcome to TG Search</h3>
+        <p>This tool searches <strong>public</strong> Telegram channels, groups, and bots using a Telethon MTProto session. No new bots needed, no joining required, and no ban risk. Save results to your personal index, categorize them, and verify dead links anytime.</p>
+      </div>
+      <button class="welcome-dismiss" id="welcomeDismiss" data-tip="Dismiss">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">Telegram Explorer</div>
+      <div class="page-subtitle">Search public channels &amp; groups, build your personal index</div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="search">Search</button>
+      <button class="tab-btn" data-tab="index">My Index</button>
+      <button class="tab-btn" data-tab="flagged">Flagged Groups</button>
+    </div>
+
+    <!-- ═══════ SEARCH TAB ═══════ -->
+    <div class="tab-panel active" id="panel-search">
+      <div class="search-wrap">
+        <div class="search-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <input
+          id="searchInput"
+          class="search-input"
+          type="text"
+          placeholder="Search Telegram channels, groups, bots…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-clear" id="searchClear" title="Clear search" aria-label="Clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="filter-row">
+        <span class="filter-label">Type</span>
+        <div class="filter-group" id="typeGroup">
+          <button class="filter-btn active" data-type="all">All</button>
+          <button class="filter-btn" data-type="channel">Channels</button>
+          <button class="filter-btn" data-type="group">Groups</button>
+          <button class="filter-btn" data-type="bot">Bots</button>
+        </div>
+
+        <div class="filter-sep"></div>
+
+        <span class="filter-label">Sort</span>
+        <div class="filter-group" id="sortGroup">
+          <button class="filter-btn active" data-sort="relevance">Relevance</button>
+          <button class="filter-btn" data-sort="members">Members &darr;</button>
+          <button class="filter-btn" data-sort="small_first">Smallest &uarr;</button>
+        </div>
+
+        <div class="filter-sep"></div>
+
+        <span class="filter-label">Members</span>
+        <div class="members-inputs">
+          <input class="members-input" id="minMembers" type="number" min="0" placeholder="Min" />
+          <span class="members-dash">&ndash;</span>
+          <input class="members-input" id="maxMembers" type="number" min="0" placeholder="Max" />
+        </div>
+      </div>
+
+      <div class="result-meta" id="resultMeta"></div>
+      <div class="result-error" id="resultError"></div>
+
+      <div class="card-grid" id="cardGrid">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div class="empty-title">Search for Telegram channels and groups</div>
+          <div class="empty-subtitle">Enter a keyword above to discover public channels, groups, and bots across Telegram.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ MY INDEX TAB ═══════ -->
+    <div class="tab-panel" id="panel-index">
+      <div class="index-toolbar">
+        <input
+          id="indexSearchInput"
+          class="search-input"
+          style="max-width: 280px; height: 38px; border-radius: 20px; font-size: 13px;"
+          type="text"
+          placeholder="Search your index…"
+        />
+        <select id="indexCategoryFilter" class="toolbar-select">
+          <option value="">All categories</option>
+        </select>
+        <select id="indexTypeFilter" class="toolbar-select">
+          <option value="">All types</option>
+          <option value="channel">Channels</option>
+          <option value="group">Groups</option>
+          <option value="bot">Bots</option>
+        </select>
+        <select id="indexStatusFilter" class="toolbar-select">
+          <option value="">All statuses</option>
+          <option value="active">Active only</option>
+          <option value="inactive">Inactive only</option>
+        </select>
+        <button class="toolbar-btn primary" id="btnRecheckAll">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;margin-right:4px;vertical-align:middle">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Re-check All
+        </button>
+      </div>
+
+      <div class="result-meta" id="indexMeta"></div>
+      <div class="result-error" id="indexError"></div>
+
+      <div class="card-grid" id="indexGrid">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="empty-title">Your index is empty</div>
+          <div class="empty-subtitle">Switch to the Search tab, find public groups or channels, and click Save on any result. They will appear here for organization and dead-link checking.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EDIT MODAL ────────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-title">Edit Item</div>
+      <div class="modal-field">
+        <label>Category</label>
+        <input type="text" id="editCategory" placeholder="e.g. crypto, news, dev" />
+      </div>
+      <div class="modal-field">
+        <label>Tags (comma separated)</label>
+        <input type="text" id="editTags" placeholder="python, trading, sri-lanka" />
+        <div class="tag-row" id="editTagRow"></div>
+      </div>
+      <div class="modal-field">
+        <label>Notes</label>
+        <textarea id="editNotes" placeholder="Private notes about this group…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="editCancel">Cancel</button>
+        <button class="modal-btn save" id="editSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- ═══════ FLAGGED GROUPS TAB ═══════ -->
+    <div class="tab-panel" id="panel-flagged">
+      <div class="index-toolbar">
+        <button class="toolbar-btn primary" id="btnRunScanner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;margin-right:4px;vertical-align:middle">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Run Scanner
+        </button>
+        <select id="flaggedReviewFilter" class="toolbar-select">
+          <option value="">All</option>
+          <option value="0">Unreviewed</option>
+          <option value="1">Reviewed</option>
+        </select>
+        <select id="flaggedCategoryFilter" class="toolbar-select">
+          <option value="">All categories</option>
+          <option value="intimate">Intimate</option>
+          <option value="personal">Personal</option>
+          <option value="family">Family</option>
+          <option value="memories">Memories</option>
+          <option value="financial">Financial</option>
+        </select>
+        <span id="flaggedStats" class="toolbar-select" style="border:none;background:none;color:#94a3b8;font-size:12px;padding:0 4px;margin-left:auto;cursor:default"></span>
+      </div>
+      <div id="flaggedResults" class="results-container" style="margin-top:0">
+        <div class="empty-state" id="flaggedEmpty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:64px;height:64px">
+              <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="empty-title">No flagged groups yet</div>
+          <div class="empty-subtitle">Click "Run Scanner" to search for accidentally-public small groups across multiple languages and keywords.</div>
+        </div>
+        <div class="card-grid" id="flaggedGrid" style="display:none"></div>
+      </div>
+    </div>
+
+  <!-- ── GUIDE MODAL ───────────────────────────────────────────────── -->
+  <div class="guide-overlay" id="guideOverlay">
+    <div class="guide-panel">
+      <div class="guide-title">
+        <span>Setup Guide &amp; How-To</span>
+        <button class="guide-close" id="guideClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">What This Tool Does</div>
+        <p>TG Search lets you discover, save, and organize public Telegram channels and groups in a personal index. Unlike other crawlers, it <strong>never joins groups</strong> and <strong>never creates bots</strong>. It uses a Telethon MTProto session to perform safe, read-only global searches.</p>
+        <div class="guide-tip">
+          <strong>Architecture:</strong> Telethon MTProto client &rarr; <code>messages.SearchGlobalRequest</code> (paginated global search with 10x more results) &rarr; <code>get_entity</code> (username resolve) &rarr; SQLite <code>tg_index</code> + <code>flagged_groups</code> tables. No messages fetched. No membership changes.
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">Setup Checklist</div>
+        <ul class="guide-checklist" id="setupChecklist">
+          <li><span class="check-box checked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>TG Search running on <code>http://127.0.0.1:8001</code></span></li>
+          <li><span class="check-box" id="chkSession"></span><span>Telegram session file <code>session</code> exists (for MTProto auth)</span></li>
+          <li><span class="check-box" id="chkDB"></span><span>SQLite database <code>telesearch.db</code> with <code>tg_index</code> table initialized</span></li>
+          <li><span class="check-box" id="chkClient"></span><span>Telegram client connected (the Search tab will show an error if not)</span></li>
+        </ul>
+        <div class="guide-tip">
+          <strong>First run:</strong> Start with <code>python main.py</code>. The lifespan manager auto-connects the Telethon client. Open <code>http://127.0.0.1:8001</code> and try a keyword search. If you get "Telegram client not connected", verify your session file exists and is valid.
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">Using the Search Tab</div>
+        <ul>
+          <li><strong>Type a keyword</strong> and press Enter or wait 600ms. Searches use Telegram's native global search.</li>
+          <li><strong>Filter by type:</strong> All, Channels, Groups, or Bots.</li>
+          <li><strong>Sort:</strong> Relevance (Telegram's ranking), Members (descending), or Smallest First (ascending — great for finding small/private groups).</li>
+          <li><strong>Member range:</strong> Set Min/Max to filter by subscriber count.</li>
+          <li><strong>Save to index:</strong> Click the <strong>Save</strong> button on any card. It stores the group metadata to your personal SQLite index.</li>
+        </ul>
+        <div class="guide-tip">
+          <strong>No ban risk:</strong> We use <code>messages.SearchGlobalRequest</code> with pagination and 3-second delays between pages, plus a background scanner with 5-second delays. These are legitimate Telegram API methods — no scraping, no automation abuse. You are not joining or messaging anything.
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">Using My Index</div>
+        <ul>
+          <li><strong>Filter &amp; search:</strong> Use the category dropdown, type filter, status filter, and search box to quickly find saved items.</li>
+          <li><strong>Edit items:</strong> Click <strong>Edit</strong> to set a custom category, add tags (comma-separated, clickable to remove), and write private notes.</li>
+          <li><strong>Delete items:</strong> Click <strong>Delete</strong> to remove from your index. This does not affect the actual Telegram group.</li>
+          <li><strong>Re-check All:</strong> Click the button to verify every saved username is still resolvable. Dead links get marked <strong>INACTIVE</strong> with a red badge and dimmed card. Active ones show <strong>ACTIVE</strong> in green.</li>
+        </ul>
+        <div class="guide-tip">
+          <strong>Dead-link check:</strong> For each saved item, we call <code>client.get_entity(username)</code> with a 0.6s delay. If Telegram returns an error (banned, deleted, private), we mark it inactive. This is a read-only operation — we do not join, leave, or interact.
+        </div>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">Data Storage</div>
+        <p>Everything is stored locally in your <code>telesearch.db</code> SQLite file. The <code>tg_index</code> table contains:</p>
+        <ul>
+          <li><code>telegram_id</code>, <code>title</code>, <code>username</code>, <code>type</code>, <code>members</code> &mdash; fetched from Telegram search</li>
+          <li><code>category</code>, <code>tags</code>, <code>notes</code> &mdash; your personal organization</li>
+          <li><code>is_active</code>, <code>last_checked</code> &mdash; dead-link tracking</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <div class="guide-section-title">Keyboard Shortcuts</div>
+        <ul>
+          <li><code>Enter</code> in search box &mdash; trigger search immediately</li>
+          <li><code>Esc</code> &mdash; close any open modal (edit, guide)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ─────────────────────────────────────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+<script>
+  // ── Auth ──────────────────────────────────────────────────────────
+  // Browser handles HTTP Basic Auth natively. No JS prompts needed.
+  function authHeader() { return {}; }
+
+  // ── Toast ───────────────────────────────────────────────────────────
+  function showToast(message, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = message;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── Welcome Banner ──────────────────────────────────────────────────
+  const welcomeBanner = document.getElementById('welcomeBanner');
+  const welcomeDismiss = document.getElementById('welcomeDismiss');
+  if (localStorage.getItem('tg_explorer_welcome_dismissed') === '1') {
+    welcomeBanner.classList.add('hidden');
+  }
+  welcomeDismiss.addEventListener('click', () => {
+    welcomeBanner.classList.add('hidden');
+    localStorage.setItem('tg_explorer_welcome_dismissed', '1');
+  });
+
+  // ── Guide Modal ─────────────────────────────────────────────────────
+  const guideOverlay = document.getElementById('guideOverlay');
+  const helpBtn = document.getElementById('helpBtn');
+  const guideClose = document.getElementById('guideClose');
+
+  helpBtn.addEventListener('click', () => {
+    guideOverlay.classList.add('open');
+    // Auto-check session status in guide
+    updateGuideChecks();
+  });
+  guideClose.addEventListener('click', () => guideOverlay.classList.remove('open'));
+  guideOverlay.addEventListener('click', e => {
+    if (e.target === guideOverlay) guideOverlay.classList.remove('open');
+  });
+
+  async function updateGuideChecks() {
+    // Check if client is connected by making a lightweight request
+    try {
+      const resp = await fetch('api/stats', { headers: authHeader() });
+      if (resp.ok) {
+        document.getElementById('chkClient').classList.add('checked');
+        document.getElementById('chkClient').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      }
+    } catch (_) {}
+    // DB is implicitly OK if we got here (page loaded)
+    document.getElementById('chkDB').classList.add('checked');
+    document.getElementById('chkDB').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    // Session file is best-effort — we can't check from browser, assume OK if client works
+    if (document.getElementById('chkClient').classList.contains('checked')) {
+      document.getElementById('chkSession').classList.add('checked');
+      document.getElementById('chkSession').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+  }
+
+  // ── Keyboard Shortcuts ──────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      guideOverlay.classList.remove('open');
+      editModal.classList.remove('open');
+    }
+  });
+
+  // ── Tabs ────────────────────────────────────────────────────────────
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      if (tab.dataset.tab === 'index') loadIndex();
+      if (tab.dataset.tab === 'flagged') loadFlagged();
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  //  SEARCH TAB
+  // ════════════════════════════════════════════════════════════════════
+
+  let currentResults = [];
+  let lastQuery      = '';
+  let debounceTimer  = null;
+  let activeType     = 'all';
+  let activeSort     = 'relevance';
+
+  const searchInput = document.getElementById('searchInput');
+  const searchClear = document.getElementById('searchClear');
+  const cardGrid    = document.getElementById('cardGrid');
+  const resultMeta  = document.getElementById('resultMeta');
+  const resultError = document.getElementById('resultError');
+  const minInput    = document.getElementById('minMembers');
+  const maxInput    = document.getElementById('maxMembers');
+
+  document.getElementById('typeGroup').addEventListener('click', e => {
+    const btn = e.target.closest('[data-type]');
+    if (!btn) return;
+    document.querySelectorAll('#typeGroup .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeType = btn.dataset.type;
+    if (lastQuery) runSearch();
+  });
+
+  document.getElementById('sortGroup').addEventListener('click', e => {
+    const btn = e.target.closest('[data-sort]');
+    if (!btn) return;
+    document.querySelectorAll('#sortGroup .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeSort = btn.dataset.sort;
+    if (lastQuery) runSearch();
+  });
+
+  minInput.addEventListener('change', () => { if (lastQuery) runSearch(); });
+  maxInput.addEventListener('change', () => { if (lastQuery) runSearch(); });
+
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { clearTimeout(debounceTimer); runSearch(); }
+  });
+  searchInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(runSearch, 600);
+  });
+  searchClear.addEventListener('click', () => {
+    searchInput.value = ''; lastQuery = ''; currentResults = [];
+    resultMeta.textContent = ''; resultError.style.display = 'none';
+    showEmpty(); searchInput.focus();
+  });
+
+  function memberColor(id) {
+    const hue = Math.abs(id * 2654435761 % 360);
+    return `hsl(${hue}, 55%, 42%)`;
+  }
+
+  function fmtMembers(n) {
+    if (n == null) return '?';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1_000)     return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return n.toLocaleString();
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showSkeletons(count = 6) {
+    cardGrid.innerHTML = Array.from({length: count}, () => `
+      <div class="skeleton-card">
+        <div class="skeleton-top"><div class="skel skeleton-avatar"></div>
+        <div class="skeleton-lines"><div class="skel skel-line skel-long"></div><div class="skel skel-line skel-short"></div></div></div>
+        <div class="skel skel-badge"></div>
+        <div class="skel-bottom"><div class="skel skel-members"></div><div class="skel skel-btn"></div></div>
+      </div>`).join('');
+  }
+
+  function showEmpty() {
+    cardGrid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div class="empty-title">Search for Telegram channels and groups</div>
+        <div class="empty-subtitle">Enter a keyword above to discover public channels, groups, and bots across Telegram.</div>
+      </div>`;
+  }
+
+  function showNoResults(query) {
+    cardGrid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="8" x2="14" y2="14" stroke-width="1.5"/></svg></div>
+        <div class="empty-title">No results found</div>
+        <div class="empty-subtitle">No public channels or groups matched "<strong>${escHtml(query)}</strong>". Try a different keyword.</div>
+      </div>`;
+  }
+
+  async function saveToIndex(item) {
+    try {
+      const resp = await fetch('api/tg-index', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({
+          telegram_id: item.id,
+          title: item.title,
+          username: item.username,
+          type: item.type,
+          members: item.members,
+          verified: item.verified,
+          scam: item.scam,
+        }),
+      });
+      if (resp.status === 409) {
+        showToast('Already in your index', 'error');
+        return;
+      }
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      showToast('Saved to My Index');
+    } catch (err) {
+      showToast('Save failed: ' + err.message, 'error');
+    }
+  }
+
+  function renderSearchCards(results) {
+    if (!results.length) { showNoResults(lastQuery); return; }
+    const html = results.map((r, i) => {
+      const initial = (r.title || '?')[0].toUpperCase();
+      const color = memberColor(r.id || i);
+      const typeClass = r.type === 'channel' ? 'channel' : r.type === 'group' ? 'group' : 'bot';
+      const typeLabel = r.type.toUpperCase();
+      const usernameHtml = r.username
+        ? `<a class="card-username" href="https://t.me/${escHtml(r.username)}" target="_blank" rel="noopener">@${escHtml(r.username)}</a>`
+        : `<span class="card-username" style="opacity:.5">private / no username</span>`;
+      const verifiedHtml = r.verified ? `<span class="card-verified" title="Verified"><svg viewBox="0 0 24 24" fill="var(--accent)"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></span>` : '';
+      const scamHtml = r.scam ? `<span class="card-scam">SCAM</span>` : '';
+      const openHtml = r.link ? `<a class="card-open" href="${escHtml(r.link)}" target="_blank" rel="noopener">Open<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>` : `<span class="card-open" style="opacity:.3;cursor:default">Private</span>`;
+      const membersHtml = `<div class="card-members"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><strong>${fmtMembers(r.members)}</strong></div>`;
+      const delay = Math.min(i * 40, 400);
+      return `
+        <div class="result-card" style="animation-delay:${delay}ms">
+          <div class="card-top">
+            <div class="card-avatar" style="background:${color}">${escHtml(initial)}</div>
+            <div class="card-info">
+              <div class="card-name-row"><span class="card-name" title="${escHtml(r.title || '')}">${escHtml(r.title || '(no name)')}</span>${verifiedHtml}${scamHtml}</div>
+              ${usernameHtml}
+            </div>
+          </div>
+          <div><span class="type-badge ${typeClass}">${typeLabel}</span></div>
+          <div class="card-bottom">
+            ${membersHtml}
+            <div class="card-actions">
+              <button class="card-btn" onclick="window._saveItem(${i})">Save</button>
+              ${openHtml}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    cardGrid.innerHTML = html;
+  }
+
+  window._saveItem = function(idx) {
+    const item = currentResults[idx];
+    if (!item) return;
+    saveToIndex(item);
+  };
+
+  async function runSearch() {
+    const query = searchInput.value.trim();
+    if (!query) { showEmpty(); resultMeta.textContent = ''; return; }
+    lastQuery = query;
+    const minVal = parseInt(minInput.value, 10) || 0;
+    const maxVal = parseInt(maxInput.value, 10) || null;
+    resultError.style.display = 'none';
+    resultMeta.textContent = 'Searching…';
+    showSkeletons(6);
+    try {
+      const resp = await fetch('api/tg-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({ query, type: activeType, sort: activeSort, min_members: minVal, max_members: maxVal }),
+      });
+      if (resp.status === 401) {
+        const errBody = await resp.json().catch(() => ({}));
+        const detail = errBody.detail || '';
+        // Distinguish between dashboard auth and Telegram session auth
+        if (detail.includes('session not authenticated') || detail.includes('Telegram session')) {
+          resultMeta.textContent = '';
+          resultError.innerHTML = `
+            <strong>Telegram session not authenticated</strong><br>
+            Search requires a logged-in Telegram user account. Bot tokens cannot search channels/groups.<br><br>
+            <strong>To fix:</strong> Run <code>python create_session_local.py</code> on your local machine,
+            sign in with your phone number, upload the generated <code>.session</code> file to the server,
+            then restart telesearch.
+          `;
+          resultError.style.display = 'block'; showEmpty(); return;
+        }
+        resultMeta.textContent = '';
+        resultError.textContent = 'Authentication failed. Reload the page to re-enter credentials.';
+        resultError.style.display = 'block'; showEmpty(); return;
+      }
+      if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.detail || `HTTP ${resp.status}`); }
+      currentResults = await resp.json();
+      const count = currentResults.length;
+      resultMeta.innerHTML = count > 0 ? `<strong>${count}</strong> result${count !== 1 ? 's' : ''} for "<strong>${escHtml(query)}</strong>"` : '';
+      renderSearchCards(currentResults);
+    } catch (err) {
+      resultMeta.textContent = '';
+      resultError.textContent = 'Search failed: ' + err.message;
+      resultError.style.display = 'block'; showEmpty();
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════════
+  //  MY INDEX TAB
+  // ════════════════════════════════════════════════════════════════════
+
+  let indexItems = [];
+  let editingId = null;
+
+  const indexGrid = document.getElementById('indexGrid');
+  const indexMeta = document.getElementById('indexMeta');
+  const indexError = document.getElementById('indexError');
+  const indexSearchInput = document.getElementById('indexSearchInput');
+  const indexCategoryFilter = document.getElementById('indexCategoryFilter');
+  const indexTypeFilter = document.getElementById('indexTypeFilter');
+  const indexStatusFilter = document.getElementById('indexStatusFilter');
+  const btnRecheckAll = document.getElementById('btnRecheckAll');
+
+  indexSearchInput.addEventListener('input', () => { renderIndex(filterIndex()); });
+  indexCategoryFilter.addEventListener('change', () => { renderIndex(filterIndex()); });
+  indexTypeFilter.addEventListener('change', () => { renderIndex(filterIndex()); });
+  indexStatusFilter.addEventListener('change', () => { renderIndex(filterIndex()); });
+
+  btnRecheckAll.addEventListener('click', async () => {
+    btnRecheckAll.disabled = true;
+    indexMeta.textContent = 'Re-checking all items…';
+    try {
+      const resp = await fetch('api/tg-index/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({}),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      showToast(`Checked ${data.checked}, changed ${data.changed}`);
+      await loadIndex();
+    } catch (err) {
+      showToast('Re-check failed: ' + err.message, 'error');
+    } finally {
+      btnRecheckAll.disabled = false;
+    }
+  });
+
+  async function loadIndex() {
+    try {
+      const resp = await fetch('api/tg-index', { headers: authHeader() });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      indexItems = await resp.json();
+      updateCategoryOptions();
+      renderIndex(filterIndex());
+    } catch (err) {
+      indexError.textContent = 'Failed to load index: ' + err.message;
+      indexError.style.display = 'block';
+    }
+  }
+
+  function updateCategoryOptions() {
+    const cats = [...new Set(indexItems.map(i => i.category).filter(Boolean))].sort();
+    const current = indexCategoryFilter.value;
+    indexCategoryFilter.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+    indexCategoryFilter.value = current;
+  }
+
+  function filterIndex() {
+    let items = [...indexItems];
+    const q = indexSearchInput.value.trim().toLowerCase();
+    const cat = indexCategoryFilter.value;
+    const type = indexTypeFilter.value;
+    const status = indexStatusFilter.value;
+    if (q) items = items.filter(i => (i.title + ' ' + (i.username||'') + ' ' + (i.tags||[]).join(' ')).toLowerCase().includes(q));
+    if (cat) items = items.filter(i => i.category === cat);
+    if (type) items = items.filter(i => i.type === type);
+    if (status === 'active') items = items.filter(i => i.is_active);
+    if (status === 'inactive') items = items.filter(i => !i.is_active);
+    return items;
+  }
+
+  function renderIndex(items) {
+    indexError.style.display = 'none';
+    indexMeta.innerHTML = items.length > 0 ? `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} in your index` : '';
+    if (!items.length) {
+      indexGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="empty-title">Your index is empty</div>
+          <div class="empty-subtitle">Switch to the Search tab, find public groups or channels, and click Save on any result. They will appear here for organization and dead-link checking.</div>
+        </div>`;
+      return;
+    }
+    const html = items.map((r, i) => {
+      const initial = (r.title || '?')[0].toUpperCase();
+      const color = memberColor(r.telegram_id || i);
+      const typeClass = r.type === 'channel' ? 'channel' : r.type === 'group' ? 'group' : 'bot';
+      const typeLabel = r.type.toUpperCase();
+      const usernameHtml = r.username
+        ? `<a class="card-username" href="https://t.me/${escHtml(r.username)}" target="_blank" rel="noopener">@${escHtml(r.username)}</a>`
+        : `<span class="card-username" style="opacity:.5">private / no username</span>`;
+      const statusClass = r.is_active ? 'active' : 'inactive';
+      const statusLabel = r.is_active ? 'ACTIVE' : 'INACTIVE';
+      const membersHtml = `<div class="card-members"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><strong>${fmtMembers(r.members)}</strong></div>`;
+      const tagsHtml = (r.tags || []).map(t => `<span class="card-tag">${escHtml(t)}</span>`).join('');
+      const checkedHtml = r.last_checked ? `<div class="last-checked">Checked ${new Date(r.last_checked).toLocaleDateString()}</div>` : '';
+      const delay = Math.min(i * 30, 300);
+      return `
+        <div class="result-card ${r.is_active ? '' : 'inactive'}" style="animation-delay:${delay}ms">
+          <div class="card-top">
+            <div class="card-avatar" style="background:${color}">${escHtml(initial)}</div>
+            <div class="card-info">
+              <div class="card-name-row">
+                <span class="card-name" title="${escHtml(r.title || '')}">${escHtml(r.title || '(no name)')}</span>
+                <span class="status-badge ${statusClass}">${statusLabel}</span>
+              </div>
+              ${usernameHtml}
+              ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ''}
+              ${checkedHtml}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <span class="type-badge ${typeClass}">${typeLabel}</span>
+            ${r.category && r.category !== 'uncategorized' ? `<span class="category-badge">${escHtml(r.category)}</span>` : ''}
+          </div>
+          <div class="card-bottom">
+            ${membersHtml}
+            <div class="card-actions" style="opacity:1">
+              <button class="card-btn" onclick="window._editItem(${r.id})">Edit</button>
+              <button class="card-btn danger" onclick="window._deleteItem(${r.id})">Delete</button>
+              ${r.username ? `<a class="card-open" href="https://t.me/${escHtml(r.username)}" target="_blank" rel="noopener">Open<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    indexGrid.innerHTML = html;
+  }
+
+  window._deleteItem = async function(id) {
+    if (!confirm('Remove this item from your index?')) return;
+    try {
+      const resp = await fetch(`api/tg-index/${id}`, {
+        method: 'DELETE',
+        headers: authHeader(),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      showToast('Removed from index');
+      await loadIndex();
+    } catch (err) {
+      showToast('Delete failed: ' + err.message, 'error');
+    }
+  };
+
+  window._editItem = function(id) {
+    const item = indexItems.find(i => i.id === id);
+    if (!item) return;
+    editingId = id;
+    document.getElementById('editCategory').value = item.category === 'uncategorized' ? '' : item.category;
+    document.getElementById('editTags').value = (item.tags || []).join(', ');
+    document.getElementById('editNotes').value = item.notes || '';
+    renderEditTags();
+    document.getElementById('editModal').classList.add('open');
+  };
+
+  // ── Edit Modal ────────────────────────────────────────────────────
+  const editModal = document.getElementById('editModal');
+  const editCategory = document.getElementById('editCategory');
+  const editTags = document.getElementById('editTags');
+  const editNotes = document.getElementById('editNotes');
+  const editTagRow = document.getElementById('editTagRow');
+
+  function renderEditTags() {
+    const vals = editTags.value.split(',').map(t => t.trim()).filter(Boolean);
+    editTagRow.innerHTML = vals.map(t => `<span class="tag-chip">${escHtml(t)}<span class="remove-tag" data-tag="${escHtml(t)}">&times;</span></span>`).join('');
+  }
+
+  editTags.addEventListener('input', renderEditTags);
+  editTagRow.addEventListener('click', e => {
+    const btn = e.target.closest('.remove-tag');
+    if (!btn) return;
+    const tag = btn.dataset.tag;
+    const vals = editTags.value.split(',').map(t => t.trim()).filter(t => t !== tag);
+    editTags.value = vals.join(', ');
+    renderEditTags();
+  });
+
+  document.getElementById('editCancel').addEventListener('click', () => {
+    editModal.classList.remove('open');
+    editingId = null;
+  });
+
+  editModal.addEventListener('click', e => {
+    if (e.target === editModal) { editModal.classList.remove('open'); editingId = null; }
+  });
+
+  document.getElementById('editSave').addEventListener('click', async () => {
+    if (!editingId) return;
+    const tags = editTags.value.split(',').map(t => t.trim()).filter(Boolean);
+    const category = editCategory.value.trim() || 'uncategorized';
+    const notes = editNotes.value.trim();
+    try {
+      const resp = await fetch(`api/tg-index/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({ category, tags, notes }),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      showToast('Updated');
+      editModal.classList.remove('open');
+      editingId = null;
+      await loadIndex();
+    } catch (err) {
+      showToast('Update failed: ' + err.message, 'error');
+    }
+  });
+
+  // ════════════════════════════════════════════════════════════════════
+  //  FLAGGED GROUPS TAB
+  // ════════════════════════════════════════════════════════════════════
+
+  const flaggedReviewFilter = document.getElementById('flaggedReviewFilter');
+  const flaggedCategoryFilter = document.getElementById('flaggedCategoryFilter');
+  const btnRunScanner = document.getElementById('btnRunScanner');
+  const flaggedEmpty = document.getElementById('flaggedEmpty');
+  const flaggedGrid = document.getElementById('flaggedGrid');
+  const flaggedStats = document.getElementById('flaggedStats');
+
+  flaggedReviewFilter.addEventListener('change', () => loadFlagged());
+  flaggedCategoryFilter.addEventListener('change', () => loadFlagged());
+
+  btnRunScanner.addEventListener('click', async () => {
+    btnRunScanner.disabled = true;
+    btnRunScanner.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin-right:4px;vertical-align:middle"></span> Scanning...';
+    try {
+      const resp = await fetch('api/scanner/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({ max_members: 100, max_results_per_keyword: 100 }),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      showToast(`Found ${data.found} new groups from ${data.searched} keywords`);
+      await loadFlagged();
+    } catch (err) {
+      showToast('Scanner failed: ' + err.message, 'error');
+    }
+    btnRunScanner.disabled = false;
+    btnRunScanner.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;margin-right:4px;vertical-align:middle"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Run Scanner`;
+  });
+
+  async function loadFlagged() {
+    try {
+      const reviewed = flaggedReviewFilter.value;
+      const category = flaggedCategoryFilter.value;
+      let url = 'api/flagged-groups';
+      const params = [];
+      if (reviewed !== '') params.push(`reviewed=${reviewed}`);
+      if (category !== '') params.push(`category=${category}`);
+      if (params.length) url += '?' + params.join('&');
+      const resp = await fetch(url, { headers: authHeader() });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const groups = await resp.json();
+      renderFlagged(groups);
+    } catch (err) {
+      showToast('Failed to load flagged groups: ' + err.message, 'error');
+    }
+  }
+
+  async function loadFlaggedStats() {
+    try {
+      const resp = await fetch('api/flagged-groups/stats', { headers: authHeader() });
+      if (!resp.ok) return;
+      const stats = await resp.json();
+      const catParts = [];
+      if (stats.categories) {
+        for (const [cat, count] of Object.entries(stats.categories)) {
+          catParts.push(`${cat}: ${count}`);
+        }
+      }
+      flaggedStats.textContent = `Total: ${stats.total} | Unreviewed: ${stats.unreviewed} | Small: ${stats.small_groups}` + (catParts.length ? ` | ${catParts.join(' | ')}` : '');
+    } catch (err) {
+      flaggedStats.textContent = '';
+    }
+  }
+
+  function renderFlagged(groups) {
+    loadFlaggedStats();
+    if (!groups.length) {
+      flaggedEmpty.style.display = 'flex';
+      flaggedGrid.style.display = 'none';
+      return;
+    }
+    flaggedEmpty.style.display = 'none';
+    flaggedGrid.style.display = 'grid';
+
+    const catColors = {
+      intimate: '#ff006e',
+      personal: '#3a86ff',
+      family: '#8338ec',
+      memories: '#fb5607',
+      financial: '#ffbe0b',
+      other: '#64748b'
+    };
+
+    flaggedGrid.innerHTML = groups.map(g => {
+      const keywords = (g.keywords_matched || []).join(', ');
+      const badgeColor = g.reviewed ? 'background:#22c55e;color:#fff;' : 'background:#ef4444;color:#fff;';
+      const badgeText = g.reviewed ? 'Reviewed' : 'Unreviewed';
+      const cat = g.flag_category || 'other';
+      const catColor = catColors[cat] || catColors.other;
+      return `
+        <div class="result-card" style="position:relative">
+          <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px">
+            <span style="padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;background:${catColor};color:#fff">${cat.toUpperCase()}</span>
+            <span style="padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;${badgeColor}">${badgeText}</span>
+          </div>
+          <div class="card-title">${escHtml(g.title)}</div>
+          <div class="card-meta">@${escHtml(g.username || 'no username')} &middot; ${g.members || '?'} members</div>
+          ${keywords ? `<div class="card-meta" style="color:#f59e0b;font-size:11px;margin-top:4px">Matched: ${escHtml(keywords)}</div>` : ''}
+          <div class="card-meta" style="color:#64748b;font-size:11px;margin-top:4px">Scanned: ${new Date(g.scan_date).toLocaleString()}</div>
+          <div class="card-actions" style="margin-top:10px">
+            <button class="card-btn" onclick="openFlaggedLink(${g.id}, '${g.username || ''}')">Open</button>
+            ${!g.reviewed ? `<button class="card-btn" onclick="reviewFlagged(${g.id}, true)">Mark Reviewed</button>` : `<button class="card-btn" onclick="reviewFlagged(${g.id}, false)">Mark Unreviewed</button>`}
+            <button class="card-btn delete" onclick="deleteFlagged(${g.id})">Delete</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  window.openFlaggedLink = (id, username) => {
+    if (username) window.open(`https://t.me/${username}`, '_blank');
+  };
+
+  window.reviewFlagged = async (id, reviewed) => {
+    try {
+      const resp = await fetch(`api/flagged-groups/${id}/review`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({ reviewed }),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      showToast(reviewed ? 'Marked as reviewed' : 'Marked as unreviewed');
+      await loadFlagged();
+    } catch (err) {
+      showToast('Failed: ' + err.message, 'error');
+    }
+  };
+
+  window.deleteFlagged = async (id) => {
+    if (!confirm('Remove this flagged group from the list?')) return;
+    try {
+      const resp = await fetch(`api/flagged-groups/${id}`, {
+        method: 'DELETE',
+        headers: authHeader(),
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      showToast('Deleted');
+      await loadFlagged();
+    } catch (err) {
+      showToast('Failed: ' + err.message, 'error');
+    }
+  };
+</script>
+</body>
+</html>

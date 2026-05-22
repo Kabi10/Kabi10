@@ -28,7 +28,7 @@ An offline-first agricultural marketplace for Sri Lankan farmers, supporting Tam
 | Metric            | Status                                           |
 | ----------------- | ------------------------------------------------ |
 | **Build Status**  | ✅ Passing                                       |
-| **Test Coverage** | ✅ 143 unit tests + 27 UI automation tests       |
+| **Test Coverage** | ✅ 258 unit tests + 27 UI automation tests       |
 | **Security**      | ✅ ProGuard, rate limiting, request signing      |
 | **CI/CD**         | ✅ GitHub Actions + CodeQL scanning              |
 | **Accessibility** | ✅ TalkBack support with trilingual descriptions |
@@ -309,9 +309,9 @@ npx supabase db push --linked
 
 | Category                | Tests | Files         |
 | ----------------------- | ----- | ------------- |
-| **Unit Tests**          | 143   | 11 test files |
+| **Unit Tests**          | 258   | 21 test files |
 | **UI Automation Tests** | 27    | 5 test files  |
-| **Total**               | 170   | 16 test files |
+| **Total**               | 285   | 26 test files |
 
 **Unit Test Files:**
 
@@ -325,6 +325,12 @@ npx supabase db push --linked
 - `CreateListingViewModelTest.kt` - Create listing flow tests
 - `CreateTransactionViewModelTest.kt` - Create transaction flow tests
 - `ListingConvertersTest.kt` - Data converter tests
+- `FavoritesViewModelTest.kt` - Favorites feature tests (10 tests)
+- `ConversationsViewModelTest.kt` - Chat conversation tests (10 tests)
+- `NotificationsViewModelTest.kt` - Notification system tests (13 tests)
+- `SyncViewModelTest.kt` - Offline sync conflict resolution (5 tests)
+- `RelativeTimeUtilTest.kt` - Time formatting utility tests
+- `TranslationUtilTest.kt` - Trilingual translation utility tests
 
 **UI Automation Test Files:**
 
