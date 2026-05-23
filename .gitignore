@@ -12,6 +12,12 @@
 !**/.env.template
 **/secrets.*
 **/config/private.*
+**/google-services.json
+**/client_secret_*.json
+**/serviceAccount*.json
+**/*adminsdk*.json
+**/keystore/*.keystore
+**/keystore/*.jks
 
 # ===================================================================
 # IDE AND EDITOR FILES
