@@ -1,6 +1,6 @@
 # Hi, I'm Kabi 👋
 
-Full-stack developer building web and mobile apps, mostly with TypeScript/Next.js and Kotlin. I also work on applied-AI tooling and do some data-science and research on the side.
+Developer with exposure across the stack, primarily building web and mobile apps with TypeScript/Next.js and Kotlin. I also work on applied-AI tooling and do some data science and research on the side
 
 - 🔭 **Currently:** [RateMyEmployer](https://github.com/Kabi10/ratemyemployer) — an employer-review platform (Next.js + Supabase)
 - 🌱 **Interested in:** developer tools, AI integration, and shipping real products
